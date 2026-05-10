@@ -52,7 +52,7 @@ function animateCounters() {
 // ═══════════ SCROLL REVEAL ═══════════
 function setupReveal() {
   const revealElements = document.querySelectorAll(
-    '.step-card, .feature-card, .testimonial-card, .employer-split, .download-card, .section-header'
+    '.step-card, .feature-card, .testimonial-card, .download-card, .section-header'
   );
   revealElements.forEach(el => el.classList.add('reveal'));
 
@@ -81,10 +81,29 @@ const heroObserver = new IntersectionObserver((entries) => {
 const heroStats = document.querySelector('.hero-stats');
 if (heroStats) heroObserver.observe(heroStats);
 
+// ═══════════ DASHBOARD PREVIEW MODAL ═══════════
+function initDashboardPreview() {
+  const overlay = document.getElementById('dash-overlay');
+  const closeBtn = document.getElementById('dash-close');
+  const openBtn  = document.getElementById('dashboard-preview-btn');
+  const regBtn   = document.getElementById('dash-register-btn');
+  if (!overlay) return;
+
+  function open()  { overlay.classList.add('active');    document.body.style.overflow = 'hidden'; }
+  function close() { overlay.classList.remove('active'); document.body.style.overflow = ''; }
+
+  if (openBtn) openBtn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  if (regBtn) regBtn.addEventListener('click', e => { e.preventDefault(); close(); });
+}
+
 // ═══════════ INIT ═══════════
 document.addEventListener('DOMContentLoaded', () => {
   setupReveal();
   initAuth();
+  initDashboardPreview();
 });
 
 // ═══════════ AUTH / SUPABASE ═══════════

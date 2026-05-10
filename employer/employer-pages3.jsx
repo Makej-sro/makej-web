@@ -33,6 +33,8 @@ function EMessages() {
   const [filter,  setFilter]    = useStateE('all');
   const [msgInput, setMsgInput] = useStateE('');
   const [sending,  setSending]  = useStateE(false);
+  const [showShiftModal, setShowShiftModal] = useStateE(false);
+  const [shiftForm, setShiftForm] = useStateE({ role: '', date: '', time: '', pay: '', location: '' });
   const userId                  = useRefE(null);
   const scrollRef               = useRefE(null);
 
@@ -49,12 +51,12 @@ function EMessages() {
     const chan = sb.channel('e-msgs-global')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
         const msg = payload.new;
+        const preview = msg.type === 'shift_offer' ? '📅 Nabídka směny' : msg.text;
         setThreads(prev => prev.map(t => {
           if (t.id !== msg.match_id) return t;
-          // For the active thread the per-thread subscription adds to msgs — here just update preview
           const isMine = msg.sender_id === userId.current;
-          if (t.id === active) return { ...t, last: msg.text };
-          return { ...t, last: msg.text, unread: isMine ? t.unread : (t.unread || 0) + 1 };
+          if (t.id === active) return { ...t, last: preview };
+          return { ...t, last: preview, unread: isMine ? t.unread : (t.unread || 0) + 1 };
         }));
       })
       .subscribe();
@@ -81,15 +83,14 @@ function EMessages() {
           if (t.id !== active) return t;
           // Avoid duplicate if it's our own optimistic message
           if (t.msgs.some(m => m.id === msg.id)) return t;
+          const isShift = msg.type === 'shift_offer' && msg.metadata;
+          const newMsg = isShift
+            ? { from: msg.sender_id === userId.current ? 'me' : 'them', kind: 'shift', shift: { role: msg.metadata.role, date: msg.metadata.date, time: msg.metadata.time, pay: msg.metadata.pay }, t: _fmtTime(msg.created_at), id: msg.id }
+            : { from: msg.sender_id === userId.current ? 'me' : 'them', text: msg.text, t: _fmtTime(msg.created_at), id: msg.id };
           return {
             ...t,
-            last: msg.text,
-            msgs: [...t.msgs, {
-              from: msg.sender_id === userId.current ? 'me' : 'them',
-              text: msg.text,
-              t: _fmtTime(msg.created_at),
-              id: msg.id,
-            }],
+            last: isShift ? '📅 Nabídka směny' : msg.text,
+            msgs: [...t.msgs, newMsg],
           };
         }));
       })
@@ -124,6 +125,40 @@ function EMessages() {
       }));
     }
     setSending(false);
+  }
+
+  async function handleSendShift() {
+    if (!active || !userId.current) return;
+    const meta = {
+      role: shiftForm.role || thread?.role?.split(' — ')[0] || 'Brigádník',
+      date: shiftForm.date,
+      time: shiftForm.time,
+      pay: parseInt(shiftForm.pay) || 0,
+      location: shiftForm.location,
+    };
+    const tempId = 'tmp-shift-' + Date.now();
+    const shiftMsg = { from: 'me', kind: 'shift', shift: { role: meta.role, date: meta.date, time: meta.time, pay: meta.pay }, t: _fmtTime(new Date().toISOString()), id: tempId };
+    setThreads(prev => prev.map(t => t.id !== active ? t : {
+      ...t, last: '📅 Nabídka směny',
+      msgs: [...t.msgs, shiftMsg],
+    }));
+    setShowShiftModal(false);
+    setShiftForm({ role: '', date: '', time: '', pay: '', location: '' });
+    const { error } = await sb.from('messages').insert({
+      match_id: active,
+      sender_id: userId.current,
+      text: 'Nabídka směny',
+      type: 'shift_offer',
+      metadata: meta,
+    }).select().single();
+    if (error) {
+      console.error('sendShiftOffer error:', error);
+      // Rollback optimistic message if DB insert failed
+      setThreads(prev => prev.map(t => t.id !== active ? t : {
+        ...t, msgs: t.msgs.filter(m => m.id !== tempId),
+      }));
+      alert('Nepodařilo se odeslat nabídku. Je potřeba spustit DB migraci: ALTER TABLE messages ADD COLUMN IF NOT EXISTS type TEXT NOT NULL DEFAULT \'text\'; ALTER TABLE messages ADD COLUMN IF NOT EXISTS metadata JSONB;');
+    }
   }
 
   const thread   = threads.find(t => t.id === active) || threads[0];
@@ -207,7 +242,7 @@ function EMessages() {
           <button style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(91,107,255,0.18)', border: '1px solid rgba(91,107,255,0.3)', color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <Icon name="user-id-bold" size={13} color="#fff"/>Profil
           </button>
-          <button style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => setShowShiftModal(true)} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <Icon name="calendar-bold" size={13} color={T.light}/>Nabídnout směnu
           </button>
         </div>
@@ -263,7 +298,10 @@ function EMessages() {
         {/* Quick replies */}
         <div style={{ padding: '0 16px 14px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {['Nabídnout směnu','Pozvat na pohovor','Zaslat pravidla','Bohužel ne'].map(q => (
-            <button key={q} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>{q}</button>
+            <button key={q} onClick={() => {
+              if (q === 'Nabídnout směnu') { setShowShiftModal(true); return; }
+              setMsgInput(q);
+            }} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>{q}</button>
           ))}
         </div>
       </main>
@@ -306,6 +344,41 @@ function EMessages() {
         ))}
         <button style={{ width: '100%', marginTop: 10, padding: '9px 12px', borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Otevřít plný profil →</button>
       </aside>
+
+      {/* Shift offer modal */}
+      {showShiftModal && (
+        <div onClick={e => { if (e.target === e.currentTarget) setShowShiftModal(false); }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', display: 'grid', placeItems: 'center', zIndex: 200 }}>
+          <div style={{ background: '#0d0d28', border: '1px solid rgba(208,208,255,.14)', borderRadius: 18, padding: 28, width: 380, position: 'relative' }}>
+            <button onClick={() => setShowShiftModal(false)} style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(208,208,255,.08)', border: 'none', borderRadius: 8, padding: 6, color: T.muted, cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>✕</button>
+            <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Nabídnout směnu</div>
+            <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginBottom: 20 }}>Nabídka bude odeslána jako zpráva — brigádník ji může přijmout nebo odmítnout.</div>
+            {[
+              { label: 'Pozice / název směny', key: 'role', placeholder: 'např. Barista, Servírka…', type: 'text' },
+              { label: 'Datum', key: 'date', placeholder: 'např. Čt 15.5.', type: 'text' },
+              { label: 'Čas (od – do)', key: 'time', placeholder: 'např. 7:00 – 15:00', type: 'text' },
+              { label: 'Odměna (Kč)', key: 'pay', placeholder: 'např. 1440', type: 'number' },
+              { label: 'Adresa / místo', key: 'location', placeholder: 'např. Náměstí Míru 3, Praha 2', type: 'text' },
+            ].map(field => (
+              <div key={field.key} style={{ marginBottom: 14 }}>
+                <div style={{ color: T.light, fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>{field.label}</div>
+                <input
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  value={shiftForm[field.key]}
+                  onChange={e => setShiftForm(f => ({ ...f, [field.key]: e.target.value }))}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 9, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(208,208,255,.14)', color: '#fff', fontSize: 13, outline: 'none', fontFamily: T.fontUI, boxSizing: 'border-box' }}
+                />
+              </div>
+            ))}
+            <button
+              onClick={handleSendShift}
+              disabled={!shiftForm.date || !shiftForm.time}
+              style={{ width: '100%', padding: '12px 0', borderRadius: 10, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontHead, fontSize: 14, fontWeight: 800, cursor: (!shiftForm.date || !shiftForm.time) ? 'not-allowed' : 'pointer', opacity: (!shiftForm.date || !shiftForm.time) ? 0.5 : 1, marginTop: 4 }}>
+              Odeslat nabídku směny
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -596,9 +669,37 @@ const inputStyle = {
 };
 
 function SettingsProfile() {
+  const initForm = () => ({
+    company_name: EPROFILE.company_name || ECOMPANY.name || '',
+    bio: EPROFILE.bio || '',
+  });
+  const [form, setForm]     = useStateE(initForm);
+  const [saving, setSaving] = useStateE(false);
+  const [toast, setToast]   = useStateE(null);
+
+  const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
+
+  async function handleSave() {
+    setSaving(true);
+    const ok = await updateEmployerProfile({ company_name: form.company_name, bio: form.bio });
+    setSaving(false);
+    setToast(ok ? 'ok' : 'err');
+    setTimeout(() => setToast(null), 2500);
+  }
+
   return (
     <ECard>
       <SectionHeader title="Firemní profil" subtitle="Tyto informace vidí kandidáti na profilu vaší firmy" />
+      {toast === 'ok' && (
+        <div style={{ padding: '10px 14px', borderRadius: 9, background: 'rgba(91,214,138,0.18)', border: '1px solid rgba(91,214,138,0.35)', color: '#5BD68A', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>
+          ✓ Profil uložen
+        </div>
+      )}
+      {toast === 'err' && (
+        <div style={{ padding: '10px 14px', borderRadius: 9, background: 'rgba(244,63,94,0.15)', border: '1px solid rgba(244,63,94,0.3)', color: '#f43f5e', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>
+          Chyba při ukládání
+        </div>
+      )}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 0', borderBottom: '1px solid ' + T.border }}>
         <div style={{ width: 64, height: 64, borderRadius: 14, background: ECOMPANY.logoColor + '22', border: '1px solid ' + ECOMPANY.logoColor + '55', display: 'grid', placeItems: 'center', color: ECOMPANY.logoColor, fontFamily: T.fontHead, fontWeight: 800, fontSize: 22 }}>{ECOMPANY.logo}</div>
         <div style={{ flex: 1 }}>
@@ -607,20 +708,23 @@ function SettingsProfile() {
         </div>
         <button style={{ padding: '8px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Nahrát</button>
       </div>
-      <FormRow label="Název firmy"><input style={inputStyle} defaultValue="Kafe Punkt s.r.o." /></FormRow>
-      <FormRow label="IČO" sub="Doplněno z ARESu"><input style={inputStyle} defaultValue="04123456" /></FormRow>
-      <FormRow label="Obor"><select style={inputStyle} defaultValue="gastro"><option value="gastro">Gastronomie a hotelnictví</option><option>Maloobchod</option><option>Eventy a marketing</option></select></FormRow>
-      <FormRow label="Krátký popis" sub="Max. 280 znaků — vidí se v kartě firmy"><textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical', fontFamily: T.fontUI }} defaultValue={'Specialty kavárna v centru Brna. Pražíme vlastní kávu, v týmu jsou samí nadšenci. Hledáme baristy, kteří chtějí umět víc než „kafe s mlíkem".'} /></FormRow>
-      <FormRow label="Adresa"><input style={inputStyle} defaultValue="Veveří 14, Brno-střed, 602 00" /></FormRow>
-      <FormRow label="Web a sociální sítě">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <input style={inputStyle} defaultValue="https://kafepunkt.cz" />
-          <input style={inputStyle} defaultValue="https://instagram.com/kafepunkt" />
-        </div>
+      <FormRow label="Název firmy">
+        <input style={inputStyle} value={form.company_name} onChange={set('company_name')} />
+      </FormRow>
+      <FormRow label="Krátký popis" sub="Max. 280 znaků — vidí se v kartě firmy">
+        <textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical', fontFamily: T.fontUI }} value={form.bio} onChange={set('bio')} placeholder="Napiš něco o firmě…" />
       </FormRow>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, paddingTop: 14 }}>
-        <button style={{ padding: '9px 16px', borderRadius: 8, background: 'transparent', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Zrušit</button>
-        <button style={{ padding: '9px 16px', borderRadius: 8, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Uložit změny</button>
+        <button
+          onClick={() => setForm(initForm())}
+          disabled={saving}
+          style={{ padding: '9px 16px', borderRadius: 8, background: 'transparent', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.5 : 1 }}
+        >Zrušit</button>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          style={{ padding: '9px 16px', borderRadius: 8, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
+        >{saving ? 'Ukládám…' : 'Uložit změny'}</button>
       </div>
     </ECard>
   );

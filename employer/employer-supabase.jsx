@@ -64,6 +64,10 @@ async function fetchEmployerData(employerId) {
     const today       = new Date();
     const companyName = (profile?.company_name || profile?.name || 'Moje firma').trim();
 
+    // ── EPROFILE ─────────────────────────────────────────────────────────────
+    Object.keys(EPROFILE).forEach(k => delete EPROFILE[k]);
+    Object.assign(EPROFILE, profile || {});
+
     // ── ECOMPANY ─────────────────────────────────────────────────────────────
     const logo = companyName.split(/\s+/).map(w => w[0] || '').join('').slice(0,2).toUpperCase() || '??';
     Object.keys(ECOMPANY).forEach(k => delete ECOMPANY[k]);
@@ -215,4 +219,18 @@ async function rejectCandidate(matchId) {
   return true;
 }
 
-Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, _strColor, _relTime, _fmtTime });
+async function updateEmployerProfile(updates) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session?.user) return false;
+  const { error } = await sb.from('profiles').update(updates).eq('id', session.user.id);
+  if (error) { console.error('updateEmployerProfile error:', error); return false; }
+  Object.assign(EPROFILE, updates);
+  if (updates.company_name) {
+    const newName = updates.company_name.trim();
+    const newLogo = newName.split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase() || '??';
+    Object.assign(ECOMPANY, { name: newName, logo: newLogo, logoColor: _strColor(newName) });
+  }
+  return true;
+}
+
+Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, _strColor, _relTime, _fmtTime });

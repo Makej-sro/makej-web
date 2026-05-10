@@ -10,6 +10,9 @@ const ECOMPANY = {
   team: 'Anna · Petr · Michal',
 };
 
+// Raw profile row from Supabase — mutated in-place by employer-supabase.jsx
+const EPROFILE = {};
+
 const E_KPIS = [
   { id: 'views', label: 'Zhlédnutí', value: 12_847, delta: +18.4, spark: [12,18,15,22,19,28,24,31,29,35,33,40], unit: '', icon: 'eye-bold' },
   { id: 'right', label: 'Swipe right rate', value: 24.6, delta: +3.2, spark: [18,19,20,22,21,24,23,25,24,26,25,24.6], unit: '%', icon: 'heart-bold' },
