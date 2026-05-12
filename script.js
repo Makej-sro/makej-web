@@ -188,14 +188,19 @@ function initAuth() {
              <iconify-icon icon="solar:chart-square-bold" width="16"></iconify-icon>
              Dashboard
            </a>`
-        : '';
+        : `<a href="/worker/" class="btn-primary" id="worker-btn">
+             <iconify-icon icon="solar:case-round-bold" width="16"></iconify-icon>
+             Moje brigády
+           </a>`;
       navActions.innerHTML = `
         ${dashBtn}
         <span class="nav-user-greeting">Ahoj, ${name}!</span>
         <button class="btn-ghost" id="logout-btn">Odhlásit se</button>
       `;
       mobileActions.innerHTML = `
-        ${role === 'employer' ? `<a href="/employer/" class="btn-primary">Dashboard</a>` : ''}
+        ${role === 'employer'
+          ? `<a href="/employer/" class="btn-primary">Dashboard</a>`
+          : `<a href="/worker/" class="btn-primary">Moje brigády</a>`}
         <span class="nav-user-greeting">Ahoj, ${name}!</span>
         <button class="btn-ghost" id="logout-btn-mobile">Odhlásit se</button>
       `;
