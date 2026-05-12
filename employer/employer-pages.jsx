@@ -7,7 +7,7 @@ const STATUS_META = {
   filled: { label: 'Naplněno', color: '#8AB4FF' },
 };
 
-function EJobs() {
+function EJobs({ onTab }) {
   const [filter, setFilter] = useStateE('all');
   const filtered = filter === 'all' ? E_JOBS : E_JOBS.filter(j => j.status === filter);
 
@@ -130,7 +130,7 @@ function EJobs() {
 
                 {/* Right: actions */}
                 <div style={{ padding: 18, borderLeft: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center' }}>
-                  <button style={{
+                  <button onClick={() => onTab?.('candidates')} style={{
                     padding: '10px 12px', borderRadius: 9,
                     background: 'linear-gradient(135deg, #0020F6, #2D2CA7)',
                     border: 'none', color: '#fff', cursor: 'pointer',

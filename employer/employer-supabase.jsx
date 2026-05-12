@@ -233,4 +233,35 @@ async function updateEmployerProfile(updates) {
   return true;
 }
 
-Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, _strColor, _relTime, _fmtTime });
+async function createJobE(employerId, fields) {
+  const ts = fields.time_start || '00:00';
+  const te = fields.time_end   || '00:00';
+  let duration = 0;
+  try {
+    const [sh, sm] = ts.split(':').map(Number);
+    const [eh, em] = te.split(':').map(Number);
+    duration = Math.max(0, (eh * 60 + em) - (sh * 60 + sm));
+  } catch (_) {}
+
+  const payload = {
+    employer_id: employerId,
+    title:       fields.title,
+    company:     fields.company || ECOMPANY.name || '',
+    description: fields.description || '',
+    pay:         parseInt(fields.pay) || 0,
+    pay_unit:    fields.pay_unit || 'Kč/h',
+    location:    fields.location || '',
+    date:        fields.date || null,
+    time_start:  ts,
+    time_end:    te,
+    duration,
+    tags:        Array.isArray(fields.tags) ? fields.tags : [],
+    requirements: Array.isArray(fields.requirements) ? fields.requirements : [],
+    status:      'active',
+  };
+  const { data, error } = await sb.from('jobs').insert(payload).select().single();
+  if (error) { console.error('createJobE error:', error); return null; }
+  return data;
+}
+
+Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, _strColor, _relTime, _fmtTime });

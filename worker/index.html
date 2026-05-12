@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>makej. — najdi brigádu</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+  <style>
+    :root { color-scheme: dark; }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body, #root { width: 100%; height: 100%; }
+    html, body {
+      margin: 0; padding: 0;
+      background: #07071a;
+      font-family: "Plus Jakarta Sans", -apple-system, system-ui, sans-serif;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+    iconify-icon { display: inline-flex; line-height: 0; }
+    @keyframes empSpin { to { transform: rotate(360deg); } }
+    @keyframes wPop { 0% { transform: scale(0.85) translateY(20px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+
+    #auth-gate {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #2a2ab5 0%, #050510 100%);
+      z-index: 9999;
+    }
+    #auth-gate.hidden { display: none; }
+
+    .gate-card {
+      background: rgba(22,22,59,0.9);
+      border: 1px solid rgba(208,208,255,0.12);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      width: min(420px, calc(100vw - 40px));
+      text-align: center;
+      animation: wPop .4s cubic-bezier(.2,.8,.2,1);
+    }
+    .gate-logo { font-family: Inter, sans-serif; font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, #7c7cff, #d0d0ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.25rem; }
+    .gate-sub { color: #FFD166; font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1.75rem; }
+    .gate-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff; }
+    .gate-desc { color: #9999cc; font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5; }
+    .gate-tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; background: rgba(255,255,255,0.04); border-radius: 10px; padding: 4px; }
+    .gate-tab { flex: 1; padding: 8px; border-radius: 7px; border: none; background: transparent; color: #9999cc; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; }
+    .gate-tab.active { background: rgba(91,107,255,0.25); color: #fff; }
+    .gate-error { background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.3); border-radius: 0.75rem; padding: 10px 14px; color: #f87171; font-size: 0.875rem; margin-bottom: 1rem; display: none; }
+    .gate-input { width: 100%; padding: 11px 15px; background: rgba(255,255,255,0.04); border: 1px solid rgba(208,208,255,0.14); border-radius: 0.75rem; color: #fff; font-family: inherit; font-size: 0.95rem; outline: none; margin-bottom: 0.75rem; transition: border-color .2s; }
+    .gate-input:focus { border-color: rgba(208,208,255,0.4); }
+    .gate-input::placeholder { color: #6e6ea8; }
+    .gate-btn { width: 100%; padding: 13px; background: linear-gradient(135deg, #292978, #3a3a99); border: none; border-radius: 0.75rem; color: #fff; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 1rem; transition: opacity .2s; }
+    .gate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .gate-link { color: #9999cc; font-size: 0.85rem; cursor: pointer; background: none; border: none; font-family: inherit; }
+    .gate-link:hover { color: #d0d0ff; }
+    .gate-divider { display: flex; align-items: center; gap: 10px; margin: 0 0 1rem; color: #6e6ea8; font-size: 12px; }
+    .gate-divider::before, .gate-divider::after { content: ''; flex: 1; height: 1px; background: rgba(208,208,255,0.1); }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(208,208,255,0.12); border-radius: 6px; }
+    button, input, textarea, select { font-family: inherit; }
+  </style>
+</head>
+<body>
+
+<div id="auth-gate">
+  <div class="gate-card">
+    <div class="gate-logo">makej!</div>
+    <div class="gate-sub">pro brigádníky</div>
+    <div class="gate-tabs">
+      <button class="gate-tab active" id="tab-login" onclick="switchGateTab('login')">Přihlásit se</button>
+      <button class="gate-tab" id="tab-register" onclick="switchGateTab('register')">Registrovat</button>
+    </div>
+    <div class="gate-error" id="gate-error"></div>
+
+    <!-- Login form -->
+    <div id="gate-login-form">
+      <input class="gate-input" type="email" id="gate-email" placeholder="tvuj@email.cz" autocomplete="email" />
+      <input class="gate-input" type="password" id="gate-password" placeholder="Heslo" autocomplete="current-password" />
+      <button class="gate-btn" id="gate-submit">Přihlásit se</button>
+    </div>
+
+    <!-- Register form -->
+    <div id="gate-register-form" style="display:none">
+      <input class="gate-input" type="text" id="reg-name" placeholder="Jméno a příjmení" autocomplete="name" />
+      <input class="gate-input" type="email" id="reg-email" placeholder="tvuj@email.cz" autocomplete="email" />
+      <input class="gate-input" type="password" id="reg-password" placeholder="Heslo (min. 6 znaků)" autocomplete="new-password" />
+      <button class="gate-btn" id="reg-submit">Vytvořit účet brigádníka</button>
+    </div>
+
+    <button class="gate-link" onclick="window.location.href='../'">← Zpět na makej.cz</button>
+  </div>
+</div>
+
+<div id="root"></div>
+
+<script>
+  const SUPABASE_URL = 'https://cxegfwfbgcgpwerfbvra.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_N_BIwMCTD6ZOTrtBl3juyw_CGIQ_lvh';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, storageKey: 'makej-auth' }
+  });
+
+  const gate = document.getElementById('auth-gate');
+  const gateError = document.getElementById('gate-error');
+
+  function showGate() { gate.classList.remove('hidden'); }
+  function hideGate() { gate.classList.add('hidden'); }
+  function showErr(msg) { gateError.textContent = msg; gateError.style.display = 'block'; }
+  function clearErr() { gateError.style.display = 'none'; }
+
+  function switchGateTab(tab) {
+    document.getElementById('gate-login-form').style.display = tab === 'login' ? '' : 'none';
+    document.getElementById('gate-register-form').style.display = tab === 'register' ? '' : 'none';
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    clearErr();
+  }
+
+  function translateErr(msg) {
+    if (msg.includes('Invalid login credentials')) return 'Nesprávný email nebo heslo.';
+    if (msg.includes('Email not confirmed')) return 'Nejdřív potvrď svůj email.';
+    if (msg.includes('User already registered') || msg.includes('already been registered')) return 'Tento email je již zaregistrovaný.';
+    if (msg.includes('Password should be at least')) return 'Heslo musí mít alespoň 6 znaků.';
+    return msg;
+  }
+
+  // Login
+  document.getElementById('gate-submit').addEventListener('click', async () => {
+    clearErr();
+    const email = document.getElementById('gate-email').value.trim();
+    const password = document.getElementById('gate-password').value;
+    if (!email || !password) { showErr('Vyplň email a heslo.'); return; }
+    const btn = document.getElementById('gate-submit');
+    btn.disabled = true; btn.textContent = 'Přihlašuji...';
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { showErr(translateErr(error.message)); btn.disabled = false; btn.textContent = 'Přihlásit se'; return; }
+    const role = data.user?.user_metadata?.role;
+    if (role === 'employer') {
+      showErr('Tento účet je zaměstnavatelský. Pokračuj na dashboard.');
+      btn.disabled = false; btn.textContent = 'Přihlásit se';
+      setTimeout(() => { window.location.href = '../employer/'; }, 1500);
+      return;
+    }
+    hideGate();
+  });
+
+  document.getElementById('gate-password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('gate-submit').click(); });
+
+  // Register
+  document.getElementById('reg-submit').addEventListener('click', async () => {
+    clearErr();
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    if (!name || !email || !password) { showErr('Vyplň všechna pole.'); return; }
+    if (password.length < 6) { showErr('Heslo musí mít alespoň 6 znaků.'); return; }
+    const btn = document.getElementById('reg-submit');
+    btn.disabled = true; btn.textContent = 'Registruji...';
+    const { error } = await sb.auth.signUp({ email, password, options: { data: { name, role: 'worker' } } });
+    if (error) { showErr(translateErr(error.message)); btn.disabled = false; btn.textContent = 'Vytvořit účet brigádníka'; return; }
+    showErr('');
+    gateError.style.display = 'block';
+    gateError.style.background = 'rgba(91,214,138,0.12)';
+    gateError.style.borderColor = 'rgba(91,214,138,0.3)';
+    gateError.style.color = '#5BD68A';
+    gateError.textContent = 'Účet vytvořen! Zkontroluj email pro potvrzení, pak se přihlas.';
+    btn.disabled = false; btn.textContent = 'Vytvořit účet brigádníka';
+    switchGateTab('login');
+  });
+
+  // Check existing session
+  sb.auth.getSession().then(({ data: { session } }) => {
+    const role = session?.user?.user_metadata?.role;
+    if (session && role !== 'employer') hideGate();
+    else showGate();
+  });
+</script>
+
+<script type="text/babel" src="../employer/app.jsx"></script>
+<script type="text/babel" src="worker-supabase.jsx"></script>
+<script type="text/babel" src="worker-swipe.jsx"></script>
+<script type="text/babel" src="worker-messages.jsx"></script>
+<script type="text/babel" src="worker-profile.jsx"></script>
+<script type="text/babel" src="worker-main.jsx"></script>
+</body>
+</html>
