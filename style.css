@@ -510,12 +510,6 @@ img { max-width: 100%; display: block; }
 .reveal.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
 /* ═══════════ CLS FIXES ═══════════ */
-/* Reserve space for Iconify icons before JS loads so they don't cause layout shift */
-iconify-icon {
-  display: inline-block;
-  contain: layout style;
-  vertical-align: -0.125em;
-}
 /* Prevent nav from shifting when auth state resolves */
 .nav-actions { min-width: 220px; justify-content: flex-end; }
 
