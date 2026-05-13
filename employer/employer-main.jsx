@@ -171,12 +171,49 @@ function ENewJobModal({ onClose, onCreated }) {
   );
 }
 
+function EToast({ toasts, onRemove }) {
+  if (!toasts.length) return null;
+  return (
+    <div style={{
+      position: 'fixed', top: 20, right: 24, zIndex: 9000,
+      display: 'flex', flexDirection: 'column', gap: 10,
+      width: 'min(360px, calc(100vw - 48px))', pointerEvents: 'none',
+    }}>
+      {toasts.map(t => (
+        <div key={t.id} style={{
+          background: 'rgba(16,16,42,0.97)',
+          border: '1px solid ' + (t.type === 'success' ? 'rgba(91,214,138,0.45)' : 'rgba(91,107,255,0.45)'),
+          borderRadius: 14, padding: '13px 16px',
+          display: 'flex', alignItems: 'flex-start', gap: 10,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          animation: 'empPop .3s cubic-bezier(.2,.8,.2,1)',
+          pointerEvents: 'auto',
+        }}>
+          <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0 }}>{t.icon}</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {t.title && <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, marginBottom: 2 }}>{t.title}</div>}
+            <div style={{ color: T.light, fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.4 }}>{t.text}</div>
+          </div>
+          <button onClick={() => onRemove(t.id)} style={{ background: 'none', border: 'none', color: T.mutedSoft, cursor: 'pointer', padding: 2, lineHeight: 1, flexShrink: 0 }}>✕</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function EmployerApp() {
   const [tab,       setTab]       = useStateE('dash');
   const [loaded,    setLoaded]    = useStateE(false);
   const [tick,      setTick]      = useStateE(0);
   const [showNewJob, setShowNewJob] = useStateE(false);
+  const [toasts,    setToasts]    = useStateE([]);
   const empId                     = useRefE(null);
+
+  function addToast(title, text, icon = '🔔', type = 'info') {
+    const id = Date.now() + Math.random();
+    setToasts(prev => [...prev, { id, title, text, icon, type }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 6000);
+  }
 
   // Initial data fetch on mount
   useEffectE(() => {
@@ -196,9 +233,12 @@ function EmployerApp() {
     const id = empId.current;
 
     const channel = sb.channel('emp-rt-' + id)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'matches' }, async () => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'matches' }, async (payload) => {
         await fetchEmployerData(id);
         setTick(t => t + 1);
+        const jobId = payload.new?.job_id;
+        const job = E_JOBS.find(j => j.id === jobId);
+        addToast('Nový zájem o brigádu', job?.title || 'Někdo projevil zájem', '👤', 'info');
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches' }, async () => {
         await fetchEmployerData(id);
@@ -275,6 +315,8 @@ function EmployerApp() {
           }}
         />
       )}
+
+      <EToast toasts={toasts} onRemove={id => setToasts(prev => prev.filter(t => t.id !== id))} />
     </div>
   );
 }
