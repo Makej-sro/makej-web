@@ -797,3 +797,88 @@ iconify-icon {
   .modal { padding: 1.75rem 1.5rem; }
   .role-cards { grid-template-columns: 1fr; }
 }
+
+/* ═══════════ MOBILE LAYOUT OVERRIDES ═══════════ */
+@media (max-width: 768px) {
+  /* Section paddings: 120px → 64px */
+  #hero         { padding: 80px 24px 56px; }
+  #how-it-works { padding: 64px 0; }
+  #features     { padding: 64px 0; }
+  #employers    { padding: 64px 0; }
+  #testimonials { padding: 64px 0; }
+  #download     { padding: 64px 0; }
+  #footer       { padding: 48px 0 24px; }
+
+  /* Section header spacing */
+  .section-header { margin-bottom: 40px; }
+  .section-header h2 { font-size: clamp(1.6rem, 7vw, 2.4rem); }
+
+  /* Hero: hide phone image to save vertical space */
+  .hero-image { display: none; }
+  .hero-content { gap: 0; }
+
+  /* Hero badge: prevent overflow on narrow screens */
+  .hero-badge { font-size: .78rem; padding: 6px 12px; max-width: 100%; flex-wrap: wrap; justify-content: center; }
+
+  /* Hero stats: tighter on small screens, hide dividers */
+  .hero-stats { gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .hero-stat-divider { display: none; }
+  .hero-stat-number { font-size: 1.6rem; }
+  .hero-stat-suffix { font-size: 1.2rem; }
+
+  /* Employer section internal spacers */
+  .emp-stats    { margin-bottom: 48px; }
+  .emp-how-wrap { margin-bottom: 48px; }
+  .emp-why-wrap { margin-bottom: 48px; }
+
+  /* Download card */
+  .download-card { padding: 48px 24px; }
+
+  /* Footer grid: single column on very small screens */
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+
+  /* Logos: smaller and wrap in fewer rows */
+  .logos-track { gap: 16px 20px; }
+  .logo-item { font-size: .85rem; }
+
+  /* How-it-works: tighter step cards, hide decorative number */
+  .step-card { padding: 20px 16px; }
+  .step-number { display: none; }
+  .step-icon-wrap { width: 52px; height: 52px; margin-bottom: 12px; }
+  .steps-grid { gap: 12px; }
+
+  /* Features: tighter cards, hide animated visual on mobile */
+  .feature-card { padding: 20px; }
+  .feature-large { padding: 24px; }
+  .feature-visual { display: none; }
+  .features-grid { gap: 12px; }
+
+  /* Employers: stats → 2-column grid */
+  .emp-stats { display: grid; grid-template-columns: 1fr 1fr; padding: 24px; gap: 20px; margin-bottom: 48px; }
+  .emp-stat-item { min-width: unset; }
+
+  /* Employers: steps → 2-column grid, hide arrows */
+  .emp-steps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+  .emp-step-arrow { display: none; }
+  .emp-step { padding: 20px 16px; max-width: unset; width: auto; }
+  .emp-step-icon { width: 48px; height: 48px; margin-bottom: 10px; }
+
+  /* Employers: why grid → 2-column on mobile */
+  .emp-why-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .emp-why-highlight { grid-column: span 2; }
+  .emp-why-card { padding: 20px; }
+  .emp-why-icon { width: 44px; height: 44px; margin-bottom: 12px; }
+
+  /* Employers: hide dashboard mock, show only CTA text */
+  .employer-visual { display: none; }
+  .employer-split { grid-template-columns: 1fr; }
+  .employer-dashboard-mock { padding: 20px; }
+  .edm-kpis { flex-wrap: wrap; }
+
+  /* Testimonials: tighter cards */
+  .testimonial-card { padding: 24px; }
+
+  /* Download card inner */
+  .download-content h2 { font-size: clamp(1.6rem, 7vw, 2.4rem); }
+  .download-buttons { flex-direction: column; align-items: center; }
+}
