@@ -80,15 +80,14 @@ async function fetchWorkerData(workerId) {
     W_JOBS.length = 0;
     (jobs || []).forEach(j => W_JOBS.push(j));
 
-    // Accepted matches → threads
+    // All matches → threads (accepted + pending that may have messages)
     const { data: matches } = await sb.from('matches')
       .select('*, job:jobs(*, employer:profiles!jobs_employer_id_fkey(*))')
       .eq('worker_id', workerId)
-      .eq('status', 'accepted')
       .order('created_at', { ascending: false });
 
-    const accepted  = matches || [];
-    const matchIds  = accepted.map(m => m.id);
+    const allMatches = matches || [];
+    const matchIds   = allMatches.map(m => m.id);
     let   messages  = [];
 
     if (matchIds.length > 0) {
@@ -100,7 +99,11 @@ async function fetchWorkerData(workerId) {
       messages = msgs || [];
     }
 
-    const newThreads = accepted.map(match => {
+    // Only show threads that are accepted OR have at least one message
+    const messageMatchIds = new Set(messages.map(m => m.match_id));
+    const threadMatches = allMatches.filter(m => m.status === 'accepted' || messageMatchIds.has(m.id));
+
+    const newThreads = threadMatches.map(match => {
       const job        = match.job || {};
       const employer   = job.employer || {};
       const company    = employer.company_name || employer.name || job.company || 'Zaměstnavatel';

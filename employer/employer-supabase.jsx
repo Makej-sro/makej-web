@@ -82,7 +82,19 @@ async function fetchEmployerData(employerId) {
       const jm     = matches.filter(m => m.job_id === job.id);
       const hired  = jm.filter(m => m.status === 'accepted').length;
       let daysLeft = 0;
-      if (job.date) daysLeft = Math.max(0, Math.ceil((new Date(job.date) - today) / 86400000));
+      if (job.date) {
+        let d = new Date(job.date);
+        if (isNaN(d.getTime())) {
+          const parts = job.date.split('.');
+          if (parts.length >= 2) {
+            const day = parseInt(parts[0], 10);
+            const mon = parseInt(parts[1], 10) - 1;
+            const yr  = parts[2] ? parseInt(parts[2], 10) : today.getFullYear();
+            d = new Date(yr, mon, day);
+          }
+        }
+        if (!isNaN(d.getTime())) daysLeft = Math.max(0, Math.ceil((d - today) / 86400000));
+      }
       let status = job.status === 'filled' ? 'filled' : (job.status === 'expired' ? 'paused' : 'active');
       if (status === 'active' && daysLeft > 0 && daysLeft <= 2) status = 'urgent';
 

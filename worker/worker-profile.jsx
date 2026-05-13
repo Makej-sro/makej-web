@@ -40,8 +40,8 @@ function WProfile({ tick, onSignOut }) {
 
   const STATS = [
     { label: 'Hodnocení', value: rating > 0 ? rating.toFixed(1) + ' ★' : '—', icon: 'star-bold', color: T.super },
-    { label: 'Brigády',   value: jobs  || '—', icon: 'case-round-bold',   color: '#8AB4FF' },
-    { label: 'Odprac. h', value: hours || '—', icon: 'clock-circle-bold', color: '#5BD68A' },
+    { label: 'Brigády',   value: jobs  != null ? jobs  : '—', icon: 'case-round-bold',   color: '#8AB4FF' },
+    { label: 'Odprac. h', value: hours != null ? hours : '—', icon: 'clock-circle-bold', color: '#5BD68A' },
     { label: 'Vydělal/a', value: earned > 0 ? Math.round(earned / 1000) + ' tis Kč' : '—', icon: 'dollar-bold', color: '#F4A261' },
   ];
 

@@ -72,6 +72,7 @@ function ESidebar({ tab, onTab }) {
       background: 'rgba(10,10,30,0.5)',
       backdropFilter: 'blur(20px)',
       overflowY: 'auto',
+      position: 'relative', zIndex: 1,
     }}>
       <div style={{ padding: '4px 8px 18px' }}>
         <ELogo />
@@ -139,15 +140,35 @@ function ESidebar({ tab, onTab }) {
           <Icon name="crown-star-bold" size={16} color={T.super} />
           <span style={{ color: T.super, fontSize: 10, fontWeight: 800, fontFamily: T.fontUI, letterSpacing: 1, textTransform: 'uppercase' }}>Premium tarif</span>
         </div>
-        <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
-          Aktivní · do 8.6.2025
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-          <div style={{ flex: 1, height: 4, borderRadius: 999, background: 'rgba(0,0,0,0.3)', overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: '68%', borderRadius: 999, background: 'linear-gradient(90deg, #5B6BFF, #0020F6)' }} />
-          </div>
-          <span style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 10, fontWeight: 600 }}>21d</span>
-        </div>
+        {(() => {
+          const expStr = EPROFILE.premium_until || EPROFILE.plan_expires_at || null;
+          const now = new Date();
+          if (!expStr) {
+            return (
+              <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginBottom: 12 }}>
+                Bezplatný tarif
+              </div>
+            );
+          }
+          const exp = new Date(expStr);
+          const daysLeft = Math.ceil((exp - now) / 86400000);
+          const isActive = daysLeft > 0;
+          const pct = isActive ? Math.min(100, Math.round((daysLeft / 365) * 100)) : 0;
+          const expLabel = exp.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' });
+          return (
+            <>
+              <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+                {isActive ? `Aktivní · do ${expLabel}` : `Vypršel · ${expLabel}`}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                <div style={{ flex: 1, height: 4, borderRadius: 999, background: 'rgba(0,0,0,0.3)', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: pct + '%', borderRadius: 999, background: 'linear-gradient(90deg, #5B6BFF, #0020F6)' }} />
+                </div>
+                <span style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 10, fontWeight: 600 }}>{isActive ? daysLeft + 'd' : '0d'}</span>
+              </div>
+            </>
+          );
+        })()}
         <button style={{
           width: '100%', padding: '8px 10px', borderRadius: 8,
           background: 'rgba(91,107,255,0.25)', border: '1px solid rgba(91,107,255,0.4)',

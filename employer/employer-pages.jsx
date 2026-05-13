@@ -192,10 +192,10 @@ function ECandidates() {
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
       <div style={{ padding: '24px 28px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13 }}>
-          Inzerát: <span style={{ color: '#fff', fontWeight: 700 }}>Barista do specialty kavárny</span>
+          Inzerát: <span style={{ color: '#fff', fontWeight: 700 }}>{E_JOBS[0]?.title || 'Všechny inzeráty'}</span>
         </div>
         <span style={{ width: 3, height: 3, borderRadius: 999, background: T.mutedSoft }} />
-        <span style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 12 }}>142 matchů · 18 najato</span>
+        <span style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 12 }}>{Object.values(E_CANDIDATES).flat().length} matchů · {E_CANDIDATES.hired.length} najato</span>
         <div style={{ flex: 1 }} />
         <button style={{ padding: '8px 12px', borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <Icon name="filter-bold" size={12} color={T.light}/>
@@ -274,7 +274,7 @@ function CandidateCard({ c, stage, active, onClick }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</div>
           <div style={{ color: T.muted, fontSize: 10.5, fontFamily: T.fontUI, marginTop: 1 }}>
-            <span style={{ fontFamily: T.fontMono }}>{c.age}</span> · {c.distance} km
+            {c.distance != null ? <><span style={{ fontFamily: T.fontMono }}>{c.age}</span> · {c.distance} km</> : (c.age != null ? <span style={{ fontFamily: T.fontMono }}>{c.age}</span> : null)}
           </div>
         </div>
         <div style={{

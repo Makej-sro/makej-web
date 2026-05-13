@@ -208,12 +208,12 @@ function initAuth() {
       document.getElementById('logout-btn-mobile').addEventListener('click', () => sb.auth.signOut());
     } else {
       navActions.innerHTML = `
-        <a href="#" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
-        <a href="#" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
+        <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
+        <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       `;
       mobileActions.innerHTML = `
-        <a href="#" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
-        <a href="#" class="btn-primary" id="mobile-register-btn">Vytvořit účet</a>
+        <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
+        <a href="javascript:void(0)" class="btn-primary" id="mobile-register-btn">Vytvořit účet</a>
       `;
       // Bind jen čerstvě vytvořené nav prvky (employer btn se binduje zvlášť, jen jednou)
       [
@@ -290,8 +290,16 @@ function initAuth() {
     const password = document.getElementById('reg-password').value;
     const company = document.getElementById('reg-company').value.trim();
 
+    if (!name) {
+      showError('register-error', 'Zadejte své jméno.');
+      return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError('register-error', 'Zadejte platný email.');
+      return;
+    }
     if (password.length < 6) {
-      showError('register-error', 'Heslo musí mít alespoň 6 znaků');
+      showError('register-error', 'Heslo musí mít alespoň 6 znaků.');
       return;
     }
 
@@ -336,6 +344,7 @@ function initAuth() {
 
 function translateAuthError(msg) {
   if (msg.includes('Invalid login credentials'))   return 'Nesprávný email nebo heslo.';
+  if (msg.includes('missing') && (msg.includes('email') || msg.includes('phone'))) return 'Zadejte email a heslo.';
   if (msg.includes('Email not confirmed'))          return 'Nejdřív potvrď svůj email.';
   if (msg.includes('User already registered'))      return 'Tento email je již zaregistrovaný.';
   if (msg.includes('already been registered'))      return 'Tento email je již zaregistrovaný.';
