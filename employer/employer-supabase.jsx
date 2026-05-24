@@ -263,7 +263,7 @@ async function createJobE(employerId, fields) {
     pay:         parseInt(fields.pay) || 0,
     pay_unit:    fields.pay_unit || 'Kč/h',
     location:    fields.location || '',
-    date:        fields.date || null,
+    date:        fields.date || new Date().toISOString().slice(0, 10),
     time_start:  ts,
     time_end:    te,
     duration,
