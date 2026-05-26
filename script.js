@@ -350,6 +350,10 @@ function translateAuthError(msg) {
   if (msg.includes('already been registered'))      return 'Tento email je již zaregistrovaný.';
   if (msg.includes('Password should be at least'))  return 'Heslo musí mít alespoň 6 znaků.';
   if (msg.includes('rate limit'))                   return 'Příliš mnoho pokusů, zkus to za chvíli.';
+  if (msg.includes('invalid') && msg.includes('email')) return 'Zadejte platný email.';
+  if (msg.includes('Email address') && msg.includes('invalid')) return 'Zadejte platný email.';
+  if (msg.includes('Signup is disabled'))           return 'Registrace je momentálně nedostupná.';
+  if (msg.includes('over_email_send_rate_limit'))   return 'Příliš mnoho emailů, zkus to za chvíli.';
   return msg;
 }
 

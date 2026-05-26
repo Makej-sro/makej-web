@@ -131,6 +131,16 @@
       gateError.style.display = 'block';
     }
 
+    function translateGateError(msg) {
+      if (msg.includes('Invalid login credentials'))  return 'Nesprávný email nebo heslo.';
+      if (msg.includes('Email not confirmed'))         return 'Nejdřív potvrď svůj email.';
+      if (msg.includes('missing'))                     return 'Zadejte email a heslo.';
+      if (msg.includes('Password should be at least')) return 'Heslo musí mít alespoň 6 znaků.';
+      if (msg.includes('rate limit'))                  return 'Příliš mnoho pokusů, zkus to za chvíli.';
+      if (msg.includes('invalid') && msg.includes('email')) return 'Zadejte platný email.';
+      return msg;
+    }
+
     gateSubmit.addEventListener('click', async () => {
       gateError.style.display = 'none';
       const email = document.getElementById('gate-email').value.trim();
@@ -143,7 +153,7 @@
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
 
       if (error) {
-        showGateError(error.message === 'Invalid login credentials' ? 'Nesprávný email nebo heslo.' : error.message);
+        showGateError(translateGateError(error.message));
         gateSubmit.disabled = false;
         gateSubmit.textContent = 'Přihlásit se';
         return;
