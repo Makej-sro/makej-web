@@ -26,41 +26,87 @@ function _isPro() {
 function ProGate({ feature, children }) {
   if (_isPro()) return children;
   return (
-    <div style={{ flex: 1, display: 'grid', placeItems: 'center', minHeight: 0, padding: 20 }}>
-      <div style={{ textAlign: 'center', maxWidth: 440 }}>
+    <div style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+
+      {/* Rozmazaný náhled obsahu */}
+      <div style={{ filter: 'blur(6px)', pointerEvents: 'none', userSelect: 'none', opacity: 0.55 }}>
+        {children}
+      </div>
+
+      {/* Overlay s CTA */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'linear-gradient(180deg, rgba(7,7,26,0.15) 0%, rgba(7,7,26,0.75) 40%, rgba(7,7,26,0.85) 100%)',
+      }}>
         <div style={{
-          width: 72, height: 72, borderRadius: 20,
-          background: 'rgba(255,209,102,0.1)', border: '1px solid rgba(255,209,102,0.3)',
-          display: 'grid', placeItems: 'center', margin: '0 auto 24px',
+          textAlign: 'center', maxWidth: 460, padding: '36px 32px',
+          background: 'rgba(16,16,48,0.92)',
+          border: '1px solid rgba(255,209,102,0.2)',
+          borderRadius: 20,
+          boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,209,102,0.08)',
+          backdropFilter: 'blur(12px)',
         }}>
-          <Icon name="crown-star-bold" size={34} color="#FFD166" />
-        </div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', fontFamily: T.fontHead, marginBottom: 10, lineHeight: 1.25 }}>
-          {feature || 'Tato funkce'} je dostupná v tarifu Pro
-        </div>
-        <div style={{ fontSize: 13, color: T.muted, fontFamily: T.fontUI, lineHeight: 1.7, marginBottom: 28 }}>
-          Upgradujte na <strong style={{ color: '#FFD166' }}>Pro</strong> nebo{' '}
-          <strong style={{ color: '#E0B0FF' }}>Business</strong> a odemkněte pokročilé reporty,
-          demografii kandidátů, analýzu nákladů a retenci.
-        </div>
-        <button style={{
-          padding: '13px 32px', borderRadius: 12,
-          background: 'linear-gradient(135deg, #292978, #3a3a99)',
-          border: 'none', color: '#fff',
-          fontFamily: T.fontUI, fontSize: 15, fontWeight: 800,
-          cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 10,
-          boxShadow: '0 4px 20px rgba(41,41,120,0.5)',
-        }}>
-          <Icon name="crown-star-bold" size={16} color="#FFD166" />
-          Zobrazit tarify Pro
-        </button>
-        <div style={{ marginTop: 14, fontSize: 12, color: T.mutedSoft, fontFamily: T.fontUI }}>
-          Máte otázky? Napište nám na{' '}
-          <a href="mailto:support@makej.eu" style={{ color: '#8AB4FF', textDecoration: 'none' }}>
-            support@makej.eu
-          </a>
+          {/* Ikona */}
+          <div style={{
+            width: 68, height: 68, borderRadius: 18,
+            background: 'linear-gradient(135deg, rgba(255,209,102,0.18), rgba(255,209,102,0.06))',
+            border: '1px solid rgba(255,209,102,0.35)',
+            display: 'grid', placeItems: 'center', margin: '0 auto 20px',
+          }}>
+            <Icon name="crown-star-bold" size={32} color="#FFD166" />
+          </div>
+
+          {/* Titulek */}
+          <div style={{ fontSize: 21, fontWeight: 800, color: '#fff', fontFamily: T.fontHead, marginBottom: 8, lineHeight: 1.25 }}>
+            {feature || 'Tato sekce'} je dostupná v tarifu Pro
+          </div>
+
+          {/* Popis */}
+          <div style={{ fontSize: 13, color: T.muted, fontFamily: T.fontUI, lineHeight: 1.7, marginBottom: 24 }}>
+            Odemkněte <strong style={{ color: '#d0d0ff' }}>pokročilé reporty</strong>,{' '}
+            demografii kandidátů, analýzu nákladů na nábor a retenci brigádníků.
+          </div>
+
+          {/* Feature list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 26, textAlign: 'left' }}>
+            {[
+              'Cohort analýza a konverzní funnel',
+              'Demografické přehledy kandidátů',
+              'Cost per hire vs. průměr trhu',
+              'Retence brigádníků + AI insights',
+            ].map((f, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: T.light, fontFamily: T.fontUI }}>
+                <Icon name="check-circle-bold" size={14} color="#FFD166" />
+                {f}
+              </div>
+            ))}
+          </div>
+
+          {/* CTA tlačítko */}
+          <button style={{
+            width: '100%', padding: '13px',
+            borderRadius: 12,
+            background: 'linear-gradient(135deg, #292978, #3a3a99)',
+            border: '1px solid rgba(91,107,255,0.4)',
+            color: '#fff', fontFamily: T.fontUI, fontSize: 15, fontWeight: 800,
+            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+            boxShadow: '0 4px 24px rgba(41,41,120,0.55)',
+            transition: 'opacity .2s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >
+            <Icon name="crown-star-bold" size={16} color="#FFD166" />
+            Upgradovat na Pro
+          </button>
+
+          <div style={{ marginTop: 12, fontSize: 12, color: T.mutedSoft, fontFamily: T.fontUI }}>
+            Otázky? <a href="mailto:support@makej.eu" style={{ color: '#8AB4FF', textDecoration: 'none' }}>support@makej.eu</a>
+          </div>
         </div>
       </div>
+
     </div>
   );
 }
