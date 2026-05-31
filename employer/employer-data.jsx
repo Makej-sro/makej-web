@@ -15,20 +15,13 @@ const EPROFILE = {};
 
 const E_KPIS = [
   { id: 'views', label: 'Zhlédnutí', value: 12_847, delta: +18.4, spark: [12,18,15,22,19,28,24,31,29,35,33,40], unit: '', icon: 'eye-bold' },
-  { id: 'right', label: 'Swipe right rate', value: 24.6, delta: +3.2, spark: [18,19,20,22,21,24,23,25,24,26,25,24.6], unit: '%', icon: 'heart-bold' },
+  { id: 'right', label: 'Swajp right rate', value: 24.6, delta: +3.2, spark: [18,19,20,22,21,24,23,25,24,26,25,24.6], unit: '%', icon: 'heart-bold' },
   { id: 'matches', label: 'Matche', value: 312, delta: +12.1, spark: [10,12,18,22,28,32,35,40,42,48,52,55], unit: '', icon: 'users-group-rounded-bold' },
   { id: 'tth', label: 'Time-to-hire', value: 2.1, delta: -0.6, spark: [4.2, 4, 3.6, 3.4, 3.1, 2.9, 2.7, 2.5, 2.4, 2.3, 2.2, 2.1], unit: ' dne', icon: 'stopwatch-bold' },
   { id: 'cph', label: 'Cost per hire', value: 480, delta: -8.2, spark: [620, 600, 590, 575, 560, 540, 520, 510, 500, 495, 488, 480], unit: ' Kč', icon: 'dollar-bold' },
   { id: 'rating', label: 'Hodnocení firmy', value: 4.8, delta: +0.1, spark: [4.5,4.5,4.6,4.6,4.6,4.7,4.7,4.7,4.8,4.8,4.8,4.8], unit: '★', icon: 'star-bold' },
 ];
 
-const E_FUNNEL = [
-  { stage: 'Zobrazeno', count: 12_847, pct: 100, color: '#5B6BFF' },
-  { stage: 'Swipe right', count: 3_158, pct: 24.6, color: '#0020F6' },
-  { stage: 'Match potvrzen', count: 312, pct: 9.9, color: '#2D2CA7' },
-  { stage: 'Pohovor', count: 124, pct: 39.7, color: '#FFD166' },
-  { stage: 'Najato', count: 42, pct: 33.9, color: '#5BD68A' },
-];
 
 const E_JOBS = [
   { id: 'ej1', title: 'Barista do specialty kavárny', status: 'active', plan: 'Premium · Top', views: 4_280, swipes: 1_120, matches: 142, hired: 18, ctr: 26.1, daysLeft: 5, pay: 180, payUnit: 'Kč/h', accent: '#F4A261' },
@@ -66,40 +59,4 @@ const E_ACTIVITY = [
   { type: 'sub', who: 'Tarif Premium', what: 'obnoven na 30 dní', when: 'před 2 dny', icon: 'shield-check-bold', color: '#5B6BFF' },
 ];
 
-// 7 days × 24 hours heatmap of candidate activity (0-100)
-const E_HEATMAP = (() => {
-  const rng = (s) => { let x = s; return () => { x = (x * 1103515245 + 12345) & 0x7fffffff; return x / 0x7fffffff; }; };
-  const r = rng(42);
-  const data = [];
-  for (let d = 0; d < 7; d++) {
-    const row = [];
-    for (let h = 0; h < 24; h++) {
-      // base low at night, peak at lunch + evening
-      const base = (h >= 8 && h <= 22) ? (h >= 11 && h <= 14 ? 70 : (h >= 17 && h <= 21 ? 85 : 45)) : 8;
-      // weekend boost on Sat/Sun evening
-      const wend = (d === 5 || d === 6) && h >= 18 ? 15 : 0;
-      const noise = Math.floor(r() * 30) - 15;
-      row.push(Math.max(0, Math.min(100, base + wend + noise)));
-    }
-    data.push(row);
-  }
-  return data;
-})();
-
-const E_GEO = [
-  { city: 'Brno-střed', count: 89, pct: 32 },
-  { city: 'Veveří', count: 64, pct: 23 },
-  { city: 'Královo Pole', count: 41, pct: 15 },
-  { city: 'Žabovřesky', count: 28, pct: 10 },
-  { city: 'Líšeň', count: 22, pct: 8 },
-  { city: 'Ostatní', count: 33, pct: 12 },
-];
-
-const E_BENCH = [
-  { metric: 'Hodinovka', you: 180, avg: 162, unit: 'Kč/h', good: true },
-  { metric: 'Match rate', you: 24.6, avg: 18.2, unit: '%', good: true },
-  { metric: 'Time to hire', you: 2.1, avg: 3.4, unit: ' dne', good: true, lowerBetter: true },
-  { metric: 'Hodnocení', you: 4.8, avg: 4.4, unit: '★', good: true },
-];
-
-Object.assign(window, { ECOMPANY, E_KPIS, E_FUNNEL, E_JOBS, E_CANDIDATES, E_ACTIVITY, E_HEATMAP, E_GEO, E_BENCH });
+Object.assign(window, { ECOMPANY, EPROFILE, E_KPIS, E_JOBS, E_CANDIDATES, E_ACTIVITY });

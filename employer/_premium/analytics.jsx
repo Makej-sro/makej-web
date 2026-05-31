@@ -1,7 +1,72 @@
-// Makej Employer — Analytika + Plán směn
+// ═══════════════════════════════════════════════════════════════
+// PRÉMIOVÁ FUNKCE: Pokročilá analytika + Plán směn
+// ═══════════════════════════════════════════════════════════════
+//
+// Doporučený tarif:  Premium / Pro
+// Zapojení:
+//   1. Přidat <script type="text/babel" src="_premium/analytics.jsx"> do index.html
+//   2. Viz README.md pro ostatní kroky
+//
+// Závislosti: T, Icon, ECard, SectionHeader, Sparkline, AreaChart, BarChart, Donut
+//             (všechny dostupné z employer-shell.jsx a app.jsx)
+// ═══════════════════════════════════════════════════════════════
 
 // ─────────────────────────────────────────────────────────────
-// ANALYTIKA — hloubkové reporty
+// PRO GATE — zobrazí upgrade CTA pokud uživatel nemá Pro tarif
+// ─────────────────────────────────────────────────────────────
+
+function _isPro() {
+  const plan = (EPROFILE.plan || '').toLowerCase();
+  if (['pro', 'business', 'premium'].includes(plan)) return true;
+  const until = EPROFILE.premium_until || EPROFILE.plan_expires_at;
+  if (until && new Date(until) > new Date()) return true;
+  return false;
+}
+
+function ProGate({ feature, children }) {
+  if (_isPro()) return children;
+  return (
+    <div style={{ flex: 1, display: 'grid', placeItems: 'center', minHeight: 0, padding: 20 }}>
+      <div style={{ textAlign: 'center', maxWidth: 440 }}>
+        <div style={{
+          width: 72, height: 72, borderRadius: 20,
+          background: 'rgba(255,209,102,0.1)', border: '1px solid rgba(255,209,102,0.3)',
+          display: 'grid', placeItems: 'center', margin: '0 auto 24px',
+        }}>
+          <Icon name="crown-star-bold" size={34} color="#FFD166" />
+        </div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', fontFamily: T.fontHead, marginBottom: 10, lineHeight: 1.25 }}>
+          {feature || 'Tato funkce'} je dostupná v tarifu Pro
+        </div>
+        <div style={{ fontSize: 13, color: T.muted, fontFamily: T.fontUI, lineHeight: 1.7, marginBottom: 28 }}>
+          Upgradujte na <strong style={{ color: '#FFD166' }}>Pro</strong> nebo{' '}
+          <strong style={{ color: '#E0B0FF' }}>Business</strong> a odemkněte pokročilé reporty,
+          demografii kandidátů, analýzu nákladů a retenci.
+        </div>
+        <button style={{
+          padding: '13px 32px', borderRadius: 12,
+          background: 'linear-gradient(135deg, #292978, #3a3a99)',
+          border: 'none', color: '#fff',
+          fontFamily: T.fontUI, fontSize: 15, fontWeight: 800,
+          cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 10,
+          boxShadow: '0 4px 20px rgba(41,41,120,0.5)',
+        }}>
+          <Icon name="crown-star-bold" size={16} color="#FFD166" />
+          Zobrazit tarify Pro
+        </button>
+        <div style={{ marginTop: 14, fontSize: 12, color: T.mutedSoft, fontFamily: T.fontUI }}>
+          Máte otázky? Napište nám na{' '}
+          <a href="mailto:support@makej.eu" style={{ color: '#8AB4FF', textDecoration: 'none' }}>
+            support@makej.eu
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// ANALYTIKA — 4 sub-sekce: Přehled / Demografie / Náklady / Retence
 // ─────────────────────────────────────────────────────────────
 function EAnalytics() {
   const [seg, setSeg] = useStateE('overview');
@@ -13,26 +78,29 @@ function EAnalytics() {
   ];
 
   return (
-    <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto' }}>
-      <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, alignSelf: 'flex-start' }}>
-        {segs.map(s => (
-          <button key={s.k} onClick={() => setSeg(s.k)} style={{
-            padding: '8px 16px', borderRadius: 8,
-            background: seg === s.k ? 'rgba(91,107,255,0.22)' : 'transparent',
-            border: 'none', color: seg === s.k ? '#fff' : T.muted,
-            fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
-          }}>{s.l}</button>
-        ))}
-      </div>
+    <ProGate feature="Analytika">
+      <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto' }}>
+        <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, alignSelf: 'flex-start' }}>
+          {segs.map(s => (
+            <button key={s.k} onClick={() => setSeg(s.k)} style={{
+              padding: '8px 16px', borderRadius: 8,
+              background: seg === s.k ? 'rgba(91,107,255,0.22)' : 'transparent',
+              border: 'none', color: seg === s.k ? '#fff' : T.muted,
+              fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
+            }}>{s.l}</button>
+          ))}
+        </div>
 
-      {seg === 'overview' && <AnalyticsOverview />}
-      {seg === 'demo' && <AnalyticsDemo />}
-      {seg === 'cost' && <AnalyticsCost />}
-      {seg === 'retention' && <AnalyticsRetention />}
-    </div>
+        {seg === 'overview' && <AnalyticsOverview />}
+        {seg === 'demo' && <AnalyticsDemo />}
+        {seg === 'cost' && <AnalyticsCost />}
+        {seg === 'retention' && <AnalyticsRetention />}
+      </div>
+    </ProGate>
   );
 }
 
+// ── Přehled ──────────────────────────────────────────────────
 function AnalyticsOverview() {
   return (
     <>
@@ -166,7 +234,6 @@ function CohortTable() {
 }
 
 function DistroChart() {
-  // Histogram of hourly wage in segment
   const buckets = [
     { l: '120', v: 8 },
     { l: '140', v: 24 },
@@ -208,6 +275,7 @@ function DistroChart() {
   );
 }
 
+// ── Demografie ────────────────────────────────────────────────
 function AnalyticsDemo() {
   return (
     <>
@@ -260,7 +328,6 @@ function AnalyticsDemo() {
           ))}
         </ECard>
       </div>
-
       <ECard>
         <SectionHeader title="Mapa kandidátů — Brno" subtitle="Hustota podle čtvrti" />
         <BrnoMap />
@@ -283,24 +350,14 @@ function BrnoMap() {
   ];
   return (
     <div style={{ position: 'relative', width: '100%', height: 360, borderRadius: 14, background: 'linear-gradient(135deg, rgba(0,32,246,0.08), rgba(15,15,40,0.6))', border: '1px solid ' + T.border, overflow: 'hidden' }}>
-      {/* grid lines suggesting map */}
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
         {Array.from({length: 12}, (_, i) => <line key={'h'+i} x1="0" y1={i*8.3} x2="100" y2={i*8.3} stroke="rgba(91,107,255,0.06)" strokeWidth="0.1" />)}
         {Array.from({length: 12}, (_, i) => <line key={'v'+i} x1={i*8.3} y1="0" x2={i*8.3} y2="100" stroke="rgba(91,107,255,0.06)" strokeWidth="0.1" />)}
-        {/* "river" — Svratka curve */}
         <path d="M 5 80 C 20 65, 40 55, 50 60 S 75 75, 95 70" stroke="rgba(91,107,255,0.25)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
       </svg>
       {dots.map((d, i) => (
-        <div key={i} style={{
-          position: 'absolute', left: d.x + '%', top: d.y + '%',
-          transform: 'translate(-50%,-50%)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <div style={{
-            width: d.r * 2, height: d.r * 2, borderRadius: 999,
-            background: 'radial-gradient(circle, rgba(0,32,246,0.5), rgba(0,32,246,0.05))',
-            border: '1px solid rgba(91,107,255,0.5)',
-          }} />
+        <div key={i} style={{ position: 'absolute', left: d.x + '%', top: d.y + '%', transform: 'translate(-50%,-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: d.r * 2, height: d.r * 2, borderRadius: 999, background: 'radial-gradient(circle, rgba(0,32,246,0.5), rgba(0,32,246,0.05))', border: '1px solid rgba(91,107,255,0.5)' }} />
           <div style={{ position: 'absolute', textAlign: 'center', pointerEvents: 'none' }}>
             <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 13, fontWeight: 700 }}>{d.n}</div>
             <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 9.5, fontWeight: 600, whiteSpace: 'nowrap' }}>{d.l}</div>
@@ -314,6 +371,7 @@ function BrnoMap() {
   );
 }
 
+// ── Náklady ───────────────────────────────────────────────────
 function AnalyticsCost() {
   return (
     <>
@@ -350,6 +408,7 @@ function AnalyticsCost() {
   );
 }
 
+// ── Retence ───────────────────────────────────────────────────
 function AnalyticsRetention() {
   return (
     <ECard>
@@ -390,47 +449,88 @@ function AnalyticsRetention() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// PLÁN SMĚN — kalendář
+// PLÁN SMĚN — reálný kalendář z Supabase dat (E_JOBS)
 // ─────────────────────────────────────────────────────────────
+
 function ECalendar() {
-  // Build a month grid for May 2025 (1.5 = Thu)
-  const days = [];
-  const daysInMonth = 31;
-  const firstWeekday = 3; // Thu = 3 (Mon=0)
-  for (let i = 0; i < firstWeekday; i++) days.push(null);
-  for (let d = 1; d <= daysInMonth; d++) days.push(d);
+  const now = new Date();
+  const [viewYear,  setViewYear]  = useStateE(now.getFullYear());
+  const [viewMonth, setViewMonth] = useStateE(now.getMonth()); // 0-indexed
 
-  const shifts = {
-    1: [{ role: 'Barista', n: 2, of: 2, c: '#F4A261' }],
-    2: [{ role: 'Servírka', n: 3, of: 3, c: '#5BD68A' }, { role: 'Kuchyně', n: 1, of: 2, c: '#f43f5e' }],
-    5: [{ role: 'Barista', n: 2, of: 2, c: '#F4A261' }],
-    6: [{ role: 'Barista', n: 1, of: 2, c: '#FFD166' }],
-    7: [{ role: 'Barista', n: 2, of: 2, c: '#F4A261' }],
-    8: [{ role: 'Catering', n: 5, of: 5, c: '#5BD68A' }],
-    9: [{ role: 'Barista', n: 0, of: 2, c: '#f43f5e' }, { role: 'Servírka', n: 2, of: 3, c: '#FFD166' }],
-    10: [{ role: 'Servírka', n: 3, of: 3, c: '#5BD68A' }],
-    12: [{ role: 'Barista', n: 2, of: 2, c: '#F4A261' }],
-    13: [{ role: 'Barista', n: 2, of: 2, c: '#F4A261' }],
-    14: [{ role: 'Catering BVV', n: 8, of: 10, c: '#FFD166' }],
-    15: [{ role: 'Barista', n: 1, of: 2, c: '#FFD166' }],
-    16: [{ role: 'Servírka', n: 0, of: 3, c: '#f43f5e' }],
-    19: [{ role: 'Barista', n: 2, of: 2, c: '#F4A261' }],
-    20: [{ role: 'Barista', n: 2, of: 2, c: '#F4A261' }, { role: 'Kuchyně', n: 1, of: 1, c: '#5BD68A' }],
-    23: [{ role: 'Catering', n: 0, of: 4, c: '#f43f5e' }],
-    25: [{ role: 'Servírka', n: 2, of: 3, c: '#FFD166' }],
-    27: [{ role: 'Barista', n: 2, of: 2, c: '#F4A261' }],
-  };
+  const MONTH_NAMES = ['Leden','Únor','Březen','Duben','Květen','Červen',
+                       'Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
+  const DAY_NAMES   = ['Po','Út','St','Čt','Pá','So','Ne'];
 
-  const today = 9;
+  // Parse ISO "2025-05-14" nebo Czech "14.5.2025"
+  function parseDate(s) {
+    if (!s) return null;
+    const iso = new Date(s);
+    if (!isNaN(iso.getTime())) return iso;
+    const p = s.split('.');
+    if (p.length >= 2) {
+      const d2 = new Date(p[2] ? parseInt(p[2]) : now.getFullYear(), parseInt(p[1]) - 1, parseInt(p[0]));
+      if (!isNaN(d2.getTime())) return d2;
+    }
+    return null;
+  }
+
+  function jobColor(j) {
+    if (j.status === 'filled')  return '#5BD68A';
+    if (j.status === 'urgent')  return '#f43f5e';
+    if (j.status === 'paused')  return '#9999cc';
+    return j.accent || '#8AB4FF';
+  }
+
+  // Jobs pro aktuální zobrazený měsíc
+  const monthJobs = E_JOBS.filter(j => {
+    const d = parseDate(j.date);
+    return d && d.getFullYear() === viewYear && d.getMonth() === viewMonth;
+  });
+
+  // Seskupit podle dne
+  const byDay = {};
+  monthJobs.forEach(j => {
+    const d = parseDate(j.date);
+    if (!d) return;
+    const day = d.getDate();
+    if (!byDay[day]) byDay[day] = [];
+    byDay[day].push(j);
+  });
+
+  // Pole dnů pro grid (null = prázdná buňka před 1. v měsíci)
+  const daysInMonth  = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const firstWeekday = (new Date(viewYear, viewMonth, 1).getDay() + 6) % 7; // Po = 0
+  const calDays = [];
+  for (let i = 0; i < firstWeekday; i++) calDays.push(null);
+  for (let d = 1; d <= daysInMonth; d++) calDays.push(d);
+
+  // Statistiky
+  const filled     = monthJobs.filter(j => j.status === 'filled').length;
+  const open       = monthJobs.filter(j => j.status === 'active' || j.status === 'urgent').length;
+  const totalHired = monthJobs.reduce((s, j) => s + (j.hired || 0), 0);
+
+  const isCurrentMonth = now.getFullYear() === viewYear && now.getMonth() === viewMonth;
+  const today = now.getDate();
+
+  function prevMonth() {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+    else setViewMonth(m => m - 1);
+  }
+  function nextMonth() {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+    else setViewMonth(m => m + 1);
+  }
 
   return (
     <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto' }}>
+
+      {/* KPI čísla */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
         {[
-          { l: 'Obsazenost května', v: '78%', sub: '32 z 41 směn', c: '#FFD166' },
-          { l: 'Otevřené sloty', v: 9, sub: 'potřeba 12 brigádníků', c: '#f43f5e' },
-          { l: 'Konfirmováno', v: 26, sub: 'směn s plnou účastí', c: '#5BD68A' },
-          { l: 'Náklady na mzdy', v: '64 800 Kč', sub: 'odhad pro tento měsíc', c: '#5B6BFF' },
+          { l: 'Brigády ' + MONTH_NAMES[viewMonth], v: monthJobs.length || '—', sub: 'inzerátů s datem v tomto měsíci', c: '#FFD166' },
+          { l: 'Otevřené',    v: open     || '—', sub: 'potřebují brigádníky',  c: '#f43f5e' },
+          { l: 'Naplněno',   v: filled    || '—', sub: 'brigád s obsazenou rolí', c: '#5BD68A' },
+          { l: 'Najato',     v: totalHired || '—', sub: 'přijatých brigádníků',  c: '#5B6BFF' },
         ].map((x, i) => (
           <ECard key={i} padding={16}>
             <div style={{ color: T.muted, fontSize: 11, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.4, textTransform: 'uppercase' }}>{x.l}</div>
@@ -442,117 +542,133 @@ function ECalendar() {
         ))}
       </div>
 
+      {/* Kalendář */}
       <ECard padding={0} style={{ overflow: 'hidden' }}>
+
+        {/* Header */}
         <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid ' + T.border }}>
-          <button style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
+          <button onClick={prevMonth} style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
             <Icon name="alt-arrow-left-line-duotone" size={14} color={T.light}/>
           </button>
-          <div style={{ fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, color: '#fff' }}>Květen 2025</div>
-          <button style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
+          <div style={{ fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, color: '#fff', minWidth: 160 }}>
+            {MONTH_NAMES[viewMonth]} {viewYear}
+          </div>
+          <button onClick={nextMonth} style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
             <Icon name="alt-arrow-right-line-duotone" size={14} color={T.light}/>
           </button>
           <div style={{ flex: 1 }} />
-          <div style={{ display: 'flex', gap: 12, fontSize: 11, fontFamily: T.fontUI }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><span style={{ width: 8, height: 8, borderRadius: 2, background: '#5BD68A' }}/><span style={{ color: T.light }}>Plně obsazeno</span></span>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><span style={{ width: 8, height: 8, borderRadius: 2, background: '#FFD166' }}/><span style={{ color: T.light }}>Částečně</span></span>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><span style={{ width: 8, height: 8, borderRadius: 2, background: '#f43f5e' }}/><span style={{ color: T.light }}>Chybí lidi</span></span>
+          {/* Legenda */}
+          <div style={{ display: 'flex', gap: 14, fontSize: 11, fontFamily: T.fontUI }}>
+            {[['#5BD68A','Naplněno'],['#8AB4FF','Aktivní'],['#f43f5e','ASAP']].map(([c,l]) => (
+              <span key={l} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ width: 8, height: 8, borderRadius: 2, background: c }}/>
+                <span style={{ color: T.light }}>{l}</span>
+              </span>
+            ))}
           </div>
-          <button style={{ padding: '7px 12px', borderRadius: 8, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-            <Icon name="add-circle-bold" size={12} color="#fff"/>Nová směna
-          </button>
         </div>
 
-        {/* Day headers */}
+        {/* Názvy dní */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid ' + T.border }}>
-          {['Po','Út','St','Čt','Pá','So','Ne'].map((d, i) => (
+          {DAY_NAMES.map((d, i) => (
             <div key={d} style={{ padding: '8px 12px', fontSize: 10.5, fontFamily: T.fontUI, fontWeight: 700, color: T.mutedSoft, letterSpacing: 0.6, textTransform: 'uppercase', textAlign: i >= 5 ? 'center' : 'left', background: i >= 5 ? 'rgba(0,0,0,0.2)' : 'transparent' }}>{d}</div>
           ))}
         </div>
 
+        {/* Buňky */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
-          {days.map((d, i) => {
-            const dayShifts = d ? (shifts[d] || []) : [];
+          {calDays.map((d, i) => {
+            const dayJobs   = d ? (byDay[d] || []) : [];
             const isWeekend = (i % 7) >= 5;
-            const isToday = d === today;
+            const isToday   = isCurrentMonth && d === today;
             return (
               <div key={i} style={{
-                minHeight: 110, padding: 8,
-                borderRight: (i % 7 < 6) ? '1px solid ' + T.border : 'none',
+                minHeight: 100, padding: 8,
+                borderRight:  (i % 7 < 6) ? '1px solid ' + T.border : 'none',
                 borderBottom: '1px solid ' + T.border,
-                background: isWeekend ? 'rgba(0,0,0,0.15)' : 'transparent',
-                opacity: d ? 1 : 0.3,
+                background:   isWeekend ? 'rgba(0,0,0,0.15)' : 'transparent',
+                opacity:      d ? 1 : 0.25,
               }}>
-                {d ? (
+                {d && (
                   <>
-                    <div style={{
-                      display: 'inline-flex', width: 24, height: 24, borderRadius: 999,
-                      alignItems: 'center', justifyContent: 'center',
-                      background: isToday ? T.primary : 'transparent',
-                      color: isToday ? '#fff' : T.light,
-                      fontFamily: T.fontMono, fontSize: 12, fontWeight: 700,
-                      marginBottom: 4,
-                    }}>{d}</div>
+                    <div style={{ display: 'inline-flex', width: 24, height: 24, borderRadius: 999, alignItems: 'center', justifyContent: 'center', background: isToday ? T.primary : 'transparent', color: isToday ? '#fff' : T.light, fontFamily: T.fontMono, fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{d}</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                      {dayShifts.map((s, j) => (
-                        <div key={j} style={{
-                          padding: '3px 6px', borderRadius: 5,
-                          background: s.c + '22', borderLeft: '2px solid ' + s.c,
-                          fontFamily: T.fontUI, fontSize: 10.5,
-                        }}>
-                          <div style={{ color: '#fff', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.role}</div>
-                          <div style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 9.5 }}>{s.n}/{s.of}</div>
-                        </div>
-                      ))}
+                      {dayJobs.map((job, j) => {
+                        const c = jobColor(job);
+                        return (
+                          <div key={j} style={{ padding: '3px 6px', borderRadius: 5, background: c + '22', borderLeft: '2px solid ' + c }}>
+                            <div style={{ color: '#fff', fontWeight: 700, fontSize: 10.5, fontFamily: T.fontUI, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{job.title}</div>
+                            {(job.time_start || job.time_end) && (
+                              <div style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 9.5 }}>
+                                {[job.time_start, job.time_end].filter(Boolean).join('–')}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </>
-                ) : null}
+                )}
               </div>
             );
           })}
         </div>
       </ECard>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        <ECard>
-          <SectionHeader title="Otevřené sloty" subtitle="Potřebují obsadit" />
-          {[
-            { day: 'Pá 9.5.', time: '17:00 – 23:00', role: 'Barista', need: 2, applied: 4 },
-            { day: 'So 16.5.', time: '11:00 – 22:00', role: 'Servírka', need: 3, applied: 1 },
-            { day: 'Čt 23.5.', time: '8:00 – 18:00', role: 'Catering BVV', need: 4, applied: 0 },
-          ].map((x, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < 2 ? '1px solid ' + T.border : 'none' }}>
-              <div style={{ textAlign: 'center', width: 60 }}>
-                <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 16, fontWeight: 700 }}>{x.day.split(' ')[1]}</div>
-                <div style={{ color: T.muted, fontSize: 10, fontFamily: T.fontUI }}>{x.day.split(' ')[0]}</div>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{x.role}</div>
-                <div style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 10.5, marginTop: 2 }}>{x.time}</div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ color: x.applied >= x.need ? '#5BD68A' : x.applied > 0 ? '#FFD166' : '#f43f5e', fontFamily: T.fontMono, fontSize: 13, fontWeight: 700 }}>{x.applied}/{x.need}</div>
-                <div style={{ color: T.mutedSoft, fontSize: 10, fontFamily: T.fontUI }}>přihlášeno</div>
-              </div>
-              <button style={{ padding: '7px 12px', borderRadius: 8, background: 'rgba(91,107,255,0.18)', border: '1px solid rgba(91,107,255,0.3)', color: '#fff', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}>Najít</button>
-            </div>
-          ))}
-        </ECard>
+      {/* Seznam otevřených brigád */}
+      {open > 0 && (() => {
+        const openJobs = monthJobs
+          .filter(j => j.status === 'active' || j.status === 'urgent')
+          .sort((a, b) => (parseDate(a.date) || 0) - (parseDate(b.date) || 0));
+        return (
+          <ECard>
+            <SectionHeader title="Otevřené brigády" subtitle="Potřebují obsadit brigádníky" />
+            {openJobs.map((j, i) => {
+              const d = parseDate(j.date);
+              const c = jobColor(j);
+              const dayName = d ? DAY_NAMES[(d.getDay() + 6) % 7] : '';
+              return (
+                <div key={j.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 0', borderBottom: i < openJobs.length - 1 ? '1px solid ' + T.border : 'none' }}>
+                  <div style={{ textAlign: 'center', width: 44, flexShrink: 0 }}>
+                    <div style={{ color: c, fontFamily: T.fontMono, fontSize: 20, fontWeight: 700, lineHeight: 1 }}>{d ? d.getDate() : '—'}</div>
+                    <div style={{ color: T.muted, fontSize: 10, fontFamily: T.fontUI }}>{dayName}</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{j.title}</div>
+                    {(j.time_start || j.time_end || j.location) && (
+                      <div style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 10.5, marginTop: 2 }}>
+                        {[j.time_start && j.time_end ? j.time_start + '–' + j.time_end : j.time_start, j.location].filter(Boolean).join(' · ')}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div style={{ color: (j.hired || 0) > 0 ? '#FFD166' : '#f43f5e', fontFamily: T.fontMono, fontSize: 13, fontWeight: 700 }}>
+                      {j.hired || 0} najato
+                    </div>
+                    {j.matches > 0 && (
+                      <div style={{ color: T.mutedSoft, fontSize: 10, fontFamily: T.fontUI }}>{j.matches} zájemců</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </ECard>
+        );
+      })()}
 
-        <ECard>
-          <SectionHeader title="Konflikty směn" subtitle="Kandidát ve dvou směnách najednou" />
-          <div style={{ padding: 12, borderRadius: 10, background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.25)', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Icon name="shield-warning-bold" size={18} color="#f43f5e" />
-            <div style={{ flex: 1 }}>
-              <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700 }}>Klára Novotná — Pá 9.5.</div>
-              <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, marginTop: 2 }}>Přijala směnu 17–23 a má i pohovor v 18:00</div>
-            </div>
-            <button style={{ padding: '6px 10px', borderRadius: 7, background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, color: '#fff', fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Vyřešit</button>
+      {/* Prázdný stav */}
+      {monthJobs.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: T.muted, fontFamily: T.fontUI }}>
+          <Icon name="calendar-bold" size={44} color={T.mutedSoft} />
+          <div style={{ marginTop: 14, fontSize: 16, fontWeight: 700, color: T.light }}>
+            Žádné brigády v {MONTH_NAMES[viewMonth]} {viewYear}
           </div>
-          <div style={{ marginTop: 14, color: T.mutedSoft, fontSize: 11, fontFamily: T.fontUI, textAlign: 'center' }}>
-            Žádné další konflikty.
+          <div style={{ marginTop: 6, fontSize: 12, lineHeight: 1.6 }}>
+            Přidejte inzeráty s datem v tomto měsíci a zobrazí se zde automaticky.
           </div>
-        </ECard>
-      </div>
+        </div>
+      )}
+
     </div>
   );
 }

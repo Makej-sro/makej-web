@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /employer/
+Disallow: /worker/
+
+Sitemap: https://makej.eu/sitemap.xml

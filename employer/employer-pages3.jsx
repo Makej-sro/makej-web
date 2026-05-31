@@ -384,229 +384,9 @@ function EMessages() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// TÝM
+// NASTAVENÍ (inline — TÝM a FAKTURACE odebrány jako nepotřebné při launchi)
 // ─────────────────────────────────────────────────────────────
-const E_TEAM = [
-  { name: 'Anna Svobodová', role: 'Owner', avatar: 'AS', color: '#0020F6', email: 'anna@kafepunkt.cz', perms: 'Vše', last: 'právě teď', hires: 32, jobs: 5, you: true },
-  { name: 'Petr Novák', role: 'Manažer', avatar: 'PN', color: '#5BD68A', email: 'petr@kafepunkt.cz', perms: 'Inzeráty + nábor', last: 'před 2 h', hires: 14, jobs: 3 },
-  { name: 'Michal Dvořák', role: 'Recruiter', avatar: 'MD', color: '#F4A261', email: 'michal@kafepunkt.cz', perms: 'Pouze nábor', last: 'včera', hires: 8, jobs: 0 },
-  { name: 'Eva Kovářová', role: 'Účetní', avatar: 'EK', color: '#E0B0FF', email: 'eva@kafepunkt.cz', perms: 'Fakturace', last: 'před 3 dny', hires: 0, jobs: 0 },
-  { name: 'pozvánka', role: 'Recruiter (pozvánka)', avatar: '?', color: '#6e6ea8', email: 'jan.k@kafepunkt.cz', perms: 'Čeká na přijetí', last: '—', hires: 0, jobs: 0, pending: true },
-];
 
-function ETeam() {
-  return (
-    <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
-        {[
-          { l: 'Aktivní členové', v: 4, c: '#5BD68A' },
-          { l: 'Pozvánky čeká', v: 1, c: '#FFD166' },
-          { l: 'Najato týmem', v: 54, c: '#5B6BFF' },
-          { l: 'Mést. limit tarifu', v: '5 / 10', c: '#E0B0FF' },
-        ].map((x, i) => (
-          <ECard key={i} padding={16}>
-            <div style={{ color: T.muted, fontSize: 11, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.4, textTransform: 'uppercase' }}>{x.l}</div>
-            <div style={{ color: x.c, fontFamily: T.fontMono, fontSize: 26, fontWeight: 700, marginTop: 6, letterSpacing: -0.8 }}>{x.v}</div>
-          </ECard>
-        ))}
-      </div>
-
-      <ECard padding={0} style={{ overflow: 'hidden' }}>
-        <div style={{ padding: '14px 18px', borderBottom: '1px solid ' + T.border, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ fontFamily: T.fontHead, fontSize: 15, fontWeight: 800, color: '#fff' }}>Členové týmu</div>
-          <div style={{ flex: 1 }} />
-          <button style={{ padding: '8px 14px', borderRadius: 8, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <Icon name="user-plus-bold" size={13} color="#fff"/>Pozvat člena
-          </button>
-        </div>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: T.fontUI, fontSize: 12.5 }}>
-          <thead>
-            <tr style={{ color: T.mutedSoft, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-              <th style={{ textAlign: 'left', padding: '10px 18px', borderBottom: '1px solid ' + T.border }}>Člen</th>
-              <th style={{ textAlign: 'left', padding: '10px 12px', borderBottom: '1px solid ' + T.border }}>Role</th>
-              <th style={{ textAlign: 'left', padding: '10px 12px', borderBottom: '1px solid ' + T.border }}>Oprávnění</th>
-              <th style={{ textAlign: 'right', padding: '10px 12px', borderBottom: '1px solid ' + T.border }}>Najato</th>
-              <th style={{ textAlign: 'right', padding: '10px 12px', borderBottom: '1px solid ' + T.border }}>Inzerátů</th>
-              <th style={{ textAlign: 'left', padding: '10px 12px', borderBottom: '1px solid ' + T.border }}>Aktivita</th>
-              <th style={{ padding: '10px 18px', borderBottom: '1px solid ' + T.border }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {E_TEAM.map((m, i) => (
-              <tr key={i} style={{ opacity: m.pending ? 0.7 : 1 }}>
-                <td style={{ padding: '12px 18px', borderBottom: '1px solid ' + T.border }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 999, background: m.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 12, border: m.pending ? '1px dashed ' + T.border : 'none' }}>{m.avatar}</div>
-                    <div>
-                      <div style={{ color: '#fff', fontWeight: 700, fontSize: 13 }}>{m.you ? 'Vy · ' : ''}{m.pending ? 'Čeká na přijetí' : m.name}</div>
-                      <div style={{ color: T.mutedSoft, fontSize: 10.5, fontFamily: T.fontMono }}>{m.email}</div>
-                    </div>
-                  </div>
-                </td>
-                <td style={{ padding: '12px 12px', borderBottom: '1px solid ' + T.border, color: T.light }}>{m.role}</td>
-                <td style={{ padding: '12px 12px', borderBottom: '1px solid ' + T.border }}>
-                  <span style={{ padding: '3px 8px', borderRadius: 6, background: m.pending ? 'rgba(255,209,102,0.18)' : 'rgba(91,107,255,0.15)', color: m.pending ? T.super : T.light, fontSize: 11, fontWeight: 700, fontFamily: T.fontUI }}>{m.perms}</span>
-                </td>
-                <td style={{ padding: '12px 12px', borderBottom: '1px solid ' + T.border, textAlign: 'right', fontFamily: T.fontMono, color: '#fff', fontWeight: 700 }}>{m.hires || '—'}</td>
-                <td style={{ padding: '12px 12px', borderBottom: '1px solid ' + T.border, textAlign: 'right', fontFamily: T.fontMono, color: T.light }}>{m.jobs || '—'}</td>
-                <td style={{ padding: '12px 12px', borderBottom: '1px solid ' + T.border, color: T.muted, fontSize: 11.5 }}>{m.last}</td>
-                <td style={{ padding: '12px 18px', borderBottom: '1px solid ' + T.border, textAlign: 'right' }}>
-                  <button style={{ width: 28, height: 28, borderRadius: 7, background: 'transparent', border: '1px solid ' + T.border, color: T.muted, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
-                    <Icon name="menu-dots-bold" size={14} color={T.muted}/>
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </ECard>
-
-      <ECard>
-        <SectionHeader title="Audit log" subtitle="Co kdo udělal v posledních 24 h" />
-        {[
-          { who: 'Anna Svobodová', what: 'najala Sáru Dvořákovou na Servírku', t: 'včera 18:42' },
-          { who: 'Petr Novák', what: 'pozastavil inzerát "Brand ambassador"', t: 'včera 14:11' },
-          { who: 'Michal Dvořák', what: 'odpověděl 12 kandidátům', t: 'včera 11:08' },
-          { who: 'Eva Kovářová', what: 'stáhla fakturu FA-2025-04', t: 'včera 09:32' },
-        ].map((a, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < 3 ? '1px solid ' + T.border : 'none' }}>
-            <Icon name="history-bold" size={13} color={T.mutedSoft}/>
-            <span style={{ color: T.light, fontSize: 12, fontFamily: T.fontUI }}><span style={{ color: '#fff', fontWeight: 700 }}>{a.who}</span> {a.what}</span>
-            <div style={{ flex: 1 }} />
-            <span style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10.5 }}>{a.t}</span>
-          </div>
-        ))}
-      </ECard>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
-// FAKTURACE
-// ─────────────────────────────────────────────────────────────
-function EBilling() {
-  return (
-    <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 14 }}>
-        <ECard padding={0} style={{ overflow: 'hidden', position: 'relative' }}>
-          <div style={{ padding: 22, background: 'linear-gradient(135deg, rgba(0,32,246,0.35), rgba(45,44,167,0.15))', borderBottom: '1px solid ' + T.border, position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: -60, right: -60, width: 240, height: 240, borderRadius: 999, background: 'radial-gradient(circle, rgba(91,107,255,0.4), transparent 60%)', filter: 'blur(20px)' }} />
-            <div style={{ position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Icon name="crown-star-bold" size={16} color={T.super}/>
-                <span style={{ color: T.super, fontSize: 10.5, fontWeight: 800, fontFamily: T.fontUI, letterSpacing: 1, textTransform: 'uppercase' }}>Aktivní tarif</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 8 }}>
-                <div style={{ fontFamily: T.fontHead, fontSize: 36, fontWeight: 800, color: '#fff', letterSpacing: -1 }}>Premium</div>
-                <div style={{ color: T.light, fontFamily: T.fontMono, fontSize: 16, fontWeight: 700 }}>2 490 Kč<span style={{ color: T.muted, fontSize: 12, fontWeight: 500 }}>/měsíc</span></div>
-              </div>
-              <div style={{ color: T.muted, fontSize: 12.5, fontFamily: T.fontUI, marginTop: 6 }}>Obnoví se automaticky 8.6.2025 · faktura na IČO 04123456</div>
-              <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-                <button style={{ padding: '8px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Změnit tarif</button>
-                <button style={{ padding: '8px 14px', borderRadius: 8, background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Zrušit obnovu</button>
-              </div>
-            </div>
-          </div>
-          <div style={{ padding: '18px 22px' }}>
-            <div style={{ color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 10 }}>Co máte</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              {[
-                'Neomezené inzeráty',
-                'Boost 5× / měsíc',
-                'AI hodnocení kandidátů',
-                'Přednostní pozice ve feedu',
-                'Pokročilá analytika',
-                'API přístup',
-                '10 členů týmu',
-                'Prioritní podpora',
-              ].map((f, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, color: T.light, fontFamily: T.fontUI, fontSize: 12.5 }}>
-                  <Icon name="check-circle-bold" size={14} color="#5BD68A"/>{f}
-                </div>
-              ))}
-            </div>
-          </div>
-        </ECard>
-
-        <ECard>
-          <SectionHeader title="Spotřeba tento měsíc" subtitle="1.5. – 31.5.2025" />
-          {[
-            { l: 'Aktivní inzeráty', v: 5, max: '∞', pct: 25 },
-            { l: 'Boosty', v: 3, max: 5, pct: 60 },
-            { l: 'API volání', v: '12 480', max: '50 000', pct: 25 },
-            { l: 'Členové týmu', v: 4, max: 10, pct: 40 },
-          ].map((u, i) => (
-            <div key={i} style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontFamily: T.fontUI, marginBottom: 4 }}>
-                <span style={{ color: T.light }}>{u.l}</span>
-                <span style={{ color: '#fff', fontFamily: T.fontMono, fontWeight: 700 }}>{u.v} / {u.max}</span>
-              </div>
-              <div style={{ height: 6, borderRadius: 3, background: 'rgba(0,0,0,0.3)' }}>
-                <div style={{ height: '100%', width: u.pct + '%', borderRadius: 3, background: 'linear-gradient(90deg, #5B6BFF, #0020F6)' }} />
-              </div>
-            </div>
-          ))}
-        </ECard>
-      </div>
-
-      <ECard>
-        <SectionHeader title="Faktury" subtitle="Posledních 12 měsíců" action={<button style={{ padding: '7px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="export-bold" size={12} color={T.light}/>Stáhnout vše</button>} />
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: T.fontUI, fontSize: 12.5 }}>
-          <thead>
-            <tr style={{ color: T.mutedSoft, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-              <th style={{ textAlign: 'left', padding: '8px 4px', borderBottom: '1px solid ' + T.border }}>Číslo</th>
-              <th style={{ textAlign: 'left', padding: '8px 4px', borderBottom: '1px solid ' + T.border }}>Datum</th>
-              <th style={{ textAlign: 'left', padding: '8px 4px', borderBottom: '1px solid ' + T.border }}>Položky</th>
-              <th style={{ textAlign: 'right', padding: '8px 4px', borderBottom: '1px solid ' + T.border }}>Částka</th>
-              <th style={{ textAlign: 'left', padding: '8px 4px', borderBottom: '1px solid ' + T.border }}>Stav</th>
-              <th style={{ padding: '8px 4px', borderBottom: '1px solid ' + T.border }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              { n: 'FA-2025-05', d: '8.5.2025', items: 'Premium · měsíc', a: '2 490 Kč', s: 'Zaplaceno' },
-              { n: 'FA-2025-04', d: '8.4.2025', items: 'Premium + Boost (3×)', a: '3 690 Kč', s: 'Zaplaceno' },
-              { n: 'FA-2025-03', d: '8.3.2025', items: 'Premium · měsíc', a: '2 490 Kč', s: 'Zaplaceno' },
-              { n: 'FA-2025-02', d: '8.2.2025', items: 'Premium + ASAP boost', a: '3 290 Kč', s: 'Zaplaceno' },
-              { n: 'FA-2025-01', d: '8.1.2025', items: 'Standard · měsíc', a: '990 Kč', s: 'Zaplaceno' },
-              { n: 'FA-2024-12', d: '8.12.2024', items: 'Standard · měsíc', a: '990 Kč', s: 'Zaplaceno' },
-            ].map((f, i) => (
-              <tr key={i}>
-                <td style={{ padding: '12px 4px', borderBottom: '1px solid ' + T.border, color: '#fff', fontWeight: 700, fontFamily: T.fontMono }}>{f.n}</td>
-                <td style={{ padding: '12px 4px', borderBottom: '1px solid ' + T.border, color: T.light, fontFamily: T.fontMono }}>{f.d}</td>
-                <td style={{ padding: '12px 4px', borderBottom: '1px solid ' + T.border, color: T.light }}>{f.items}</td>
-                <td style={{ padding: '12px 4px', borderBottom: '1px solid ' + T.border, textAlign: 'right', fontFamily: T.fontMono, color: '#fff', fontWeight: 700 }}>{f.a}</td>
-                <td style={{ padding: '12px 4px', borderBottom: '1px solid ' + T.border }}>
-                  <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,214,138,0.15)', color: '#5BD68A', fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                    <Icon name="check-circle-bold" size={11} color="#5BD68A"/>{f.s}
-                  </span>
-                </td>
-                <td style={{ padding: '12px 4px', borderBottom: '1px solid ' + T.border, textAlign: 'right' }}>
-                  <button style={{ padding: '5px 10px', borderRadius: 7, background: 'transparent', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 11, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                    <Icon name="document-add-bold" size={11} color={T.light}/>PDF
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </ECard>
-
-      <ECard>
-        <SectionHeader title="Platební metoda" subtitle="Záloha pro automatické obnovy" />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 14, borderRadius: 12, background: 'linear-gradient(135deg, #1a1a4a, #0a0a28)', border: '1px solid ' + T.border, position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: 999, background: 'radial-gradient(circle, rgba(255,209,102,0.2), transparent 60%)' }} />
-          <div style={{ width: 50, height: 32, borderRadius: 5, background: 'linear-gradient(135deg, #FFD166, #FFA500)' }} />
-          <div style={{ flex: 1, position: 'relative' }}>
-            <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 14, fontWeight: 700, letterSpacing: 1.5 }}>•••• •••• •••• 4242</div>
-            <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, marginTop: 3 }}>Visa · platí do 09/27 · Anna Svobodová</div>
-          </div>
-          <button style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Změnit</button>
-        </div>
-      </ECard>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────
 // NASTAVENÍ
@@ -618,9 +398,7 @@ function ESettings() {
       <aside style={{ width: 220, padding: 22, borderRight: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', gap: 4 }}>
         {[
           { k: 'profile', l: 'Firemní profil', i: 'buildings-3-bold' },
-          { k: 'public', l: 'Veřejný profil', i: 'eye-bold' },
           { k: 'notif', l: 'Notifikace', i: 'bell-bold' },
-          { k: 'integ', l: 'Integrace', i: 'plug-circle-bold' },
           { k: 'priv', l: 'Soukromí + GDPR', i: 'shield-keyhole-bold' },
           { k: 'danger', l: 'Nebezpečná zóna', i: 'shield-warning-bold' },
         ].map(s => (
@@ -640,9 +418,7 @@ function ESettings() {
       </aside>
       <div style={{ flex: 1, padding: '24px 28px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 760 }}>
         {seg === 'profile' && <SettingsProfile />}
-        {seg === 'public' && <SettingsPublic />}
         {seg === 'notif' && <SettingsNotif />}
-        {seg === 'integ' && <SettingsIntegrations />}
         {seg === 'priv' && <SettingsPrivacy />}
         {seg === 'danger' && <SettingsDanger />}
       </div>
@@ -730,33 +506,10 @@ function SettingsProfile() {
   );
 }
 
-function SettingsPublic() {
-  return (
-    <ECard>
-      <SectionHeader title="Veřejný profil" subtitle="Jak vás kandidáti uvidí ve feedu a v kartě firmy" />
-      <FormRow label="Slogan"><input style={inputStyle} defaultValue="Káva, která něco znamená." /></FormRow>
-      <FormRow label="Co u nás brigádníci dostanou" sub="3 nejdůležitější benefity">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <input style={inputStyle} defaultValue="🥐 Snídaně z naší pekárny zdarma" />
-          <input style={inputStyle} defaultValue="📚 Školení specialty kávy + cupping" />
-          <input style={inputStyle} defaultValue="🚇 5 min od Náměstí Svobody" />
-        </div>
-      </FormRow>
-      <FormRow label="Galerie" sub="Až 6 fotek pracoviště">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-          {[0,1,2,3,4].map(i => (
-            <div key={i} style={{ aspectRatio: '4/3', borderRadius: 10, background: `linear-gradient(135deg, ${['#F4A261','#5B6BFF','#FFD166','#5BD68A','#E0B0FF'][i]}55, rgba(15,15,40,0.6))`, border: '1px solid ' + T.border }}/>
-          ))}
-          <button style={{ aspectRatio: '4/3', borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '2px dashed ' + T.border, color: T.muted, cursor: 'pointer', display: 'grid', placeItems: 'center', fontFamily: T.fontUI, fontSize: 11 }}>+ Přidat</button>
-        </div>
-      </FormRow>
-    </ECard>
-  );
-}
 
 function SettingsNotif() {
   const rows = [
-    { l: 'Nový match', s: 'Někdo swipnul vpravo na váš inzerát', e: true, p: true, push: true },
+    { l: 'Nový match', s: 'Někdo swajpnul vpravo na váš inzerát', e: true, p: true, push: true },
     { l: 'Zpráva od kandidáta', s: 'Nová zpráva ve schránce', e: true, p: true, push: true },
     { l: 'Kandidát potvrdil směnu', s: 'Po nabídce směny v threadu', e: false, p: true, push: true },
     { l: 'Kandidát zrušil směnu', s: 'Důležité — vyžaduje akci', e: true, p: true, push: true },
@@ -807,40 +560,6 @@ function Toggle({ on }) {
   );
 }
 
-function SettingsIntegrations() {
-  const list = [
-    { n: 'Google Calendar', d: 'Automaticky synchronizovat směny do kalendáře týmu', i: 'calendar-bold', c: '#4285F4', on: true },
-    { n: 'Slack', d: 'Notifikace o nových matchích do #recruitment', i: 'chat-square-2-bold', c: '#4A154B', on: true },
-    { n: 'POHODA', d: 'Export brigádníků a odpracovaných hodin', i: 'document-text-bold', c: '#5BD68A', on: false },
-    { n: 'Make (Integromat)', d: 'Vlastní automatizace přes webhooky', i: 'bolt-bold', c: '#6D49DB', on: false },
-    { n: 'Zapier', d: '7 000+ aplikací', i: 'plug-circle-bold', c: '#FF4A00', on: false },
-    { n: 'Webhook + REST API', d: 'Pro vlastní backend', i: 'code-bold', c: '#5B6BFF', on: true },
-  ];
-  return (
-    <ECard padding={0} style={{ overflow: 'hidden' }}>
-      <div style={{ padding: '18px 22px 8px' }}>
-        <SectionHeader title="Integrace" subtitle="Propojte makej s vašimi nástroji" />
-      </div>
-      {list.map((it, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 22px', borderBottom: i < list.length - 1 ? '1px solid ' + T.border : 'none' }}>
-          <div style={{ width: 38, height: 38, borderRadius: 9, background: it.c + '22', border: '1px solid ' + it.c + '44', display: 'grid', placeItems: 'center' }}>
-            <Icon name={it.i} size={16} color={it.c}/>
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13.5, fontWeight: 700 }}>{it.n}</div>
-            <div style={{ color: T.muted, fontSize: 11.5, fontFamily: T.fontUI, marginTop: 2 }}>{it.d}</div>
-          </div>
-          {it.on ? (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 6, background: 'rgba(91,214,138,0.15)', color: '#5BD68A', fontFamily: T.fontUI, fontSize: 11, fontWeight: 700 }}>
-              <span style={{ width: 6, height: 6, borderRadius: 999, background: '#5BD68A' }}/>Připojeno
-            </span>
-          ) : null}
-          <button style={{ padding: '8px 14px', borderRadius: 8, background: it.on ? 'transparent' : 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: '1px solid ' + (it.on ? T.border : 'transparent'), color: it.on ? T.muted : '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>{it.on ? 'Odpojit' : 'Propojit'}</button>
-        </div>
-      ))}
-    </ECard>
-  );
-}
 
 function SettingsPrivacy() {
   return (
@@ -888,4 +607,4 @@ function SettingsDanger() {
   );
 }
 
-Object.assign(window, { EMessages, ETeam, EBilling, ESettings });
+Object.assign(window, { EMessages, ESettings });

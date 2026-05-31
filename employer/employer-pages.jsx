@@ -18,7 +18,7 @@ function EJobs({ onTab }) {
         {[
           { label: 'Aktivních', value: E_JOBS.filter(j=>j.status==='active'||j.status==='urgent').length, sub: 'inzerátů', color: '#5BD68A' },
           { label: 'Celkem zhlédnutí', value: E_JOBS.reduce((a,j)=>a+j.views,0).toLocaleString('cs-CZ').replace(/,/g,' '), sub: 'za 30 dní', color: '#5B6BFF' },
-          { label: 'Průměrný CTR', value: (E_JOBS.reduce((a,j)=>a+j.ctr,0)/E_JOBS.length).toFixed(1)+'%', sub: 'swipe → match', color: '#FFD166' },
+          { label: 'Průměrný CTR', value: (E_JOBS.reduce((a,j)=>a+j.ctr,0)/E_JOBS.length).toFixed(1)+'%', sub: 'swajp → match', color: '#FFD166' },
           { label: 'Najato celkem', value: E_JOBS.reduce((a,j)=>a+j.hired,0), sub: 'v tomto měsíci', color: '#5BD68A' },
         ].map((s, i) => (
           <ECard key={i} padding={16}>
@@ -122,8 +122,8 @@ function EJobs({ onTab }) {
                     ))}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, paddingTop: 4, borderTop: '1px solid ' + T.border }}>
-                    <BarMetric label="CTR (zhlédnuto → swipe)" value={j.ctr} max={30} suffix="%" />
-                    <BarMetric label="Match rate (swipe → match)" value={parseFloat(matchRate)} max={20} suffix="%" />
+                    <BarMetric label="CTR (zhlédnuto → swajp)" value={j.ctr} max={30} suffix="%" />
+                    <BarMetric label="Match rate (swajp → match)" value={parseFloat(matchRate)} max={20} suffix="%" />
                     <BarMetric label="Hire rate (match → najato)" value={parseFloat(hireRate)} max={30} suffix="%" />
                   </div>
                 </div>

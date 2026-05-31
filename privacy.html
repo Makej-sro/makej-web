@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zásady ochrany osobních údajů — Makej!</title>
+  <meta name="description" content="Zásady ochrany osobních údajů platformy Makej! — jak zpracováváme tvá data a jaká máš práva." />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #050510;
+      --fg: #ffffff;
+      --card: #16163b;
+      --primary: #292978;
+      --secondary: #d0d0ff;
+      --muted-fg: #9999cc;
+      --border: rgba(208,208,255,.1);
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --font-heading: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(5,5,16,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 800px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      font-family: var(--font-heading);
+      font-size: 1.3rem; font-weight: 700;
+      color: #fff; text-decoration: none;
+    }
+    .nav-back {
+      font-size: .875rem; color: var(--muted-fg);
+      text-decoration: none; transition: color .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-back:hover { color: #fff; }
+    /* CONTENT */
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 64px 24px 120px;
+    }
+    .page-label {
+      display: inline-block;
+      font-size: .75rem; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--secondary);
+      background: rgba(208,208,255,.08);
+      border: 1px solid rgba(208,208,255,.15);
+      border-radius: 100px;
+      padding: 4px 12px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .page-meta {
+      color: var(--muted-fg);
+      font-size: .9rem;
+      margin-bottom: 56px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    h2 {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 48px 0 16px;
+      color: #fff;
+    }
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 28px 0 10px;
+      color: var(--secondary);
+    }
+    p { margin-bottom: 16px; color: rgba(255,255,255,.8); font-size: .95rem; }
+    ul, ol { margin: 0 0 16px 20px; color: rgba(255,255,255,.8); font-size: .95rem; }
+    li { margin-bottom: 8px; }
+    a { color: var(--secondary); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover { color: #fff; }
+    .highlight-box {
+      background: rgba(41,41,120,.25);
+      border: 1px solid rgba(208,208,255,.12);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 24px 0;
+    }
+    .highlight-box p { margin: 0; font-size: .9rem; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0 28px; font-size: .875rem; }
+    th { text-align: left; padding: 10px 14px; background: rgba(208,208,255,.06); color: var(--secondary); font-weight: 600; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid rgba(208,208,255,.05); color: rgba(255,255,255,.75); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; }
+    footer p { color: var(--muted-fg); font-size: .875rem; margin: 0; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Makej!</a>
+      <a href="/" class="nav-back">← Zpět na hlavní stránku</a>
+    </div>
+  </nav>
+
+  <main class="page">
+    <span class="page-label">Právní dokumenty</span>
+    <h1>Zásady ochrany osobních údajů</h1>
+    <p class="page-meta">Platné od: 1. června 2026 &nbsp;·&nbsp; Správce: Samuel Pseja, IČO: <strong>[DOPLŇ IČO]</strong>, e-mail: <a href="mailto:privacy@makej.eu">privacy@makej.eu</a></p>
+
+    <div class="highlight-box">
+      <p>Tyto zásady popisují, jaké osobní údaje o tobě zpracováváme, k čemu je používáme a jaká máš práva. Pokud máš jakékoliv dotazy, napiš nám na <a href="mailto:privacy@makej.eu">privacy@makej.eu</a>.</p>
+    </div>
+
+    <h2>1. Správce osobních údajů</h2>
+    <p>Správcem osobních údajů je Samuel Pseja, se sídlem v České republice, IČO: <strong>[DOPLŇ IČO]</strong> (dále jen „my" nebo „Makej!"). Kontaktní e-mail pro záležitosti ochrany osobních údajů: <a href="mailto:privacy@makej.eu">privacy@makej.eu</a>.</p>
+
+    <h2>2. Jaké údaje zpracováváme</h2>
+
+    <h3>2.1 Údaje, které nám přímo poskytneš</h3>
+    <ul>
+      <li><strong>Registrační údaje:</strong> jméno, e-mailová adresa, heslo (ukládáme pouze hash), typ účtu (brigádník / zaměstnavatel), název firmy (pouze zaměstnavatelé).</li>
+      <li><strong>Profilové údaje:</strong> profilová fotografie, dovednosti, popis, preferované obory práce.</li>
+      <li><strong>Obsah konverzací:</strong> zprávy v chatu mezi brigádníky a zaměstnavateli.</li>
+      <li><strong>Hodnocení:</strong> hodnocení a recenze po dokončené brigádě.</li>
+    </ul>
+
+    <h3>2.2 Údaje, které vznikají při používání aplikace</h3>
+    <ul>
+      <li><strong>Swajp aktivita:</strong> záznamy o tom, které inzeráty jsi přijal nebo odmítl.</li>
+      <li><strong>Zhlédnutí inzerátů:</strong> anonymizovaná statistika pro zaměstnavatele.</li>
+      <li><strong>Přihlašovací záznamy:</strong> čas posledního přihlášení, typ zařízení.</li>
+    </ul>
+
+    <h3>2.3 Přihlášení přes Google (OAuth)</h3>
+    <p>Pokud se přihlásíš přes Google, obdržíme od Googlu tvé jméno, e-mailovou adresu a profilovou fotografii. Heslo v takovém případě neukládáme.</p>
+
+    <h2>3. Na jakém právním základě a k čemu údaje používáme</h2>
+
+    <table>
+      <tr>
+        <th>Účel</th>
+        <th>Právní základ (GDPR)</th>
+      </tr>
+      <tr>
+        <td>Poskytování služby — registrace, matching, chat</td>
+        <td>Plnění smlouvy (čl. 6 odst. 1 písm. b)</td>
+      </tr>
+      <tr>
+        <td>Zasílání transakčních e-mailů (potvrzení, reset hesla)</td>
+        <td>Plnění smlouvy (čl. 6 odst. 1 písm. b)</td>
+      </tr>
+      <tr>
+        <td>Zobrazení statistik v dashboardu zaměstnavatele</td>
+        <td>Plnění smlouvy (čl. 6 odst. 1 písm. b)</td>
+      </tr>
+      <tr>
+        <td>Zabezpečení služby, prevence zneužití</td>
+        <td>Oprávněný zájem (čl. 6 odst. 1 písm. f)</td>
+      </tr>
+      <tr>
+        <td>Analytika a vylepšování produktu</td>
+        <td>Oprávněný zájem (čl. 6 odst. 1 písm. f)</td>
+      </tr>
+    </table>
+
+    <h2>4. Komu údaje předáváme</h2>
+    <p>Tvé osobní údaje neprodáváme třetím stranám. Sdílíme je pouze s:</p>
+    <ul>
+      <li><strong>Supabase Inc.</strong> (USA) — databáze a autentizace. Data jsou uložena v regionu EU (eu-west-1, Irsko). Supabase je certifikován dle SOC 2 Type 2 a dodržuje standardní smluvní doložky EU.</li>
+      <li><strong>Google LLC</strong> — pouze pokud se přihlašuješ přes Google OAuth.</li>
+      <li><strong>Poskytovatel e-mailových služeb</strong> — pro zasílání transakčních e-mailů (potvrzení registrace, reset hesla).</li>
+    </ul>
+    <p>Všichni zpracovatelé jsou smluvně zavázáni k ochraně tvých dat a nesmí je použít k jiným účelům.</p>
+
+    <h2>5. Jak dlouho údaje uchováváme</h2>
+    <ul>
+      <li>Po dobu, po kterou je tvůj účet aktivní.</li>
+      <li>Po smazání účtu jsou tvé osobní údaje trvale odstraněny do <strong>30 dnů</strong> (s výjimkou anonymizovaných statistik a záznamů vyžadovaných zákonem).</li>
+      <li>Záznamy o transakcích (fakturace) uchováváme po dobu vyžadovanou českým daňovým zákonem (5 let).</li>
+    </ul>
+
+    <h2>6. Tvá práva (GDPR)</h2>
+    <p>Jako subjekt údajů máš tato práva:</p>
+    <ul>
+      <li><strong>Právo na přístup</strong> — můžeš požádat o kopii svých údajů.</li>
+      <li><strong>Právo na opravu</strong> — oprav si profil přímo v aplikaci, nebo nás kontaktuj.</li>
+      <li><strong>Právo na výmaz</strong> — v nastavení profilu najdeš tlačítko „Smazat účet a všechna data". Smazání je okamžité a nevratné.</li>
+      <li><strong>Právo na přenositelnost</strong> — na vyžádání ti poskytneme tvá data ve strojově čitelném formátu (JSON).</li>
+      <li><strong>Právo vznést námitku</strong> — můžeš vznést námitku proti zpracování na základě oprávněného zájmu.</li>
+      <li><strong>Právo podat stížnost</strong> — máš právo podat stížnost u Úřadu pro ochranu osobních údajů (ÚOOÚ), Pplk. Sochora 27, 170 00 Praha 7, <a href="https://www.uoou.cz" target="_blank" rel="noopener">www.uoou.cz</a>.</li>
+    </ul>
+    <p>Žádosti vyřizujeme do 30 dnů. Kontaktuj nás na <a href="mailto:privacy@makej.eu">privacy@makej.eu</a>.</p>
+
+    <h2>7. Soubory cookies a lokální úložiště</h2>
+    <p>Naše webová stránka a aplikace používají:</p>
+    <ul>
+      <li><strong>localStorage</strong> — ukládáme přihlašovací session pod klíčem <code>makej-auth</code>. Bez tohoto záznamu bys musel/a zadávat heslo při každém otevření aplikace. Jde o technicky nezbytné ukládání dat, které nevyžaduje souhlas.</li>
+      <li><strong>Google Fonts</strong> — načítáme písma z CDN Googlu (fonts.googleapis.com). Google může při tomto požadavku zpracovávat IP adresu. Nepoužíváme reklamní cookies Google.</li>
+    </ul>
+    <p>Nepoužíváme reklamní cookies ani sledovací pixely třetích stran.</p>
+
+    <h2>8. Bezpečnost</h2>
+    <p>Data ukládáme v databázi s aktivním Row Level Security (RLS) — každý uživatel vidí pouze svá vlastní data. Komunikace probíhá výhradně přes HTTPS. Hesla ukládáme jako bcrypt hash, nikdy v čitelné podobě.</p>
+
+    <h2>9. Věk uživatelů</h2>
+    <p>Makej! není určeno dětem mladším 16 let. Pokud zjistíme, že jsme neúmyslně shromáždili údaje o osobě mladší 16 let, tyto údaje neprodleně smažeme. Pokud víš o takovém případu, kontaktuj nás na <a href="mailto:privacy@makej.eu">privacy@makej.eu</a>.</p>
+
+    <h2>10. Změny těchto zásad</h2>
+    <p>O podstatných změnách tě budeme informovat e-mailem nebo oznámením v aplikaci nejméně 14 dní předem. Aktuální verze je vždy dostupná na této stránce. Datum poslední aktualizace je uvedeno v záhlaví dokumentu.</p>
+
+    <h2>11. Kontakt</h2>
+    <p>Máš-li jakékoliv dotazy nebo chceš uplatnit svá práva, napiš nám:</p>
+    <div class="highlight-box">
+      <p>📧 <a href="mailto:privacy@makej.eu">privacy@makej.eu</a><br/>
+      Správce: Samuel Pseja, IČO: <strong>[DOPLŇ IČO]</strong><br/>
+      Česká republika</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 Makej! &nbsp;·&nbsp; <a href="/privacy.html">Soukromí</a> &nbsp;·&nbsp; <a href="/terms.html">Podmínky</a> &nbsp;·&nbsp; <a href="/">Zpět na hlavní stránku</a></p>
+  </footer>
+
+</body>
+</html>

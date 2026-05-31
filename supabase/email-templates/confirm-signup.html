@@ -1,0 +1,71 @@
+<!--
+  Supabase → Authentication → Email Templates → Confirm signup
+  Subject: Potvrď svůj účet na Makej!
+
+  Proměnné Supabase: {{ .ConfirmationURL }}
+-->
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Potvrzení účtu — Makej!</title>
+</head>
+<body style="margin:0;padding:0;background:#050510;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:#ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#050510;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#16163b;border-radius:16px;border:1px solid rgba(208,208,255,0.1);overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#292978,#3a3a99);padding:32px 40px;text-align:center;">
+              <div style="font-size:28px;font-weight:800;letter-spacing:-0.5px;color:#ffffff;">Makej!</div>
+              <div style="font-size:13px;color:rgba(208,208,255,0.7);margin-top:4px;">Swajpuj. Matchuj. Pracuj.</div>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:36px 40px;">
+              <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 12px;">Potvrď svůj e-mail</h1>
+              <p style="font-size:15px;color:rgba(255,255,255,0.7);line-height:1.65;margin:0 0 28px;">
+                Vítej v Makej! Jeden krok tě dělí od prvního swajpu. Klikni na tlačítko níže a potvrď svůj e-mail.
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center">
+                    <a href="{{ .ConfirmationURL }}"
+                       style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#292978,#3a3a99);color:#ffffff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;letter-spacing:0.2px;">
+                      ✓ Potvrdit e-mail
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size:12px;color:rgba(255,255,255,0.3);margin:28px 0 0;text-align:center;line-height:1.6;">
+                Tlačítko nefunguje? Zkopíruj tento odkaz do prohlížeče:<br/>
+                <a href="{{ .ConfirmationURL }}" style="color:rgba(208,208,255,0.6);word-break:break-all;">{{ .ConfirmationURL }}</a>
+              </p>
+              <p style="font-size:12px;color:rgba(255,255,255,0.25);margin:16px 0 0;text-align:center;">
+                Odkaz vyprší za 24 hodin. Pokud jsi tento e-mail nečekal/a, ignoruj ho.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 40px;border-top:1px solid rgba(208,208,255,0.08);text-align:center;">
+              <p style="font-size:12px;color:rgba(255,255,255,0.25);margin:0;">
+                © 2026 Makej! · <a href="https://makej.eu/privacy.html" style="color:rgba(208,208,255,0.4);text-decoration:none;">Ochrana soukromí</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

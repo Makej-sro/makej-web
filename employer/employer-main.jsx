@@ -2,14 +2,12 @@
 
 const TITLES = {
   dash:       { title: 'Dashboard',   subtitle: 'Přehled výkonu náboru za 30 dní' },
-  analytics:  { title: 'Analytika',  subtitle: 'Pokročilé reporty a segmentace' },
+  analytics:  { title: 'Analytika',   subtitle: 'Pokročilé reporty a segmentace' },
   jobs:       { title: 'Inzeráty',   subtitle: 'Správa a výkon vašich brigád' },
   candidates: { title: 'Kandidáti',  subtitle: 'Náborový pipeline' },
   chat:       { title: 'Zprávy',     subtitle: 'Komunikace s kandidáty' },
-  calendar:   { title: 'Plán směn',  subtitle: 'Kalendář a obsazení' },
-  team:       { title: 'Tým',        subtitle: 'Vaši kolegové a oprávnění' },
-  billing:    { title: 'Fakturace',  subtitle: 'Tarify, faktury a platby' },
-  settings:   { title: 'Nastavení',  subtitle: 'Firemní profil a integrace' },
+  calendar:   { title: 'Plán směn',  subtitle: 'Kalendář obsazení a otevřené sloty' },
+  settings:   { title: 'Nastavení',  subtitle: 'Firemní profil a nastavení' },
 };
 
 function ELoadingSpinner() {
@@ -266,13 +264,11 @@ function EmployerApp() {
   } else if (noData && tab === 'dash') {
     body = <EEmptyState />;
   } else if (tab === 'dash')        body = <EDashboard key={tick} />;
+  else if (tab === 'analytics')     body = <EAnalytics key={tick} />;
   else if (tab === 'jobs')          body = <EJobs key={tick} onTab={setTab} />;
   else if (tab === 'candidates')    body = <ECandidates key={tick} />;
-  else if (tab === 'analytics')     body = <EAnalytics key={tick} />;
-  else if (tab === 'calendar')      body = <ECalendar key={tick} />;
   else if (tab === 'chat')          body = <EMessages key={tick} />;
-  else if (tab === 'team')          body = <ETeam key={tick} />;
-  else if (tab === 'billing')       body = <EBilling key={tick} />;
+  else if (tab === 'calendar')      body = <ECalendar key={tick} />;
   else if (tab === 'settings')      body = <ESettings key={tick} />;
   else body = (
     <div style={{ flex: 1, display: 'grid', placeItems: 'center', color: T.muted, fontFamily: T.fontUI }}>

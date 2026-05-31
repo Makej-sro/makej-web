@@ -368,3 +368,26 @@ function showToast(msg) {
     setTimeout(() => toast.remove(), 350);
   }, 4500);
 }
+
+// ═══════════ COOKIE CONSENT BANNER ═══════════
+(function () {
+  const COOKIE_KEY = 'makej-cookie-consent';
+  const banner = document.getElementById('cookie-banner');
+  if (!banner) return;
+
+  // Pokud uživatel už rozhodl, nezobrazuj banner
+  if (localStorage.getItem(COOKIE_KEY)) return;
+
+  // Zobraz banner s malým zpožděním (po načtení stránky)
+  setTimeout(() => banner.classList.add('visible'), 800);
+
+  document.getElementById('cookie-accept').addEventListener('click', () => {
+    localStorage.setItem(COOKIE_KEY, 'accepted');
+    banner.classList.remove('visible');
+  });
+
+  document.getElementById('cookie-reject').addEventListener('click', () => {
+    localStorage.setItem(COOKIE_KEY, 'rejected');
+    banner.classList.remove('visible');
+  });
+})();

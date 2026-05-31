@@ -40,8 +40,8 @@ function ESidebar({ tab, onTab }) {
     {
       label: 'Přehled',
       items: [
-        { k: 'dash', label: 'Dashboard', icon: 'chart-square-bold', iconLine: 'chart-square-linear' },
-        { k: 'analytics', label: 'Analytika', icon: 'graph-up-bold', iconLine: 'graph-up-linear', badge: 'PRO' },
+        { k: 'dash',      label: 'Dashboard', icon: 'chart-square-bold',  iconLine: 'chart-square-linear' },
+        { k: 'analytics', label: 'Analytika', icon: 'graph-up-bold',      iconLine: 'graph-up-linear',    badge: 'PRO' },
       ],
     },
     {
@@ -56,8 +56,6 @@ function ESidebar({ tab, onTab }) {
     {
       label: 'Firma',
       items: [
-        { k: 'team', label: 'Tým', icon: 'users-group-two-rounded-bold', iconLine: 'users-group-two-rounded-linear' },
-        { k: 'billing', label: 'Fakturace', icon: 'card-bold', iconLine: 'card-linear' },
         { k: 'settings', label: 'Nastavení', icon: 'settings-bold', iconLine: 'settings-linear' },
       ],
     },
@@ -90,20 +88,22 @@ function ESidebar({ tab, onTab }) {
               {sec.items.map(it => {
                 const active = tab === it.k;
                 return (
-                  <button key={it.k} onClick={() => onTab(it.k)} style={{
+                  <button key={it.k} onClick={() => !it.disabled && onTab(it.k)} style={{
                     display: 'flex', alignItems: 'center', gap: 11,
                     padding: '9px 12px', borderRadius: 10,
                     background: active ? 'linear-gradient(135deg, rgba(0,32,246,0.28), rgba(91,107,255,0.12))' : 'transparent',
                     border: '1px solid ' + (active ? 'rgba(91,107,255,0.4)' : 'transparent'),
-                    color: active ? '#fff' : T.muted,
-                    cursor: 'pointer', textAlign: 'left',
+                    color: active ? '#fff' : it.disabled ? 'rgba(153,153,204,0.35)' : T.muted,
+                    cursor: it.disabled ? 'not-allowed' : 'pointer', textAlign: 'left',
                     fontFamily: T.fontUI, fontWeight: active ? 700 : 500, fontSize: 13.5,
                     transition: 'all .15s',
+                    opacity: it.disabled ? 0.5 : 1,
                   }}
-                  onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(208,208,255,0.04)'; }}
+                  onMouseEnter={e => { if (!active && !it.disabled) e.currentTarget.style.background = 'rgba(208,208,255,0.04)'; }}
                   onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}>
                     <Icon name={active ? it.icon : it.iconLine} size={18} color={active ? T.light : T.muted} />
                     <span style={{ flex: 1 }}>{it.label}</span>
+                    {it.disabled && <span style={{ fontSize: 9, fontWeight: 700, fontFamily: T.fontUI, color: 'rgba(153,153,204,0.5)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Brzy</span>}
                     {it.badge != null ? (
                       typeof it.badge === 'string' ? (
                         <span style={{

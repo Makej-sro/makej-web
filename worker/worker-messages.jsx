@@ -123,7 +123,7 @@ function WMessages({ tick }) {
           <div style={{ fontSize: 64, marginBottom: 12 }}>💬</div>
           <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Zatím žádné zprávy</div>
           <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13, lineHeight: 1.6 }}>
-            Swipuj brigády a jakmile tě zaměstnavatel přijme,<br />otevře se chat přímo tady.
+            Swajpuj brigády a jakmile tě zaměstnavatel přijme,<br />otevře se chat přímo tady.
           </div>
         </div>
       </div>

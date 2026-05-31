@@ -118,7 +118,7 @@ const CHATS = [
 ];
 
 const THREAD = [
-  { from: 'them', text: 'Ahoj Tome! Díky za swipe 💙 Máme rádi rychlé.', time: '12:30' },
+  { from: 'them', text: 'Ahoj Tome! Díky za swajp 💙 Máme rádi rychlé.', time: '12:30' },
   { from: 'me', text: 'Ahoj! Mám dotaz — vařil jsem espresso, ale latte art jen základ. Vadí?', time: '12:32' },
   { from: 'them', text: 'Vůbec ne, naučíme. První směna je hlavně o seznámení s tým a kávou.', time: '12:33' },
   { from: 'shift', shift: { date: 'Pá 9. května', time: '7:00 – 15:00', pay: 1440 }, time: '12:35' },
