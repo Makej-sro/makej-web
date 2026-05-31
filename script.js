@@ -280,15 +280,29 @@ function initAuth() {
     }
   });
 
+  // ─── Zobrazit / skrýt heslo ───
+  function setupPwToggle(toggleId, inputId, iconId) {
+    document.getElementById(toggleId).addEventListener('click', () => {
+      const input = document.getElementById(inputId);
+      const icon  = document.getElementById(iconId);
+      const show  = input.type === 'password';
+      input.type  = show ? 'text' : 'password';
+      icon.setAttribute('icon', show ? 'solar:eye-closed-bold' : 'solar:eye-bold');
+    });
+  }
+  setupPwToggle('reg-pw-toggle',  'reg-password',  'reg-pw-icon');
+  setupPwToggle('reg-pw2-toggle', 'reg-password2', 'reg-pw2-icon');
+
   // ─── Register form — stejná logika jako makej/src/app/(auth)/register/page.tsx ───
   document.getElementById('register-form').addEventListener('submit', async e => {
     e.preventDefault();
     clearErrors();
-    const btn     = document.getElementById('register-submit');
-    const name    = document.getElementById('reg-name').value.trim();
-    const email   = document.getElementById('reg-email').value.trim();
+    const btn      = document.getElementById('register-submit');
+    const name     = document.getElementById('reg-name').value.trim();
+    const email    = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
-    const company = document.getElementById('reg-company').value.trim();
+    const password2 = document.getElementById('reg-password2').value;
+    const company  = document.getElementById('reg-company').value.trim();
 
     if (!name) {
       showError('register-error', 'Zadejte své jméno.');
@@ -300,6 +314,10 @@ function initAuth() {
     }
     if (password.length < 6) {
       showError('register-error', 'Heslo musí mít alespoň 6 znaků.');
+      return;
+    }
+    if (password !== password2) {
+      showError('register-error', 'Hesla se neshodují. Zkontroluj je a zkus to znovu.');
       return;
     }
 

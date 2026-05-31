@@ -630,6 +630,15 @@ img { max-width: 100%; display: block; }
 }
 .form-input:focus { border-color: rgba(208,208,255,.4); background: rgba(208,208,255,.06); }
 .form-input::placeholder { color: var(--muted-fg); }
+
+.password-wrap { position: relative; }
+.password-wrap .form-input { padding-right: 44px; }
+.pw-toggle {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; padding: 4px;
+  color: var(--muted-fg); display: flex; align-items: center; transition: color .2s;
+}
+.pw-toggle:hover { color: var(--secondary); }
 .btn-full { width: 100%; justify-content: center; border-radius: .75rem; margin-top: .4rem; }
 .btn-full:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
