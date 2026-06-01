@@ -255,16 +255,16 @@ function ETopbar({ title, subtitle, onNew, onSignOut }) {
       <button
         onClick={onSignOut}
         title="Odhlásit se"
-        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,63,94,0.12)'; e.currentTarget.style.borderColor = 'rgba(244,63,94,0.35)'; e.currentTarget.style.color = '#f87171'; }}
-        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.muted; }}
+        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,63,94,0.22)'; e.currentTarget.style.borderColor = 'rgba(244,63,94,0.6)'; }}
+        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(244,63,94,0.1)'; e.currentTarget.style.borderColor = 'rgba(244,63,94,0.3)'; }}
         style={{
           width: 38, height: 38, borderRadius: 10,
-          background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
-          color: T.muted, cursor: 'pointer',
+          background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.3)',
+          color: '#f87171', cursor: 'pointer',
           display: 'grid', placeItems: 'center',
-          transition: 'background .15s, border-color .15s, color .15s',
+          transition: 'background .15s, border-color .15s',
         }}>
-        <Icon name="logout-2-bold" size={18} color="currentColor" />
+        <Icon name="logout-2-bold" size={18} color="#f87171" />
       </button>
 
       <button onClick={onNew} style={{
