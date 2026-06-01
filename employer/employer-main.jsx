@@ -423,6 +423,11 @@ function EmployerApp() {
     return () => { try { sb.removeChannel(channel); } catch(e) {} };
   }, [loaded]);
 
+  async function handleSignOut() {
+    await sb.auth.signOut();
+    window.location.href = '/';
+  }
+
   const meta   = TITLES[tab] || TITLES.dash;
   const noData = loaded && E_JOBS.length === 0;
 
@@ -465,7 +470,7 @@ function EmployerApp() {
       {loaded && <ESidebar tab={tab} onTab={setTab} />}
 
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, position: 'relative' }}>
-        {loaded && <ETopbar title={meta.title} subtitle={meta.subtitle} onNew={() => setShowNewJob(true)} />}
+        {loaded && <ETopbar title={meta.title} subtitle={meta.subtitle} onNew={() => setShowNewJob(true)} onSignOut={handleSignOut} />}
         {body}
       </main>
 

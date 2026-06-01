@@ -203,7 +203,7 @@ function ESidebar({ tab, onTab }) {
 // ─────────────────────────────────────────────────────────────
 // TOPBAR
 // ─────────────────────────────────────────────────────────────
-function ETopbar({ title, subtitle, onNew }) {
+function ETopbar({ title, subtitle, onNew, onSignOut }) {
   return (
     <header style={{
       display: 'flex', alignItems: 'center', gap: 16,
@@ -250,6 +250,21 @@ function ETopbar({ title, subtitle, onNew }) {
           width: 7, height: 7, borderRadius: 999, background: T.destructive,
           border: '2px solid #07071a',
         }} />
+      </button>
+
+      <button
+        onClick={onSignOut}
+        title="Odhlásit se"
+        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,63,94,0.12)'; e.currentTarget.style.borderColor = 'rgba(244,63,94,0.35)'; e.currentTarget.style.color = '#f87171'; }}
+        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.muted; }}
+        style={{
+          width: 38, height: 38, borderRadius: 10,
+          background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
+          color: T.muted, cursor: 'pointer',
+          display: 'grid', placeItems: 'center',
+          transition: 'background .15s, border-color .15s, color .15s',
+        }}>
+        <Icon name="logout-2-bold" size={18} color="currentColor" />
       </button>
 
       <button onClick={onNew} style={{
