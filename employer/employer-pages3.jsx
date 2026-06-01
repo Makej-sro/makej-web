@@ -415,6 +415,25 @@ function ESettings() {
             {s.l}
           </button>
         ))}
+        {/* Odhlásit se */}
+        <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid ' + T.border }}>
+          <button onClick={async () => {
+            await sb.auth.signOut();
+            window.location.href = '/';
+          }} style={{
+            display: 'flex', alignItems: 'center', gap: 9,
+            padding: '9px 12px', borderRadius: 9, width: '100%',
+            background: 'transparent', border: '1px solid transparent',
+            color: T.muted, cursor: 'pointer', textAlign: 'left',
+            fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600,
+            transition: 'color 0.2s, background 0.2s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,63,94,0.12)'; e.currentTarget.style.color = '#f43f5e'; e.currentTarget.style.borderColor = 'rgba(244,63,94,0.25)'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = T.muted; e.currentTarget.style.borderColor = 'transparent'; }}>
+            <Icon name="logout-2-bold" size={14} color="currentColor"/>
+            Odhlásit se
+          </button>
+        </div>
       </aside>
       <div style={{ flex: 1, padding: '24px 28px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 760 }}>
         {seg === 'profile' && <SettingsProfile />}

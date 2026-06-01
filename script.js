@@ -1,8 +1,33 @@
-// ═══════════ NAVBAR SCROLL ═══════════
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 50);
-}, { passive: true });
+// ═══════════ NAVBAR SCROLL + SCROLLSPY ═══════════
+const navbar    = document.getElementById('navbar');
+const navActions = document.getElementById('nav-actions') || document.querySelector('.nav-actions');
+const navLinks  = document.querySelectorAll('.nav-links a[href^="#"]');
+const spySections = ['how-it-works', 'features', 'employers', 'about', 'download']
+  .map(id => document.getElementById(id)).filter(Boolean);
+
+function updateNav() {
+  const scrollY = window.scrollY;
+  navbar.classList.toggle('scrolled', scrollY > 50);
+
+  if (navActions) {
+    const hero = document.getElementById('hero');
+    navActions.classList.toggle('nav-actions-visible', hero ? scrollY > hero.offsetHeight * 0.8 : scrollY > 400);
+  }
+
+  const mid = window.innerHeight * 0.35;
+  let active = null;
+  spySections.forEach(sec => {
+    const rect = sec.getBoundingClientRect();
+    if (rect.top <= mid) active = sec;
+  });
+  navLinks.forEach(a => {
+    const matches = active && a.getAttribute('href') === '#' + active.id;
+    a.classList.toggle('nav-active', matches);
+  });
+}
+
+window.addEventListener('scroll', updateNav, { passive: true });
+updateNav();
 
 // ═══════════ MOBILE MENU ═══════════
 const menuBtn = document.getElementById('mobile-menu-btn');
@@ -99,6 +124,27 @@ function initDashboardPreview() {
   if (regBtn) regBtn.addEventListener('click', e => { e.preventDefault(); close(); });
 }
 
+// ═══════════ HERO LINE SCROLL UNDERLINE ═══════════
+function setupHeroUnderline() {
+  const heroLines = document.querySelectorAll('.hero-line');
+  if (!heroLines.length) return;
+
+  // Trigger underlines sequentially when hero heading enters the viewport
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        heroLines.forEach((line, i) => {
+          setTimeout(() => line.classList.add('hero-line--active'), i * 300);
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+
+  const heroH1 = document.querySelector('#hero h1');
+  if (heroH1) observer.observe(heroH1);
+}
+
 // ═══════════ INIT ═══════════
 document.addEventListener('DOMContentLoaded', () => {
   setupReveal();
@@ -126,6 +172,9 @@ function initAuth() {
     if (type === 'login') {
       loginModal.classList.add('active');
       registerModal.classList.remove('active');
+      // Restart peeker animation
+      const p = document.getElementById('main-peeker');
+      if (p) { p.style.animation = 'none'; requestAnimationFrame(() => { p.style.animation = 'peekerIn 0.45s cubic-bezier(.2,.8,.2,1) both'; }); }
     } else {
       registerModal.classList.add('active');
       loginModal.classList.remove('active');
@@ -180,7 +229,14 @@ function initAuth() {
     const navActions    = document.querySelector('.nav-actions');
     const mobileActions = document.querySelector('.mobile-menu-actions');
 
+    // ─── Update hero CTA section ───
+    const heroCTAAuth     = document.getElementById('hero-cta-auth');
+    const heroCTALoggedin = document.getElementById('hero-cta-loggedin');
+    const heroDashBtn     = document.getElementById('hero-dashboard-btn');
+    const heroWorkerBtn   = document.getElementById('hero-worker-btn');
+
     if (user) {
+      navActions.classList.add('nav-actions-visible'); // always show when logged in
       const name = user.user_metadata?.name || user.email.split('@')[0];
       const role = user.user_metadata?.role;
       const dashBtn = role === 'employer'
@@ -206,6 +262,12 @@ function initAuth() {
       `;
       document.getElementById('logout-btn').addEventListener('click', () => sb.auth.signOut());
       document.getElementById('logout-btn-mobile').addEventListener('click', () => sb.auth.signOut());
+
+      // Hero CTA: hide auth buttons, show the right dashboard/worker button
+      if (heroCTAAuth)     heroCTAAuth.style.display     = 'none';
+      if (heroCTALoggedin) heroCTALoggedin.style.display = 'flex';
+      if (heroDashBtn)   heroDashBtn.style.display   = role === 'employer' ? 'inline-flex' : 'none';
+      if (heroWorkerBtn) heroWorkerBtn.style.display = role !== 'employer' ? 'inline-flex' : 'none';
     } else {
       navActions.innerHTML = `
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
@@ -225,6 +287,10 @@ function initAuth() {
         const el = document.getElementById(id);
         if (el) el.addEventListener('click', e => { e.preventDefault(); openModal(type); });
       });
+
+      // Hero CTA: show auth buttons, hide dashboard/worker
+      if (heroCTAAuth)     heroCTAAuth.style.display     = 'flex';
+      if (heroCTALoggedin) heroCTALoggedin.style.display = 'none';
     }
   }
 
@@ -233,6 +299,12 @@ function initAuth() {
   if (employerBtn) {
     employerBtn.addEventListener('click', e => { e.preventDefault(); openModal('register', 'employer'); });
   }
+
+  // Hero CTA buttons (Vytvořit účet zdarma / Přihlásit se)
+  const heroRegisterBtn = document.getElementById('hero-register-btn');
+  const heroLoginBtn    = document.getElementById('hero-login-btn');
+  if (heroRegisterBtn) heroRegisterBtn.addEventListener('click', e => { e.preventDefault(); openModal('register'); });
+  if (heroLoginBtn)    heroLoginBtn.addEventListener('click',    e => { e.preventDefault(); openModal('login'); });
 
   // Escape key zavře modál
   document.addEventListener('keydown', e => {
@@ -355,8 +427,15 @@ function initAuth() {
   });
 
   // ─── Auth state — Supabase v2 posílá INITIAL_SESSION při startu, getSession není potřeba ───
-  sb.auth.onAuthStateChange((_event, session) => {
+  sb.auth.onAuthStateChange((event, session) => {
     updateNavAuth(session?.user || null);
+
+    // INITIAL_SESSION = obnova existující session při načtení stránky → nepřesměrovávat
+    // SIGNED_IN = aktivní přihlášení (formulář / Google OAuth callback) → přesměrovat
+    if (event === 'SIGNED_IN' && session?.user) {
+      const role = session.user.user_metadata?.role;
+      window.location.href = role === 'employer' ? '/employer/' : '/worker/';
+    }
   });
 }
 
@@ -408,4 +487,102 @@ function showToast(msg) {
     localStorage.setItem(COOKIE_KEY, 'rejected');
     banner.classList.remove('visible');
   });
+})();
+
+// ═══════════ PEEKER (cursor-tracking face in login modal) ═══════════
+(function() {
+  var peeker = document.getElementById('main-peeker');
+  var eyeL   = document.getElementById('main-eyeL');
+  var eyeR   = document.getElementById('main-eyeR');
+  var pupilL = document.getElementById('main-pupilL');
+  var pupilR = document.getElementById('main-pupilR');
+  var browL  = document.getElementById('main-browL');
+  var browR  = document.getElementById('main-browR');
+  var lidL   = document.getElementById('main-lidL');
+  var lidR   = document.getElementById('main-lidR');
+  if (!peeker) return;
+
+  var isPwd = false;
+  var blinkTimer = null;
+  var peekTimers = [];
+
+  function movePupil(pupilEl, eyeEl, mx, my) {
+    var rect = eyeEl.getBoundingClientRect();
+    if (!rect.width) return;
+    var cx = rect.left + rect.width  / 2;
+    var cy = rect.top  + rect.height / 2;
+    var dx = mx - cx, dy = my - cy;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    var r = 4.5;
+    var s = Math.min(dist, r) / Math.max(dist, 0.001);
+    pupilEl.style.transform = 'translate(' + (dx * s).toFixed(2) + 'px,' + (dy * s).toFixed(2) + 'px)';
+  }
+
+  document.addEventListener('mousemove', function(e) {
+    if (!peeker || peeker.offsetParent === null) return;
+    movePupil(pupilL, eyeL, e.clientX, e.clientY);
+    movePupil(pupilR, eyeR, e.clientX, e.clientY);
+  });
+
+  function setLid(speed) {
+    if (!lidL || !lidR) return;
+    lidL.style.transition = 'height ' + speed + ' ease';
+    lidR.style.transition = 'height ' + speed + ' ease';
+  }
+
+  function scheduleBlink() {
+    blinkTimer = setTimeout(function() {
+      if (isPwd) return;
+      setLid('0.08s');
+      lidL.style.height = '21px'; lidR.style.height = '21px';
+      setTimeout(function() {
+        lidL.style.height = '0'; lidR.style.height = '0';
+        setTimeout(function() { setLid('0.28s'); scheduleBlink(); }, 120);
+      }, 100);
+    }, 5000);
+  }
+
+  function clearPeekTimers() { peekTimers.forEach(clearTimeout); peekTimers = []; }
+
+  function schedulePeek() {
+    peekTimers.push(setTimeout(function() {
+      lidR.style.height = '11px';
+      peekTimers.push(setTimeout(function() {
+        lidR.style.height = '21px';
+        peekTimers.push(setTimeout(schedulePeek, 5000));
+      }, 1000));
+    }, 3000));
+  }
+
+  function peekAtPassword() {
+    isPwd = true;
+    peeker.style.animation = 'none';
+    clearTimeout(blinkTimer);
+    clearPeekTimers();
+    peeker.style.transform = 'translateX(-50%)';
+    setLid('0.28s');
+    lidL.style.height = '21px'; lidR.style.height = '21px';
+    browL.style.transform = 'translateY(5px)';
+    browR.style.transform = 'translateY(5px)';
+    schedulePeek();
+  }
+
+  function stopPeeking() {
+    isPwd = false;
+    clearPeekTimers();
+    peeker.style.animation = 'none';
+    peeker.style.transform = 'translateX(-50%)';
+    setLid('0.28s');
+    lidL.style.height = '0'; lidR.style.height = '0';
+    browL.style.transform = ''; browR.style.transform = '';
+    scheduleBlink();
+  }
+
+  var pwdField = document.getElementById('login-password');
+  if (pwdField) {
+    pwdField.addEventListener('focus', peekAtPassword);
+    pwdField.addEventListener('blur',  stopPeeking);
+  }
+
+  scheduleBlink();
 })();

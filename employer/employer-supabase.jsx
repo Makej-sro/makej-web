@@ -269,6 +269,7 @@ async function createJobE(employerId, fields) {
     duration,
     tags:        Array.isArray(fields.tags) ? fields.tags : [],
     requirements: Array.isArray(fields.requirements) ? fields.requirements : [],
+    job_type:    fields.job_type || 'brigada',
     status:      'active',
   };
   const { data, error } = await sb.from('jobs').insert(payload).select().single();

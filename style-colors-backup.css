@@ -1,0 +1,40 @@
+/*
+ * ═══════════════════════════════════════════════
+ *  MAKEJ-WEB — ORIGINÁLNÍ BARVY (záloha)
+ *  Uloženo před změnou na Yasinův styl (2026-06-01)
+ *  Pro obnovení: zkopíruj :root blok zpět do style.css
+ * ═══════════════════════════════════════════════
+ *
+ * :root {
+ *   --bg: #0f0f2d;
+ *   --fg: #ffffff;
+ *   --card: #16163b;
+ *   --primary: #292978;
+ *   --secondary: #d0d0ff;
+ *   --muted: #22224d;
+ *   --muted-fg: #9999cc;
+ *   --accent: #3a3a99;
+ *   --destructive: #f43f5e;
+ *   --border: #22224d;
+ *   --radius: 1rem;
+ *   --font-sans: 'Plus Jakarta Sans', sans-serif;
+ *   --font-heading: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+ * }
+ *
+ * body { background: #050510; }
+ * body::before { background: linear-gradient(180deg, #2a2ab5 0%, #050510 100%); }
+ *
+ * .gradient-text {
+ *   background: linear-gradient(135deg, #7c7cff, #d0d0ff, #a78bfa);
+ *   -webkit-background-clip: text; background-clip: text;
+ *   -webkit-text-fill-color: transparent;
+ * }
+ *
+ * .nav-logo {
+ *   background: linear-gradient(135deg, #7c7cff, #d0d0ff);
+ *   -webkit-background-clip: text; background-clip: text;
+ *   -webkit-text-fill-color: transparent;
+ * }
+ *
+ * theme-color meta: #292978
+ */

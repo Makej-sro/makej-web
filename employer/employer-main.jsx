@@ -48,7 +48,22 @@ function EEmptyState() {
   );
 }
 
-const EMPTY_JOB_FORM = { title: '', description: '', pay: '', pay_unit: 'Kč/h', location: '', date: '', time_start: '', time_end: '', tags: '', requirements: '' };
+const EMPTY_JOB_FORM = {
+  title: '', description: '', pay: '', pay_unit: 'Kč/h',
+  location: '', date: '', time_start: '', time_end: '',
+  tags: '', requirements: '', job_type: 'brigada',
+  hours_per_week: '', start_date: '', contract_duration: '',
+  contract_type: 'HPP', benefits: '',
+};
+
+const JOB_TYPES = [
+  { value: 'jednrazova_vypomoc', label: 'Jednorázová výpomoc', icon: '⚡', desc: 'Jednorázová akce' },
+  { value: 'brigada',            label: 'Brigáda',             icon: '💼', desc: 'Krátkodobá práce' },
+  { value: 'part_time',          label: 'Part-time',           icon: '🕐', desc: 'Částečný úvazek' },
+  { value: 'full_time',          label: 'Full-time',           icon: '🏢', desc: 'Plný úvazek' },
+];
+
+const CONTRACT_TYPES = ['HPP', 'DPP', 'DPČ', 'Živnostenský list'];
 
 function ENewJobModal({ onClose, onCreated }) {
   const [form,   setForm]   = useStateE(EMPTY_JOB_FORM);
@@ -57,9 +72,15 @@ function ENewJobModal({ onClose, onCreated }) {
 
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
+  const isOneshot  = form.job_type === 'jednrazova_vypomoc';
+  const isBrigada  = form.job_type === 'brigada';
+  const isPartTime = form.job_type === 'part_time';
+  const isFullTime = form.job_type === 'full_time';
+  const isShortTerm = isOneshot || isBrigada;
+
   async function handleSubmit() {
-    if (!form.title.trim()) { setErr('Vyplň název pozice.'); return; }
-    if (!form.pay)          { setErr('Vyplň hodinovou mzdu.'); return; }
+    if (!form.title.trim())    { setErr('Vyplň název pozice.'); return; }
+    if (!form.pay)             { setErr('Vyplň mzdu.'); return; }
     if (!form.location.trim()) { setErr('Vyplň místo.'); return; }
     setSaving(true); setErr('');
     const { data: { session } } = await sb.auth.getSession();
@@ -89,68 +110,215 @@ function ENewJobModal({ onClose, onCreated }) {
         animation: 'empPop .3s cubic-bezier(.2,.8,.2,1)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 18, fontWeight: 800 }}>Nový inzerát</div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: T.muted, cursor: 'pointer', padding: 4 }}>
-            <Icon name="close-circle-bold" size={20} color={T.muted} />
-          </button>
+          <div>
+            <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 18, fontWeight: 800 }}>Nový inzerát</div>
+            <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, marginTop: 2 }}>
+              {isOneshot  ? 'Vyplň základní info — datum, čas a odměnu' :
+               isBrigada  ? 'Krátkodobá brigáda s konkrétním termínem' :
+               isPartTime ? 'Částečný úvazek — hodinový nebo měsíční' :
+               'Plný úvazek s detailními podmínkami'}
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: T.muted, cursor: 'pointer', padding: 4, fontSize: 16, lineHeight: 1, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
         </div>
 
         {err && <div style={{ background: 'rgba(244,63,94,0.12)', border: '1px solid rgba(244,63,94,0.3)', borderRadius: 9, padding: '9px 13px', color: '#f87171', fontFamily: T.fontUI, fontSize: 12, marginBottom: 14 }}>{err}</div>}
 
+        {/* Typ inzerátu */}
+        <div style={rowStyle}>
+          <label style={labelStyle}>Typ inzerátu</label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {JOB_TYPES.map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  const n = opt.value;
+                  setForm(f => ({
+                    ...f, job_type: n,
+                    pay_unit: (n === 'full_time' || n === 'part_time') ? 'Kč/měsíc' : 'Kč/h',
+                    date: '', time_start: '', time_end: '',
+                    hours_per_week: '', start_date: '', contract_duration: '',
+                    contract_type: 'HPP', benefits: '',
+                  }));
+                }}
+                style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 3,
+                  padding: '10px 12px', borderRadius: 10, cursor: 'pointer', textAlign: 'left',
+                  background: form.job_type === opt.value ? 'rgba(41,41,120,0.5)' : 'rgba(255,255,255,0.04)',
+                  border: '1px solid ' + (form.job_type === opt.value ? 'rgba(208,208,255,0.5)' : 'rgba(208,208,255,0.12)'),
+                  transition: 'all .15s',
+                }}
+              >
+                <span style={{ fontSize: 18 }}>{opt.icon}</span>
+                <span style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700 }}>{opt.label}</span>
+                <span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 10.5 }}>{opt.desc}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Název pozice — vždy */}
         <div style={rowStyle}>
           <label style={labelStyle}>Název pozice *</label>
           <input style={inputStyle} placeholder="např. Barista, Skladník, Hosteska…" value={form.title} onChange={e => setF('title', e.target.value)} />
         </div>
 
+        {/* Mzda — vždy, label a jednotky se mění podle typu */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
           <div>
-            <label style={labelStyle}>Mzda *</label>
-            <input style={inputStyle} type="number" placeholder="180" value={form.pay} onChange={e => setF('pay', e.target.value)} />
+            <label style={labelStyle}>{isFullTime ? 'Měsíční mzda *' : 'Mzda *'}</label>
+            <input style={inputStyle} type="number" placeholder={isFullTime ? '35 000' : isPartTime ? '180' : '180'} value={form.pay} onChange={e => setF('pay', e.target.value)} />
           </div>
           <div>
             <label style={labelStyle}>Jednotka</label>
-            <select style={{ ...inputStyle, appearance: 'none' }} value={form.pay_unit} onChange={e => setF('pay_unit', e.target.value)}>
-              <option>Kč/h</option>
-              <option>Kč/směna</option>
-              <option>Kč/den</option>
-            </select>
+            {isFullTime ? (
+              <select style={{ ...inputStyle, appearance: 'none' }} value={form.pay_unit} onChange={e => setF('pay_unit', e.target.value)}>
+                <option>Kč/měsíc</option>
+              </select>
+            ) : isPartTime ? (
+              <select style={{ ...inputStyle, appearance: 'none' }} value={form.pay_unit} onChange={e => setF('pay_unit', e.target.value)}>
+                <option>Kč/h</option>
+                <option>Kč/měsíc</option>
+              </select>
+            ) : (
+              <select style={{ ...inputStyle, appearance: 'none' }} value={form.pay_unit} onChange={e => setF('pay_unit', e.target.value)}>
+                <option>Kč/h</option>
+                <option>Kč/směna</option>
+                <option>Kč/den</option>
+              </select>
+            )}
           </div>
         </div>
 
+        {/* Místo — vždy */}
         <div style={rowStyle}>
           <label style={labelStyle}>Místo *</label>
           <input style={inputStyle} placeholder="např. Brno — Veveří" value={form.location} onChange={e => setF('location', e.target.value)} />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
-          <div>
-            <label style={labelStyle}>Datum</label>
-            <input style={inputStyle} type="date" value={form.date} onChange={e => setF('date', e.target.value)} />
+        {/* Krátkodobé: datum + čas (jednorázová / brigáda) */}
+        {isShortTerm && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
+            <div>
+              <label style={labelStyle}>Datum</label>
+              <input style={inputStyle} type="date" value={form.date} onChange={e => setF('date', e.target.value)} />
+            </div>
+            <div>
+              <label style={labelStyle}>Začátek</label>
+              <input style={inputStyle} type="time" value={form.time_start} onChange={e => setF('time_start', e.target.value)} />
+            </div>
+            <div>
+              <label style={labelStyle}>Konec</label>
+              <input style={inputStyle} type="time" value={form.time_end} onChange={e => setF('time_end', e.target.value)} />
+            </div>
           </div>
-          <div>
-            <label style={labelStyle}>Začátek</label>
-            <input style={inputStyle} type="time" value={form.time_start} onChange={e => setF('time_start', e.target.value)} />
-          </div>
-          <div>
-            <label style={labelStyle}>Konec</label>
-            <input style={inputStyle} type="time" value={form.time_end} onChange={e => setF('time_end', e.target.value)} />
-          </div>
-        </div>
+        )}
 
+        {/* Part-time: hodin týdně + nástup */}
+        {isPartTime && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+            <div>
+              <label style={labelStyle}>Hodin týdně</label>
+              <input style={inputStyle} type="number" placeholder="20" value={form.hours_per_week} onChange={e => setF('hours_per_week', e.target.value)} />
+            </div>
+            <div>
+              <label style={labelStyle}>Nástup od</label>
+              <input style={inputStyle} type="date" value={form.start_date} onChange={e => setF('start_date', e.target.value)} />
+            </div>
+          </div>
+        )}
+        {isPartTime && (
+          <div style={rowStyle}>
+            <label style={labelStyle}>Délka spolupráce</label>
+            <input style={inputStyle} placeholder="např. 3 měsíce, neurčito…" value={form.contract_duration} onChange={e => setF('contract_duration', e.target.value)} />
+          </div>
+        )}
+
+        {/* Full-time: typ úvazku + nástup + délka */}
+        {isFullTime && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+            <div>
+              <label style={labelStyle}>Typ úvazku</label>
+              <select style={{ ...inputStyle, appearance: 'none' }} value={form.contract_type} onChange={e => setF('contract_type', e.target.value)}>
+                {CONTRACT_TYPES.map(ct => <option key={ct}>{ct}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Nástup od</label>
+              <input style={inputStyle} type="date" value={form.start_date} onChange={e => setF('start_date', e.target.value)} />
+            </div>
+          </div>
+        )}
+        {isFullTime && (
+          <div style={rowStyle}>
+            <label style={labelStyle}>Délka spolupráce</label>
+            <input style={inputStyle} placeholder="např. neurčito, 1 rok, zkušební 3 měs.…" value={form.contract_duration} onChange={e => setF('contract_duration', e.target.value)} />
+          </div>
+        )}
+
+        {/* Popis — vždy, ale placeholder se mění */}
         <div style={rowStyle}>
-          <label style={labelStyle}>Popis</label>
-          <textarea style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }} rows={3} placeholder="Popis práce, čeká se na brigádníka…" value={form.description} onChange={e => setF('description', e.target.value)} />
+          <label style={labelStyle}>{isFullTime ? 'Popis pozice' : isPartTime ? 'Popis práce' : 'Popis'}</label>
+          <textarea
+            style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
+            rows={isFullTime ? 4 : 3}
+            placeholder={
+              isFullTime  ? 'Náplň práce, co hledáme, pracovní podmínky a prostředí…' :
+              isPartTime  ? 'Co bude zaměstnanec dělat, prostředí, co nabízíte…' :
+              isOneshot   ? 'Stručný popis práce (nepovinné)' :
+                            'Popis práce, čeká se na brigádníka…'
+            }
+            value={form.description}
+            onChange={e => setF('description', e.target.value)}
+          />
         </div>
 
+        {/* Benefity — jen full-time */}
+        {isFullTime && (
+          <div style={rowStyle}>
+            <label style={labelStyle}>Benefity</label>
+            <textarea
+              style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
+              rows={2}
+              placeholder="Stravenky, home office, 5 týdnů dovolené, sick days, cafeterie…"
+              value={form.benefits}
+              onChange={e => setF('benefits', e.target.value)}
+            />
+          </div>
+        )}
+
+        {/* Tagy — vždy */}
         <div style={rowStyle}>
           <label style={labelStyle}>Tagy (oddělené čárkou)</label>
-          <input style={inputStyle} placeholder="Gastro, Ranní směna, Bez zkušeností" value={form.tags} onChange={e => setF('tags', e.target.value)} />
+          <input
+            style={inputStyle}
+            placeholder={
+              isFullTime  ? 'IT, Marketing, Vedoucí pozice, Praha' :
+              isPartTime  ? 'Gastro, Administrativa, Víkendy' :
+                            'Gastro, Ranní směna, Bez zkušeností'
+            }
+            value={form.tags}
+            onChange={e => setF('tags', e.target.value)}
+          />
         </div>
 
-        <div style={rowStyle}>
-          <label style={labelStyle}>Výhody / požadavky (oddělené čárkou)</label>
-          <input style={inputStyle} placeholder="Káva zdarma, Nástup ihned" value={form.requirements} onChange={e => setF('requirements', e.target.value)} />
-        </div>
+        {/* Požadavky — skryté u jednorázové */}
+        {!isOneshot && (
+          <div style={rowStyle}>
+            <label style={labelStyle}>{isFullTime ? 'Požadavky' : 'Výhody / požadavky'} (oddělené čárkou)</label>
+            <input
+              style={inputStyle}
+              placeholder={
+                isFullTime  ? 'VŠ vzdělání, angličtina B2, praxe 2+ roky' :
+                isPartTime  ? 'Spolehlivost, flexibilita, zájem o obor' :
+                              'Káva zdarma, Nástup ihned'
+              }
+              value={form.requirements}
+              onChange={e => setF('requirements', e.target.value)}
+            />
+          </div>
+        )}
 
         <button
           onClick={handleSubmit}

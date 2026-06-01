@@ -85,7 +85,7 @@ function WorkerApp() {
 
   async function handleSignOut() {
     await sb.auth.signOut();
-    window.location.reload();
+    window.location.href = '/';
   }
 
   const unreadMessages = W_THREADS.reduce((s, t) => s + (t.unread || 0), 0);

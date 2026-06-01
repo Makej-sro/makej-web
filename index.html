@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Makej! — Swajpuj. Matchuj. Pracuj.</title>
   <meta name="description" content="Makej! je mobilní aplikace pro jednorázové brigády. Swajpuj nabídky, matchuj se zaměstnavateli a začni pracovat ještě dnes." />
-  <meta name="theme-color" content="#292978" />
+  <meta name="theme-color" content="#0020f6" />
   <link rel="canonical" href="https://makej.eu/" />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
@@ -41,7 +41,7 @@
         <a href="#about">O nás</a>
         <a href="#download">Stáhnout</a>
       </div>
-      <div class="nav-actions">
+      <div class="nav-actions" id="nav-actions">
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
         <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       </div>
@@ -68,50 +68,31 @@
     <div class="hero-bg-particles" id="particles"></div>
     <div class="hero-content">
       <div class="hero-text">
-        <div class="hero-badge">
-          <iconify-icon icon="solar:fire-bold" width="16"></iconify-icon>
-          <span>Nová brigádní appka v Česku</span>
-        </div>
-        <h1>Swajpuj.<br/><span class="gradient-text">Matchuj.</span><br/>Pracuj.</h1>
+        <h1>
+          <span class="hero-line">Swajpuj</span>
+          <span class="hero-line gradient-text">Matchuj</span>
+          <span class="hero-line">Pracuj</span>
+        </h1>
         <p class="hero-subtitle">Najdi si brigádu za pár sekund. Swajpni doprava, matchni se s&nbsp;firmou a začni vydělávat ještě dnes.</p>
-        <div class="hero-cta">
-          <a href="#download" class="btn-primary btn-lg">
-            <iconify-icon icon="solar:download-minimalistic-bold" width="20"></iconify-icon>
-            Stáhnout zdarma
+        <!-- hero-cta-auth: shown when logged out; hidden when logged in -->
+        <div class="hero-cta" id="hero-cta-auth">
+          <a href="javascript:void(0)" class="btn-primary btn-lg" id="hero-register-btn">
+            Vytvořit účet zdarma
           </a>
-          <a href="#how-it-works" class="btn-ghost btn-lg">
-            <iconify-icon icon="solar:play-circle-bold" width="20"></iconify-icon>
-            Jak to funguje?
+          <a href="javascript:void(0)" class="btn-ghost btn-lg" id="hero-login-btn">
+            Přihlásit se
           </a>
         </div>
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="hero-stat-label" style="font-size:.9rem;color:var(--secondary)">✓ Zdarma pro brigádníky</span>
-          </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-label" style="font-size:.9rem;color:var(--secondary)">✓ Bez skrytých poplatků</span>
-          </div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-label" style="font-size:.9rem;color:var(--secondary)">✓ iOS &amp; Android</span>
-          </div>
-        </div>
-      </div>
-      <div class="hero-image">
-        <div class="hero-phone-glow"></div>
-        <img src="hero-mockup.png" alt="Makej! aplikace - swajp nabídky práce" class="hero-phone" />
-        <div class="hero-floating-card card-1">
-          <iconify-icon icon="solar:heart-angle-bold" width="20" style="color:#d0d0ff"></iconify-icon>
-          <span>Nová shoda!</span>
-        </div>
-        <div class="hero-floating-card card-2">
-          <iconify-icon icon="solar:wallet-money-bold" width="20" style="color:#d0d0ff"></iconify-icon>
-          <span>+180 Kč vyděláno</span>
-        </div>
-        <div class="hero-floating-card card-3">
-          <iconify-icon icon="solar:star-bold" width="18" style="color:#fbbf24"></iconify-icon>
-          <span>5.0 hodnocení</span>
+        <!-- hero-cta-loggedin: shown when logged in -->
+        <div class="hero-cta" id="hero-cta-loggedin" style="display:none;">
+          <a href="/employer/" class="btn-primary btn-lg" id="hero-dashboard-btn" style="display:none;">
+            <iconify-icon icon="solar:chart-square-bold" width="20"></iconify-icon>
+            Dashboard
+          </a>
+          <a href="/worker/" class="btn-primary btn-lg" id="hero-worker-btn" style="display:none;">
+            <iconify-icon icon="solar:case-round-bold" width="20"></iconify-icon>
+            Moje brigády
+          </a>
         </div>
       </div>
     </div>
@@ -526,15 +507,12 @@
         <p class="about-lead">Hledání brigády <em>nemá být</em> druhá brigáda.</p>
         <div class="about-principles">
           <div class="about-principle">
-            <span class="about-pill">01 — Princip</span>
             <p>Stavíme nejjednodušší most mezi člověkem, co má pár volných hodin, a firmou, co potřebuje ruce. Tečka.</p>
           </div>
           <div class="about-principle">
-            <span class="about-pill">02 — Princip</span>
             <p>Žádné poplatky za to, že chcete pracovat. Žádné skryté podmínky. Žádné agenturní marže.</p>
           </div>
           <div class="about-principle">
-            <span class="about-pill">03 — Princip</span>
             <p>Hodnocení jdou oběma směry. Spravedlivý vztah začíná tím, že mluvíme jako sobě rovní.</p>
           </div>
         </div>
@@ -551,24 +529,20 @@
         </div>
         <div class="about-team">
           <div class="about-person">
-            <div class="about-photo"><span class="about-photo-badge">CEO</span></div>
+            <div class="about-photo"></div>
             <h4>Samuel Pšeja</h4>
-            <span class="about-role">Co-founder · Produkt</span>
           </div>
           <div class="about-person">
-            <div class="about-photo"><span class="about-photo-badge">Engineering</span></div>
+            <div class="about-photo"></div>
             <h4>Jan Weber</h4>
-            <span class="about-role">Co-founder · Engineering</span>
           </div>
           <div class="about-person">
-            <div class="about-photo"><span class="about-photo-badge">Design</span></div>
+            <div class="about-photo"></div>
             <h4>Yasin Benmerzouk</h4>
-            <span class="about-role">Head of Design</span>
           </div>
           <div class="about-person">
-            <div class="about-photo"><span class="about-photo-badge">Ops</span></div>
+            <div class="about-photo"></div>
             <h4>Petr Kakáč</h4>
-            <span class="about-role">Operations Lead</span>
           </div>
         </div>
       </div>
@@ -662,7 +636,6 @@
       </div>
       <div class="footer-bottom">
         <span>© 2026 Makej! Všechna práva vyhrazena.</span>
-        <span>Vytvořeno s 💜 v Česku</span>
       </div>
     </div>
   </footer>
@@ -671,10 +644,31 @@
   <div class="modal-overlay" id="modal-overlay">
 
     <!-- LOGIN MODAL -->
-    <div class="modal" id="login-modal">
-      <button class="modal-close" id="login-close" aria-label="Zavřít">
-        <iconify-icon icon="solar:close-bold" width="22"></iconify-icon>
-      </button>
+    <div class="modal" id="login-modal" style="overflow:visible;">
+      <!-- Makač peeker -->
+      <div id="main-peeker" style="
+        position:absolute; top:-70px; left:50%; transform:translateX(-50%);
+        pointer-events:none; z-index:3;
+        filter: drop-shadow(0 14px 36px rgba(0,0,60,0.65));
+        transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+        animation: peekerIn 0.45s cubic-bezier(.2,.8,.2,1) both;
+      ">
+        <div style="width:88px;height:76px;background:linear-gradient(160deg,#4848c4 0%,#1c1c7a 100%);border-radius:50% 50% 44% 44%;position:relative;box-shadow:0 14px 36px rgba(0,0,60,0.65),inset 0 1px 0 rgba(255,255,255,0.18);border:2px solid rgba(140,140,255,0.3);">
+          <div id="main-browL" style="position:absolute;left:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-browR" style="position:absolute;right:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-eyeL" style="position:absolute;left:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilL" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidL" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div id="main-eyeR" style="position:absolute;right:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilR" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidR" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div style="position:absolute;bottom:11px;left:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+          <div style="position:absolute;bottom:11px;right:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+        </div>
+      </div>
+      <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej!</div>
       <h2 class="modal-title">Přihlásit se</h2>
       <p class="modal-subtitle">Vítej zpět! Přihlaš se ke svému účtu.</p>
@@ -705,9 +699,7 @@
 
     <!-- REGISTER MODAL -->
     <div class="modal" id="register-modal">
-      <button class="modal-close" id="register-close" aria-label="Zavřít">
-        <iconify-icon icon="solar:close-bold" width="22"></iconify-icon>
-      </button>
+      <button class="modal-close" id="register-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej!</div>
 
       <!-- Krok 1: výběr role -->
@@ -784,9 +776,7 @@
   <!-- ═══════════ DASHBOARD PREVIEW MODAL ═══════════ -->
   <div class="dash-overlay" id="dash-overlay">
     <div class="dash-modal">
-      <button class="dash-close" id="dash-close" aria-label="Zavřít">
-        <iconify-icon icon="solar:close-bold" width="20"></iconify-icon>
-      </button>
+      <button class="dash-close" id="dash-close" aria-label="Zavřít">✕</button>
       <div class="dash-modal-header">
         <span class="dash-modal-logo">Makej!</span>
         <span class="dash-modal-tag">Dashboard zaměstnavatele — náhled</span>
