@@ -148,7 +148,7 @@ img { max-width: 100%; display: block; }
 /* ═══════════ HERO ═══════════ */
 #hero {
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  padding: 115px 24px 130px; position: relative; overflow: hidden;
+  padding: 100px 24px 72px; position: relative; overflow: hidden;
 }
 /* Animated gradient wash — landing-page hero background (our palette) */
 .hero-bg-particles {
@@ -191,7 +191,7 @@ img { max-width: 100%; display: block; }
   margin-bottom: 24px; animation: fadeInUp .6s ease-out;
 }
 .hero-text h1 {
-  font-family: var(--font-heading); font-size: clamp(5rem,11vw,9.5rem);
+  font-family: var(--font-heading); font-size: clamp(2.8rem, min(11vw, 15vh), 9.5rem);
   font-weight: 900; line-height: 1.02; margin-bottom: 28px;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   animation: fadeInUp .6s ease-out both;
@@ -251,6 +251,21 @@ img { max-width: 100%; display: block; }
   .hero-text h1 { font-size: clamp(2.8rem,12vw,4rem); }
   .hero-cta { flex-direction: column; align-items: center; }
   .hero-stats { justify-content: center; gap: 16px; }
+}
+
+/* Short / low-resolution screens — keep CTAs above the fold */
+@media (max-height: 760px) {
+  #hero { padding: 88px 24px 48px; }
+  .hero-badge { margin-bottom: 14px; }
+  .hero-text h1 { margin-bottom: 18px; gap: 2px; }
+  .hero-subtitle { margin-bottom: 22px; }
+  .hero-cta { margin-bottom: 0; }
+  .hero-scroll-indicator { display: none; }
+}
+@media (max-height: 620px) {
+  #hero { padding: 76px 24px 36px; }
+  .hero-badge { margin-bottom: 10px; }
+  .hero-subtitle { margin-bottom: 16px; font-size: 1rem; }
 }
 
 /* ═══════════ SOCIAL PROOF ═══════════ */
