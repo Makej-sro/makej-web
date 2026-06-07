@@ -586,3 +586,30 @@ function showToast(msg) {
 
   scheduleBlink();
 })();
+
+/* ── Showcase toggle: switch between the interactive phone and the feature grid ── */
+(function () {
+  var toggle = document.getElementById('showcase-toggle');
+  var stage  = document.querySelector('.showcase-stage');
+  if (!toggle || !stage) return;
+
+  var btns  = toggle.querySelectorAll('.sct-btn');
+  var views = stage.querySelectorAll('.showcase-view');
+
+  function setView(view) {
+    toggle.setAttribute('data-active', view);
+    btns.forEach(function (b) {
+      var on = b.getAttribute('data-view') === view;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    views.forEach(function (v) {
+      v.classList.toggle('is-active', v.getAttribute('data-view') === view);
+    });
+  }
+
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () { setView(b.getAttribute('data-view')); });
+  });
+})();
+

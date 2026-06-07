@@ -108,7 +108,7 @@
 
     /* ── Plans grid (5 columns) ── */
     .cn-plans-wrap {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
       padding: 0 24px 60px;
       overflow-x: auto;
@@ -116,115 +116,123 @@
     .cn-plans {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
-      min-width: 900px;
+      gap: 16px;
+      min-width: 960px;
+      padding-top: 24px;
+      align-items: stretch;
     }
     .cn-plan {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 28px 20px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(208,208,255,.1);
+      border-radius: 24px;
+      padding: 32px 22px 28px;
       display: flex;
       flex-direction: column;
       position: relative;
-      transition: border-color .2s, transform .2s;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
     }
-    .cn-plan:hover { transform: translateY(-3px); border-color: rgba(91,107,255,.35); }
+    .cn-plan:hover { transform: translateY(-4px); border-color: rgba(91,107,255,.3); box-shadow: 0 16px 40px rgba(0,0,0,.25); }
     .cn-plan.popular {
-      border-color: rgba(91,107,255,.6);
-      background: linear-gradient(160deg, rgba(0,32,246,.12), rgba(91,107,255,.05));
+      border-color: rgba(91,107,255,.75);
+      background: linear-gradient(160deg, rgba(0,32,246,.18), rgba(91,107,255,.07));
+      box-shadow: 0 0 0 1px rgba(91,107,255,.25), 0 20px 50px rgba(0,32,246,.18);
     }
-    .cn-plan.popular:hover { border-color: rgba(91,107,255,.9); }
+    .cn-plan.popular:hover { border-color: rgba(91,107,255,1); box-shadow: 0 0 0 1px rgba(91,107,255,.5), 0 24px 60px rgba(0,32,246,.28); }
     .cn-popular-badge {
       position: absolute;
-      top: -13px; left: 50%;
+      top: -16px; left: 50%;
       transform: translateX(-50%);
       background: linear-gradient(90deg, #0020F6, #5B6BFF);
       color: #fff;
-      font-size: .68rem;
+      font-size: .7rem;
       font-weight: 700;
-      padding: 4px 14px;
+      padding: 5px 16px;
       border-radius: 100px;
       white-space: nowrap;
-      letter-spacing: .04em;
+      letter-spacing: .05em;
     }
-    .cn-plan-icon { font-size: 1.4rem; margin-bottom: 10px; }
     .cn-plan-name {
-      font-size: .72rem;
+      font-size: .68rem;
       font-weight: 700;
-      color: var(--muted-fg);
+      color: rgba(208,208,255,.45);
       text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 12px;
+      letter-spacing: .1em;
+      margin-bottom: 18px;
     }
     .cn-plan-price {
       font-family: var(--font-heading);
-      font-size: 2rem;
-      font-weight: 800;
       line-height: 1;
       color: #fff;
-      margin-bottom: 3px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      flex-wrap: wrap;
     }
-    .cn-plan-price .prefix { font-size: 1rem; font-weight: 600; vertical-align: super; }
-    .cn-plan-price .unit { font-size: .9rem; font-weight: 500; color: var(--muted-fg); }
-    .cn-plan-period { color: var(--muted-fg); font-size: .75rem; margin-bottom: 8px; }
-    .cn-plan-target { color: var(--muted-fg); font-size: .78rem; line-height: 1.4; margin-bottom: 20px; font-style: italic; }
-    .cn-plan-divider { border: none; border-top: 1px solid var(--border); margin: 0 0 18px; }
+    .cn-plan-price .od { font-size: .85rem; font-weight: 600; color: rgba(208,208,255,.45); margin-bottom: 0; }
+    .cn-plan-price .num { font-size: 3rem; font-weight: 800; line-height: 1; }
+    .cn-plan-price .kc { font-size: 1.15rem; font-weight: 600; color: rgba(208,208,255,.65); }
+    .cn-plan-price.free .num { font-size: 2.4rem; }
+    .cn-plan-period { color: rgba(208,208,255,.4); font-size: .74rem; margin-bottom: 24px; }
+    .cn-plan-divider { border: none; border-top: 1px solid rgba(208,208,255,.08); margin: 0 0 22px; }
 
-    /* Feature groups */
-    .cn-feat-group { margin-bottom: 14px; }
-    .cn-feat-group-label {
-      font-size: .65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--muted-fg);
-      opacity: .6;
-      margin-bottom: 6px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid rgba(208,208,255,.06);
-    }
     .cn-feat {
       display: flex;
       align-items: flex-start;
-      gap: 8px;
-      font-size: .8rem;
-      color: var(--light);
-      margin-bottom: 7px;
-      line-height: 1.35;
+      gap: 10px;
+      font-size: .82rem;
+      color: rgba(255,255,255,.82);
+      margin-bottom: 11px;
+      line-height: 1.4;
     }
-    .cn-feat iconify-icon { color: #5B6BFF; flex-shrink: 0; margin-top: 1px; }
+    .cn-feat iconify-icon { color: #5B6BFF; flex-shrink: 0; margin-top: 2px; }
     .cn-feat.off iconify-icon { color: rgba(208,208,255,.2); }
-    .cn-feat.off { color: rgba(208,208,255,.28); }
-    .cn-feat .val {
-      margin-left: auto;
-      font-family: var(--font-mono);
-      font-size: .73rem;
-      font-weight: 700;
-      color: #a0b0ff;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+    .cn-feat.off { color: rgba(208,208,255,.22); }
 
-    .cn-plan-cta { margin-top: auto; padding-top: 20px; }
+    .cn-plan-cta { margin-top: auto; padding-top: 28px; }
     .cn-plan-cta a {
       display: block;
       text-align: center;
-      padding: 11px;
-      border-radius: 11px;
+      padding: 13px 16px;
+      border-radius: 14px;
       font-weight: 700;
-      font-size: .85rem;
+      font-size: .88rem;
       text-decoration: none;
       transition: all .18s;
     }
     .cn-plan-cta a.primary {
       background: linear-gradient(135deg, #0020F6, #3a3a99);
       color: #fff;
-      box-shadow: 0 6px 18px rgba(0,32,246,.3);
+      box-shadow: 0 6px 20px rgba(0,32,246,.35);
     }
-    .cn-plan-cta a.primary:hover { box-shadow: 0 8px 24px rgba(0,32,246,.5); transform: translateY(-1px); }
-    .cn-plan-cta a.ghost { border: 1px solid rgba(208,208,255,.2); color: #d0d0ff; }
-    .cn-plan-cta a.ghost:hover { border-color: rgba(208,208,255,.45); background: rgba(208,208,255,.05); }
+    .cn-plan-cta a.primary:hover { box-shadow: 0 10px 28px rgba(0,32,246,.55); transform: translateY(-1px); }
+    .cn-plan-cta a.ghost { border: 1px solid rgba(208,208,255,.22); color: rgba(255,255,255,.75); }
+    .cn-plan-cta a.ghost:hover { border-color: rgba(208,208,255,.5); background: rgba(208,208,255,.06); color: #fff; }
+
+    /* ── Expand / collapse ── */
+    .cn-feat-details { display: none; }
+    .cn-plan.expanded .cn-feat-details { display: block; }
+    .cn-expand-btn {
+      width: 100%;
+      margin-top: 4px;
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(208,208,255,.1);
+      background: transparent;
+      color: rgba(208,208,255,.45);
+      font-family: var(--font-body);
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all .15s;
+    }
+    .cn-expand-btn:hover { border-color: rgba(208,208,255,.3); color: #d0d0ff; }
+    .cn-expand-btn iconify-icon { transition: transform .25s; flex-shrink: 0; }
+    .cn-plan.expanded .cn-expand-btn iconify-icon { transform: rotate(180deg); }
 
     /* ── Discount info bar ── */
     .cn-discounts {
@@ -401,183 +409,107 @@
 
           <!-- STARTER -->
           <div class="cn-plan">
-            <div class="cn-plan-icon">🆓</div>
             <div class="cn-plan-name">Starter</div>
-            <div class="cn-plan-price">Zdarma</div>
+            <div class="cn-plan-price free"><span class="num">Zdarma</span></div>
             <div class="cn-plan-period">navždy zdarma</div>
-            <div class="cn-plan-target">Firmy, OSVČ i soukromé osoby</div>
             <hr class="cn-plan-divider" />
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Inzeráty</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Aktivní inzeráty</span><span class="val">1</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Drafty</span><span class="val">2</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Full-time inzerce</span><span class="val">1</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="14"></iconify-icon><span>Topování inzerátu</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="14"></iconify-icon><span>Branding nad inzerátem</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>1 aktivní inzerát</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>1 full-time inzerce</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (1×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Základní statistiky</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Topování inzerátu</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Ověřená firma</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>SMS Urgent</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Prémiový badge</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Export dat (CSV)</span></div>
             </div>
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Profil &amp; nábor</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Fotky na profilu</span><span class="val">3</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Oslovování brigádníků</span><span class="val">1×/měs</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="14"></iconify-icon><span>Ověřená firma</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="14"></iconify-icon><span>Šablony inzerátů</span></div>
-            </div>
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Analytika</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Základní statistiky</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="14"></iconify-icon><span>Plné statistiky</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="14"></iconify-icon><span>Export dat (CSV)</span></div>
-            </div>
-
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
             <div class="cn-plan-cta"><a href="javascript:void(0)" class="ghost" id="cenik-reg-starter">Začít zdarma</a></div>
           </div>
 
           <!-- STANDARD -->
           <div class="cn-plan popular">
             <div class="cn-popular-badge">Nejoblíbenější</div>
-            <div class="cn-plan-icon">⭐</div>
             <div class="cn-plan-name">Standard</div>
-            <div class="cn-plan-price"><span class="unit" id="std-price">499 Kč</span></div>
+            <div class="cn-plan-price"><span class="num" id="std-price">499</span><span class="kc"> Kč</span></div>
             <div class="cn-plan-period">za měsíc bez DPH</div>
-            <div class="cn-plan-target">Malé a středně velké firmy</div>
             <hr class="cn-plan-divider" />
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Inzeráty</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Aktivní inzeráty</span><span class="val">2</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Drafty</span><span class="val">5</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Full-time inzerce</span><span class="val">2</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Topování inzerátu</span><span class="val">1×/měs</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Branding nad inzerátem</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>2 aktivní inzeráty</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (1×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Ověřená firma + branding</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (10×/měs)</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Plné statistiky + CSV export</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Šablony inzerátů</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Video na profilu</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>SMS Urgent</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Prémiový badge</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
             </div>
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Profil &amp; nábor</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Fotky na profilu</span><span class="val">5</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Video na profilu</span><span class="val">1</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Ověřená firma</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Oslovování brigádníků</span><span class="val">10×/měs</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Šablony inzerátů</span></div>
-            </div>
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Analytika</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Plné statistiky inzerátů</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Export dat (CSV)</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="14"></iconify-icon><span>Pokročilá analytika</span></div>
-            </div>
-
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
             <div class="cn-plan-cta"><a href="javascript:void(0)" class="primary" id="cenik-reg-standard">Vybrat Standard</a></div>
           </div>
 
           <!-- BUSINESS -->
           <div class="cn-plan">
-            <div class="cn-plan-icon">🏆</div>
             <div class="cn-plan-name">Business</div>
-            <div class="cn-plan-price"><span class="unit" id="biz-price">4 999 Kč</span></div>
+            <div class="cn-plan-price"><span class="num" id="biz-price">4 999</span><span class="kc"> Kč</span></div>
             <div class="cn-plan-period">za měsíc bez DPH</div>
-            <div class="cn-plan-target">Velké firmy, řetězce, vysoký objem</div>
             <hr class="cn-plan-divider" />
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Inzeráty</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Aktivní inzeráty</span><span class="val">10</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Drafty</span><span class="val">20</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Full-time inzerce</span><span class="val">∞</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Topování inzerátu</span><span class="val">5×/měs</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Barevné ohraničení inzerátu</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>10 aktivních inzerátů</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (5×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>SMS Urgent + prémiový badge</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (100×/měs)</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Zmínka na FB + IG Makej</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Role uživatelů</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Plánování inzerátu</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Možnost konzultace</span></div>
             </div>
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Profil &amp; nábor</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Prémiový badge</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Oslovování brigádníků</span><span class="val">100×/měs</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>SMS Urgent (last-minute)</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Plánování inzerátu</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Zmínka na FB + IG</span><span class="val">1×/měs</span></div>
-            </div>
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Analytika &amp; tým</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Pokročilá analytika</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Role uživatelů (admin/recruiter)</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Možnost konzultace</span></div>
-            </div>
-
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
             <div class="cn-plan-cta"><a href="javascript:void(0)" class="ghost" id="cenik-reg-business">Vybrat Business</a></div>
           </div>
 
           <!-- AGENCY -->
           <div class="cn-plan">
-            <div class="cn-plan-icon">🤝</div>
             <div class="cn-plan-name">Agency</div>
-            <div class="cn-plan-price"><span class="prefix">od</span> <span class="unit" id="agency-price">4 999 Kč</span></div>
+            <div class="cn-plan-price"><span class="od">od </span><span class="num">4 999</span><span class="kc"> Kč</span></div>
             <div class="cn-plan-period">za měsíc bez DPH</div>
-            <div class="cn-plan-target">Personální agentury — inzerce pro klienty</div>
             <hr class="cn-plan-divider" />
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Inzeráty</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Aktivní inzeráty</span><span class="val">∞</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Drafty</span><span class="val">500</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Topování inzerátu</span><span class="val">20×/měs</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Inzerce jménem klienta</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Barevné ohraničení inzerátu</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Neomezené inzeráty</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Inzerce jménem klienta</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (20×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (100×/měs)</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Prémiový badge + SMS Urgent</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika + CSV</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Role uživatelů</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Zmínka na FB + IG Makej</span></div>
             </div>
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Profil &amp; nábor</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Oslovování brigádníků</span><span class="val">100×/měs</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>SMS Urgent (last-minute)</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Prémiový badge</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Zmínka na FB + IG</span><span class="val">1×/měs</span></div>
-            </div>
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Analytika &amp; tým</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Pokročilá analytika</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Role uživatelů</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Možnost konzultace</span></div>
-            </div>
-
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
             <div class="cn-plan-cta"><a href="mailto:hello@makej.eu" class="ghost">Kontaktovat nás</a></div>
           </div>
 
           <!-- ENTERPRISE -->
           <div class="cn-plan">
-            <div class="cn-plan-icon">🛠️</div>
             <div class="cn-plan-name">Enterprise</div>
-            <div class="cn-plan-price"><span class="prefix">od</span> <span class="unit">9 999 Kč</span></div>
-            <div class="cn-plan-period">za měsíc, kalkulace na míru</div>
-            <div class="cn-plan-target">Korporace a vlastní integrace</div>
+            <div class="cn-plan-price"><span class="od">od </span><span class="num">9 999</span><span class="kc"> Kč</span></div>
+            <div class="cn-plan-period">kalkulace na míru</div>
             <hr class="cn-plan-divider" />
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Inzeráty</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Aktivní inzeráty</span><span class="val">∞</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Topování inzerátu</span><span class="val">∞</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Barevné ohraničení inzerátu</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Vše z Business</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Custom integrace (HR systémy)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Co-marketing s Makej</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Vlastní reporting na míru</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Neomezení uživatelé v týmu</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Onboarding a školení týmu</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>SLA 99,99 % + prioritní podpora</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Dedikovaný account manager</span></div>
             </div>
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Profil &amp; nábor</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Oslovování brigádníků</span><span class="val">1 000×/měs</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>SMS Urgent (last-minute)</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Prémiový badge + 2 top recenze</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Co-marketing s Makej</span></div>
-            </div>
-
-            <div class="cn-feat-group">
-              <div class="cn-feat-group-label">Analytika &amp; integrace</div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Vlastní reporting na míru</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Custom integrace (HR systémy)</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Onboarding a školení</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="14"></iconify-icon><span>Neomezení uživatelé v týmu</span></div>
-            </div>
-
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
             <div class="cn-plan-cta"><a href="mailto:hello@makej.eu" class="ghost">Nezávazná poptávka</a></div>
           </div>
 
@@ -705,6 +637,7 @@
           <h4>Firma</h4>
           <a href="/podpora.html">Podpora</a>
           <a href="mailto:hello@makej.eu">Kontakt</a>
+          <a href="/o-nas.html">O nás</a>
         </div>
         <div class="footer-col">
           <h4>Právní</h4>
@@ -763,6 +696,16 @@
   </div>
 
   <script>
+    // Expand / collapse plan details
+    function toggleExpand(btn) {
+      var plan = btn.closest('.cn-plan');
+      var isExpanded = plan.classList.contains('expanded');
+      plan.classList.toggle('expanded', !isExpanded);
+      btn.innerHTML = isExpanded
+        ? 'Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon>'
+        : 'Zobrazit méně <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon>';
+    }
+
     // Tab switching
     function showPanel(btn, name) {
       document.querySelectorAll('.cn-panel').forEach(p => p.classList.remove('active'));
@@ -783,7 +726,7 @@
       var badge  = document.getElementById('billing-badge');
       toggle.classList.toggle('on', annualOn);
       badge.textContent = annualOn ? 'aktivní — 15 % sleva' : 'ušetři 15 %';
-      var fmt = function(n) { return n.toLocaleString('cs-CZ') + ' Kč'; };
+      var fmt = function(n) { return n.toLocaleString('cs-CZ'); };
       document.getElementById('std-price').textContent   = fmt(annualOn ? prices.std.annual  : prices.std.monthly);
       document.getElementById('biz-price').textContent   = fmt(annualOn ? prices.biz.annual  : prices.biz.monthly);
     }
