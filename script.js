@@ -4,6 +4,9 @@ const navActions = document.getElementById('nav-actions') || document.querySelec
 const navLinks  = document.querySelectorAll('.nav-links a[href^="#"]');
 const spySections = ['how-it-works', 'features', 'employers', 'about', 'download']
   .map(id => document.getElementById(id)).filter(Boolean);
+// Na podstránkách (např. /pro-zamestnavatele) je aktivní odkaz aktuální stránky
+// nastaven natvrdo — scrollspy pak nesmí rozsvěcet sekční kotvy (#download apod.).
+const hasStaticActive = !!document.querySelector('.nav-links a.nav-active:not([href^="#"])');
 
 function updateNav() {
   const scrollY = window.scrollY;
@@ -11,8 +14,10 @@ function updateNav() {
 
   if (navActions) {
     const hero = document.getElementById('hero');
-    navActions.classList.toggle('nav-actions-visible', hero ? scrollY > hero.offsetHeight * 0.8 : scrollY > 400);
+    navActions.classList.toggle('nav-actions-visible', hero ? scrollY > hero.offsetHeight * 0.8 : true);
   }
+
+  if (hasStaticActive) return; // aktivní je jen odkaz aktuální stránky
 
   const mid = window.innerHeight * 0.35;
   let active = null;
@@ -77,7 +82,7 @@ function animateCounters() {
 // ═══════════ SCROLL REVEAL ═══════════
 function setupReveal() {
   const revealElements = document.querySelectorAll(
-    '.step-card, .feature-card, .testimonial-card, .download-card, .section-header'
+    '.step-card, .feature-card, .testimonial-card, .download-card, .section-header, .cn-plan'
   );
   revealElements.forEach(el => el.classList.add('reveal'));
 
@@ -106,24 +111,6 @@ const heroObserver = new IntersectionObserver((entries) => {
 const heroStats = document.querySelector('.hero-stats');
 if (heroStats) heroObserver.observe(heroStats);
 
-// ═══════════ DASHBOARD PREVIEW MODAL ═══════════
-function initDashboardPreview() {
-  const overlay = document.getElementById('dash-overlay');
-  const closeBtn = document.getElementById('dash-close');
-  const openBtn  = document.getElementById('dashboard-preview-btn');
-  const regBtn   = document.getElementById('dash-register-btn');
-  if (!overlay) return;
-
-  function open()  { overlay.classList.add('active');    document.body.style.overflow = 'hidden'; }
-  function close() { overlay.classList.remove('active'); document.body.style.overflow = ''; }
-
-  if (openBtn) openBtn.addEventListener('click', open);
-  closeBtn.addEventListener('click', close);
-  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
-  if (regBtn) regBtn.addEventListener('click', e => { e.preventDefault(); close(); });
-}
-
 // ═══════════ HERO LINE SCROLL UNDERLINE ═══════════
 function setupHeroUnderline() {
   const heroLines = document.querySelectorAll('.hero-line');
@@ -149,7 +136,6 @@ function setupHeroUnderline() {
 document.addEventListener('DOMContentLoaded', () => {
   setupReveal();
   initAuth();
-  initDashboardPreview();
 });
 
 // ═══════════ AUTH / SUPABASE ═══════════
@@ -295,10 +281,9 @@ function initAuth() {
   }
 
   // ─── Statická tlačítka (nejsou nikdy přepisována) — bindujeme jen jednou ───
-  const employerBtn = document.getElementById('employer-register-btn');
-  if (employerBtn) {
-    employerBtn.addEventListener('click', e => { e.preventDefault(); openModal('register', 'employer'); });
-  }
+  document.querySelectorAll('.employer-cta-register').forEach(btn => {
+    btn.addEventListener('click', e => { e.preventDefault(); openModal('register', 'employer'); });
+  });
 
   // Hero CTA buttons (Vytvořit účet zdarma / Přihlásit se)
   const heroRegisterBtn = document.getElementById('hero-register-btn');

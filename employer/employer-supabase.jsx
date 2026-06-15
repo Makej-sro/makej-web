@@ -45,7 +45,10 @@ async function fetchEmployerData(employerId) {
           .select('*, worker:profiles!matches_worker_id_fkey(*), job:jobs(*)')
           .in('job_id', jobIds)
           .order('created_at', { ascending: false }),
-        sb.from('reviews').select('*').eq('reviewed_id', employerId),
+        sb.from('reviews')
+          .select('*, reviewer:profiles!reviews_reviewer_id_fkey(name)')
+          .eq('reviewed_id', employerId)
+          .order('created_at', { ascending: false }),
       ]);
       matches = matchRes.data || [];
       reviews = reviewRes.data || [];
@@ -205,6 +208,22 @@ async function fetchEmployerData(employerId) {
     ];
     E_FUNNEL.length = 0;
     newFunnel.forEach(f => E_FUNNEL.push(f));
+
+    // ── E_REVIEWS ──────────────────────────────────────────────────────────────
+    const newReviews = reviews.map(r => {
+      const author = r.reviewer?.name || 'Anonym';
+      return {
+        id: r.id,
+        author,
+        avatar: author.split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase() || '??',
+        color: _strColor(r.reviewer_id || r.id),
+        rating: Number(r.rating) || 0,
+        text: r.text || '',
+        when: _relTime(r.created_at),
+      };
+    });
+    E_REVIEWS.length = 0;
+    newReviews.forEach(r => E_REVIEWS.push(r));
 
     return true;
   } catch (err) {

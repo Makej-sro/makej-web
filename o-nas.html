@@ -25,18 +25,6 @@
       line-height: 1.05; letter-spacing: -0.03em; margin: 16px 0 0;
     }
 
-    .about-eyebrow {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
-      color: var(--muted-fg);
-      display: inline-flex; align-items: center; gap: 10px;
-      margin-bottom: 18px;
-    }
-    .about-eyebrow::before {
-      content: ''; width: 6px; height: 6px; border-radius: 50%;
-      background: var(--secondary); flex-shrink: 0;
-    }
-
     /* Manifesto block */
     .about-manifesto {
       padding: 72px 80px; border-radius: 24px;
@@ -53,7 +41,6 @@
       -webkit-mask-image: radial-gradient(ellipse 80% 70% at 80% 50%, #000 20%, transparent 70%);
       pointer-events: none;
     }
-    .about-manifesto .about-eyebrow { color: rgba(208,208,255,.6); position: relative; }
     .about-lead {
       font-family: 'Bricolage Grotesque', sans-serif;
       font-size: clamp(30px, 4.6vw, 68px);
@@ -281,9 +268,8 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej!</a>
       <div class="nav-links">
-        <a href="/#how-it-works">Jak to funguje</a>
-        <a href="/#features">Funkce</a>
-        <a href="/#employers">Pro zaměstnavatele</a>
+        <a href="/hledam-si-praci.html">Hledám si práci</a>
+        <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
         <a href="/#download">Stáhnout</a>
         <a href="/podpora.html">Podpora</a>
       </div>
@@ -296,9 +282,8 @@
       </button>
     </div>
     <div class="mobile-menu" id="mobile-menu">
-      <a href="/#how-it-works">Jak to funguje</a>
-      <a href="/#features">Funkce</a>
-      <a href="/#employers">Pro zaměstnavatele</a>
+      <a href="/hledam-si-praci.html">Hledám si práci</a>
+      <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
       <a href="/#download">Stáhnout</a>
       <a href="/podpora.html">Podpora</a>
       <div class="mobile-menu-actions">
@@ -319,7 +304,6 @@
 
         <!-- Manifesto -->
         <div class="about-manifesto">
-          <span class="about-eyebrow">Manifest</span>
           <p class="about-lead">Hledání brigády <em>nemá být</em> druhá brigáda.</p>
           <div class="about-principles">
             <div class="about-principle">
@@ -341,7 +325,6 @@
         <div class="about-block">
           <div class="about-block-head">
             <div>
-              <span class="about-eyebrow">Příběh</span>
               <h2 class="about-h2">Začalo to ve společné hodině na VŠ</h2>
             </div>
             <p class="about-desc">Nápad na Makej! se zrodil v jedné z hodin na vysoké škole. Jakožto spolužáci jsme měli zadaný projekt na vytvoření reálné firmy — myšlenka moderní aplikace propojující lidi, co práci zadávají, i ty, kdo o ni mají zájem, nás naprosto uchvátila. Primárně jsme se chtěli soustředit na jednorázové přivýdělky, každopádně časem jsme usoudili, že se chceme soustředit na trh práce komplexně.</p>
@@ -352,7 +335,6 @@
         <div class="about-block">
           <div class="about-block-head">
             <div>
-              <span class="about-eyebrow">Tým</span>
               <h2 class="about-h2">Tým Makej!</h2>
             </div>
             <p class="about-desc">Malý, sehraný tým. Spolužáci z VŠ s velkými ambicemi.</p>
@@ -415,8 +397,8 @@
         </div>
         <div class="footer-col">
           <h4>Produkt</h4>
-          <a href="/#features">Funkce</a>
-          <a href="/#how-it-works">Jak to funguje</a>
+          <a href="/hledam-si-praci.html">Hledám si práci</a>
+          <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
           <a href="/cenik.html">Ceník</a>
           <a href="/#download">Stáhnout</a>
         </div>
@@ -483,6 +465,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js"></script>
+  <script src="/script.js?v=4"></script>
 </body>
 </html>

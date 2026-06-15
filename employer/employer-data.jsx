@@ -59,4 +59,11 @@ const E_ACTIVITY = [
   { type: 'sub', who: 'Tarif Premium', what: 'obnoven na 30 dní', when: 'před 2 dny', icon: 'shield-check-bold', color: '#5B6BFF' },
 ];
 
-Object.assign(window, { ECOMPANY, EPROFILE, E_KPIS, E_JOBS, E_CANDIDATES, E_ACTIVITY });
+// Recenze firmy — přepsány reálnými daty z Supabase při načtení
+const E_REVIEWS = [
+  { id: 'r1', author: 'Adam Procházka', avatar: 'AP', color: '#FFD166', rating: 5, text: 'Super parta, férové jednání a výplata na čas. Určitě zase přijdu.', when: 'před 3 dny' },
+  { id: 'r2', author: 'Markéta L.',     avatar: 'ML', color: '#FF6B35', rating: 5, text: 'Příjemné prostředí, jasné instrukce. Doporučuju.', when: 'před týdnem' },
+  { id: 'r3', author: 'Jakub Veselý',   avatar: 'JV', color: '#8AB4FF', rating: 4, text: 'Dobrá zkušenost, jen občas chaos v rozpisu směn.', when: 'před 2 týdny' },
+];
+
+Object.assign(window, { ECOMPANY, EPROFILE, E_KPIS, E_JOBS, E_CANDIDATES, E_ACTIVITY, E_REVIEWS });

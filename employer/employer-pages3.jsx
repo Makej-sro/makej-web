@@ -463,65 +463,246 @@ const inputStyle = {
   color: '#fff', fontFamily: T.fontUI, fontSize: 13, outline: 'none',
 };
 
+// ── Pomocné prvky profilu ──────────────────────────────────────────────────
+const INDUSTRIES = ['Gastro / restaurace', 'Kavárna', 'Maloobchod', 'Sklad / logistika', 'Eventy / catering', 'Hotelnictví', 'Výroba', 'Úklid', 'Administrativa', 'Jiné'];
+const SOCIAL_FIELDS = [
+  { k: 'instagram', icon: 'instagram', ph: 'instagram.com/firma' },
+  { k: 'facebook',  icon: 'facebook',  ph: 'facebook.com/firma' },
+  { k: 'linkedin',  icon: 'linkedin',  ph: 'linkedin.com/company/firma' },
+  { k: 'tiktok',    icon: 'tiktok',    ph: 'tiktok.com/@firma' },
+];
+
+function ImageField({ label, sub, value, onChange, fallback, color }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 0', borderBottom: '1px solid ' + T.border }}>
+      <div style={{ width: 64, height: 64, borderRadius: 14, flexShrink: 0, overflow: 'hidden', background: (color || T.primary) + '22', border: '1px solid ' + (color || T.primary) + '55', display: 'grid', placeItems: 'center', color: color || T.light, fontFamily: T.fontHead, fontWeight: 800, fontSize: 20 }}>
+        {value ? <img src={value} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; }} /> : fallback}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 14.5, fontWeight: 800 }}>{label}</div>
+        <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, margin: '2px 0 7px' }}>{sub}</div>
+        <input style={{ ...inputStyle, fontSize: 12 }} value={value} onChange={onChange} placeholder="Vlož odkaz na obrázek (URL)" />
+      </div>
+    </div>
+  );
+}
+
+function Stars({ n }) {
+  return (
+    <span style={{ display: 'inline-flex', gap: 1 }}>
+      {[1,2,3,4,5].map(i => <Icon key={i} name={i <= n ? 'star-bold' : 'star-line-duotone'} size={13} color={i <= n ? T.super : T.mutedSoft} />)}
+    </span>
+  );
+}
+
 function SettingsProfile() {
   const initForm = () => ({
     company_name: EPROFILE.company_name || ECOMPANY.name || '',
-    bio: EPROFILE.bio || '',
+    ic:        EPROFILE.ic || '',
+    industry:  EPROFILE.industry || '',
+    bio:       EPROFILE.bio || '',
+    website:   EPROFILE.website || '',
+    address:   EPROFILE.address || '',
+    avatar_url: EPROFILE.avatar_url || '',
+    logo_url:  EPROFILE.logo_url || '',
+    socials:   Object.assign({ instagram: '', facebook: '', linkedin: '', tiktok: '' }, EPROFILE.socials || {}),
+    photos:    Array.isArray(EPROFILE.photos) ? EPROFILE.photos.slice() : [],
+    branding:  Object.assign({ color: ECOMPANY.logoColor || T.primary }, EPROFILE.branding || {}),
   });
   const [form, setForm]     = useStateE(initForm);
   const [saving, setSaving] = useStateE(false);
   const [toast, setToast]   = useStateE(null);
 
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
+  const setSocial = k => e => setForm(f => ({ ...f, socials: { ...f.socials, [k]: e.target.value } }));
+  const setPhoto  = (i, v) => setForm(f => { const p = f.photos.slice(); p[i] = v; return { ...f, photos: p }; });
+  const addPhoto  = () => setForm(f => ({ ...f, photos: [...f.photos, ''] }));
+  const rmPhoto   = i => setForm(f => ({ ...f, photos: f.photos.filter((_, j) => j !== i) }));
 
   async function handleSave() {
     setSaving(true);
-    const ok = await updateEmployerProfile({ company_name: form.company_name, bio: form.bio });
+    const ok = await updateEmployerProfile({
+      company_name: form.company_name,
+      ic: form.ic, industry: form.industry, bio: form.bio,
+      website: form.website, address: form.address,
+      avatar_url: form.avatar_url, logo_url: form.logo_url,
+      socials: form.socials,
+      photos: form.photos.filter(u => u && u.trim()),
+      branding: form.branding,
+    });
     setSaving(false);
     setToast(ok ? 'ok' : 'err');
     setTimeout(() => setToast(null), 2500);
   }
 
+  const verified   = !!EPROFILE.verified;
+  const mapsUrl    = form.address ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(form.address) : null;
+  const mapEmbed   = form.address ? 'https://maps.google.com/maps?q=' + encodeURIComponent(form.address) + '&z=14&output=embed' : null;
+  const activeJobs = (typeof E_JOBS !== 'undefined' ? E_JOBS : []).filter(j => j.status === 'active' || j.status === 'urgent');
+  const reviews    = (typeof E_REVIEWS !== 'undefined' ? E_REVIEWS : []);
+  const avgRating  = reviews.length ? (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length).toFixed(1) : null;
+
   return (
-    <ECard>
-      <SectionHeader title="Firemní profil" subtitle="Tyto informace vidí kandidáti na profilu vaší firmy" />
-      {toast === 'ok' && (
-        <div style={{ padding: '10px 14px', borderRadius: 9, background: 'rgba(91,214,138,0.18)', border: '1px solid rgba(91,214,138,0.35)', color: '#5BD68A', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>
-          ✓ Profil uložen
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <ECard>
+        <SectionHeader title="Firemní profil" subtitle="Tyto informace vidí kandidáti na profilu vaší firmy" />
+        {toast === 'ok' && (
+          <div style={{ padding: '10px 14px', borderRadius: 9, background: 'rgba(91,214,138,0.18)', border: '1px solid rgba(91,214,138,0.35)', color: '#5BD68A', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>✓ Profil uložen</div>
+        )}
+        {toast === 'err' && (
+          <div style={{ padding: '10px 14px', borderRadius: 9, background: 'rgba(244,63,94,0.15)', border: '1px solid rgba(244,63,94,0.3)', color: '#f43f5e', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>Chyba při ukládání</div>
+        )}
+
+        {/* Ověřeno */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingBottom: 14, borderBottom: '1px solid ' + T.border }}>
+          {verified ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 999, background: 'rgba(0,32,246,0.16)', border: '1px solid rgba(91,107,255,0.5)', color: '#8AB4FF', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700 }}>
+              <Icon name="verified-check-bold" size={14} color="#5B6BFF" /> Ověřená firma
+            </span>
+          ) : (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 999, background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600 }}>
+              <Icon name="shield-warning-bold" size={14} color={T.muted} /> Neověřeno — kontaktuj podporu pro ověření
+            </span>
+          )}
         </div>
-      )}
-      {toast === 'err' && (
-        <div style={{ padding: '10px 14px', borderRadius: 9, background: 'rgba(244,63,94,0.15)', border: '1px solid rgba(244,63,94,0.3)', color: '#f43f5e', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>
-          Chyba při ukládání
+
+        {/* Logo + profilovka */}
+        <ImageField label="Logo firmy" sub="PNG / SVG, čtvercové, ideálně 256×256" value={form.logo_url} onChange={set('logo_url')} fallback={ECOMPANY.logo} color={form.branding.color} />
+        <ImageField label="Profilová fotka" sub="Hlavní fotka profilu (např. provozovna)" value={form.avatar_url} onChange={set('avatar_url')} fallback={<Icon name="camera-bold" size={22} color={T.muted} />} color={form.branding.color} />
+
+        {/* Základní info */}
+        <FormRow label="Název firmy">
+          <input style={inputStyle} value={form.company_name} onChange={set('company_name')} />
+        </FormRow>
+        <FormRow label="IČ" sub="Identifikační číslo firmy">
+          <input style={inputStyle} value={form.ic} onChange={set('ic')} placeholder="např. 12345678" inputMode="numeric" />
+        </FormRow>
+        <FormRow label="Odvětví">
+          <select style={{ ...inputStyle, appearance: 'auto' }} value={form.industry} onChange={set('industry')}>
+            <option value="">Vyber odvětví…</option>
+            {INDUSTRIES.map(o => <option key={o} value={o}>{o}</option>)}
+          </select>
+        </FormRow>
+        <FormRow label="Krátký popis" sub="Max. 280 znaků — vidí se v kartě firmy">
+          <textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical', fontFamily: T.fontUI }} value={form.bio} onChange={set('bio')} maxLength={280} placeholder="Napiš něco o firmě…" />
+        </FormRow>
+
+        {/* Kontakt */}
+        <FormRow label="Web">
+          <input style={inputStyle} value={form.website} onChange={set('website')} placeholder="https://www.firma.cz" />
+        </FormRow>
+        <FormRow label="Adresa firmy" sub="Zobrazí se na mapě v profilu">
+          <input style={inputStyle} value={form.address} onChange={set('address')} placeholder="Náměstí Míru 3, Praha 2" />
+          {mapsUrl && (
+            <a href={mapsUrl} target="_blank" rel="noopener" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 7, color: '#8AB4FF', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600, textDecoration: 'none' }}>
+              <Icon name="map-point-bold" size={13} color="#8AB4FF" /> Zobrazit na mapě
+            </a>
+          )}
+          {mapEmbed && (
+            <div style={{ marginTop: 8, borderRadius: 10, overflow: 'hidden', border: '1px solid ' + T.border }}>
+              <iframe title="mapa" src={mapEmbed} style={{ width: '100%', height: 150, border: 0, display: 'block', filter: 'grayscale(0.3) invert(0.9) hue-rotate(180deg)' }} loading="lazy"></iframe>
+            </div>
+          )}
+        </FormRow>
+
+        {/* Sociální sítě */}
+        <FormRow label="Sociální sítě" sub="Odkazy na vaše profily">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {SOCIAL_FIELDS.map(s => (
+              <div key={s.k} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                <span style={{ width: 30, height: 30, flexShrink: 0, borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, display: 'grid', placeItems: 'center' }}>
+                  <Icon name={s.icon} size={15} color={T.light} />
+                </span>
+                <input style={{ ...inputStyle, fontSize: 12 }} value={form.socials[s.k] || ''} onChange={setSocial(s.k)} placeholder={s.ph} />
+              </div>
+            ))}
+          </div>
+        </FormRow>
+
+        {/* Bonusové fotky */}
+        <FormRow label="Bonusové fotky" sub="Galerie na profilu firmy">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {form.photos.length === 0 && (
+              <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12 }}>Zatím žádné fotky.</div>
+            )}
+            {form.photos.map((url, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, display: 'grid', placeItems: 'center' }}>
+                  {url ? <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; }} /> : <Icon name="gallery-bold" size={15} color={T.mutedSoft} />}
+                </div>
+                <input style={{ ...inputStyle, fontSize: 12 }} value={url} onChange={e => setPhoto(i, e.target.value)} placeholder="URL fotky" />
+                <button onClick={() => rmPhoto(i)} style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.25)', color: '#f43f5e', cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
+                  <Icon name="trash-bin-trash-bold" size={14} color="#f43f5e" />
+                </button>
+              </div>
+            ))}
+            <button onClick={addPhoto} style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px dashed ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              <Icon name="add-circle-bold" size={14} color={T.light} /> Přidat fotku
+            </button>
+          </div>
+        </FormRow>
+
+        {/* Branding */}
+        <FormRow label="Barva značky" sub="Branding — akcent na profilu firmy">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <input type="color" value={form.branding.color} onChange={e => setForm(f => ({ ...f, branding: { ...f.branding, color: e.target.value } }))} style={{ width: 44, height: 36, padding: 0, borderRadius: 8, border: '1px solid ' + T.border, background: 'transparent', cursor: 'pointer' }} />
+            <input style={{ ...inputStyle, maxWidth: 130, fontFamily: T.fontMono }} value={form.branding.color} onChange={e => setForm(f => ({ ...f, branding: { ...f.branding, color: e.target.value } }))} />
+          </div>
+        </FormRow>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, paddingTop: 16 }}>
+          <button onClick={() => setForm(initForm())} disabled={saving} style={{ padding: '9px 16px', borderRadius: 8, background: 'transparent', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.5 : 1 }}>Zrušit</button>
+          <button onClick={handleSave} disabled={saving} style={{ padding: '9px 16px', borderRadius: 8, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>{saving ? 'Ukládám…' : 'Uložit změny'}</button>
         </div>
-      )}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 0', borderBottom: '1px solid ' + T.border }}>
-        <div style={{ width: 64, height: 64, borderRadius: 14, background: ECOMPANY.logoColor + '22', border: '1px solid ' + ECOMPANY.logoColor + '55', display: 'grid', placeItems: 'center', color: ECOMPANY.logoColor, fontFamily: T.fontHead, fontWeight: 800, fontSize: 22 }}>{ECOMPANY.logo}</div>
-        <div style={{ flex: 1 }}>
-          <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 16, fontWeight: 800 }}>Logo firmy</div>
-          <div style={{ color: T.muted, fontSize: 11.5, fontFamily: T.fontUI, marginTop: 2 }}>PNG / SVG, min. 256×256, max. 1 MB</div>
-        </div>
-        <button style={{ padding: '8px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Nahrát</button>
-      </div>
-      <FormRow label="Název firmy">
-        <input style={inputStyle} value={form.company_name} onChange={set('company_name')} />
-      </FormRow>
-      <FormRow label="Krátký popis" sub="Max. 280 znaků — vidí se v kartě firmy">
-        <textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical', fontFamily: T.fontUI }} value={form.bio} onChange={set('bio')} placeholder="Napiš něco o firmě…" />
-      </FormRow>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, paddingTop: 14 }}>
-        <button
-          onClick={() => setForm(initForm())}
-          disabled={saving}
-          style={{ padding: '9px 16px', borderRadius: 8, background: 'transparent', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.5 : 1 }}
-        >Zrušit</button>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          style={{ padding: '9px 16px', borderRadius: 8, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
-        >{saving ? 'Ukládám…' : 'Uložit změny'}</button>
-      </div>
-    </ECard>
+      </ECard>
+
+      {/* Aktivní inzeráty */}
+      <ECard>
+        <SectionHeader title="Aktivní inzeráty" subtitle={activeJobs.length + ' aktivních na profilu'} />
+        {activeJobs.length === 0 ? (
+          <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12.5, padding: '8px 0' }}>Žádné aktivní inzeráty.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {activeJobs.map((j, i) => (
+              <div key={j.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < activeJobs.length - 1 ? '1px solid ' + T.border : 'none' }}>
+                <div style={{ width: 8, height: 8, borderRadius: 999, flexShrink: 0, background: j.status === 'urgent' ? '#f43f5e' : '#5BD68A' }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.title}</div>
+                  <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, marginTop: 2 }}>
+                    {j.status === 'urgent' ? 'Spěchá' : 'Aktivní'}{j.location ? ' · ' + j.location : ''}{j.matches ? ' · ' + j.matches + ' kandidátů' : ''}
+                  </div>
+                </div>
+                <div style={{ flexShrink: 0, color: T.light, fontFamily: T.fontMono, fontSize: 13, fontWeight: 700 }}>{j.pay} {j.payUnit || 'Kč/h'}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </ECard>
+
+      {/* Recenze */}
+      <ECard>
+        <SectionHeader title="Recenze" subtitle={avgRating ? avgRating + ' ★ průměr · ' + reviews.length + ' hodnocení' : 'Zatím bez recenzí'} />
+        {reviews.length === 0 ? (
+          <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12.5, padding: '8px 0' }}>Zatím žádné recenze.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {reviews.map((r, i) => (
+              <div key={r.id} style={{ display: 'flex', gap: 12, padding: '14px 0', borderBottom: i < reviews.length - 1 ? '1px solid ' + T.border : 'none' }}>
+                <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: 999, background: (r.color || T.primary) + '22', border: '1px solid ' + (r.color || T.primary) + '55', display: 'grid', placeItems: 'center', color: r.color || T.light, fontFamily: T.fontHead, fontWeight: 800, fontSize: 13 }}>{r.avatar}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <span style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{r.author}</span>
+                    <span style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 11 }}>{r.when}</span>
+                  </div>
+                  <div style={{ margin: '3px 0 5px' }}><Stars n={r.rating} /></div>
+                  {r.text && <div style={{ color: T.light, fontFamily: T.fontUI, fontSize: 12.5, lineHeight: 1.5 }}>{r.text}</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </ECard>
+    </div>
   );
 }
 

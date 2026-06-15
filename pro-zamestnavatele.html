@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pro zaměstnavatele — Makej!</title>
+  <meta name="description" content="Najděte brigádníky během hodin, ne týdnů. Vytvořte inzerát za 60 sekund, kandidáti swajpují a vy přijímáte jedním tapem. Web dashboard s kompletní analytikou." />
+  <meta name="theme-color" content="#0020f6" />
+  <link rel="canonical" href="https://makej.eu/pro-zamestnavatele.html" />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://makej.eu/pro-zamestnavatele.html" />
+  <meta property="og:title" content="Pro zaměstnavatele — Makej!" />
+  <meta property="og:description" content="Žádné inzeráty na portálech, žádné čekání týdny. Vytvoříte nabídku za 60 sekund a kandidáti přicházejí sami." />
+  <meta property="og:image" content="https://makej.eu/og-image.png" />
+  <meta property="og:locale" content="cs_CZ" />
+  <meta property="og:site_name" content="Makej!" />
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Pro zaměstnavatele — Makej!" />
+  <meta name="twitter:description" content="Žádné inzeráty na portálech, žádné čekání týdny. Vytvoříte nabídku za 60 sekund a kandidáti přicházejí sami." />
+  <meta name="twitter:image" content="https://makej.eu/og-image.png" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="/iconify-solar.js"></script>
+  <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
+  <link rel="stylesheet" href="style.css?v=18" />
+</head>
+<body>
+
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Makej!</a>
+      <div class="nav-links">
+        <a href="/hledam-si-praci.html">Hledám si práci</a>
+        <a href="/pro-zamestnavatele.html" class="nav-active">Pro zaměstnavatele</a>
+        <a href="#download">Stáhnout</a>
+        <a href="/podpora.html">Podpora</a>
+      </div>
+      <div class="nav-actions nav-actions-visible" id="nav-actions">
+        <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
+        <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
+      </div>
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+        <iconify-icon icon="solar:hamburger-menu-bold" width="24"></iconify-icon>
+      </button>
+    </div>
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/hledam-si-praci.html">Hledám si práci</a>
+      <a href="/pro-zamestnavatele.html" class="nav-active">Pro zaměstnavatele</a>
+      <a href="#download">Stáhnout</a>
+      <a href="/podpora.html">Podpora</a>
+      <div class="mobile-menu-actions">
+        <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
+        <a href="javascript:void(0)" class="btn-primary" id="mobile-register-btn">Vytvořit účet</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ═══════════ EMPLOYERS ═══════════ -->
+    <section id="employers" style="padding-top:152px;">
+      <div class="container">
+
+        <!-- Intro -->
+        <div class="section-header reveal">
+          <h2>Brigádník nastoupí <span class="gradient-text">zítra</span></h2>
+          <p>Žádné inzeráty na portálech, žádné čekání týdny. Vytvoříte nabídku za 60 sekund a kandidáti přicházejí sami.</p>
+        </div>
+
+        <!-- Stats row -->
+        <div class="emp-stats">
+          <div class="emp-stat-item">
+            <div class="emp-stat-value">2,4h</div>
+            <div class="emp-stat-label">průměrná doba do prvního kandidáta</div>
+          </div>
+          <div class="emp-stat-divider"></div>
+          <div class="emp-stat-item">
+            <div class="emp-stat-value">850+</div>
+            <div class="emp-stat-label">aktivních zaměstnavatelů v ČR</div>
+          </div>
+          <div class="emp-stat-divider"></div>
+          <div class="emp-stat-item">
+            <div class="emp-stat-value">94%</div>
+            <div class="emp-stat-label">zaměstnavatelů najme do 48 hodin</div>
+          </div>
+          <div class="emp-stat-divider"></div>
+          <div class="emp-stat-item">
+            <div class="emp-stat-value">0 Kč</div>
+            <div class="emp-stat-label">pro začátek — základní plán zdarma</div>
+          </div>
+        </div>
+
+        <!-- How it works for employers -->
+        <div class="emp-how-wrap">
+          <h3 class="emp-sub-heading">Jak to funguje</h3>
+          <div class="emp-steps">
+            <div class="emp-step">
+              <div class="emp-step-icon">
+                <iconify-icon icon="solar:document-add-bold" width="28"></iconify-icon>
+              </div>
+              <h4>Vytvořte inzerát</h4>
+              <p>Vyplňte pozici, datum, hodinovou mzdu a popis. Hotovo za 60 sekund přímo v aplikaci.</p>
+            </div>
+            <div class="emp-step-arrow"><iconify-icon icon="solar:arrow-right-bold" width="22"></iconify-icon></div>
+            <div class="emp-step">
+              <div class="emp-step-icon">
+                <iconify-icon icon="solar:hand-heart-bold" width="28"></iconify-icon>
+              </div>
+              <h4>Kandidáti swajpují</h4>
+              <p>Tisíce brigádníků uvidí vaši nabídku ve feedu. Ti co chtějí, swajpnou doprava — a vy je vidíte okamžitě.</p>
+            </div>
+            <div class="emp-step-arrow"><iconify-icon icon="solar:arrow-right-bold" width="22"></iconify-icon></div>
+            <div class="emp-step">
+              <div class="emp-step-icon">
+                <iconify-icon icon="solar:user-check-rounded-bold" width="28"></iconify-icon>
+              </div>
+              <h4>Přijmete nebo odmítnete</h4>
+              <p>Podívejte se na profil, hodnocení a zkušenosti. Jedním tapem přijmete — nebo posunete dál.</p>
+            </div>
+            <div class="emp-step-arrow"><iconify-icon icon="solar:arrow-right-bold" width="22"></iconify-icon></div>
+            <div class="emp-step">
+              <div class="emp-step-icon">
+                <iconify-icon icon="solar:chat-round-dots-bold" width="28"></iconify-icon>
+              </div>
+              <h4>Domluvte detaily</h4>
+              <p>Po přijetí se otevře chat. Upřesněte čas, místo a co si vzít. Brigádník je připravený.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Why Makej vs. portály -->
+        <div class="emp-why-wrap">
+          <h3 class="emp-sub-heading">Proč Makej, ne klasické portály</h3>
+          <div class="emp-why-grid">
+            <div class="emp-why-card">
+              <div class="emp-why-icon">
+                <iconify-icon icon="solar:shield-star-bold" width="32"></iconify-icon>
+              </div>
+              <h4>Ověřené profily</h4>
+              <p>Každý brigádník má viditelné hodnocení, historii brigád a úroveň. Víte, koho přijímáte — ne jen životopis co si napsal sám.</p>
+            </div>
+            <div class="emp-why-card">
+              <div class="emp-why-icon">
+                <iconify-icon icon="solar:chart-bold" width="32"></iconify-icon>
+              </div>
+              <h4>Analytika v reálném čase</h4>
+              <p>Vidíte kolik lidí vidělo váš inzerát, kolik swajplo, kolik matchovalo. Optimalizujte nabídku a plňte pozice rychleji.</p>
+            </div>
+            <div class="emp-why-card">
+              <div class="emp-why-icon">
+                <iconify-icon icon="solar:chat-round-bold" width="32"></iconify-icon>
+              </div>
+              <h4>Chat místo emailů</h4>
+              <p>Žádné zdlouhavé emaily. Napište zprávu, brigádník odpoví do minut. Vše na jednom místě — v aplikaci i ve web dashboardu.</p>
+            </div>
+            <div class="emp-why-card">
+              <div class="emp-why-icon">
+                <iconify-icon icon="solar:wallet-bold" width="32"></iconify-icon>
+              </div>
+              <h4>Zdarma pro začátek</h4>
+              <p>Základní plán je zcela bez poplatků. Platíte až když chcete víc — boost, pokročilá analytika nebo více aktivních inzerátů.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard preview + CTA -->
+        <div class="employer-split">
+          <div class="employer-visual">
+            <div class="employer-dashboard-mock">
+              <img src="/dashboard-preview.png" alt="Náhled dashboardu zaměstnavatele" loading="lazy" />
+            </div>
+          </div>
+          <div class="employer-text">
+            <h2>Plná kontrola <span class="gradient-text">na jednom místě</span></h2>
+            <p>Web dashboard pro zaměstnavatele zobrazuje všechny vaše inzeráty, kandidáty a chaty. Přijímejte, odmítejte a komunikujte — z počítače i telefonu.</p>
+            <ul class="employer-benefits">
+              <li>
+                <iconify-icon icon="solar:check-circle-bold" width="20" style="color:#d0d0ff"></iconify-icon>
+                <span>Přehledný kanban kandidátů</span>
+              </li>
+              <li>
+                <iconify-icon icon="solar:check-circle-bold" width="20" style="color:#d0d0ff"></iconify-icon>
+                <span>Realtime notifikace — nový match ihned</span>
+              </li>
+              <li>
+                <iconify-icon icon="solar:check-circle-bold" width="20" style="color:#d0d0ff"></iconify-icon>
+                <span>KPI dashboard s výkonem inzerátů</span>
+              </li>
+              <li>
+                <iconify-icon icon="solar:check-circle-bold" width="20" style="color:#d0d0ff"></iconify-icon>
+                <span>Chat synchronizovaný s mobilní appkou</span>
+              </li>
+              <li>
+                <iconify-icon icon="solar:check-circle-bold" width="20" style="color:#d0d0ff"></iconify-icon>
+                <span>Plán směn a správa týmu</span>
+              </li>
+            </ul>
+            <div class="emp-cta-group">
+              <a href="#" class="btn-primary btn-lg employer-cta-register" id="employer-register-btn">
+                <iconify-icon icon="solar:buildings-bold" width="20"></iconify-icon>
+                Začít zdarma
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══════════ PRICING ═══════════ -->
+  <section id="pricing" style="padding:60px 0 120px;">
+    <div class="container">
+
+      <div class="section-header reveal">
+        <h2>Ceny, které <span class="gradient-text">dávají smysl</span></h2>
+        <p>Začněte zdarma a rozšiřte plán, až budete potřebovat víc inzerátů, oslovování nebo pokročilou analytiku.</p>
+      </div>
+
+      <!-- Annual toggle -->
+      <div class="cn-billing" id="billing-wrap">
+        <span>Měsíční platba</span>
+        <button class="cn-billing-toggle" id="billing-toggle" onclick="toggleBilling()" title="Přepnout na roční platbu"></button>
+        <span>Roční platba</span>
+        <span class="cn-billing-badge" id="billing-badge">ušetři 15 %</span>
+      </div>
+
+      <div class="cn-plans-wrap">
+        <div class="cn-plans">
+
+          <!-- STARTER -->
+          <div class="cn-plan">
+            <div class="cn-plan-name">Starter</div>
+            <div class="cn-plan-price free"><span class="num">Zdarma</span></div>
+            <div class="cn-plan-period">navždy zdarma</div>
+            <hr class="cn-plan-divider" />
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>1 aktivní inzerát</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>1 full-time inzerce</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (1×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Základní statistiky</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Topování inzerátu</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Ověřená firma</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>SMS Urgent</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Prémiový badge</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Export dat (CSV)</span></div>
+            </div>
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
+            <div class="cn-plan-cta"><a href="javascript:void(0)" class="ghost employer-cta-register">Začít zdarma</a></div>
+          </div>
+
+          <!-- STANDARD -->
+          <div class="cn-plan popular">
+            <div class="cn-popular-badge"><iconify-icon icon="solar:star-bold" width="13"></iconify-icon>Nejoblíbenější</div>
+            <div class="cn-plan-name">Standard</div>
+            <div class="cn-plan-price"><span class="num" id="std-price">499</span><span class="kc"> Kč</span></div>
+            <div class="cn-plan-period">za měsíc bez DPH</div>
+            <hr class="cn-plan-divider" />
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>2 aktivní inzeráty</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (1×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Ověřená firma + branding</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (10×/měs)</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Plné statistiky + CSV export</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Šablony inzerátů</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Video na profilu</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>SMS Urgent</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Prémiový badge</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
+            </div>
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
+            <div class="cn-plan-cta"><a href="javascript:void(0)" class="primary employer-cta-register">Vybrat Standard</a></div>
+          </div>
+
+          <!-- BUSINESS -->
+          <div class="cn-plan">
+            <div class="cn-plan-name">Business</div>
+            <div class="cn-plan-price"><span class="num" id="biz-price">4 999</span><span class="kc"> Kč</span></div>
+            <div class="cn-plan-period">za měsíc bez DPH</div>
+            <hr class="cn-plan-divider" />
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>10 aktivních inzerátů</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (5×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>SMS Urgent + prémiový badge</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (100×/měs)</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Zmínka na FB + IG Makej</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Role uživatelů</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Plánování inzerátu</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Možnost konzultace</span></div>
+            </div>
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
+            <div class="cn-plan-cta"><a href="javascript:void(0)" class="ghost employer-cta-register">Vybrat Business</a></div>
+          </div>
+
+          <!-- AGENCY -->
+          <div class="cn-plan">
+            <div class="cn-plan-name">Agency</div>
+            <div class="cn-plan-price"><span class="od">od </span><span class="num">4 999</span><span class="kc"> Kč</span></div>
+            <div class="cn-plan-period">za měsíc bez DPH</div>
+            <hr class="cn-plan-divider" />
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Neomezené inzeráty</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Inzerce jménem klienta</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (20×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (100×/měs)</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Prémiový badge + SMS Urgent</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika + CSV</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Role uživatelů</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Zmínka na FB + IG Makej</span></div>
+            </div>
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
+            <div class="cn-plan-cta"><a href="mailto:hello@makej.eu" class="ghost">Kontaktovat nás</a></div>
+          </div>
+
+          <!-- ENTERPRISE -->
+          <div class="cn-plan">
+            <div class="cn-plan-name">Enterprise</div>
+            <div class="cn-plan-price"><span class="od">od </span><span class="num">9 999</span><span class="kc"> Kč</span></div>
+            <div class="cn-plan-period">kalkulace na míru</div>
+            <hr class="cn-plan-divider" />
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Vše z Business</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Custom integrace (HR systémy)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Co-marketing s Makej</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Vlastní reporting na míru</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Neomezení uživatelé v týmu</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Onboarding a školení týmu</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>SLA 99,99 % + prioritní podpora</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Dedikovaný account manager</span></div>
+            </div>
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
+            <div class="cn-plan-cta"><a href="mailto:hello@makej.eu" class="ghost">Nezávazná poptávka</a></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════ DOWNLOAD CTA ═══════════ -->
+  <section id="download">
+    <div class="container">
+      <div class="download-card">
+        <div class="download-glow"></div>
+        <div class="download-content">
+          <h2>Připraven<span class="gradient-text"> Makat?</span></h2>
+          <p>Stáhni si aplikaci zdarma a prozkoumej pracovní příležitosti ve tvém okolí ještě dnes.</p>
+          <div class="download-buttons">
+            <a href="#" class="store-btn store-btn--soon" aria-disabled="true">
+              <iconify-icon icon="logos:apple" width="28"></iconify-icon>
+              <div>
+                <small>Brzy dostupné na</small>
+                <strong>App Store</strong>
+              </div>
+            </a>
+            <a href="#" class="store-btn store-btn--soon" aria-disabled="true">
+              <iconify-icon icon="logos:google-play-icon" width="24"></iconify-icon>
+              <div>
+                <small>Brzy dostupné na</small>
+                <strong>Google Play</strong>
+              </div>
+            </a>
+          </div>
+          <p class="download-note">Zdarma · Bez reklam · iOS &amp; Android · Spuštění brzy</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer id="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="footer-logo">Makej!</a>
+          <p>Brigádní appka nové generace. Swajpuj, matchuj a pracuj.</p>
+          <div class="footer-social">
+            <!-- Sociální sítě — doplň skutečné URL před launchem -->
+            <!-- <a href="https://instagram.com/makej.eu" aria-label="Instagram"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a> -->
+            <!-- <a href="https://tiktok.com/@makej.eu" aria-label="TikTok"><iconify-icon icon="ic:baseline-tiktok" width="22"></iconify-icon></a> -->
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Produkt</h4>
+          <a href="/hledam-si-praci.html">Hledám si práci</a>
+          <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+          <a href="/cenik.html">Ceník</a>
+          <a href="#download">Stáhnout</a>
+        </div>
+        <div class="footer-col">
+          <h4>Firma</h4>
+          <a href="/podpora.html">Podpora</a>
+          <a href="mailto:hello@makej.eu">Kontakt</a>
+          <a href="/o-nas.html">O nás</a>
+        </div>
+        <div class="footer-col">
+          <h4>Právní</h4>
+          <a href="/terms.html">Podmínky použití</a>
+          <a href="/privacy.html">Ochrana soukromí</a>
+          <a href="/privacy.html#cookies">Cookies</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Makej! Všechna práva vyhrazena.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════ AUTH MODALS ═══════════ -->
+  <div class="modal-overlay" id="modal-overlay">
+
+    <!-- LOGIN MODAL -->
+    <div class="modal" id="login-modal" style="overflow:visible;">
+      <!-- Makač peeker -->
+      <div id="main-peeker" style="
+        position:absolute; top:-70px; left:50%; transform:translateX(-50%);
+        pointer-events:none; z-index:3;
+        filter: drop-shadow(0 14px 36px rgba(0,0,60,0.65));
+        transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+        animation: peekerIn 0.45s cubic-bezier(.2,.8,.2,1) both;
+      ">
+        <div style="width:88px;height:76px;background:linear-gradient(160deg,#4848c4 0%,#1c1c7a 100%);border-radius:50% 50% 44% 44%;position:relative;box-shadow:0 14px 36px rgba(0,0,60,0.65),inset 0 1px 0 rgba(255,255,255,0.18);border:2px solid rgba(140,140,255,0.3);">
+          <div id="main-browL" style="position:absolute;left:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-browR" style="position:absolute;right:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-eyeL" style="position:absolute;left:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilL" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidL" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div id="main-eyeR" style="position:absolute;right:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilR" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidR" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div style="position:absolute;bottom:11px;left:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+          <div style="position:absolute;bottom:11px;right:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+        </div>
+      </div>
+      <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
+      <div class="modal-logo">Makej!</div>
+      <h2 class="modal-title">Přihlásit se</h2>
+      <p class="modal-subtitle">Vítej zpět! Přihlaš se ke svému účtu.</p>
+      <div class="modal-error" id="login-error"></div>
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email</label>
+          <input class="form-input" type="email" id="login-email" placeholder="tvuj@email.cz" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Heslo</label>
+          <input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
+      </form>
+      <div class="modal-divider"><span>nebo</span></div>
+      <button class="btn-google" id="login-google">
+        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.6 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.3C29.4 35.5 26.8 36.5 24 36.5c-5.2 0-9.6-3.4-11.2-8l-6.6 5C9.7 39.7 16.3 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.2 5.3C37.5 39.7 44 35.4 44 24c0-1.3-.1-2.6-.4-3.9z"/>
+        </svg>
+        Pokračovat s Google
+      </button>
+      <p class="modal-switch">Nemáš účet? <a href="#" id="switch-to-register">Zaregistruj se</a></p>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div class="modal" id="register-modal">
+      <button class="modal-close" id="register-close" aria-label="Zavřít">✕</button>
+      <div class="modal-logo">Makej!</div>
+
+      <!-- Krok 1: výběr role -->
+      <div id="reg-step-1">
+        <h2 class="modal-title">Vytvořit účet</h2>
+        <p class="modal-subtitle">Kdo jsi?</p>
+        <div class="role-cards">
+          <button type="button" class="role-card" data-role="worker">
+            <iconify-icon icon="solar:user-bold" width="32"></iconify-icon>
+            <strong>Brigádník</strong>
+            <small>Hledám práci</small>
+          </button>
+          <button type="button" class="role-card" data-role="employer">
+            <iconify-icon icon="solar:buildings-bold" width="32"></iconify-icon>
+            <strong>Zaměstnavatel</strong>
+            <small>Hledám brigádníky</small>
+          </button>
+        </div>
+      </div>
+
+      <!-- Krok 2: údaje -->
+      <div id="reg-step-2" style="display:none">
+        <button class="modal-back" id="reg-back">
+          <iconify-icon icon="solar:arrow-left-bold" width="16"></iconify-icon>
+          Zpět
+        </button>
+        <h2 class="modal-title">Tvoje údaje</h2>
+        <p class="modal-subtitle" id="reg-role-subtitle">Brigádník</p>
+        <div class="modal-error" id="register-error"></div>
+        <form id="register-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Jméno</label>
+            <input class="form-input" type="text" id="reg-name" placeholder="Tvoje jméno" autocomplete="name" required />
+          </div>
+          <div class="form-group" id="reg-company-group" style="display:none">
+            <label class="form-label" for="reg-company">Název firmy</label>
+            <input class="form-input" type="text" id="reg-company" placeholder="Název tvé firmy" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email</label>
+            <input class="form-input" type="email" id="reg-email" placeholder="tvuj@email.cz" autocomplete="email" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Heslo</label>
+            <div class="password-wrap">
+              <input class="form-input" type="password" id="reg-password" placeholder="Min. 6 znaků" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" id="reg-pw-toggle" aria-label="Zobrazit heslo" tabindex="-1">
+                <iconify-icon icon="solar:eye-bold" width="18" id="reg-pw-icon"></iconify-icon>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password2">Heslo znovu</label>
+            <div class="password-wrap">
+              <input class="form-input" type="password" id="reg-password2" placeholder="Zopakuj heslo" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" id="reg-pw2-toggle" aria-label="Zobrazit heslo" tabindex="-1">
+                <iconify-icon icon="solar:eye-bold" width="18" id="reg-pw2-icon"></iconify-icon>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary btn-full btn-lg" id="register-submit">Vytvořit účet</button>
+          <p style="font-size:.78rem;color:var(--muted-fg);text-align:center;margin-top:12px;line-height:1.5;">
+            Registrací souhlasíš s našimi <a href="/terms.html" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
+            a <a href="/privacy.html" target="_blank" style="color:var(--secondary)">Zásadami ochrany osobních údajů</a>.
+          </p>
+        </form>
+      </div>
+
+      <p class="modal-switch">Už máš účet? <a href="#" id="switch-to-login">Přihlásit se</a></p>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ COOKIE BANNER ═══════════ -->
+  <div id="cookie-banner" role="dialog" aria-label="Souhlas s cookies" aria-live="polite">
+    <div class="cookie-inner">
+      <p class="cookie-text">
+        🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
+        Žádné reklamní trackery. Více informací v naší <a href="/privacy.html#cookies">Politice ochrany soukromí</a>.
+      </p>
+      <div class="cookie-actions">
+        <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
+        <button class="cookie-btn cookie-btn-accept" id="cookie-accept">Rozumím, souhlasím</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="script.js?v=4"></script>
+  <script>
+    // Pricing: expand / collapse plan details
+    function toggleExpand(btn) {
+      var plan = btn.closest('.cn-plan');
+      var isExpanded = plan.classList.contains('expanded');
+      plan.classList.toggle('expanded', !isExpanded);
+      btn.innerHTML = isExpanded
+        ? 'Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon>'
+        : 'Zobrazit méně <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon>';
+    }
+
+    // Count-up animace čísla (NumberFlow styl)
+    function cnAnimateNumber(el, to) {
+      var from = parseInt((el.textContent || '0').replace(/\s/g, ''), 10) || 0;
+      var start = performance.now(), dur = 480;
+      function step(now) {
+        var t = Math.min((now - start) / dur, 1);
+        var eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(from + (to - from) * eased).toLocaleString('cs-CZ');
+        if (t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    // Confetti v brandových barvách při přepnutí na roční
+    function cnConfetti(originEl) {
+      if (typeof confetti !== 'function' || !originEl) return;
+      var r = originEl.getBoundingClientRect();
+      confetti({
+        particleCount: 60, spread: 65,
+        origin: { x: (r.left + r.width / 2) / window.innerWidth, y: (r.top + r.height / 2) / window.innerHeight },
+        colors: ['#0020f6', '#1a35ff', '#a0b4ff', '#34d399'],
+        ticks: 200, gravity: 1.2, decay: 0.94, startVelocity: 30, shapes: ['circle']
+      });
+    }
+
+    // Pricing: annual billing toggle
+    var annualOn = false;
+    var prices = {
+      std: { monthly: 499,  annual: Math.round(499  * 12 * 0.85 / 12) },
+      biz: { monthly: 4999, annual: Math.round(4999 * 12 * 0.85 / 12) },
+    };
+    function toggleBilling() {
+      annualOn = !annualOn;
+      var toggle = document.getElementById('billing-toggle');
+      var badge  = document.getElementById('billing-badge');
+      toggle.classList.toggle('on', annualOn);
+      badge.textContent = annualOn ? 'aktivní — 15 % sleva' : 'ušetři 15 %';
+      cnAnimateNumber(document.getElementById('std-price'), annualOn ? prices.std.annual : prices.std.monthly);
+      cnAnimateNumber(document.getElementById('biz-price'), annualOn ? prices.biz.annual : prices.biz.monthly);
+      if (annualOn) cnConfetti(toggle);
+    }
+  </script>
+</body>
+</html>

@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/style.css?v=18" />
   <style>
     .cn-page { padding: 80px 0 100px; }
 
@@ -62,177 +62,6 @@
 
     .cn-panel { display: none; }
     .cn-panel.active { display: block; }
-
-    /* ── Billing toggle (annual/quarterly discount) ── */
-    .cn-billing {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 48px;
-      font-family: var(--font-ui, sans-serif);
-      font-size: .88rem;
-      color: var(--muted-fg);
-    }
-    .cn-billing-toggle {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      background: rgba(208,208,255,.15);
-      border-radius: 999px;
-      cursor: pointer;
-      transition: background .2s;
-      border: none;
-      flex-shrink: 0;
-    }
-    .cn-billing-toggle.on { background: linear-gradient(135deg, #0020F6, #3a3a99); }
-    .cn-billing-toggle::after {
-      content: '';
-      position: absolute;
-      top: 3px; left: 3px;
-      width: 18px; height: 18px;
-      border-radius: 999px;
-      background: #fff;
-      transition: transform .2s;
-    }
-    .cn-billing-toggle.on::after { transform: translateX(20px); }
-    .cn-billing-badge {
-      padding: 3px 10px;
-      border-radius: 100px;
-      background: rgba(52,211,153,.15);
-      border: 1px solid rgba(52,211,153,.3);
-      color: #34d399;
-      font-size: .75rem;
-      font-weight: 700;
-    }
-
-    /* ── Plans grid (5 columns) ── */
-    .cn-plans-wrap {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 24px 60px;
-      overflow-x: auto;
-    }
-    .cn-plans {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 16px;
-      min-width: 960px;
-      padding-top: 24px;
-      align-items: stretch;
-    }
-    .cn-plan {
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(208,208,255,.1);
-      border-radius: 24px;
-      padding: 32px 22px 28px;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      transition: border-color .2s, transform .2s, box-shadow .2s;
-    }
-    .cn-plan:hover { transform: translateY(-4px); border-color: rgba(91,107,255,.3); box-shadow: 0 16px 40px rgba(0,0,0,.25); }
-    .cn-plan.popular {
-      border-color: rgba(91,107,255,.75);
-      background: linear-gradient(160deg, rgba(0,32,246,.18), rgba(91,107,255,.07));
-      box-shadow: 0 0 0 1px rgba(91,107,255,.25), 0 20px 50px rgba(0,32,246,.18);
-    }
-    .cn-plan.popular:hover { border-color: rgba(91,107,255,1); box-shadow: 0 0 0 1px rgba(91,107,255,.5), 0 24px 60px rgba(0,32,246,.28); }
-    .cn-popular-badge {
-      position: absolute;
-      top: -16px; left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(90deg, #0020F6, #5B6BFF);
-      color: #fff;
-      font-size: .7rem;
-      font-weight: 700;
-      padding: 5px 16px;
-      border-radius: 100px;
-      white-space: nowrap;
-      letter-spacing: .05em;
-    }
-    .cn-plan-name {
-      font-size: .68rem;
-      font-weight: 700;
-      color: rgba(208,208,255,.45);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      margin-bottom: 18px;
-    }
-    .cn-plan-price {
-      font-family: var(--font-heading);
-      line-height: 1;
-      color: #fff;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: baseline;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-    .cn-plan-price .od { font-size: .85rem; font-weight: 600; color: rgba(208,208,255,.45); margin-bottom: 0; }
-    .cn-plan-price .num { font-size: 3rem; font-weight: 800; line-height: 1; }
-    .cn-plan-price .kc { font-size: 1.15rem; font-weight: 600; color: rgba(208,208,255,.65); }
-    .cn-plan-price.free .num { font-size: 2.4rem; }
-    .cn-plan-period { color: rgba(208,208,255,.4); font-size: .74rem; margin-bottom: 24px; }
-    .cn-plan-divider { border: none; border-top: 1px solid rgba(208,208,255,.08); margin: 0 0 22px; }
-
-    .cn-feat {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: .82rem;
-      color: rgba(255,255,255,.82);
-      margin-bottom: 11px;
-      line-height: 1.4;
-    }
-    .cn-feat iconify-icon { color: #5B6BFF; flex-shrink: 0; margin-top: 2px; }
-    .cn-feat.off iconify-icon { color: rgba(208,208,255,.2); }
-    .cn-feat.off { color: rgba(208,208,255,.22); }
-
-    .cn-plan-cta { margin-top: auto; padding-top: 28px; }
-    .cn-plan-cta a {
-      display: block;
-      text-align: center;
-      padding: 13px 16px;
-      border-radius: 14px;
-      font-weight: 700;
-      font-size: .88rem;
-      text-decoration: none;
-      transition: all .18s;
-    }
-    .cn-plan-cta a.primary {
-      background: linear-gradient(135deg, #0020F6, #3a3a99);
-      color: #fff;
-      box-shadow: 0 6px 20px rgba(0,32,246,.35);
-    }
-    .cn-plan-cta a.primary:hover { box-shadow: 0 10px 28px rgba(0,32,246,.55); transform: translateY(-1px); }
-    .cn-plan-cta a.ghost { border: 1px solid rgba(208,208,255,.22); color: rgba(255,255,255,.75); }
-    .cn-plan-cta a.ghost:hover { border-color: rgba(208,208,255,.5); background: rgba(208,208,255,.06); color: #fff; }
-
-    /* ── Expand / collapse ── */
-    .cn-feat-details { display: none; }
-    .cn-plan.expanded .cn-feat-details { display: block; }
-    .cn-expand-btn {
-      width: 100%;
-      margin-top: 4px;
-      padding: 8px;
-      border-radius: 10px;
-      border: 1px solid rgba(208,208,255,.1);
-      background: transparent;
-      color: rgba(208,208,255,.45);
-      font-family: var(--font-body);
-      font-size: .78rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      transition: all .15s;
-    }
-    .cn-expand-btn:hover { border-color: rgba(208,208,255,.3); color: #d0d0ff; }
-    .cn-expand-btn iconify-icon { transition: transform .25s; flex-shrink: 0; }
-    .cn-plan.expanded .cn-expand-btn iconify-icon { transform: rotate(180deg); }
 
     /* ── Discount info bar ── */
     .cn-discounts {
@@ -334,7 +163,6 @@
     .cn-bottom-cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
     @media (max-width: 920px) {
-      .cn-plans { grid-template-columns: repeat(3,1fr); min-width: 680px; }
       .cn-discounts { grid-template-columns: 1fr; }
       .cn-mak-packages { grid-template-columns: repeat(2,1fr); }
     }
@@ -350,9 +178,8 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej!</a>
       <div class="nav-links">
-        <a href="/#how-it-works">Jak to funguje</a>
-        <a href="/#features">Funkce</a>
-        <a href="/#employers">Pro zaměstnavatele</a>
+        <a href="/hledam-si-praci.html">Hledám si práci</a>
+        <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
         <a href="/#download">Stáhnout</a>
         <a href="/podpora.html">Podpora</a>
       </div>
@@ -365,9 +192,8 @@
       </button>
     </div>
     <div class="mobile-menu" id="mobile-menu">
-      <a href="/#how-it-works">Jak to funguje</a>
-      <a href="/#features">Funkce</a>
-      <a href="/#employers">Pro zaměstnavatele</a>
+      <a href="/hledam-si-praci.html">Hledám si práci</a>
+      <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
       <a href="/#download">Stáhnout</a>
       <a href="/podpora.html">Podpora</a>
       <div class="mobile-menu-actions">
@@ -382,7 +208,6 @@
 
     <!-- Hero -->
     <div class="cn-hero">
-      <span class="section-tag">Ceník</span>
       <h1>Transparentní <span class="gradient-text">ceny</span></h1>
       <p>Pro brigádníky je Makej! zdarma a vždy bude. Zaměstnavatelé platí podle toho, kolik lidí potřebují.</p>
     </div>
@@ -431,7 +256,7 @@
 
           <!-- STANDARD -->
           <div class="cn-plan popular">
-            <div class="cn-popular-badge">Nejoblíbenější</div>
+            <div class="cn-popular-badge"><iconify-icon icon="solar:star-bold" width="13"></iconify-icon>Nejoblíbenější</div>
             <div class="cn-plan-name">Standard</div>
             <div class="cn-plan-price"><span class="num" id="std-price">499</span><span class="kc"> Kč</span></div>
             <div class="cn-plan-period">za měsíc bez DPH</div>
@@ -606,7 +431,7 @@
         <p>Starter tarif nic nestojí. Zaměstnavatelé platí až když chtějí víc.</p>
         <div class="cn-bottom-cta-btns">
           <a href="javascript:void(0)" class="btn-primary btn-lg" id="cenik-cta-register">Vytvořit účet zdarma</a>
-          <a href="/#how-it-works" class="btn-ghost btn-lg">Jak to funguje</a>
+          <a href="/hledam-si-praci.html" class="btn-ghost btn-lg">Jak to funguje</a>
         </div>
       </div>
     </section>
@@ -628,8 +453,8 @@
         </div>
         <div class="footer-col">
           <h4>Produkt</h4>
-          <a href="/#features">Funkce</a>
-          <a href="/#how-it-works">Jak to funguje</a>
+          <a href="/hledam-si-praci.html">Hledám si práci</a>
+          <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
           <a href="/cenik.html">Ceník</a>
           <a href="/#download">Stáhnout</a>
         </div>
@@ -720,15 +545,38 @@
       std:    { monthly: 499,  annual: Math.round(499  * 12 * 0.85 / 12) },
       biz:    { monthly: 4999, annual: Math.round(4999 * 12 * 0.85 / 12) },
     };
+    // Count-up animace čísla (NumberFlow styl)
+    function cnAnimateNumber(el, to) {
+      var from = parseInt((el.textContent || '0').replace(/\s/g, ''), 10) || 0;
+      var start = performance.now(), dur = 480;
+      function step(now) {
+        var t = Math.min((now - start) / dur, 1);
+        var eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(from + (to - from) * eased).toLocaleString('cs-CZ');
+        if (t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    // Confetti v brandových barvách při přepnutí na roční
+    function cnConfetti(originEl) {
+      if (typeof confetti !== 'function' || !originEl) return;
+      var r = originEl.getBoundingClientRect();
+      confetti({
+        particleCount: 60, spread: 65,
+        origin: { x: (r.left + r.width / 2) / window.innerWidth, y: (r.top + r.height / 2) / window.innerHeight },
+        colors: ['#0020f6', '#1a35ff', '#a0b4ff', '#34d399'],
+        ticks: 200, gravity: 1.2, decay: 0.94, startVelocity: 30, shapes: ['circle']
+      });
+    }
     function toggleBilling() {
       annualOn = !annualOn;
       var toggle = document.getElementById('billing-toggle');
       var badge  = document.getElementById('billing-badge');
       toggle.classList.toggle('on', annualOn);
       badge.textContent = annualOn ? 'aktivní — 15 % sleva' : 'ušetři 15 %';
-      var fmt = function(n) { return n.toLocaleString('cs-CZ'); };
-      document.getElementById('std-price').textContent   = fmt(annualOn ? prices.std.annual  : prices.std.monthly);
-      document.getElementById('biz-price').textContent   = fmt(annualOn ? prices.biz.annual  : prices.biz.monthly);
+      cnAnimateNumber(document.getElementById('std-price'), annualOn ? prices.std.annual : prices.std.monthly);
+      cnAnimateNumber(document.getElementById('biz-price'), annualOn ? prices.biz.annual : prices.biz.monthly);
+      if (annualOn) cnConfetti(toggle);
     }
 
     // CTA buttons → open register modal
@@ -740,7 +588,8 @@
       });
     });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js"></script>
+  <script src="/script.js?v=4"></script>
 </body>
 </html>
