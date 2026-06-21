@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Průvodce — Makej!</title>
+  <meta name="description" content="Jak Makej! funguje? Přepni si, jestli jsi brigádník nebo zaměstnavatel, a projdi si ve zkratce celý průběh — od swajpu po hotovou brigádu." />
+  <meta name="theme-color" content="#0020f6" />
+  <link rel="canonical" href="https://makej.eu/pruvodce.html" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="/iconify-solar.js"></script>
+  <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
+  <link rel="stylesheet" href="/style.css?v=22" />
+  <style>
+    .pg-page { padding: 80px 0 100px; }
+
+    /* Hero */
+    .pg-hero { text-align: center; max-width: 600px; margin: 0 auto 44px; padding: 0 24px; }
+    .pg-hero h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+      font-weight: 800; line-height: 1.1; margin: 16px 0 20px;
+    }
+    .pg-hero p { color: var(--muted-fg); font-size: 1.05rem; line-height: 1.65; max-width: 480px; margin: 0 auto; }
+
+    /* Role toggle (segmented control) */
+    .pg-toggle {
+      position: relative;
+      display: inline-flex;
+      padding: 5px;
+      border-radius: 100px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(208,208,255,.12);
+      margin: 0 auto 56px;
+      gap: 4px;
+    }
+    .pg-toggle-wrap { text-align: center; padding: 0 24px; }
+    .pg-thumb {
+      position: absolute;
+      top: 5px; left: 5px;
+      width: calc(50% - 5px); height: calc(100% - 10px);
+      border-radius: 100px;
+      background: linear-gradient(135deg, #00103f, #0a1aa3);
+      box-shadow: 0 8px 22px rgba(0,32,246,.35);
+      transition: transform .32s cubic-bezier(.34,1.3,.5,1);
+      z-index: 0;
+    }
+    .pg-toggle.employer .pg-thumb { transform: translateX(100%); }
+    .pg-btn {
+      position: relative; z-index: 1;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 26px;
+      border: none; background: transparent;
+      color: var(--muted-fg);
+      font-family: var(--font-heading);
+      font-weight: 600; font-size: .92rem;
+      cursor: pointer; white-space: nowrap;
+      transition: color .25s;
+    }
+    .pg-btn.is-active { color: #fff; }
+
+    /* Panels */
+    .pg-panel { display: none; }
+    .pg-panel.is-active { display: block; animation: pgFade .4s ease both; }
+    @keyframes pgFade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Steps grid */
+    .pg-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .pg-step {
+      position: relative;
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(208,208,255,.1);
+      border-radius: 20px;
+      padding: 28px 24px 26px;
+      transition: border-color .25s, transform .3s cubic-bezier(.34,1.3,.5,1), box-shadow .3s;
+    }
+    .pg-step:hover {
+      transform: translateY(-6px);
+      border-color: rgba(91,107,255,.4);
+      box-shadow: 0 20px 46px rgba(0,0,0,.28);
+    }
+    .pg-step-icon {
+      width: 54px; height: 54px;
+      display: grid; place-items: center;
+      border-radius: 15px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      box-shadow: 0 8px 22px rgba(0,32,246,.3);
+      margin-bottom: 18px;
+    }
+    .pg-step h3 {
+      font-family: var(--font-heading);
+      font-size: 1.08rem; font-weight: 700; color: #fff;
+      margin-bottom: 9px;
+    }
+    .pg-step p { color: var(--muted-fg); font-size: .88rem; line-height: 1.6; }
+
+    /* Bottom CTA */
+    .pg-cta { text-align: center; padding: 80px 24px 0; }
+    .pg-cta h2 { font-family: var(--font-heading); font-size: clamp(1.8rem,4vw,2.6rem); font-weight: 800; margin-bottom: 14px; }
+    .pg-cta p { color: var(--muted-fg); margin-bottom: 32px; font-size: 1rem; }
+    .pg-cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 900px) {
+      .pg-steps { grid-template-columns: repeat(2, 1fr); max-width: 560px; }
+    }
+    @media (max-width: 480px) {
+      .pg-steps { grid-template-columns: 1fr; max-width: 360px; }
+      .pg-btn { padding: 11px 18px; font-size: .86rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════ NAV ═══════════ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Makej!</a>
+      <div class="nav-links">
+        <a href="/hledam-si-praci.html">Hledám si práci</a>
+        <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+        <a href="/#download">Stáhnout</a>
+        <a href="/podpora.html">Podpora</a>
+      </div>
+      <div class="nav-actions nav-actions-visible" id="nav-actions">
+        <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
+        <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
+      </div>
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+        <iconify-icon icon="solar:hamburger-menu-bold" width="24"></iconify-icon>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/hledam-si-praci.html">Hledám si práci</a>
+      <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+      <a href="/#download">Stáhnout</a>
+      <a href="/podpora.html">Podpora</a>
+      <div class="mobile-menu-actions">
+        <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
+        <a href="javascript:void(0)" class="btn-primary" id="mobile-register-btn">Vytvořit účet</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="pg-page">
+
+    <!-- Hero -->
+    <section class="pg-hero">
+      <h1>Jak Makej! <span class="gradient-text">funguje</span></h1>
+      <p>Vyber si svou stranu a projdi si ve zkratce celý průběh — od prvního swajpu po hotovou brigádu.</p>
+    </section>
+
+    <!-- Role toggle -->
+    <div class="pg-toggle-wrap">
+      <div class="pg-toggle" id="pg-toggle">
+        <span class="pg-thumb"></span>
+        <button class="pg-btn is-active" data-role="worker" onclick="showRole(this,'worker')">
+          <iconify-icon icon="solar:user-bold" width="18"></iconify-icon> Jsem brigádník
+        </button>
+        <button class="pg-btn" data-role="employer" onclick="showRole(this,'employer')">
+          <iconify-icon icon="solar:buildings-bold" width="18"></iconify-icon> Jsem zaměstnavatel
+        </button>
+      </div>
+    </div>
+
+    <!-- PANEL: Brigádník -->
+    <div class="pg-panel is-active" data-role="worker">
+      <div class="pg-steps">
+        <div class="pg-step">
+          <div class="pg-step-icon"><iconify-icon icon="solar:user-bold" width="26"></iconify-icon></div>
+          <h3>Založ si profil</h3>
+          <p>Zaregistruj se, přidej zkušenosti a co tě baví. Hotovo za minutu.</p>
+        </div>
+        <div class="pg-step">
+          <div class="pg-step-icon"><iconify-icon icon="solar:card-recive-bold" width="26"></iconify-icon></div>
+          <h3>Swajpuj nabídky</h3>
+          <p>Procházej brigády jako na Tinderu. Doprava = mám zájem, doleva = další.</p>
+        </div>
+        <div class="pg-step">
+          <div class="pg-step-icon"><iconify-icon icon="solar:hand-heart-bold" width="26"></iconify-icon></div>
+          <h3>Matchni se</h3>
+          <p>Když kývne i zaměstnavatel, vznikne match a otevře se vám chat.</p>
+        </div>
+        <div class="pg-step">
+          <div class="pg-step-icon"><iconify-icon icon="solar:chat-round-dots-bold" width="26"></iconify-icon></div>
+          <h3>Domluv se a pracuj</h3>
+          <p>Upřesni čas a místo v chatu, odpracuj brigádu a sbírej hodnocení.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: Zaměstnavatel -->
+    <div class="pg-panel" data-role="employer">
+      <div class="pg-steps">
+        <div class="pg-step">
+          <div class="pg-step-icon"><iconify-icon icon="solar:document-add-bold" width="26"></iconify-icon></div>
+          <h3>Vytvoř inzerát</h3>
+          <p>Pozice, datum, hodinová mzda a popis. Hotovo za 60 sekund.</p>
+        </div>
+        <div class="pg-step">
+          <div class="pg-step-icon"><iconify-icon icon="solar:card-recive-bold" width="26"></iconify-icon></div>
+          <h3>Kandidáti swajpují</h3>
+          <p>Tisíce brigádníků uvidí tvou nabídku ve feedu. Zájemci swajpnou doprava.</p>
+        </div>
+        <div class="pg-step">
+          <div class="pg-step-icon"><iconify-icon icon="solar:user-check-rounded-bold" width="26"></iconify-icon></div>
+          <h3>Přijmi nebo odmítni</h3>
+          <p>Projdi profily a hodnocení. Jedním tapem přijmeš toho pravého.</p>
+        </div>
+        <div class="pg-step">
+          <div class="pg-step-icon"><iconify-icon icon="solar:chat-round-dots-bold" width="26"></iconify-icon></div>
+          <h3>Domluvte detaily</h3>
+          <p>Po přijetí se otevře chat. Upřesníte čas a místo — a máš člověka.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom CTA -->
+    <section class="pg-cta">
+      <h2>Připraven <span class="gradient-text">začít?</span></h2>
+      <p>Založ si účet zdarma a vyzkoušej si to na vlastní kůži.</p>
+      <div class="pg-cta-btns">
+        <a href="javascript:void(0)" class="btn-primary btn-lg" id="hero-register-btn">Vytvořit účet zdarma</a>
+        <a href="/#download" class="btn-ghost btn-lg">Stáhnout appku</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer id="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="footer-logo">Makej!</a>
+          <p>Pracovní platforma nové generace. Propojujeme lidi s příležitostmi.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Instagram"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a>
+            <a href="#" aria-label="TikTok"><iconify-icon icon="ic:baseline-tiktok" width="22"></iconify-icon></a>
+            <a href="#" aria-label="LinkedIn"><iconify-icon icon="mdi:linkedin" width="22"></iconify-icon></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Produkt</h4>
+          <a href="/hledam-si-praci.html">Hledám si práci</a>
+          <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+          <a href="/cenik.html">Ceník</a>
+          <a href="/#download">Stáhnout</a>
+        </div>
+        <div class="footer-col">
+          <h4>Firma</h4>
+          <a href="/podpora.html">Podpora</a>
+          <a href="mailto:hello@makej.eu">Kontakt</a>
+          <a href="/o-nas.html">O nás</a>
+        </div>
+        <div class="footer-col">
+          <h4>Právní</h4>
+          <a href="/terms.html">Podmínky použití</a>
+          <a href="/privacy.html">Ochrana soukromí</a>
+          <a href="/privacy.html#cookies">Cookies</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Makej! Všechna práva vyhrazena.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════ AUTH MODALS ═══════════ -->
+  <div class="modal-overlay" id="modal-overlay">
+
+    <!-- LOGIN MODAL -->
+    <div class="modal" id="login-modal">
+      <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
+      <div class="modal-logo">Makej!</div>
+      <h2 class="modal-title">Přihlásit se</h2>
+      <p class="modal-subtitle">Vítej zpět! Přihlaš se ke svému účtu.</p>
+      <div class="modal-error" id="login-error"></div>
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email</label>
+          <input class="form-input" type="email" id="login-email" placeholder="tvuj@email.cz" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Heslo</label>
+          <input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
+      </form>
+      <div class="modal-divider"><span>nebo</span></div>
+      <button class="btn-google" id="login-google">
+        <iconify-icon icon="flat-color-icons:google" width="18"></iconify-icon>
+        Pokračovat přes Google
+      </button>
+      <p class="modal-switch">Nemáš účet? <a href="#" id="switch-to-register">Zaregistruj se</a></p>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div class="modal" id="register-modal">
+      <button class="modal-close" id="register-close" aria-label="Zavřít">✕</button>
+      <div class="modal-logo">Makej!</div>
+
+      <!-- Krok 1: výběr role -->
+      <div id="reg-step-1">
+        <h2 class="modal-title">Vytvořit účet</h2>
+        <p class="modal-subtitle">Kdo jsi?</p>
+        <div class="role-cards">
+          <button type="button" class="role-card" data-role="worker">
+            <iconify-icon icon="solar:user-bold" width="32"></iconify-icon>
+            <strong>Brigádník</strong>
+            <small>Hledám práci</small>
+          </button>
+          <button type="button" class="role-card" data-role="employer">
+            <iconify-icon icon="solar:buildings-bold" width="32"></iconify-icon>
+            <strong>Zaměstnavatel</strong>
+            <small>Hledám brigádníky</small>
+          </button>
+        </div>
+      </div>
+
+      <!-- Krok 2: údaje -->
+      <div id="reg-step-2" style="display:none">
+        <button class="modal-back" id="reg-back">
+          <iconify-icon icon="solar:arrow-left-bold" width="16"></iconify-icon>
+          Zpět
+        </button>
+        <h2 class="modal-title">Tvoje údaje</h2>
+        <p class="modal-subtitle" id="reg-role-subtitle">Brigádník</p>
+        <div class="modal-error" id="register-error"></div>
+        <form id="register-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Jméno</label>
+            <input class="form-input" type="text" id="reg-name" placeholder="Tvoje jméno" autocomplete="name" required />
+          </div>
+          <div class="form-group" id="reg-company-group" style="display:none">
+            <label class="form-label" for="reg-company">Název firmy</label>
+            <input class="form-input" type="text" id="reg-company" placeholder="Název tvé firmy" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email</label>
+            <input class="form-input" type="email" id="reg-email" placeholder="tvuj@email.cz" autocomplete="email" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Heslo</label>
+            <div class="password-wrap">
+              <input class="form-input" type="password" id="reg-password" placeholder="Min. 6 znaků" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" id="reg-pw-toggle" aria-label="Zobrazit heslo" tabindex="-1">
+                <iconify-icon icon="solar:eye-bold" width="18" id="reg-pw-icon"></iconify-icon>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password2">Heslo znovu</label>
+            <div class="password-wrap">
+              <input class="form-input" type="password" id="reg-password2" placeholder="Zopakuj heslo" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" id="reg-pw2-toggle" aria-label="Zobrazit heslo" tabindex="-1">
+                <iconify-icon icon="solar:eye-bold" width="18" id="reg-pw2-icon"></iconify-icon>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary btn-full btn-lg" id="register-submit">Vytvořit účet</button>
+          <p style="font-size:.78rem;color:var(--muted-fg);text-align:center;margin-top:12px;line-height:1.5;">
+            Registrací souhlasíš s našimi <a href="/terms.html" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
+            a <a href="/privacy.html" target="_blank" style="color:var(--secondary)">Zásadami ochrany osobních údajů</a>.
+          </p>
+        </form>
+      </div>
+
+      <p class="modal-switch">Už máš účet? <a href="#" id="switch-to-login">Přihlásit se</a></p>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ COOKIE BANNER ═══════════ -->
+  <div id="cookie-banner" role="dialog" aria-label="Souhlas s cookies" aria-live="polite">
+    <div class="cookie-inner">
+      <p class="cookie-text">
+        🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
+        Žádné reklamní trackery. Více informací v naší <a href="/privacy.html#cookies">Politice ochrany soukromí</a>.
+      </p>
+      <div class="cookie-actions">
+        <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
+        <button class="cookie-btn cookie-btn-accept" id="cookie-accept">Rozumím, souhlasím</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showRole(btn, role) {
+      document.getElementById('pg-toggle').classList.toggle('employer', role === 'employer');
+      document.querySelectorAll('.pg-btn').forEach(function (b) {
+        b.classList.toggle('is-active', b.dataset.role === role);
+      });
+      document.querySelectorAll('.pg-panel').forEach(function (p) {
+        p.classList.toggle('is-active', p.dataset.role === role);
+      });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/script.js?v=9"></script>
+</body>
+</html>

@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/style.css?v=22" />
   <style>
     /* ── Page-specific overrides ── */
     .sup-page { padding: 80px 0 100px; }
@@ -21,7 +21,7 @@
     .sup-hero {
       text-align: center;
       max-width: 580px;
-      margin: 0 auto 72px;
+      margin: 0 auto 88px;
       padding: 0 24px;
     }
     .sup-hero h1 {
@@ -39,61 +39,43 @@
       margin: 0 auto;
     }
 
-    /* Contact cards */
-    .sup-cards {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      max-width: 580px;
-      margin: 0 auto 88px;
-      padding: 0 24px;
+    /* Hero contact actions */
+    .sup-hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px 26px;
+      flex-wrap: wrap;
+      margin-top: 34px;
     }
-    .sup-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 36px 28px 32px;
-      text-align: center;
-      transition: border-color .2s, transform .22s;
-    }
-    .sup-card:hover {
-      border-color: rgba(91,107,255,.45);
-      transform: translateY(-4px);
-    }
-    .sup-card-icon {
-      font-size: 2.6rem;
-      margin-bottom: 18px;
-      display: block;
-    }
-    .sup-card h3 {
-      font-family: var(--font-heading);
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 10px;
-    }
-    .sup-card p {
-      color: var(--muted-fg);
-      font-size: .88rem;
-      line-height: 1.65;
-      margin-bottom: 24px;
-    }
-    .sup-card a {
-      display: inline-block;
-      padding: 9px 22px;
+    .sup-mail {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 12px 24px;
       border-radius: 100px;
-      border: 1px solid rgba(208,208,255,.2);
-      color: #d0d0ff;
-      font-size: .85rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all .18s;
-    }
-    .sup-card a:hover {
-      border-color: rgba(91,107,255,.5);
-      background: rgba(91,107,255,.12);
+      background: linear-gradient(135deg, #00103f, #0a1aa3);
       color: #fff;
+      font-weight: 700;
+      font-size: .92rem;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(0,32,246,.35);
+      transition: transform .2s, box-shadow .2s;
     }
+    .sup-mail:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,32,246,.5); }
+    .sup-mail iconify-icon { color: #fff; }
+
+    .sup-guide {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #a0b4ff;
+      font-weight: 600;
+      font-size: .92rem;
+      text-decoration: none;
+      transition: color .2s, gap .2s;
+    }
+    .sup-guide:hover { color: #fff; gap: 10px; }
 
     /* FAQ */
     .faq-section {
@@ -154,8 +136,8 @@
     .faq-a a:hover { text-decoration: underline; }
     .faq-item.open .faq-a { display: block; }
 
-    @media (max-width: 700px) {
-      .sup-cards { grid-template-columns: 1fr; max-width: 400px; }
+    @media (max-width: 480px) {
+      .sup-mail { padding: 11px 20px; }
     }
   </style>
 </head>
@@ -197,24 +179,18 @@
     <!-- Hero -->
     <section class="sup-hero">
       <h1>Jak ti můžeme <span class="gradient-text">pomoci?</span></h1>
-      <p>Odpovědi na časté otázky nebo nás rovnou kontaktuj — jsme tu pro tebe.</p>
+      <p>Většinu odpovědí najdeš v častých otázkách níže. Pokud ne, ozvi se — jsme tu pro tebe.</p>
+      <div class="sup-hero-actions">
+        <a class="sup-mail" href="mailto:podpora@makej.eu">
+          <iconify-icon icon="solar:letter-bold" width="18"></iconify-icon>
+          podpora@makej.eu
+        </a>
+        <a class="sup-guide" href="/pruvodce.html">
+          Projít průvodce
+          <iconify-icon icon="solar:arrow-right-linear" width="18"></iconify-icon>
+        </a>
+      </div>
     </section>
-
-    <!-- Contact cards -->
-    <div class="sup-cards">
-      <div class="sup-card">
-        <span class="sup-card-icon">📧</span>
-        <h3>Email</h3>
-        <p>Složitější dotazy nebo problémy s účtem řeš s námi přes email.</p>
-        <a href="mailto:podpora@makej.eu">podpora@makej.eu</a>
-      </div>
-      <div class="sup-card">
-        <span class="sup-card-icon">📖</span>
-        <h3>Průvodce</h3>
-        <p>Podrobné návody a odpovědi na nejčastější otázky v naší databázi znalostí.</p>
-        <a href="/hledam-si-praci.html">Jak to funguje</a>
-      </div>
-    </div>
 
     <!-- FAQ -->
     <section class="faq-section">
@@ -394,6 +370,6 @@
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=4"></script>
+  <script src="/script.js?v=9"></script>
 </body>
 </html>

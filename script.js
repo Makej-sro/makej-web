@@ -17,6 +17,14 @@ function updateNav() {
     navActions.classList.toggle('nav-actions-visible', hero ? scrollY > hero.offsetHeight * 0.8 : true);
   }
 
+  // Navbar nad světlou (bílou) sekcí → ztmavit text
+  let overLight = false;
+  document.querySelectorAll('.nav-light').forEach(sec => {
+    const r = sec.getBoundingClientRect();
+    if (r.top <= 70 && r.bottom >= 10) overLight = true;
+  });
+  navbar.classList.toggle('nav-over-light', overLight);
+
   if (hasStaticActive) return; // aktivní je jen odkaz aktuální stránky
 
   const mid = window.innerHeight * 0.35;
@@ -33,6 +41,54 @@ function updateNav() {
 
 window.addEventListener('scroll', updateNav, { passive: true });
 updateNav();
+
+// ═══════════ NAVBAR DROPDOWNS ═══════════
+function setupNavDropdowns() {
+  const menus = {
+    'pro-zamestnavatele.html': [
+      ['Jak to funguje', '/pro-zamestnavatele.html#jak-to-funguje'],
+      ['Dashboard',      '/pro-zamestnavatele.html#dashboard'],
+      ['Ceník',          '/pro-zamestnavatele.html#pricing'],
+      ['Časté dotazy',   '/pro-zamestnavatele.html#faq'],
+    ],
+    'hledam-si-praci.html': [
+      ['Jak to funguje', '/hledam-si-praci.html#how-it-works'],
+      ['Vyzkoušej appku','/hledam-si-praci.html#features'],
+      ['Stáhnout',       '/hledam-si-praci.html#download'],
+    ],
+  };
+  document.querySelectorAll('.nav-links > a').forEach(a => {
+    const href = a.getAttribute('href') || '';
+    const key = Object.keys(menus).find(k => href.indexOf(k) !== -1);
+    if (!key) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'nav-dropdown';
+    a.parentNode.insertBefore(wrap, a);
+    wrap.appendChild(a);
+    const menu = document.createElement('div');
+    menu.className = 'nav-dropdown-menu';
+    menus[key].forEach(([label, url]) => {
+      const link = document.createElement('a');
+      link.href = url;
+      link.textContent = label;
+      menu.appendChild(link);
+    });
+    wrap.appendChild(menu);
+  });
+}
+setupNavDropdowns();
+
+// Po načtení (vč. obrázků) doskroluj přesně na kotvu z URL — opraví posun z lazy-load
+window.addEventListener('load', function () {
+  if (!location.hash) return;
+  var el = null;
+  try { el = document.querySelector(location.hash); } catch (e) { return; }
+  if (!el) return;
+  requestAnimationFrame(function () {
+    var y = el.getBoundingClientRect().top + window.scrollY - 92;
+    window.scrollTo(0, y);
+  });
+});
 
 // ═══════════ MOBILE MENU ═══════════
 const menuBtn = document.getElementById('mobile-menu-btn');
@@ -283,6 +339,9 @@ function initAuth() {
   // ─── Statická tlačítka (nejsou nikdy přepisována) — bindujeme jen jednou ───
   document.querySelectorAll('.employer-cta-register').forEach(btn => {
     btn.addEventListener('click', e => { e.preventDefault(); openModal('register', 'employer'); });
+  });
+  document.querySelectorAll('.worker-cta-register').forEach(btn => {
+    btn.addEventListener('click', e => { e.preventDefault(); openModal('register', 'worker'); });
   });
 
   // Hero CTA buttons (Vytvořit účet zdarma / Přihlásit se)

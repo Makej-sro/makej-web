@@ -273,29 +273,6 @@ img { max-width: 100%; display: block; }
 
 /* ═══════════ HOW IT WORKS ═══════════ */
 #how-it-works { padding: 120px 0; }
-.steps-grid { display: flex; align-items: center; justify-content: center; gap: 0; }
-.step-card {
-  flex: 1; max-width: 320px; padding: 40px 32px; border-radius: 20px;
-  background: rgba(5,7,26,.5); border: 1px solid rgba(208,208,255,.08);
-  text-align: center; transition: transform 250ms cubic-bezier(0.23,1,0.32,1), border-color 250ms ease, box-shadow 250ms ease-out;
-}
-@media (hover: hover) and (pointer: fine) {
-  .step-card:hover { transform: translateY(-8px); border-color: rgba(208,208,255,.2); box-shadow: 0 20px 60px rgba(5,5,40,.6), 0 0 40px rgba(41,41,120,.2); }
-}
-.step-icon-wrap {
-  width: 72px; height: 72px; margin: 0 auto 20px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 20px; background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: var(--secondary);
-}
-.step-card h3 { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; margin-bottom: 12px; }
-.step-card p { color: var(--muted-fg); font-size: .95rem; }
-.step-connector { color: rgba(208,208,255,.2); padding: 0 16px; }
-
-@media (max-width: 768px) {
-  .steps-grid { flex-direction: column; gap: 24px; }
-  .step-connector { transform: rotate(90deg); }
-}
 
 /* ═══════════ FEATURES ═══════════ */
 #features { padding: 120px 0; }
@@ -1016,11 +993,6 @@ img { max-width: 100%; display: block; }
   .logos-track { gap: 16px 20px; }
   .logo-item { font-size: .85rem; }
 
-  /* How-it-works: tighter step cards */
-  .step-card { padding: 20px 16px; }
-  .step-icon-wrap { width: 52px; height: 52px; margin-bottom: 12px; }
-  .steps-grid { gap: 12px; }
-
   /* Features: tighter cards, hide animated visual on mobile */
   .feature-card { padding: 20px; }
   .features-grid { gap: 12px; }
@@ -1472,3 +1444,47 @@ img { max-width: 100%; display: block; }
 @media (max-width: 920px) {
   .cn-plans { grid-template-columns: repeat(3,1fr); min-width: 720px; }
 }
+
+/* ═══════════ NAVBAR DROPDOWN ═══════════ */
+html { scroll-padding-top: 92px; }
+:target { scroll-margin-top: 92px; }
+
+.nav-dropdown { position: relative; display: inline-flex; align-items: center; pointer-events: all; }
+.nav-dropdown > a { pointer-events: all; }
+.nav-dropdown::after { content: ''; position: absolute; top: 100%; left: -14px; right: -14px; height: 18px; }
+.nav-dropdown-menu {
+  position: absolute; top: 100%; left: 50%;
+  transform: translateX(-50%) translateY(14px);
+  min-width: 212px; margin-top: 8px; padding: 8px;
+  background: rgba(7,9,28,.55);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid rgba(208,208,255,.12); border-radius: 16px;
+  box-shadow: 0 22px 55px rgba(0,0,0,.5);
+  display: flex; flex-direction: column; gap: 2px;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease, visibility .2s;
+  z-index: 200;
+}
+.nav-dropdown:hover .nav-dropdown-menu {
+  opacity: 1; visibility: visible; pointer-events: all;
+  transform: translateX(-50%) translateY(8px);
+}
+.nav-dropdown-menu a {
+  padding: 10px 14px; border-radius: 10px;
+  font-size: .9rem; font-weight: 500; color: rgba(208,208,255,.75);
+  white-space: nowrap; border-bottom: none; pointer-events: all;
+  transition: background .15s, color .15s;
+}
+.nav-dropdown-menu a:hover { background: rgba(208,208,255,.08); color: #fff; }
+
+/* ═══════════ NAVBAR nad světlou sekcí ═══════════ */
+#navbar.nav-over-light .nav-logo { color: #0a0d2e; -webkit-text-fill-color: #0a0d2e; }
+#navbar.nav-over-light .nav-links a { color: #0a0d2e; }
+#navbar.nav-over-light .nav-links a:hover { color: #000; }
+#navbar.nav-over-light .nav-links a.nav-active { color: #000; border-bottom-color: #0a0d2e; }
+#navbar.nav-over-light .mobile-menu-btn { color: #0a0d2e; }
+#navbar.nav-over-light #nav-login-btn {
+  background: transparent; color: #0a0d2e; border-color: rgba(10,13,46,.22);
+}
+#navbar.nav-over-light #nav-login-btn:hover { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.4); }

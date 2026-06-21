@@ -26,11 +26,139 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="stylesheet" href="style.css?v=22" />
   <style>
-    .page-head { text-align: center; max-width: 700px; margin: 0 auto; padding: 132px 24px 0; }
-    .page-head h1 { font-family: var(--font-heading); font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 0; text-wrap: balance; }
-    .page-head p { color: var(--muted-fg); font-size: 1.05rem; max-width: 520px; margin: 16px auto 0; line-height: 1.6; }
+    /* Bolt-style střídavé kroky (foto + text) */
+    .bolt-head { text-align: center; max-width: 1080px; margin: 0 auto 56px; padding: 0 24px; }
+    .bolt-head h2 { font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
+    .bolt-journey { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    .bolt-steps { display: flex; flex-direction: column; gap: 88px; }
+    .bolt-path { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
+    .bolt-cta { display: flex; justify-content: center; margin-top: 60px; position: relative; z-index: 1; }
+    .bolt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
+    .bolt-row:nth-child(even) .bolt-media { order: 2; }
+
+    .bolt-media {
+      aspect-ratio: 4 / 3;
+      border-radius: 24px;
+      overflow: hidden;
+      background: linear-gradient(150deg, #0a1640, #0a0e26);
+      border: 1px solid rgba(208,208,255,.1);
+      display: grid; place-items: center;
+    }
+    .bolt-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .bolt-media-empty {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      color: rgba(208,208,255,.32); font-size: .85rem; font-weight: 500;
+    }
+
+    .bolt-text-label {
+      display: inline-block;
+      font-family: var(--font-heading);
+      font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--secondary);
+      margin-bottom: 16px;
+      padding: 5px 14px; border-radius: 100px;
+      background: rgba(0,32,246,.16); border: 1px solid rgba(208,208,255,.14);
+    }
+    .bolt-text h3 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3vw, 2.4rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    .bolt-text p { color: var(--muted-fg); font-size: 1.05rem; line-height: 1.7; max-width: 460px; }
+
+    @media (max-width: 768px) {
+      .bolt-steps { gap: 48px; }
+      .bolt-row { grid-template-columns: 1fr; gap: 24px; }
+      .bolt-row:nth-child(even) .bolt-media { order: 0; }
+      .bolt-path { display: none; }
+    }
+
+    /* Kroky na bílé (jako employer) */
+    #how-it-works { background: #fff; }
+    #how-it-works .bolt-head h2 { color: #0a0d2e; }
+    #how-it-works .bolt-text h3 { color: #0a0d2e; }
+    #how-it-works .bolt-text p { color: rgba(10,13,46,.6); }
+    #how-it-works .bolt-text-label { color: var(--primary); background: rgba(0,32,246,.07); border-color: rgba(0,32,246,.18); }
+    #how-it-works .bolt-path path { stroke: rgba(0,32,246,.3); }
+
+    /* Sekce „Proč si zvolíš Makej" jako samostatná bílá stránka */
+    #features { background: #fff; }
+    #features .section-header h2 { color: #0a0d2e; }
+    #features .section-header p { color: rgba(10,13,46,.55); }
+
+    /* Přepínač na bílé */
+    #features .showcase-toggle { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.12); }
+    #features .sct-btn { color: rgba(10,13,46,.5); }
+    #features .sct-btn.is-active { color: #fff; }
+    #features .sct-thumb { background: #14141c; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
+
+    /* Karty funkcí na bílé */
+    #features .feature-card { background: #f4f5fb; border-color: rgba(10,13,46,.08); }
+    #features .feature-card:hover { border-color: rgba(10,13,46,.18); }
+    #features .feature-card h3 { color: #0a0d2e; }
+    #features .feature-card p { color: rgba(10,13,46,.55); }
+
+    /* Demo telefon na bílé sekci */
+    .sv-demo { padding: 8px 24px 8px; }
+    .sv-demo .demo-outer-wrap::before { display: none; }
+    .demo-hint-text { color: rgba(10,13,46,.45) !important; }
+    .sv-demo .demo-phone {
+      box-shadow: 0 0 0 1px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1),
+        0 34px 70px rgba(20,20,60,.26), 0 8px 20px rgba(0,0,0,.16);
+    }
+
+    /* ═══════════ Modré hero s telefonem (jako employer) ═══════════ */
+    .emp-hero-blue { background: #0b21f6; position: relative; overflow: hidden; padding: 134px 24px 0; text-align: center; }
+    .eh-head { max-width: 950px; margin: 0 auto; position: relative; z-index: 2; }
+    .eh-head h1 { font-family: var(--font-heading); font-size: clamp(2.7rem, 7vw, 5.4rem); font-weight: 800; color: #fff; line-height: 1.0; letter-spacing: -.025em; margin: 0 0 26px; }
+    .eh-head h1 .eh-accent { color: #c3c8ff; }
+    .eh-sub { color: rgba(255,255,255,.85); font-size: clamp(1.02rem, 1.6vw, 1.3rem); line-height: 1.5; max-width: 640px; margin: 0 auto 34px; }
+    .eh-btn { display: inline-block; background: #eef6f0; color: #0a0d2e; font-family: var(--font-sans); font-weight: 700; font-size: 1.02rem; padding: 16px 32px; border-radius: 16px; text-decoration: none; cursor: pointer; transition: background .2s, transform .2s; }
+    .eh-btn:hover { background: #fff; transform: translateY(-2px); }
+
+    .mkj-visual { position: relative; height: 600px; margin: -110px auto 0; max-width: 1100px; overflow: hidden; pointer-events: none; }
+    .mkj-stage { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); perspective: 1500px; perspective-origin: 50% 28%; }
+    .mkj-phone { width: 384px; height: 790px; background: #0a0b10; border-radius: 50px; padding: 12px; transform: rotateX(46deg); transform-origin: 50% 50%; box-shadow: 0 0 0 2px rgba(255,255,255,.08) inset, 0 40px 90px rgba(0,0,40,.45); }
+    .mkj-screen { width: 100%; height: 100%; border-radius: 32px; overflow: hidden; position: relative; background: #2f33ee; }
+    .mkj-notch { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 108px; height: 26px; background: #0a0b10; border-radius: 999px; z-index: 5; }
+
+    /* Swipe card obsah */
+    .sw-hero { position: relative; height: 238px; background: linear-gradient(180deg,#cdb084 0%,#9e7a4d 46%,#2f33ee 100%); }
+    .sw-facade { position: absolute; inset: 0; opacity: .16; background: repeating-linear-gradient(90deg,transparent 0 24px,rgba(35,22,4,.7) 24px 26px),repeating-linear-gradient(180deg,transparent 0 30px,rgba(35,22,4,.5) 30px 32px); -webkit-mask: linear-gradient(180deg,#000 0%,#000 52%,transparent 78%); mask: linear-gradient(180deg,#000 0%,#000 52%,transparent 78%); }
+    .sw-top { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 40px 16px 0; z-index: 2; }
+    .sw-logo { font-family: var(--font-heading); font-size: 19px; font-weight: 800; color: #fff; letter-spacing: -.02em; text-shadow: 0 1px 6px rgba(0,0,0,.3); }
+    .sw-filt { width: 34px; height: 34px; border-radius: 50%; background: rgba(20,20,40,.45); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .sw-body { position: relative; margin-top: -42px; padding: 0 16px; z-index: 2; }
+    .sw-comp { display: flex; align-items: center; gap: 9px; }
+    .sw-clogo { width: 38px; height: 38px; border-radius: 11px; background: #fff; color: #2f33ee; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+    .sw-cname { font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 4px; }
+    .sw-chk { color: #7fe0ff; font-size: 14px; display: flex; }
+    .sw-rate { font-size: 11px; color: rgba(255,255,255,.8); margin-top: 1px; display: flex; align-items: center; gap: 4px; }
+    .sw-star { color: #ffc83d; font-size: 12px; display: flex; }
+    .sw-top-badge { margin-left: auto; display: flex; align-items: center; gap: 4px; background: #ffc83d; color: #5a3d00; font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 999px; }
+    .sw-title { font-family: var(--font-heading); font-size: 24px; font-weight: 800; color: #fff; line-height: 1.08; letter-spacing: -.01em; margin: 12px 0 9px; text-shadow: 0 1px 8px rgba(0,0,0,.25); }
+    .sw-meta { display: flex; gap: 14px; font-size: 11.5px; color: rgba(255,255,255,.85); }
+    .sw-meta span { display: flex; align-items: center; gap: 5px; }
+    .sw-tags { display: flex; gap: 7px; margin: 13px 0 0; flex-wrap: wrap; }
+    .sw-tag { font-size: 10.5px; font-weight: 600; color: #fff; border: 1px solid rgba(255,255,255,.35); padding: 6px 11px; border-radius: 999px; }
+    .sw-tag.mak { background: linear-gradient(90deg,#ffd34d,#f5b724); color: #5a3d00; border: none; display: flex; align-items: center; gap: 5px; }
+    .sw-mk { width: 15px; height: 15px; border-radius: 50%; background: #2f33ee; color: #fff; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .sw-pay { margin: 18px 0 0; }
+    .sw-pnum { font-family: var(--font-heading); font-size: 28px; font-weight: 800; color: #fff; line-height: 1; }
+    .sw-pbonus { font-size: 10px; letter-spacing: .1em; color: rgba(255,255,255,.7); margin-top: 4px; text-transform: uppercase; }
+    .sw-acts { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 20px 0 0; }
+    .sw-btn { border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #fff; flex-shrink: 0; }
+    .sw-rej { width: 52px; height: 52px; color: #ff4d6a; font-size: 23px; }
+    .sw-fav { width: 52px; height: 52px; color: #ffb02e; font-size: 23px; }
+    .sw-like { width: 64px; height: 64px; background: #3b40ff; color: #fff; font-size: 29px; box-shadow: 0 6px 18px rgba(59,64,255,.5); }
+    .sw-nav { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-around; align-items: center; padding: 11px 0 16px; background: #14155e; border-top: 1px solid rgba(255,255,255,.08); }
+    .sw-ni { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 9px; letter-spacing: .04em; color: rgba(255,255,255,.5); }
+    .sw-ni iconify-icon { font-size: 19px; }
+    .sw-ni.on { color: #fff; }
+
+    @media (max-width: 600px) {
+      .emp-hero-blue { padding-top: 112px; }
+      .mkj-visual { height: 470px; margin-top: -70px; }
+      .mkj-stage { transform: translateX(-50%) scale(.8); top: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -67,53 +195,133 @@
   </nav>
 
   <main>
-    <!-- ═══════════ PAGE HEAD ═══════════ -->
-    <div class="page-head">
-      <h1>Hledám si <span class="gradient-text">práci</span></h1>
-      <p>Žádné životopisy, žádné pohovory. Prohlížej nabídky jako na Tinderu, matchuj se s firmami a vyzkoušej, jak appka funguje, hned tady.</p>
-    </div>
+    <!-- ═══════════ HERO (modré, swipe telefon) ═══════════ -->
+    <section class="emp-hero-blue">
+      <div class="eh-head">
+        <h1>Najdi si brigádu <span class="eh-accent">ještě dnes</span></h1>
+        <p class="eh-sub">Žádné životopisy, žádné pohovory. Swajpni nabídku, matchni se s firmou a začni vydělávat.</p>
+        <a href="#" class="eh-btn worker-cta-register">Vytvořit účet zdarma</a>
+      </div>
+
+      <!-- Telefon se swipe kartou -->
+      <div class="mkj-visual" aria-hidden="true">
+        <div class="mkj-stage">
+          <div class="mkj-phone">
+            <div class="mkj-screen">
+              <div class="mkj-notch"></div>
+              <div class="sw-hero">
+                <div class="sw-facade"></div>
+                <div class="sw-top">
+                  <span class="sw-logo">Makej!</span>
+                  <span class="sw-filt"><iconify-icon icon="tabler:adjustments-horizontal"></iconify-icon></span>
+                </div>
+              </div>
+              <div class="sw-body">
+                <div class="sw-comp">
+                  <span class="sw-clogo">Café</span>
+                  <div>
+                    <div class="sw-cname">Café Atrium <span class="sw-chk"><iconify-icon icon="tabler:rosette-discount-check"></iconify-icon></span></div>
+                    <div class="sw-rate"><span class="sw-star"><iconify-icon icon="tabler:star"></iconify-icon></span>4,8 · 64 přihlášených</div>
+                  </div>
+                  <span class="sw-top-badge"><iconify-icon icon="tabler:flame"></iconify-icon> TOP</span>
+                </div>
+                <div class="sw-title">Barista / Obsluha</div>
+                <div class="sw-meta">
+                  <span><iconify-icon icon="tabler:map-pin"></iconify-icon> Brno · centrum · 2 km</span>
+                  <span><iconify-icon icon="tabler:clock"></iconify-icon> Flexibilní směny</span>
+                </div>
+                <div class="sw-tags">
+                  <span class="sw-tag">Zkrácený úvazek</span>
+                  <span class="sw-tag">Spropitné</span>
+                  <span class="sw-tag mak"><span class="sw-mk">M</span> + 64 Makaček</span>
+                </div>
+                <div class="sw-pay">
+                  <div class="sw-pnum">190 Kč/h</div>
+                  <div class="sw-pbonus">+ spropitné</div>
+                </div>
+                <div class="sw-acts">
+                  <span class="sw-btn sw-rej"><iconify-icon icon="tabler:x"></iconify-icon></span>
+                  <span class="sw-btn sw-fav"><iconify-icon icon="tabler:star"></iconify-icon></span>
+                  <span class="sw-btn sw-like"><iconify-icon icon="tabler:heart"></iconify-icon></span>
+                </div>
+              </div>
+              <div class="sw-nav">
+                <span class="sw-ni on"><iconify-icon icon="tabler:briefcase"></iconify-icon>PRÁCE</span>
+                <span class="sw-ni"><iconify-icon icon="tabler:message-circle"></iconify-icon>ZPRÁVY</span>
+                <span class="sw-ni"><iconify-icon icon="tabler:user"></iconify-icon>PROFIL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- ═══════════ HOW IT WORKS ═══════════ -->
-    <section id="how-it-works">
+    <section id="how-it-works" class="nav-light" style="padding-top:90px;">
       <div class="container">
-        <div class="section-header">
-          <h2>Brigáda za <span class="gradient-text">3 kroky</span></h2>
-          <p>Žádné životopisy, žádné pohovory. Prostě swajpni a jdi pracovat.</p>
+        <div class="bolt-head">
+          <h2>Pojď si vydělat s <span class="gradient-text">Makej</span></h2>
         </div>
-        <div class="steps-grid">
-          <div class="step-card" data-step="1">
-            <div class="step-icon-wrap">
-              <iconify-icon icon="solar:hand-shake-bold" width="40"></iconify-icon>
+        <div class="bolt-journey">
+          <svg class="bolt-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M 26,12 C 26,28 74,29 74,44 C 74,60 26,61 26,76 C 26,88 50,90 50,98"
+                  fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2.5"
+                  stroke-linecap="round" vector-effect="non-scaling-stroke" />
+          </svg>
+          <div class="bolt-steps">
+          <div class="bolt-row">
+            <div class="bolt-media">
+              <div class="bolt-media-empty">
+                <iconify-icon icon="solar:gallery-bold" width="34"></iconify-icon>
+                <span>Místo pro foto</span>
+              </div>
             </div>
-            <h3>Swajpni</h3>
-            <p>Prohlížej nabídky brigád jako na Tinderu. Doprava = chci, doleva = nechci.</p>
-          </div>
-          <div class="step-connector">
-            <iconify-icon icon="solar:arrow-right-bold" width="28"></iconify-icon>
-          </div>
-          <div class="step-card" data-step="2">
-            <div class="step-icon-wrap">
-              <iconify-icon icon="solar:chat-round-dots-bold" width="40"></iconify-icon>
+            <div class="bolt-text">
+      
+              <h3>Swajpni nabídky</h3>
+              <p>Prohlížej nabídky brigád jako na Tinderu. Doprava = chci, doleva = nechci. Rychlé, intuitivní a zábavné.</p>
             </div>
-            <h3>Matchuj</h3>
-            <p>Když tě firma přijme, vznikne match. Začněte si chatovat a domluvte se na detailech.</p>
           </div>
-          <div class="step-connector">
-            <iconify-icon icon="solar:arrow-right-bold" width="28"></iconify-icon>
-          </div>
-          <div class="step-card" data-step="3">
-            <div class="step-icon-wrap">
-              <iconify-icon icon="solar:wallet-money-bold" width="40"></iconify-icon>
+
+          <div class="bolt-row">
+            <div class="bolt-media">
+              <div class="bolt-media-empty">
+                <iconify-icon icon="solar:gallery-bold" width="34"></iconify-icon>
+                <span>Místo pro foto</span>
+              </div>
             </div>
-            <h3>Pracuj</h3>
-            <p>Přijď na směnu, odveď práci a vydělanej jdi domů. Tak jednoduché to je.</p>
+            <div class="bolt-text">
+             
+              <h3>Matchni se s firmou</h3>
+              <p>Když tě firma přijme, vznikne match. Začněte si chatovat a domluvte se na detailech přímo v appce.</p>
+            </div>
+          </div>
+
+          <div class="bolt-row">
+            <div class="bolt-media">
+              <div class="bolt-media-empty">
+                <iconify-icon icon="solar:gallery-bold" width="34"></iconify-icon>
+                <span>Místo pro foto</span>
+              </div>
+            </div>
+            <div class="bolt-text">
+             
+              <h3>Pracuj a vydělávej</h3>
+              <p>Přijď na směnu, odveď práci a vydělanej jdi domů. Žádné životopisy, žádné pohovory. Tak jednoduché to je.</p>
+            </div>
+          </div>
+          </div>
+          <div class="bolt-cta">
+            <a href="#" class="btn-primary btn-lg worker-cta-register">
+              Vytvořit účet <iconify-icon icon="solar:arrow-right-linear" width="18"></iconify-icon>
+            </a>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ═══════════ FEATURES ═══════════ -->
-    <section id="features">
+    <section id="features" class="nav-light">
       <div class="container">
         <div class="section-header">
           <h2>Proč si zvolíš <span class="gradient-text">Makej!</span></h2>
@@ -447,7 +655,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=4"></script>
+  <script src="script.js?v=9"></script>
 
   <!-- ── App Demo ── -->
   <script>
