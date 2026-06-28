@@ -65,12 +65,32 @@ const JOB_TYPES = [
 
 const CONTRACT_TYPES = ['HPP', 'DPP', 'DPČ', 'Živnostenský list'];
 
-function ENewJobModal({ onClose, onCreated }) {
+function ENewJobModal({ onClose, onCreated, editJob }) {
+  const isEdit = !!editJob;
   const [form,   setForm]   = useStateE(EMPTY_JOB_FORM);
   const [saving, setSaving] = useStateE(false);
   const [err,    setErr]    = useStateE('');
 
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
+
+  // Editace: předvyplň formulář ze syrového řádku v DB
+  useEffectE(() => {
+    if (!editJob) return;
+    sb.from('jobs').select('*').eq('id', editJob.id).single().then(({ data }) => {
+      if (!data) return;
+      setForm({
+        title: data.title || '', description: data.description || '',
+        pay: data.pay != null ? String(data.pay) : '', pay_unit: data.pay_unit || 'Kč/h',
+        location: data.location || '', date: data.date || '',
+        time_start: data.time_start || '', time_end: data.time_end || '',
+        tags: Array.isArray(data.tags) ? data.tags.join(', ') : '',
+        requirements: Array.isArray(data.requirements) ? data.requirements.join(', ') : '',
+        job_type: data.job_type || 'brigada',
+        hours_per_week: '', start_date: '', contract_duration: '',
+        contract_type: 'HPP', benefits: '',
+      });
+    });
+  }, []);
 
   const isOneshot  = form.job_type === 'jednrazova_vypomoc';
   const isBrigada  = form.job_type === 'brigada';
@@ -86,9 +106,11 @@ function ENewJobModal({ onClose, onCreated }) {
     const { data: { session } } = await sb.auth.getSession();
     const tags = form.tags.split(',').map(t => t.trim()).filter(Boolean);
     const reqs = form.requirements.split(',').map(r => r.trim()).filter(Boolean);
-    const result = await createJobE(session.user.id, { ...form, tags, requirements: reqs });
+    const result = isEdit
+      ? await updateJobE(editJob.id, { ...form, tags, requirements: reqs })
+      : await createJobE(session.user.id, { ...form, tags, requirements: reqs });
     setSaving(false);
-    if (!result) { setErr('Nepodařilo se přidat inzerát. Zkus to znovu.'); return; }
+    if (!result) { setErr(isEdit ? 'Nepodařilo se uložit změny. Zkus to znovu.' : 'Nepodařilo se přidat inzerát. Zkus to znovu.'); return; }
     onCreated();
   }
 
@@ -111,7 +133,7 @@ function ENewJobModal({ onClose, onCreated }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 18, fontWeight: 800 }}>Nový inzerát</div>
+            <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 18, fontWeight: 800 }}>{isEdit ? 'Upravit inzerát' : 'Nový inzerát'}</div>
             <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, marginTop: 2 }}>
               {isOneshot  ? 'Vyplň základní info — datum, čas a odměnu' :
                isBrigada  ? 'Krátkodobá brigáda s konkrétním termínem' :
@@ -330,7 +352,7 @@ function ENewJobModal({ onClose, onCreated }) {
             fontFamily: T.fontHead, fontSize: 15, fontWeight: 800,
             cursor: 'pointer', opacity: saving ? 0.6 : 1, marginTop: 4,
           }}>
-          {saving ? 'Přidávám…' : 'Přidat inzerát'}
+          {saving ? (isEdit ? 'Ukládám…' : 'Přidávám…') : (isEdit ? 'Uložit změny' : 'Přidat inzerát')}
         </button>
       </div>
     </div>
@@ -369,9 +391,11 @@ function EToast({ toasts, onRemove }) {
 
 function EmployerApp() {
   const [tab,       setTab]       = useStateE('dash');
+  if (typeof window !== 'undefined') window.empGoTab = setTab;  // bridge pro navigaci z child komponent
   const [loaded,    setLoaded]    = useStateE(false);
   const [tick,      setTick]      = useStateE(0);
   const [showNewJob, setShowNewJob] = useStateE(false);
+  const [editJob,    setEditJob]    = useStateE(null);
   const [toasts,    setToasts]    = useStateE([]);
   const empId                     = useRefE(null);
 
@@ -380,6 +404,8 @@ function EmployerApp() {
     setToasts(prev => [...prev, { id, title, text, icon, type }]);
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 6000);
   }
+  // Bridge: nech volat toasty i z child komponent (shell, pages) bez prop drilling
+  if (typeof window !== 'undefined') window.empToast = addToast;
 
   // Initial data fetch on mount
   useEffectE(() => {
@@ -388,6 +414,10 @@ function EmployerApp() {
       empId.current = session.user.id;
       fetchEmployerData(session.user.id).then(() => {
         setLoaded(true);
+        setTick(1);
+      }).catch((err) => {
+        console.error('[employer] načtení dat selhalo:', err);
+        setLoaded(true);   // degraduj gracefully místo věčného „Načítám data…"
         setTick(1);
       });
     });
@@ -438,7 +468,7 @@ function EmployerApp() {
     body = <EEmptyState />;
   } else if (tab === 'dash')        body = <EDashboard key={tick} />;
   else if (tab === 'analytics')     body = <EAnalytics key={tick} />;
-  else if (tab === 'jobs')          body = <EJobs key={tick} onTab={setTab} />;
+  else if (tab === 'jobs')          body = <EJobs key={tick} onTab={setTab} onEdit={setEditJob} />;
   else if (tab === 'candidates')    body = <ECandidates key={tick} />;
   else if (tab === 'chat')          body = <EMessages key={tick} />;
   else if (tab === 'calendar')      body = <ECalendar key={tick} />;
@@ -479,6 +509,18 @@ function EmployerApp() {
           onClose={() => setShowNewJob(false)}
           onCreated={async () => {
             setShowNewJob(false);
+            await fetchEmployerData(empId.current);
+            setTick(t => t + 1);
+          }}
+        />
+      )}
+
+      {editJob && (
+        <ENewJobModal
+          editJob={editJob}
+          onClose={() => setEditJob(null)}
+          onCreated={async () => {
+            setEditJob(null);
             await fetchEmployerData(empId.current);
             setTick(t => t + 1);
           }}

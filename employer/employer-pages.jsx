@@ -7,9 +7,13 @@ const STATUS_META = {
   filled: { label: 'Naplněno', color: '#8AB4FF' },
 };
 
-function EJobs({ onTab }) {
+function EJobs({ onTab, onEdit }) {
   const [filter, setFilter] = useStateE('all');
-  const filtered = filter === 'all' ? E_JOBS : E_JOBS.filter(j => j.status === filter);
+  const [q, setQ] = useStateE('');
+  const byStatus = filter === 'all' ? E_JOBS : E_JOBS.filter(j => j.status === filter);
+  const filtered = q.trim()
+    ? byStatus.filter(j => (j.title || '').toLowerCase().includes(q.trim().toLowerCase()))
+    : byStatus;
 
   return (
     <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto' }}>
@@ -55,7 +59,7 @@ function EJobs({ onTab }) {
         <div style={{ flex: 1 }} />
         <div style={{ position: 'relative' }}>
           <Icon name="magnifer-bold" size={14} color={T.mutedSoft} />
-          <input placeholder="Hledat inzerát…" style={{
+          <input placeholder="Hledat inzerát…" value={q} onChange={e => setQ(e.target.value)} style={{
             paddingLeft: 30, padding: '8px 12px 8px 30px',
             borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
             color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, width: 220, outline: 'none',
@@ -137,14 +141,14 @@ function EJobs({ onTab }) {
                     fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700,
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   }}><Icon name="users-group-rounded-bold" size={14} color="#fff"/>Kandidáti ({j.matches})</button>
-                  <button style={{
+                  <button onClick={() => window.empToast && window.empToast('Boost inzerátu', 'Zvýhodněné zobrazení je prémiová funkce — připravujeme ji.', '🚀', 'info')} style={{
                     padding: '8px 12px', borderRadius: 9,
                     background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
                     color: T.light, cursor: 'pointer',
                     fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600,
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   }}><Icon name="rocket-2-bold" size={12} color={T.super}/>Boostnout</button>
-                  <button style={{
+                  <button onClick={() => onEdit && onEdit(j)} style={{
                     padding: '8px 12px', borderRadius: 9,
                     background: 'transparent', border: '1px solid ' + T.border,
                     color: T.muted, cursor: 'pointer',
@@ -197,7 +201,7 @@ function ECandidates() {
         <span style={{ width: 3, height: 3, borderRadius: 999, background: T.mutedSoft }} />
         <span style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 12 }}>{Object.values(E_CANDIDATES).flat().length} matchů · {E_CANDIDATES.hired.length} najato</span>
         <div style={{ flex: 1 }} />
-        <button style={{ padding: '8px 12px', borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <button onClick={() => window.empToast && window.empToast('Filtry kandidátů', 'Filtrování podle hodnocení, vzdálenosti a dovedností připravujeme.', '⚙️', 'info')} style={{ padding: '8px 12px', borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <Icon name="filter-bold" size={12} color={T.light}/>
           Filtry
         </button>
@@ -493,7 +497,7 @@ function CandidateDrawer({ c, onClose, onAccepted }) {
           color: T.light, cursor: 'pointer',
           fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600,
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-        }}><Icon name="chat-round-line-bold" size={13} color={T.light}/>Napsat zprávu</button>
+        }} onClick={() => window.empGoTab && window.empGoTab('chat')}><Icon name="chat-round-line-bold" size={13} color={T.light}/>Napsat zprávu</button>
       </div>
     </div>
   );

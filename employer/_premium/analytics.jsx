@@ -94,6 +94,7 @@ function ProGate({ feature, children }) {
             boxShadow: '0 4px 24px rgba(41,41,120,0.55)',
             transition: 'opacity .2s',
           }}
+            onClick={() => window.empToast && window.empToast('Makej! PRO', 'Prémiový tarif s pokročilou analytikou připravujeme. Ozveme se brzy!', '👑', 'info')}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >

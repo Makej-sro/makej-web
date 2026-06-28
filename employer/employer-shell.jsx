@@ -36,6 +36,10 @@ function ELogo() {
 // SIDEBAR
 // ─────────────────────────────────────────────────────────────
 function ESidebar({ tab, onTab }) {
+  // Dynamické počty z reálných dat (0 → bez badge)
+  const jobCount  = (typeof E_JOBS !== 'undefined') ? E_JOBS.length : 0;
+  const candCount = (typeof E_CANDIDATES !== 'undefined' && E_CANDIDATES.new) ? E_CANDIDATES.new.length : 0;
+  const chatCount = (typeof E_THREADS !== 'undefined') ? E_THREADS.length : 0;
   const sections = [
     {
       label: 'Přehled',
@@ -47,9 +51,9 @@ function ESidebar({ tab, onTab }) {
     {
       label: 'Nábor',
       items: [
-        { k: 'jobs', label: 'Inzeráty', icon: 'document-text-bold', iconLine: 'document-text-linear', badge: 5 },
-        { k: 'candidates', label: 'Kandidáti', icon: 'users-group-rounded-bold', iconLine: 'users-group-rounded-linear', badge: 12 },
-        { k: 'chat', label: 'Zprávy', icon: 'chat-round-line-bold', iconLine: 'chat-round-line-linear', badge: 3 },
+        { k: 'jobs', label: 'Inzeráty', icon: 'document-text-bold', iconLine: 'document-text-linear', badge: jobCount || null },
+        { k: 'candidates', label: 'Kandidáti', icon: 'users-group-rounded-bold', iconLine: 'users-group-rounded-linear', badge: candCount || null },
+        { k: 'chat', label: 'Zprávy', icon: 'chat-round-line-bold', iconLine: 'chat-round-line-linear', badge: chatCount || null },
         { k: 'calendar', label: 'Plán směn', icon: 'calendar-bold', iconLine: 'calendar-linear' },
       ],
     },
@@ -169,7 +173,7 @@ function ESidebar({ tab, onTab }) {
             </>
           );
         })()}
-        <button style={{
+        <button onClick={() => onTab && onTab('settings')} style={{
           width: '100%', padding: '8px 10px', borderRadius: 8,
           background: 'rgba(91,107,255,0.25)', border: '1px solid rgba(91,107,255,0.4)',
           color: '#fff', cursor: 'pointer',
@@ -204,6 +208,10 @@ function ESidebar({ tab, onTab }) {
 // TOPBAR
 // ─────────────────────────────────────────────────────────────
 function ETopbar({ title, subtitle, onNew, onSignOut }) {
+  const [period, setPeriod] = useStateE('30d');
+  const [bellOpen, setBellOpen] = useStateE(false);
+  const periodLabel = { '7d': 'za 7 dní', '30d': 'za 30 dní', '90d': 'za 90 dní', 'rok': 'za rok' }[period];
+  const acts = (typeof E_ACTIVITY !== 'undefined') ? E_ACTIVITY : [];
   return (
     <header style={{
       display: 'flex', alignItems: 'center', gap: 16,
@@ -217,7 +225,7 @@ function ETopbar({ title, subtitle, onNew, onSignOut }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <h1 style={{ margin: 0, fontFamily: T.fontHead, fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: -0.4 }}>{title}</h1>
           <span style={{ width: 4, height: 4, borderRadius: 999, background: T.mutedSoft }} />
-          <span style={{ fontFamily: T.fontUI, fontSize: 13, color: T.muted, fontWeight: 500 }}>{subtitle}</span>
+          <span style={{ fontFamily: T.fontUI, fontSize: 13, color: T.muted, fontWeight: 500 }}>{(subtitle || '').replace(/za \d+ dní|za rok/, periodLabel)}</span>
         </div>
       </div>
 
@@ -226,31 +234,63 @@ function ETopbar({ title, subtitle, onNew, onSignOut }) {
         display: 'flex', gap: 2, padding: 3, borderRadius: 10,
         background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
       }}>
-        {['7d', '30d', '90d', 'rok'].map((p, i) => (
-          <button key={p} style={{
-            padding: '6px 12px', borderRadius: 7,
-            background: i === 1 ? 'rgba(91,107,255,0.2)' : 'transparent',
-            border: 'none',
-            color: i === 1 ? '#fff' : T.muted,
-            fontFamily: T.fontMono, fontSize: 12, fontWeight: 700,
-            cursor: 'pointer',
-          }}>{p}</button>
-        ))}
+        {['7d', '30d', '90d', 'rok'].map((p) => {
+          const on = period === p;
+          return (
+            <button key={p} onClick={() => setPeriod(p)} style={{
+              padding: '6px 12px', borderRadius: 7,
+              background: on ? 'rgba(91,107,255,0.2)' : 'transparent',
+              border: 'none',
+              color: on ? '#fff' : T.muted,
+              fontFamily: T.fontMono, fontSize: 12, fontWeight: 700,
+              cursor: 'pointer',
+            }}>{p}</button>
+          );
+        })}
       </div>
 
-      <button style={{
-        width: 38, height: 38, borderRadius: 10,
-        background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
-        color: T.muted, cursor: 'pointer',
-        display: 'grid', placeItems: 'center', position: 'relative',
-      }}>
-        <Icon name="bell-bold" size={18} color={T.light} />
-        <span style={{
-          position: 'absolute', top: 8, right: 8,
-          width: 7, height: 7, borderRadius: 999, background: T.destructive,
-          border: '2px solid #07071a',
-        }} />
-      </button>
+      <div style={{ position: 'relative' }}>
+        <button onClick={() => setBellOpen(o => !o)} style={{
+          width: 38, height: 38, borderRadius: 10,
+          background: bellOpen ? 'rgba(91,107,255,0.2)' : 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
+          color: T.muted, cursor: 'pointer',
+          display: 'grid', placeItems: 'center', position: 'relative',
+        }}>
+          <Icon name="bell-bold" size={18} color={T.light} />
+          {acts.length > 0 && <span style={{
+            position: 'absolute', top: 8, right: 8,
+            width: 7, height: 7, borderRadius: 999, background: T.destructive,
+            border: '2px solid #07071a',
+          }} />}
+        </button>
+        {bellOpen && (
+          <>
+            <div onClick={() => setBellOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+            <div style={{
+              position: 'absolute', top: 46, right: 0, width: 320, zIndex: 41,
+              background: '#12122e', border: '1px solid ' + T.border, borderRadius: 14,
+              boxShadow: '0 20px 50px rgba(0,0,30,0.6)', overflow: 'hidden',
+            }}>
+              <div style={{ padding: '12px 14px', borderBottom: '1px solid ' + T.border, fontFamily: T.fontUI, fontWeight: 700, fontSize: 13, color: '#fff' }}>Notifikace</div>
+              <div style={{ maxHeight: 320, overflowY: 'auto' }}>
+                {acts.length === 0 ? (
+                  <div style={{ padding: '22px 14px', textAlign: 'center', color: T.muted, fontFamily: T.fontUI, fontSize: 12.5 }}>Žádné nové notifikace</div>
+                ) : acts.map((a, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 10, padding: '11px 14px', borderBottom: i < acts.length - 1 ? '1px solid ' + T.border : 'none' }}>
+                    <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: (a.color || T.primary) + '22', display: 'grid', placeItems: 'center' }}>
+                      <Icon name={a.icon || 'bell-bold'} size={15} color={a.color || T.primary} />
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontFamily: T.fontUI, fontSize: 12.5, color: '#fff' }}><strong>{a.who}</strong> {a.what}</div>
+                      <div style={{ fontFamily: T.fontUI, fontSize: 11, color: T.muted, marginTop: 1 }}>{a.when}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
 
       <button
         onClick={onSignOut}

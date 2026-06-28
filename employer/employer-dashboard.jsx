@@ -1,6 +1,25 @@
 // Makej Employer — Dashboard page
 // Reuses ECard, Sparkline, AreaChart, SectionHeader, E_KPIS, E_ACTIVITY, E_JOBS
 
+function exportJobsCsv() {
+  const rows = [['Inzerát', 'Stav', 'Zhlédnutí', 'CTR (%)', 'Matche', 'Najato', 'Mzda']];
+  (typeof E_JOBS !== 'undefined' ? E_JOBS : []).forEach(j => {
+    rows.push([j.title || '', j.status || '', j.views ?? 0, j.ctr ?? 0, j.matches ?? 0, j.hired ?? 0, (j.pay ?? '') + ' ' + (j.payUnit || '')]);
+  });
+  const csv = rows.map(r => r.map(c => {
+    const s = String(c).replace(/"/g, '""');
+    return /[",;\n]/.test(s) ? '"' + s + '"' : s;
+  }).join(';')).join('\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'makej-vykon-inzeratu-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  if (window.empToast) window.empToast('Export hotový', 'Staženo ' + (typeof E_JOBS !== 'undefined' ? E_JOBS.length : 0) + ' inzerátů do CSV.', '📄', 'success');
+}
+
 function EDashboard() {
   return (
     <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto' }}>
@@ -103,7 +122,7 @@ function EDashboard() {
           title="Výkon inzerátů"
           subtitle="Klíčové metriky podle inzerátu"
           action={
-            <button style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <button onClick={exportJobsCsv} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <Icon name="export-bold" size={12} color={T.light}/>Export CSV
             </button>
           }

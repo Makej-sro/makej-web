@@ -200,15 +200,6 @@ async function fetchEmployerData(employerId) {
     E_KPIS.length = 0;
     newKpis.forEach(k => E_KPIS.push(k));
 
-    // ── E_FUNNEL ─────────────────────────────────────────────────────────────
-    const newFunnel = [
-      { stage: 'Aktivní inzeráty', count: activeJobs, pct: 100, color: '#5B6BFF' },
-      { stage: 'Kandidáti celkem', count: totalM, pct: activeJobs ? Math.round(totalM / activeJobs * 10) : 0, color: '#0020F6' },
-      { stage: 'Najato',           count: totalH, pct: totalM ? Math.round(totalH / totalM * 100) : 0, color: '#5BD68A' },
-    ];
-    E_FUNNEL.length = 0;
-    newFunnel.forEach(f => E_FUNNEL.push(f));
-
     // ── E_REVIEWS ──────────────────────────────────────────────────────────────
     const newReviews = reviews.map(r => {
       const author = r.reviewer?.name || 'Anonym';
@@ -296,4 +287,33 @@ async function createJobE(employerId, fields) {
   return data;
 }
 
-Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, _strColor, _relTime, _fmtTime });
+async function updateJobE(jobId, fields) {
+  const ts = fields.time_start || '00:00';
+  const te = fields.time_end   || '00:00';
+  let duration = 0;
+  try {
+    const [sh, sm] = ts.split(':').map(Number);
+    const [eh, em] = te.split(':').map(Number);
+    duration = Math.max(0, (eh * 60 + em) - (sh * 60 + sm));
+  } catch (_) {}
+
+  const payload = {
+    title:       fields.title,
+    description: fields.description || '',
+    pay:         parseInt(fields.pay) || 0,
+    pay_unit:    fields.pay_unit || 'Kč/h',
+    location:    fields.location || '',
+    date:        fields.date || new Date().toISOString().slice(0, 10),
+    time_start:  ts,
+    time_end:    te,
+    duration,
+    tags:        Array.isArray(fields.tags) ? fields.tags : [],
+    requirements: Array.isArray(fields.requirements) ? fields.requirements : [],
+    job_type:    fields.job_type || 'brigada',
+  };
+  const { data, error } = await sb.from('jobs').update(payload).eq('id', jobId).select().single();
+  if (error) { console.error('updateJobE error:', error); return null; }
+  return data;
+}
+
+Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, _strColor, _relTime, _fmtTime });
