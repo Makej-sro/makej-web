@@ -94,12 +94,13 @@
       line-height: 0;
       background: #0a0d2e;
       overflow: hidden;
+      aspect-ratio: 16 / 9;       /* rezervuje výšku → žádný CLS, než se video načte */
+      max-height: 90vh;
     }
     #features .feat-video video {
       display: block;
       width: 100%;
-      height: auto;
-      max-height: 90vh;
+      height: 100%;
       object-fit: cover;
     }
     @media (max-width: 700px) {
@@ -342,7 +343,7 @@
         </div>
         <!-- ── Video ukázka aplikace (přes celou šířku stránky) ── -->
         <div class="feat-video">
-          <video src="kavarna-demo.mp4?v=1" autoplay muted loop playsinline preload="auto" aria-label="Ukázka aplikace Makej!"></video>
+          <video src="kavarna-demo.mp4?v=1" muted loop playsinline preload="none" aria-label="Ukázka aplikace Makej! — brigáda v kavárně"></video>
         </div>
 
         <!-- FUNKCE -->
@@ -600,5 +601,20 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="script.js?v=9"></script>
+  <!-- Lazy-play ukázkového videa: stáhne a přehraje až ve viewportu (šetří data + LCP) -->
+  <script>
+  (function () {
+    var v = document.querySelector('.feat-video video');
+    if (!v) return;
+    if (!('IntersectionObserver' in window)) { v.setAttribute('autoplay',''); v.play().catch(function(){}); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { v.play().catch(function () {}); }
+        else if (!v.paused) { v.pause(); }
+      });
+    }, { threshold: 0.25 });
+    io.observe(v);
+  })();
+  </script>
 </body>
 </html>

@@ -27,6 +27,50 @@
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
   <link rel="stylesheet" href="style.css?v=23" />
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://makej.eu/#organization",
+        "name": "Makej!",
+        "url": "https://makej.eu/",
+        "logo": "https://makej.eu/favicon.png",
+        "image": "https://makej.eu/og-image.png",
+        "description": "Makej! je česká aplikace pro hledání brigád a práce. Swajpni nabídku, matchni se se zaměstnavatelem a začni vydělávat ještě dnes.",
+        "sameAs": [
+          "https://instagram.com/makej.eu",
+          "https://tiktok.com/@makej.eu"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://makej.eu/#website",
+        "url": "https://makej.eu/",
+        "name": "Makej!",
+        "inLanguage": "cs",
+        "publisher": { "@id": "https://makej.eu/#organization" }
+      },
+      {
+        "@type": "MobileApplication",
+        "name": "Makej!",
+        "operatingSystem": "iOS, Android",
+        "applicationCategory": "BusinessApplication",
+        "inLanguage": "cs",
+        "url": "https://makej.eu/",
+        "description": "Najdi si brigádu nebo práci na pár swajpů. Swajpni nabídku, matchni se s firmou a domluv se přes chat.",
+        "publisher": { "@id": "https://makej.eu/#organization" },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "CZK"
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
