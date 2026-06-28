@@ -4,24 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Podpora — Makej!</title>
-  <meta name="description" content="Potřebuješ pomoct? Najdi odpovědi na časté otázky nebo nás kontaktuj přímo." />
+  <meta name="description" content="Makej! je mobilní aplikace pro jednorázové brigády. Swajpuj nabídky, matchuj se zaměstnavateli a začni pracovat ještě dnes." />
   <meta name="theme-color" content="#0020f6" />
+  <link rel="canonical" href="https://makej.eu/" />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://makej.eu/" />
+  <meta property="og:title" content="Makej! — Swajpuj. Matchuj. Pracuj." />
+  <meta property="og:description" content="Najdi si brigádu za pár sekund. Swajpni doprava, matchni se s firmou a začni vydělávat ještě dnes." />
+  <meta property="og:image" content="https://makej.eu/og-image.png" />
+  <meta property="og:locale" content="cs_CZ" />
+  <meta property="og:site_name" content="Makej!" />
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Makej! — Swajpuj. Matchuj. Pracuj." />
+  <meta name="twitter:description" content="Najdi si brigádu za pár sekund. Swajpni doprava, matchni se s firmou a začni vydělávat ještě dnes." />
+  <meta name="twitter:image" content="https://makej.eu/og-image.png" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="stylesheet" href="/style.css?v=22" />
+  <link rel="stylesheet" href="/style.css?v=23" />
   <style>
-    /* ── Page-specific overrides ── */
-    .sup-page { padding: 80px 0 100px; }
-
-    /* Hero */
+    /* ── Podpora sekce ── */
+    .sup-page { padding: 0; }
+    .sup-white-zone { min-height: 100vh; padding: 100px 0 80px; box-sizing: border-box; }
     .sup-hero {
       text-align: center;
       max-width: 580px;
-      margin: 0 auto 88px;
+      margin: 0 auto 44px;
       padding: 0 24px;
     }
     .sup-hero h1 {
@@ -31,119 +44,177 @@
       line-height: 1.1;
       margin: 16px 0 20px;
     }
-    .sup-hero p {
-      color: var(--muted-fg);
-      font-size: 1.05rem;
-      line-height: 1.65;
-      max-width: 440px;
-      margin: 0 auto;
-    }
-
-    /* Hero contact actions */
-    .sup-hero-actions {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px 26px;
-      flex-wrap: wrap;
-      margin-top: 34px;
-    }
-    .sup-mail {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      padding: 12px 24px;
-      border-radius: 100px;
-      background: linear-gradient(135deg, #00103f, #0a1aa3);
-      color: #fff;
-      font-weight: 700;
-      font-size: .92rem;
-      text-decoration: none;
-      box-shadow: 0 8px 24px rgba(0,32,246,.35);
-      transition: transform .2s, box-shadow .2s;
-    }
-    .sup-mail:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,32,246,.5); }
-    .sup-mail iconify-icon { color: #fff; }
-
-    .sup-guide {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: #a0b4ff;
-      font-weight: 600;
-      font-size: .92rem;
-      text-decoration: none;
-      transition: color .2s, gap .2s;
-    }
-    .sup-guide:hover { color: #fff; gap: 10px; }
-
-    /* FAQ */
-    .faq-section {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-    .faq-heading {
-      text-align: center;
-      margin-bottom: 48px;
-    }
-    .faq-heading h2 {
-      font-family: var(--font-heading);
-      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-    .faq-heading p {
-      color: var(--muted-fg);
-      font-size: .95rem;
-    }
+    .sup-hero p { color: var(--muted-fg); font-size: 1.05rem; line-height: 1.65; max-width: 440px; margin: 0 auto; }
+    .sup-search { position: relative; max-width: 520px; margin: 44px auto 0; }
+    .sup-search svg { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #9090b0; pointer-events: none; flex-shrink: 0; z-index: 2; }
+    .sup-search input { width: 100%; box-sizing: border-box; padding: 16px 20px 16px 52px; border-radius: 14px; border: 1.5px solid rgba(208,208,255,.15); background: rgba(255,255,255,.07); color: #fff; font-size: 1rem; font-family: var(--font-body); outline: none; transition: border-color .2s, background .2s; }
+    .sup-search input::placeholder { color: transparent; }
+    .sup-search input:focus { border-color: rgba(91,107,255,.5); background: rgba(255,255,255,.1); }
+    .sup-search-ph { position: absolute; left: 52px; top: 50%; transform: translateY(-50%); color: #7070a0; font-size: 1rem; font-family: var(--font-body); pointer-events: none; white-space: nowrap; overflow: hidden; z-index: 1; }
+    .sup-search-ph .ph-cursor { display: inline-block; width: 2px; height: 1.1em; background: #7070a0; vertical-align: text-bottom; margin-left: 1px; animation: blink-cur .7s step-end infinite; }
+    @keyframes blink-cur { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .faq-no-results { text-align: center; padding: 40px 0; color: var(--muted-fg); font-size: .95rem; display: none; }
+    .sup-search-drop { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: #1a1a3a; border: 1.5px solid rgba(208,208,255,.15); border-radius: 14px; overflow: hidden; z-index: 100; box-shadow: 0 16px 48px rgba(0,0,20,.5); display: none; }
+    .sup-search-drop.open { display: block; }
+    .ssd-item { display: flex; align-items: center; padding: 13px 18px; cursor: pointer; color: #c8c8f0; font-size: .93rem; transition: background .12s; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .ssd-item:last-child { border-bottom: none; }
+    .ssd-item:hover, .ssd-item.active { background: rgba(91,107,255,.18); color: #fff; }
+    .ssd-item svg { flex-shrink: 0; color: #6060a0; }
+    .ssd-item mark { background: none; color: #a78bfa; font-weight: 700; }
+    .sup-cards-wrap { background: #0020f6; padding: 60px 24px 70px; }
+    .sup-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 860px; margin: 0 auto; }
+    .sup-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 36px 28px 32px; text-align: center; transition: border-color .2s, transform .22s; }
+    .sup-card:hover { border-color: rgba(91,107,255,.45); transform: translateY(-4px); }
+    .sup-card-icon { font-size: 2.6rem; margin-bottom: 18px; display: block; }
+    .sup-card h3 { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .sup-card p { color: #fff; font-size: .88rem; line-height: 1.65; margin-bottom: 24px; }
+    .sup-card a { display: inline-block; padding: 9px 22px; border-radius: 100px; border: 1px solid rgba(208,208,255,.2); color: #d0d0ff; font-size: .85rem; font-weight: 600; text-decoration: none; transition: all .18s; }
+    .sup-card a:hover { border-color: rgba(91,107,255,.5); background: rgba(91,107,255,.12); color: #fff; }
+    .faq-section { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    .faq-heading { text-align: center; margin-bottom: 48px; }
+    .faq-heading h2 { font-family: var(--font-heading); font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800; margin-bottom: 12px; }
+    .faq-heading p { color: var(--muted-fg); font-size: .95rem; }
     .faq-heading a { color: #a78bfa; text-decoration: none; }
     .faq-heading a:hover { text-decoration: underline; }
-
     .faq-list { border-top: 1px solid var(--border); }
     .faq-item { border-bottom: 1px solid var(--border); }
-    .faq-q {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 4px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: .97rem;
-      color: var(--light);
-      gap: 16px;
-      transition: color .15s;
-      user-select: none;
-    }
+    .faq-q { display: flex; justify-content: space-between; align-items: center; padding: 20px 4px; cursor: pointer; font-weight: 600; font-size: .97rem; color: var(--light); gap: 16px; transition: color .15s; user-select: none; }
     .faq-q:hover { color: #d0d0ff; }
-    .faq-icon {
-      color: var(--muted-fg);
-      flex-shrink: 0;
-      transition: transform .25s cubic-bezier(.2,.8,.2,1), color .15s;
-    }
-    .faq-item.open .faq-icon {
-      transform: rotate(45deg);
-      color: #a78bfa;
-    }
-    .faq-a {
-      display: none;
-      padding: 0 4px 20px;
-      color: var(--muted-fg);
-      font-size: .9rem;
-      line-height: 1.75;
-    }
+    .faq-icon { color: var(--muted-fg); flex-shrink: 0; transition: transform .25s cubic-bezier(.2,.8,.2,1), color .15s; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); color: #a78bfa; }
+    .faq-a { display: none; padding: 0 4px 20px; color: var(--muted-fg); font-size: .9rem; line-height: 1.75; }
     .faq-a a { color: #a78bfa; text-decoration: none; }
     .faq-a a:hover { text-decoration: underline; }
     .faq-item.open .faq-a { display: block; }
-
-    @media (max-width: 480px) {
-      .sup-mail { padding: 11px 20px; }
+    #makac-bubble { position: absolute; top: -130px; right: calc(50% + 72px); width: 188px; background: linear-gradient(135deg, #2e2e62 0%, #1a1a3a 100%); border: 1.5px solid rgba(167,139,250,.35); border-radius: 14px; padding: 11px 14px; box-shadow: 0 10px 28px rgba(0,0,30,.55); z-index: 10; animation: bubble-in .4s cubic-bezier(.2,.8,.2,1) .5s both; }
+    #makac-bubble p { color: #e0e0ff; font-size: .78rem; line-height: 1.55; margin: 0 0 10px; }
+    #makac-bubble strong { color: #fff; }
+    #makac-chat-btn { display: block; width: 100%; padding: 7px 0; background: linear-gradient(135deg, #292978, #3a3a99); border: none; border-radius: 8px; color: #fff; font-size: .75rem; font-weight: 700; font-family: var(--font-body); cursor: pointer; transition: opacity .15s; }
+    #makac-chat-btn:hover { opacity: .85; }
+    @keyframes bubble-in { from { opacity: 0; transform: scale(.85) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    @media (max-width: 700px) {
+      .sup-cards { grid-template-columns: 1fr; max-width: 400px; }
+      #makac-bubble { right: auto; left: 50%; transform: translateX(-50%); top: -140px; }
     }
-  </style>
+  
+    /* Navbar: tlačítka vždy viditelná, Podpora aktivní */
+    #navbar .nav-actions { opacity: 1 !important; pointer-events: all !important; }
+
+    /* Světlý navbar nad bílou sekcí — připraveno */
+    #navbar { transition: background .35s, box-shadow .35s; }
+    .nav-logo { transition: color .35s; }
+    .nav-links a { transition: color .25s, border-bottom-color .25s, font-weight .2s !important; }
+    #navbar.navbar-light {
+      background: rgba(255,255,255,.15) !important;
+      box-shadow: 0 1px 0 rgba(0,32,246,.1) !important;
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+    }
+    #navbar.navbar-light .nav-logo { -webkit-text-fill-color: #0020f6 !important; color: #0020f6 !important; }
+    #navbar.navbar-light .nav-links a { color: #0020f6 !important; }
+    #navbar.navbar-light .nav-links a.nav-active { color: #0020f6 !important; border-bottom-color: #0020f6 !important; }
+    #navbar.navbar-light .mobile-menu-btn { color: #1a1a3a; }
+    #navbar.navbar-light #nav-login-btn {
+      background: transparent; color: #0020f6; border-color: rgba(0,32,246,.3); font-weight: 600;
+    }
+    #navbar.navbar-light #nav-login-btn:hover { background: rgba(0,32,246,.06); border-color: #0020f6; }
+
+    /* ── Bílé pozadí + modrý text (light theme override) ── */
+    body { background: #fff; }
+    #podpora { background: #fff; }
+    .gradient-text { -webkit-text-fill-color: #0020f6 !important; color: #0020f6 !important; }
+    .sup-hero h1 { color: #0020f6; }
+    .sup-hero p { color: #4a5070; }
+    .sup-search svg { color: #0020f6; }
+    .sup-search input { background: #f4f4fc; border-color: rgba(0,32,246,.2); color: #0d0d28; }
+    .sup-search input:focus { border-color: #0020f6; background: #fff; box-shadow: 0 0 0 3px rgba(0,32,246,.08); }
+    .sup-search-ph { color: #6060a0; }
+    .sup-search-ph .ph-cursor { background: #6060a0; }
+    .sup-search-drop { background: #fff; border-color: rgba(0,32,246,.2); box-shadow: 0 12px 40px rgba(0,32,246,.12); }
+    .ssd-item { color: #0d0d28; border-bottom-color: rgba(0,32,246,.07); }
+    .ssd-item:hover, .ssd-item.active { background: #0020f6; color: #fff; }
+    .ssd-item mark { color: #0020f6; }
+    .ssd-item:hover mark, .ssd-item.active mark { color: #a8b8ff; }
+    .sup-card { background: #fff; border-color: rgba(255,255,255,.2); }
+    .sup-card:hover { border-color: rgba(255,255,255,.6); box-shadow: 0 8px 32px rgba(0,0,80,.18); transform: translateY(-4px); }
+    .sup-card h3 { color: #0020f6; }
+    .sup-card p { color: #4a5070; }
+    .sup-card a { border-color: rgba(0,32,246,.25); color: #0020f6; }
+    .sup-card a:hover { background: rgba(0,32,246,.06); border-color: #0020f6; color: #0020f6; }
+    .faq-heading h2 { color: #0020f6; }
+    .faq-heading p { color: #4a5070; }
+    .faq-heading a { color: #0020f6; }
+    .sup-page { padding-bottom: 0 !important; }
+    #footer { background: #0020f6; border-top: none; }
+    .footer-bottom { border-top-color: rgba(255,255,255,.15); }
+    .footer-logo { background: none !important; -webkit-text-fill-color: #fff !important; color: #fff !important; }
+    .footer-brand > p, .footer-col h4, .footer-col a, .footer-bottom span { color: rgba(255,255,255,.85) !important; }
+    .footer-col a:hover { color: #fff !important; }
+    .faq-list { border-top-color: rgba(0,32,246,.12); }
+    .faq-item { border-bottom-color: rgba(0,32,246,.12); }
+    .faq-q { color: #0d0d28; }
+    .faq-q:hover { color: #0020f6; }
+    .faq-icon { color: #9090b8; }
+    .faq-item.open .faq-icon { color: #0020f6; }
+    .faq-a { color: #4a5070; }
+    .faq-a a { color: #0020f6; }
+    .faq-no-results { color: #6060a0; }
+    /* Navbar nad bílou sekcí */
+    #navbar.pnav-white { background: rgba(255,255,255,.15) !important; box-shadow: 0 1px 0 rgba(0,32,246,.1) !important; backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%); }
+    #navbar.pnav-white .nav-logo { -webkit-text-fill-color: #0020f6 !important; color: #0020f6 !important; }
+    #navbar.pnav-white .nav-links a { color: #0020f6 !important; }
+    #navbar.pnav-white .nav-links a.nav-active { color: #0020f6 !important; border-bottom-color: #0020f6 !important; }
+    #navbar.pnav-white .mobile-menu-btn { color: #0020f6; }
+    #navbar.pnav-white #nav-login-btn { background: transparent; color: #0020f6; border-color: rgba(0,32,246,.3); font-weight: 600; }
+    #navbar.pnav-white #nav-login-btn:hover { background: rgba(0,32,246,.06); border-color: #0020f6; }
+    #navbar.pnav-white #nav-register-btn { background: linear-gradient(135deg,#0020f6,#3a3a99) !important; color: #fff !important; }
+    /* Navbar nad modrou sekcí */
+    #navbar.pnav-blue { background: rgba(0,20,220,.55) !important; box-shadow: none !important; backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%); }
+    #navbar.pnav-blue .nav-logo { -webkit-text-fill-color: #fff !important; color: #fff !important; }
+    #navbar.pnav-blue .nav-links a { color: rgba(255,255,255,.85) !important; }
+    #navbar.pnav-blue .nav-links a:hover, #navbar.pnav-blue .nav-links a.nav-active { color: #fff !important; border-bottom-color: #fff !important; }
+    #navbar.pnav-blue .mobile-menu-btn { color: #fff; }
+    #navbar.pnav-blue #nav-login-btn { background: transparent; color: #fff; border-color: rgba(255,255,255,.4); font-weight: 600; }
+    #navbar.pnav-blue #nav-login-btn:hover { background: rgba(255,255,255,.12); border-color: #fff; }
+    #navbar.pnav-blue #nav-register-btn { background: rgba(255,255,255,.18) !important; color: #fff !important; border-color: rgba(255,255,255,.5) !important; }
+    #navbar.pnav-blue #nav-register-btn:hover { background: rgba(255,255,255,.28) !important; }
+
+    /* FAQ split layout */
+    .faq-split-section { display:flex; gap:40px; max-width:960px; margin:88px auto 80px; padding:20px 24px; align-items:flex-start; background:#f4f4fc; border:1px solid rgba(0,32,246,.12); border-radius:20px; }
+    .faq-sidebar { flex:0 0 170px; display:flex; flex-direction:column; gap:14px; }
+    .faq-sidebar-bubble { background:#0020f6; color:#fff; border-radius:100px; padding:10px 20px; font-weight:700; font-size:.88rem; text-align:center; margin-bottom:6px; }
+    .faq-nav { display:block; width:100%; padding:10px 18px; border-radius:100px; border:1.5px solid rgba(0,32,246,.2); background:transparent; color:#0020f6; font-size:.88rem; font-weight:600; font-family:var(--font-body); text-align:center; cursor:pointer; transition:all .18s; box-sizing:border-box; }
+    .faq-nav.active { background:#0020f6; border-color:#0020f6; color:#fff; }
+    .faq-nav:hover:not(.active) { background:#0020f6; border-color:#0020f6; color:#fff; }
+    .faq-nav.faq-nav-bubble { background:#0020f6; color:#fff; border-color:#0020f6; text-align:center; margin-bottom:6px; }
+    .faq-nav.faq-nav-bubble.active { background:#0020f6; color:#fff; box-shadow:0 0 0 3px rgba(0,32,246,.18); }
+    .faq-nav.faq-nav-bubble:hover { background:#0012b8; border-color:#0012b8; }
+    .faq-panel { flex:1; min-width:0; max-height:248px; overflow-y:auto; overscroll-behavior:contain; padding-right:6px; scrollbar-width:thin; scrollbar-color:rgba(0,32,246,.25) transparent; }
+    .faq-panel::-webkit-scrollbar { width:5px; }
+    .faq-panel::-webkit-scrollbar-track { background:transparent; }
+    .faq-panel::-webkit-scrollbar-thumb { background:rgba(0,32,246,.25); border-radius:10px; }
+    @media (max-width:640px) { .faq-split-section { flex-direction:column; gap:20px; } .faq-sidebar { flex:none; position:static; flex-direction:row; flex-wrap:wrap; } }
+
+    /* FAQ highlight sweep */
+    @keyframes faq-sweep {
+      0%   { transform: scaleX(0); opacity: 1; }
+      77%  { transform: scaleX(1); opacity: 1; }
+      100% { transform: scaleX(1); opacity: 0; }
+    }
+    .faq-item.faq-highlight { position: relative; overflow: hidden; }
+    .faq-item.faq-highlight::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(0,32,246,.28);
+      transform-origin: left center;
+      animation: faq-sweep 1.3s ease forwards;
+      pointer-events: none;
+    }
+</style>
 </head>
 <body>
+<body>
 
-  <!-- ═══════════ NAV ═══════════ -->
+    <!-- ═══════════ NAVBAR ═══════════ -->
   <nav id="navbar">
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej!</a>
@@ -161,6 +232,7 @@
         <iconify-icon icon="solar:hamburger-menu-bold" width="24"></iconify-icon>
       </button>
     </div>
+    <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobile-menu">
       <a href="/hledam-si-praci.html">Hledám si práci</a>
       <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
@@ -173,107 +245,243 @@
     </div>
   </nav>
 
-  <!-- ═══════════ MAIN ═══════════ -->
-  <main class="sup-page">
+  <!-- ═══════════ PODPORA ═══════════ -->
+  <section id="podpora">
+    <div class="sup-page">
 
-    <!-- Hero -->
-    <section class="sup-hero">
-      <h1>Jak ti můžeme <span class="gradient-text">pomoci?</span></h1>
-      <p>Většinu odpovědí najdeš v častých otázkách níže. Pokud ne, ozvi se — jsme tu pro tebe.</p>
-      <div class="sup-hero-actions">
-        <a class="sup-mail" href="mailto:podpora@makej.eu">
-          <iconify-icon icon="solar:letter-bold" width="18"></iconify-icon>
-          podpora@makej.eu
-        </a>
-        <a class="sup-guide" href="/pruvodce.html">
-          Projít průvodce
-          <iconify-icon icon="solar:arrow-right-linear" width="18"></iconify-icon>
-        </a>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="faq-section">
-      <div class="faq-heading">
-        <h2>Časté <span class="gradient-text">otázky</span></h2>
-        <p>Nenašel jsi odpověď? Napiš nám na <a href="mailto:podpora@makej.eu">podpora@makej.eu</a></p>
-      </div>
-
-      <div class="faq-list">
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
-            <span>Je Makej! zdarma?</span>
-            <iconify-icon icon="solar:add-circle-bold" width="20" class="faq-icon"></iconify-icon>
-          </div>
-          <div class="faq-a">Pro brigádníky je Makej! zcela zdarma — registrace, swipování i chat. Zaměstnavatelé mají základní plán dostupný po spuštění aplikace.</div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
-            <span>Jak probíhá výplata za práci?</span>
-            <iconify-icon icon="solar:add-circle-bold" width="20" class="faq-icon"></iconify-icon>
-          </div>
-          <div class="faq-a">Výplata probíhá přímo mezi tebou a zaměstnavatelem — Makej! slouží jako platforma pro propojení, ne jako zprostředkovatel plateb. Podmínky si domluv přímo s firmou přes náš chat.</div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
-            <span>Je moje platební karta v bezpečí?</span>
-            <iconify-icon icon="solar:add-circle-bold" width="20" class="faq-icon"></iconify-icon>
-          </div>
-          <div class="faq-a">Na Makej! nezadáváš žádné platební údaje — aplikace je zdarma a nepotřebujeme přístup k tvé kartě. Tvoje osobní data chráníme v souladu s GDPR.</div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
-            <span>Jak smažu svůj účet?</span>
-            <iconify-icon icon="solar:add-circle-bold" width="20" class="faq-icon"></iconify-icon>
-          </div>
-          <div class="faq-a">V aplikaci jdi do Nastavení → Účet → Smazat účet. Nebo nám napiš na <a href="mailto:podpora@makej.eu">podpora@makej.eu</a> a my to vyřídíme za tebe do 3 pracovních dnů. Data mažeme v souladu s GDPR.</div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
-            <span>Jak nahlásím problém se zaměstnavatelem nebo brigádníkem?</span>
-            <iconify-icon icon="solar:add-circle-bold" width="20" class="faq-icon"></iconify-icon>
-          </div>
-          <div class="faq-a">V profilu každého uživatele najdeš tlačítko "Nahlásit". Každé hlášení prověřuje náš tým do 24 hodin. Při závažném porušení podmínek okamžitě blokujeme účet. Bezpečnost komunity je pro nás priorita.</div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
-            <span>Na jakých zařízeních Makej! funguje?</span>
-            <iconify-icon icon="solar:add-circle-bold" width="20" class="faq-icon"></iconify-icon>
-          </div>
-          <div class="faq-a">Makej! bude dostupný na iOS (App Store) a Androidu (Google Play). Spuštění brzy — registruj se teď a budeš mezi prvními.</div>
+      <div class="sup-white-zone">
+      <!-- Hero -->
+      <div class="sup-hero">
+        <h1>Jak ti můžeme <span class="gradient-text">pomoci?</span></h1>
+        <div class="sup-search">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="faq-search" placeholder="" autocomplete="off" />
+          <span class="sup-search-ph" id="faq-ph"><span id="faq-ph-text"></span><span class="ph-cursor"></span></span>
+          <div class="sup-search-drop" id="faq-drop"></div>
         </div>
       </div>
-    </section>
 
-  </main>
+      <!-- FAQ split layout -->
+      <div class="faq-split-section">
+        <div class="faq-sidebar">
+          <button class="faq-nav active" data-cat="popular">Časté dotazy</button>
+          <button class="faq-nav" data-cat="vyplaty">Výplaty</button>
+          <button class="faq-nav" data-cat="smeny">Směny</button>
+          <button class="faq-nav" data-cat="ucet">Účet</button>
+          <button class="faq-nav" data-cat="makacky">Makačky</button>
+        </div>
+        <div class="faq-panel">
+          <div class="faq-list" id="faq-list">
+            <div class="faq-no-results" id="faq-no-results">Žádné výsledky pro tuto frázi 🙁</div>
 
-  <!-- ═══════════ FOOTER ═══════════ -->
+            <!-- VÝPLATY -->
+            <div class="faq-item" data-cat="vyplaty popular">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Je Makej! zdarma?</span></div>
+              <div class="faq-a">Pro brigádníky je Makej! zcela zdarma — registrace, swipování i chat. Zaměstnavatelé mají základní plán dostupný po spuštění aplikace.</div>
+            </div>
+            <div class="faq-item" data-cat="vyplaty popular">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak probíhá výplata za práci?</span></div>
+              <div class="faq-a">Výplata probíhá přímo mezi tebou a zaměstnavatelem — Makej! slouží jako platforma pro propojení, ne jako zprostředkovatel plateb. Podmínky si domluv přímo s firmou přes náš chat.</div>
+            </div>
+            <div class="faq-item" data-cat="vyplaty">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Je moje platební karta v bezpečí?</span></div>
+              <div class="faq-a">Na Makej! nezadáváš žádné platební údaje — aplikace je zdarma a nepotřebujeme přístup k tvé kartě. Tvoje osobní data chráníme v souladu s GDPR.</div>
+            </div>
+            <div class="faq-item" data-cat="vyplaty">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Kdy dostanu výplatu za brigádu?</span></div>
+              <div class="faq-a">Termín výplaty závisí na domluvě se zaměstnavatelem — může to být hotově na konci směny, bankovním převodem do pátku nebo dle jiné dohody. Vždy si podmínky ověř předem v chatu.</div>
+            </div>
+            <div class="faq-item" data-cat="vyplaty">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Můžu brigádu fakturovat jako OSVČ?</span></div>
+              <div class="faq-a">Ano, pokud jsi OSVČ, můžeš vystavit fakturu. Dohodněte se se zaměstnavatelem přes chat — Makej! to nijak neomezuje. Vždy si předem ověř, zda firma přijímá fakturaci.</div>
+            </div>
+            <div class="faq-item" data-cat="vyplaty">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Co když mi zaměstnavatel nezaplatí?</span></div>
+              <div class="faq-a">Situaci nejdřív zkus vyřešit přes chat v aplikaci. Pokud to nepomůže, napiš nám na <a href="mailto:podpora@makej.eu">podpora@makej.eu</a> — případ prošetříme a firma riskuje zablokování na platformě.</div>
+            </div>
+            <div class="faq-item" data-cat="vyplaty">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Je potřeba podepsat pracovní smlouvu?</span></div>
+              <div class="faq-a">To záleží na zaměstnavateli. Krátkodobé brigády bývají na dohodu o provedení práce (DPP) nebo dohodu o pracovní činnosti (DPČ). Vždy si dohodněte podmínky před nástupem do práce.</div>
+            </div>
+            <div class="faq-item" data-cat="vyplaty">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak funguje výplata pro brigádníky pod 18 let?</span></div>
+              <div class="faq-a">Brigádníci mladší 18 let mohou pracovat s omezením hodin dle zákoníku práce. Výplata probíhá stejně jako u ostatních — přímo od zaměstnavatele. Doporučujeme mít písemnou dohodu.</div>
+            </div>
+            <div class="faq-item" data-cat="vyplaty">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Mohu mít více brigád najednou přes Makej!?</span></div>
+              <div class="faq-a">Ano, žádné omezení neexistuje. Můžeš mít aktivní matche s více firmami a pracovat pro více zaměstnavatelů zároveň — jen si hlídej, aby se směny nepřekrývaly.</div>
+            </div>
+            <div class="faq-item" data-cat="vyplaty">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak se řeší spory o výši odměny?</span></div>
+              <div class="faq-a">Dohodnutou odměnu si vždy potvrď písemně přes chat v aplikaci — máš tak důkaz o dohodě. Při sporech nám napiš na <a href="mailto:podpora@makej.eu">podpora@makej.eu</a> a my ti pomůžeme situaci vyřešit.</div>
+            </div>
+
+            <!-- SMĚNY -->
+            <div class="faq-item" data-cat="smeny popular">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak se domluvím na termínu směny?</span></div>
+              <div class="faq-a">Po matchi s firmou se otevře chat, kde si přímo se zaměstnavatelem domluvíš datum a čas. Vše probíhá v reálném čase — bez zbytečných telefonátů nebo e-mailů.</div>
+            </div>
+            <div class="faq-item" data-cat="smeny">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Na jakých zařízeních Makej! funguje?</span></div>
+              <div class="faq-a">Makej! bude dostupný na iOS (App Store) a Androidu (Google Play). Spuštění brzy — registruj se teď a budeš mezi prvními.</div>
+            </div>
+            <div class="faq-item" data-cat="smeny">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Mohu zrušit potvrzenou směnu?</span></div>
+              <div class="faq-a">Ano, ale vždy to oznám zaměstnavateli co nejdříve přes chat — zbytečné rušení bez omluvy může negativně ovlivnit tvé hodnocení. Časté rušení může vést k omezení účtu.</div>
+            </div>
+            <div class="faq-item" data-cat="smeny">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Co se stane, když na směnu nepřijdu?</span></div>
+              <div class="faq-a">Zaměstnavatel tě může negativně ohodnotit, což ovlivní tvůj profil. Opakované neomluvené absence mohou vést k zablokování účtu. Vždy radši informuj zaměstnavatele předem.</div>
+            </div>
+            <div class="faq-item" data-cat="smeny">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak dlouho trvají brigády přes Makej!?</span></div>
+              <div class="faq-a">Délka záleží na inzerátu — od jednorázové směny (pár hodin) přes víkendové akce až po opakující se part-time pozice. Každý inzerát má uvedenou délku a typ závazku.</div>
+            </div>
+            <div class="faq-item" data-cat="smeny">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Mohu pracovat přes víkend nebo o svátcích?</span></div>
+              <div class="faq-a">Ano, mnoho brigád na Makej! je právě přes víkendy a svátky — gastro, eventy, sklady a podobné obory jsou nejaktivnější právě tehdy. Filtruj inzeráty dle dostupnosti.</div>
+            </div>
+            <div class="faq-item" data-cat="smeny">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Kde přesně mám na směnu přijít?</span></div>
+              <div class="faq-a">Adresa pracoviště je uvedena přímo v inzerátu. Detaily (vchod, kontaktní osoba) si dodomluv se zaměstnavatelem přes chat před nástupem.</div>
+            </div>
+            <div class="faq-item" data-cat="smeny">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Mohu filtrovat brigády podle vzdálenosti?</span></div>
+              <div class="faq-a">Ano, v nastavení aplikace si nastavíš maximální vzdálenost od tvé polohy a Makej! ti zobrazí jen inzeráty v dosahu. Ideální pro ty, kdo nechtějí dojíždět daleko.</div>
+            </div>
+            <div class="faq-item" data-cat="smeny">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Co znamená „vzdálená" nebo „remote" brigáda?</span></div>
+              <div class="faq-a">Vzdálená brigáda znamená, že práci vykonáváš z domova — typicky administrativní nebo kreativní úkoly. Na inzerátu je vždy jasně označeno, zda je pozice na místě nebo remote.</div>
+            </div>
+            <div class="faq-item" data-cat="smeny">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak funguje plán směn pro zaměstnavatele?</span></div>
+              <div class="faq-a">V employer dashboardu máš přehled všech přijatých brigádníků a jejich směn. Můžeš si tam plánovat obsazení, komunikovat s týmem a sledovat docházku — vše na jednom místě.</div>
+            </div>
+
+            <!-- ÚČET -->
+            <div class="faq-item" data-cat="ucet popular">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak smažu svůj účet?</span></div>
+              <div class="faq-a">V aplikaci jdi do Nastavení → Účet → Smazat účet. Nebo nám napiš na <a href="mailto:podpora@makej.eu">podpora@makej.eu</a> a my to vyřídíme za tebe do 3 pracovních dnů. Data mažeme v souladu s GDPR.</div>
+            </div>
+            <div class="faq-item" data-cat="ucet popular">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak obnovím zapomenuté heslo?</span></div>
+              <div class="faq-a">Na přihlašovací obrazovce klikni na „Zapomněl jsem heslo" a zadej svůj email. Za pár minut ti přijde odkaz pro reset — funguje to automaticky, stačí zkontrolovat i spam.</div>
+            </div>
+            <div class="faq-item" data-cat="ucet">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak změním svůj email nebo heslo?</span></div>
+              <div class="faq-a">Jdi do Nastavení → Účet → Změnit email / Změnit heslo. Budeme ti na starý email posílat ověřovací kód jako bezpečnostní opatření.</div>
+            </div>
+            <div class="faq-item" data-cat="ucet">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Mohu mít více účtů?</span></div>
+              <div class="faq-a">Každý uživatel smí mít pouze jeden účet. Vytváření více účtů je porušením podmínek a může vést k zablokování všech. Pokud potřebuješ změnit roli, kontaktuj nás.</div>
+            </div>
+            <div class="faq-item" data-cat="ucet">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak nastavím svůj profil brigádníka?</span></div>
+              <div class="faq-a">Po registraci jdi do sekce Profil a doplň svou fotku, krátký popis, dovednosti a preferované obory práce. Vyplněný profil výrazně zvyšuje šanci, že tě zaměstnavatel přijme.</div>
+            </div>
+            <div class="faq-item" data-cat="ucet">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak změním profilovou fotku?</span></div>
+              <div class="faq-a">V sekci Profil klikni na svou aktuální fotku a vyber novou z galerie. Doporučujeme použít jasnou fotku obličeje — profily s fotkou mají výrazně vyšší úspěšnost.</div>
+            </div>
+            <div class="faq-item" data-cat="ucet">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak se registruji jako zaměstnavatel?</span></div>
+              <div class="faq-a">Při registraci zvol roli „Zaměstnavatel" a vyplň název firmy. Po registraci máš přístup k employer dashboardu, kde můžeš přidávat inzeráty a spravovat kandidáty.</div>
+            </div>
+            <div class="faq-item" data-cat="ucet">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Mohu přepnout z brigádníka na zaměstnavatele?</span></div>
+              <div class="faq-a">Přepínání rolí v rámci jednoho účtu zatím není podporováno. Pokud potřebuješ změnit roli, napiš nám na <a href="mailto:podpora@makej.eu">podpora@makej.eu</a> a pomůžeme ti to vyřešit.</div>
+            </div>
+            <div class="faq-item" data-cat="ucet">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak funguje ověření identity?</span></div>
+              <div class="faq-a">Základní ověření probíhá přes emailovou adresu. V budoucích verzích plánujeme volitelné ověření dokladem pro větší důvěryhodnost profilu — zaměstnavatelé pak budou moci preferovat ověřené brigádníky.</div>
+            </div>
+            <div class="faq-item" data-cat="ucet">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Co se stane s mými daty po smazání účtu?</span></div>
+              <div class="faq-a">Po smazání účtu jsou tvoje osobní data trvale vymazána z naší databáze do 30 dnů, v souladu s GDPR. Anonymizované statistické údaje (bez vazby na tvoji osobu) si můžeme ponechat pro analýzu.</div>
+            </div>
+
+            <!-- MAKAČKY -->
+            <div class="faq-item" data-cat="makacky popular">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak nahlásím problém se zaměstnavatelem nebo brigádníkem?</span></div>
+              <div class="faq-a">V profilu každého uživatele najdeš tlačítko „Nahlásit". Každé hlášení prověřuje náš tým do 24 hodin. Při závažném porušení podmínek okamžitě blokujeme účet. Bezpečnost komunity je pro nás priorita.</div>
+            </div>
+            <div class="faq-item" data-cat="makacky popular">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak funguje hodnocení po brigádě?</span></div>
+              <div class="faq-a">Po dokončení brigády můžeš ohodnotit zaměstnavatele a on tebe. Hodnocení jsou viditelná ostatním a pomáhají budovat důvěru v komunitě. Dobré hodnocení ti otevírá dveře k lepším příležitostem.</div>
+            </div>
+            <div class="faq-item" data-cat="makacky">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Co jsou Makačky a jak je získám?</span></div>
+              <div class="faq-a">Makačky jsou body loajality, které získáváš za aktivitu na platformě — dokončené brigády, dobré hodnocení, pravidelné používání aplikace. Čím více Makačků, tím výše se zobrazuješ ve výsledcích.</div>
+            </div>
+            <div class="faq-item" data-cat="makacky">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak zvýším své hodnocení na Makej!?</span></div>
+              <div class="faq-a">Choď na domluvené směny, komunikuj včas, pracuj poctivě a žádej o hodnocení po každé brigádě. Vyplněný profil s fotkou a popisem také přispívá k celkovému dojmu.</div>
+            </div>
+            <div class="faq-item" data-cat="makacky">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak funguje swipování inzerátů?</span></div>
+              <div class="faq-a">Přejedeš prstem doprava = zájem o brigádu (match request), doleva = přeskočení. Zaměstnavatel pak může tvůj zájem přijmout nebo odmítnout. Po oboustranném přijetí se otevře chat.</div>
+            </div>
+            <div class="faq-item" data-cat="makacky">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Co se stane po matchi?</span></div>
+              <div class="faq-a">Po matchi se oběma stranám otevře chatovací okno. Tam si domluvíte vše potřebné — datum, čas, místo, odměnu a další podmínky. Chat zůstane aktivní po celou dobu spolupráce.</div>
+            </div>
+            <div class="faq-item" data-cat="makacky">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Mohu odmítnout match od zaměstnavatele?</span></div>
+              <div class="faq-a">Ano, match je vždy dobrovolný. Pokud se situace změní, můžeš konverzaci ukončit. Odmítnutí nebude mít vliv na tvé hodnocení — jen se ujisti, že zaměstnavatele informuješ slušně.</div>
+            </div>
+            <div class="faq-item" data-cat="makacky">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak fungují notifikace v aplikaci?</span></div>
+              <div class="faq-a">Notifikace dostaneš při novém matchi, nové zprávě v chatu nebo při přijetí/odmítnutí tvé žádosti. Nastavení notifikací si přizpůsobíš v Nastavení → Oznámení.</div>
+            </div>
+            <div class="faq-item" data-cat="makacky">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Jak dlouho mi match zůstane aktivní?</span></div>
+              <div class="faq-a">Match zůstane aktivní, dokud ho jedna ze stran neukončí nebo dokud se inzerát nezaplní jiným brigádníkem. Aktivní matche vidíš v sekci Zprávy.</div>
+            </div>
+            <div class="faq-item" data-cat="makacky">
+              <div class="faq-q" onclick="toggleFaq(this)"><span>Mohu si stáhnout Makej! teď?</span></div>
+              <div class="faq-a">Aplikace je aktuálně ve vývoji a brzy dorazí do App Store a Google Play. Registruj se předem na makej.eu a dostaneš notifikaci hned při spuštění — plus první brigády bez fronty.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div><!-- /.sup-white-zone -->
+
+      <!-- Contact cards -->
+      <div class="sup-cards-wrap">
+      <div style="text-align:center;margin-bottom:44px;">
+        <h2 style="font-family:var(--font-heading);font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;line-height:1.25;color:#fff;margin:0;">Nenašel jsi svou odpověď?<br><span style="opacity:.75;">Zkus to tady</span></h2>
+        <p style="color:rgba(255,255,255,.8);font-size:1.05rem;line-height:1.65;margin:20px auto 0;max-width:480px;">Pokud je tvůj dotaz složitější, neváhej nás kontaktovat emailem. Uděláme vše proto, abys dostal svou odpověď ještě ten stejný den.</p>
+        <a href="mailto:podpora@makej.eu" style="display:inline-block;margin-top:20px;padding:12px 28px;border-radius:100px;border:2px solid rgba(255,255,255,.45);color:#fff;font-size:1rem;font-weight:700;font-family:var(--font-body);text-decoration:none;letter-spacing:.01em;transition:background .18s,border-color .18s,transform .18s;" onmouseover="this.style.background='rgba(255,255,255,.15)';this.style.borderColor='#fff';this.style.transform='translateY(-2px)';" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,.45)';this.style.transform='translateY(0)';">podpora@makej.eu</a>
+      </div>
+    </div>
+  </section>
+
+    <!-- ═══════════ FOOTER ═══════════ -->
   <footer id="footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="/" class="footer-logo">Makej!</a>
-          <p>Pracovní platforma nové generace. Propojujeme lidi s příležitostmi.</p>
+          <p>Brigádní appka nové generace. Swajpuj, matchuj a pracuj.</p>
           <div class="footer-social">
-            <a href="#" aria-label="Instagram"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a>
-            <a href="#" aria-label="TikTok"><iconify-icon icon="ic:baseline-tiktok" width="22"></iconify-icon></a>
-            <a href="#" aria-label="LinkedIn"><iconify-icon icon="mdi:linkedin" width="22"></iconify-icon></a>
+            <!-- Sociální sítě — doplň skutečné URL před launchem -->
+            <!-- <a href="https://instagram.com/makej.eu" aria-label="Instagram"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a> -->
+            <!-- <a href="https://tiktok.com/@makej.eu" aria-label="TikTok"><iconify-icon icon="ic:baseline-tiktok" width="22"></iconify-icon></a> -->
           </div>
         </div>
         <div class="footer-col">
           <h4>Produkt</h4>
-          <a href="/hledam-si-praci.html">Hledám si práci</a>
-          <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+          <a href="#features">Funkce</a>
+          <a href="/hledam-si-praci.html">Jak to funguje</a>
+          <a href="/cenik.html">Ceník</a>
           <a href="/#download">Stáhnout</a>
         </div>
         <div class="footer-col">
           <h4>Firma</h4>
-          <a href="/podpora.html">Podpora</a>
+          <a href="/podpora.html" class="nav-active">Podpora</a>
           <a href="mailto:hello@makej.eu">Kontakt</a>
           <a href="/o-nas.html">O nás</a>
         </div>
@@ -290,13 +498,38 @@
     </div>
   </footer>
 
-  <!-- Login modal (stejný jako na index.html) -->
+  <!-- ═══════════ AUTH MODALS ═══════════ -->
   <div class="modal-overlay" id="modal-overlay">
-    <div class="modal" id="login-modal">
+
+    <!-- LOGIN MODAL -->
+    <div class="modal" id="login-modal" style="overflow:visible;">
+      <!-- Makač peeker -->
+      <div id="main-peeker" style="
+        position:absolute; top:-70px; left:50%; transform:translateX(-50%);
+        pointer-events:none; z-index:3;
+        filter: drop-shadow(0 14px 36px rgba(0,0,60,0.65));
+        transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+        animation: peekerIn 0.45s cubic-bezier(.2,.8,.2,1) both;
+      ">
+        <div style="width:88px;height:76px;background:linear-gradient(160deg,#4848c4 0%,#1c1c7a 100%);border-radius:50% 50% 44% 44%;position:relative;box-shadow:0 14px 36px rgba(0,0,60,0.65),inset 0 1px 0 rgba(255,255,255,0.18);border:2px solid rgba(140,140,255,0.3);">
+          <div id="main-browL" style="position:absolute;left:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-browR" style="position:absolute;right:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-eyeL" style="position:absolute;left:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilL" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidL" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div id="main-eyeR" style="position:absolute;right:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilR" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidR" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div style="position:absolute;bottom:11px;left:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+          <div style="position:absolute;bottom:11px;right:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+        </div>
+      </div>
       <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej!</div>
       <h2 class="modal-title">Přihlásit se</h2>
-      <p class="modal-subtitle">Vítej zpět!</p>
+      <p class="modal-subtitle">Vítej zpět! Přihlaš se ke svému účtu.</p>
       <div class="modal-error" id="login-error"></div>
       <form id="login-form" novalidate>
         <div class="form-group">
@@ -311,65 +544,763 @@
       </form>
       <div class="modal-divider"><span>nebo</span></div>
       <button class="btn-google" id="login-google">
-        <iconify-icon icon="flat-color-icons:google" width="18"></iconify-icon>
-        Pokračovat přes Google
+        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.6 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.3C29.4 35.5 26.8 36.5 24 36.5c-5.2 0-9.6-3.4-11.2-8l-6.6 5C9.7 39.7 16.3 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.2 5.3C37.5 39.7 44 35.4 44 24c0-1.3-.1-2.6-.4-3.9z"/>
+        </svg>
+        Pokračovat s Google
       </button>
-      <p class="modal-switch">Nemáš účet? <a href="javascript:void(0)" id="switch-to-register">Zaregistruj se</a></p>
+      <p class="modal-switch">Nemáš účet? <a href="#" id="switch-to-register">Zaregistruj se</a></p>
     </div>
 
-    <div class="modal" id="register-modal" style="display:none;">
+    <!-- REGISTER MODAL -->
+    <div class="modal" id="register-modal">
       <button class="modal-close" id="register-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej!</div>
-      <h2 class="modal-title">Vytvořit účet</h2>
-      <p class="modal-subtitle">Začni swipovat práci ještě dnes.</p>
-      <div class="modal-error" id="register-error"></div>
-      <div id="register-step-1">
-        <div style="display:flex;gap:10px;margin-bottom:20px;">
-          <button type="button" class="role-btn" id="role-worker" onclick="selectRole('worker')">
-            <iconify-icon icon="solar:user-bold" width="20"></iconify-icon>
-            <span>Hledám práci</span>
+
+      <!-- Krok 1: výběr role -->
+      <div id="reg-step-1">
+        <h2 class="modal-title">Vytvořit účet</h2>
+        <p class="modal-subtitle">Kdo jsi?</p>
+        <div class="role-cards">
+          <button type="button" class="role-card" data-role="worker">
+            <iconify-icon icon="solar:user-bold" width="32"></iconify-icon>
+            <strong>Brigádník</strong>
+            <small>Hledám práci</small>
           </button>
-          <button type="button" class="role-btn" id="role-employer" onclick="selectRole('employer')">
-            <iconify-icon icon="solar:buildings-bold" width="20"></iconify-icon>
-            <span>Hledám lidi</span>
+          <button type="button" class="role-card" data-role="employer">
+            <iconify-icon icon="solar:buildings-bold" width="32"></iconify-icon>
+            <strong>Zaměstnavatel</strong>
+            <small>Hledám brigádníky</small>
           </button>
         </div>
-        <button type="button" class="btn-primary btn-full btn-lg" onclick="goToStep2()">Pokračovat</button>
       </div>
-      <div id="register-step-2" style="display:none;">
+
+      <!-- Krok 2: údaje -->
+      <div id="reg-step-2" style="display:none">
+        <button class="modal-back" id="reg-back">
+          <iconify-icon icon="solar:arrow-left-bold" width="16"></iconify-icon>
+          Zpět
+        </button>
+        <h2 class="modal-title">Tvoje údaje</h2>
+        <p class="modal-subtitle" id="reg-role-subtitle">Brigádník</p>
+        <div class="modal-error" id="register-error"></div>
         <form id="register-form" novalidate>
           <div class="form-group">
             <label class="form-label" for="reg-name">Jméno</label>
-            <input class="form-input" type="text" id="reg-name" placeholder="Jan Novák" required />
+            <input class="form-input" type="text" id="reg-name" placeholder="Tvoje jméno" autocomplete="name" required />
           </div>
-          <div class="form-group" id="reg-company-group" style="display:none;">
+          <div class="form-group" id="reg-company-group" style="display:none">
             <label class="form-label" for="reg-company">Název firmy</label>
-            <input class="form-input" type="text" id="reg-company" placeholder="Moje firma s.r.o." />
+            <input class="form-input" type="text" id="reg-company" placeholder="Název tvé firmy" />
           </div>
           <div class="form-group">
             <label class="form-label" for="reg-email">Email</label>
-            <input class="form-input" type="email" id="reg-email" placeholder="tvuj@email.cz" required />
+            <input class="form-input" type="email" id="reg-email" placeholder="tvuj@email.cz" autocomplete="email" required />
           </div>
           <div class="form-group">
             <label class="form-label" for="reg-password">Heslo</label>
-            <input class="form-input" type="password" id="reg-password" placeholder="Alespoň 8 znaků" required />
+            <div class="password-wrap">
+              <input class="form-input" type="password" id="reg-password" placeholder="Min. 6 znaků" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" id="reg-pw-toggle" aria-label="Zobrazit heslo" tabindex="-1">
+                <iconify-icon icon="solar:eye-bold" width="18" id="reg-pw-icon"></iconify-icon>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password2">Heslo znovu</label>
+            <div class="password-wrap">
+              <input class="form-input" type="password" id="reg-password2" placeholder="Zopakuj heslo" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" id="reg-pw2-toggle" aria-label="Zobrazit heslo" tabindex="-1">
+                <iconify-icon icon="solar:eye-bold" width="18" id="reg-pw2-icon"></iconify-icon>
+              </button>
+            </div>
           </div>
           <button type="submit" class="btn-primary btn-full btn-lg" id="register-submit">Vytvořit účet</button>
+          <p style="font-size:.78rem;color:var(--muted-fg);text-align:center;margin-top:12px;line-height:1.5;">
+            Registrací souhlasíš s našimi <a href="/terms.html" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
+            a <a href="/privacy.html" target="_blank" style="color:var(--secondary)">Zásadami ochrany osobních údajů</a>.
+          </p>
         </form>
       </div>
-      <p class="modal-switch">Máš účet? <a href="javascript:void(0)" id="switch-to-login">Přihlásit se</a></p>
+
+      <p class="modal-switch">Už máš účet? <a href="#" id="switch-to-login">Přihlásit se</a></p>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ COOKIE BANNER ═══════════ -->
+  <div id="cookie-banner" role="dialog" aria-label="Souhlas s cookies" aria-live="polite">
+    <div class="cookie-inner">
+      <p class="cookie-text">
+        🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
+        Žádné reklamní trackery. Více informací v naší <a href="/privacy.html#cookies">Politice ochrany soukromí</a>.
+      </p>
+      <div class="cookie-actions">
+        <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
+        <button class="cookie-btn cookie-btn-accept" id="cookie-accept">Rozumím, souhlasím</button>
+      </div>
     </div>
   </div>
 
-  <script>
-    function toggleFaq(el) {
-      const item = el.parentElement;
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
-    }
-  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="/script.js?v=9"></script>
+  <script src="/chat-widget.js"></script>
+
+  <!-- ── Podpora: FAQ + typewriter ── -->
+  <script>
+  function toggleFaq(el) {
+    var item = el.parentElement;
+    var isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(function(i) { i.classList.remove('open'); });
+    if (!isOpen) item.classList.add('open');
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Typewriter placeholder
+    var phText = document.getElementById('faq-ph-text');
+    var phWrap = document.getElementById('faq-ph');
+    var input  = document.getElementById('faq-search');
+    if (phText && input) {
+      var questions = ['Je Makej! zdarma?','Jak smažu svůj účet?','Jak probíhá výplata za práci?','Na jakých zařízeních Makej! funguje?','Jak nahlásím problém se zaměstnavatelem?','Je moje platební karta v bezpečí?'];
+      var qi = 0, ci = 0, deleting = false, paused = false;
+      function tick() {
+        if (input.value.length > 0 || document.activeElement === input) { phWrap.style.opacity='0'; setTimeout(tick,200); return; }
+        phWrap.style.opacity='1';
+        var q = questions[qi];
+        if (paused) { paused=false; deleting=true; setTimeout(tick,30); return; }
+        if (!deleting) { phText.textContent=q.slice(0,ci); ci++; if(ci>q.length){paused=true;setTimeout(tick,900);return;} setTimeout(tick,45); }
+        else { phText.textContent=q.slice(0,ci); ci--; if(ci<0){deleting=false;ci=0;qi=(qi+1)%questions.length;setTimeout(tick,280);return;} setTimeout(tick,28); }
+      }
+      input.addEventListener('input', function(){ phWrap.style.opacity=this.value.length?'0':'1'; });
+      input.addEventListener('focus', function(){ phWrap.style.opacity='0'; });
+      input.addEventListener('blur',  function(){ if(!this.value.length) phWrap.style.opacity='1'; });
+      setTimeout(tick, 600);
+    }
+
+    // FAQ live search + autocomplete
+    var noResults = document.getElementById('faq-no-results');
+    var drop      = document.getElementById('faq-drop');
+    if (!input || !drop) return;
+    var faqItems = Array.from(document.querySelectorAll('.faq-item'));
+    var activeIdx = -1;
+    var activeCat = 'popular';
+    function getQ(item){ return (item.querySelector('.faq-q span')||item).textContent.trim(); }
+    function hl(text,q){ if(!q) return text; return text.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>'); }
+    function showDrop(q){
+      if(!q){closeDrop();return;}
+      var m=faqItems.filter(function(i){return getQ(i).toLowerCase().includes(q);});
+      if(!m.length){closeDrop();return;}
+      drop.innerHTML=m.slice(0,5).map(function(i){return'<div class="ssd-item" data-idx="'+faqItems.indexOf(i)+'"><span>'+hl(getQ(i),q)+'</span></div>';}).join('');
+      drop.classList.add('open'); activeIdx=-1;
+      drop.querySelectorAll('.ssd-item').forEach(function(el){ el.addEventListener('mousedown',function(e){e.preventDefault();selectSug(parseInt(this.dataset.idx));}); });
+    }
+    function closeDrop(){drop.classList.remove('open');drop.innerHTML='';activeIdx=-1;}
+    function selectSug(idx){
+      var item=faqItems[idx]; if(!item) return;
+      var cats=(item.dataset.cat||'').split(' ').filter(Boolean);
+      var primaryCat=cats.find(function(c){return c!=='popular';})||cats[0]||activeCat;
+      activeCat=primaryCat;
+      document.querySelectorAll('.faq-nav').forEach(function(b){
+        b.classList.toggle('active', b.dataset.cat===activeCat);
+      });
+      if(phWrap) phWrap.style.opacity='1';
+      input.value=''; closeDrop(); filterFaq('');
+      setTimeout(function(){
+        item.scrollIntoView({behavior:'smooth',block:'nearest'});
+        if(!item.classList.contains('open'))item.classList.add('open');
+        item.classList.remove('faq-highlight');
+        void item.offsetWidth;
+        item.classList.add('faq-highlight');
+        setTimeout(function(){ item.classList.remove('faq-highlight'); }, 1400);
+      },80);
+    }
+    function filterFaq(q){
+      var v=0;
+      faqItems.forEach(function(item){
+        var text=getQ(item).toLowerCase()+' '+((item.querySelector('.faq-a')||{textContent:''}).textContent.toLowerCase());
+        var matchQ=!q||text.includes(q);
+        var cat=item.dataset.cat||'';
+        var matchCat=!activeCat||cat===activeCat||cat.split(' ').includes(activeCat);
+        var m=matchQ&&matchCat; item.style.display=m?'':'none'; if(m)v++;
+      });
+      if(noResults) noResults.style.display=v===0?'block':'none';
+      if(q) document.querySelectorAll('.faq-item.open').forEach(function(i){i.classList.remove('open');});
+    }
+    input.addEventListener('input',function(){ var q=this.value.trim().toLowerCase(); filterFaq(q); showDrop(q); });
+    input.addEventListener('keydown',function(e){
+      var items=drop.querySelectorAll('.ssd-item');
+      if(!items.length) return;
+      if(e.key==='ArrowDown'){e.preventDefault();activeIdx=Math.min(activeIdx+1,items.length-1);}
+      else if(e.key==='ArrowUp'){e.preventDefault();activeIdx=Math.max(activeIdx-1,0);}
+      else if(e.key==='Enter'&&activeIdx>=0){e.preventDefault();selectSug(parseInt(items[activeIdx].dataset.idx));return;}
+      else if(e.key==='Escape'){closeDrop();return;}
+      else return;
+      items.forEach(function(el,i){el.classList.toggle('active',i===activeIdx);});
+    });
+    document.addEventListener('click',function(e){if(!input.contains(e.target)&&!drop.contains(e.target))closeDrop();});
+
+    // Sidebar nav filtering
+    document.querySelectorAll('.faq-nav').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        document.querySelectorAll('.faq-nav').forEach(function(t){t.classList.remove('active');});
+        this.classList.add('active');
+        activeCat=this.dataset.cat;
+        input.value='';
+        if(phWrap) phWrap.style.opacity='1';
+        closeDrop();
+        filterFaq('');
+      });
+    });
+    filterFaq('');
+
+    // Doc peeker eye tracking
+    var eyeL=document.getElementById('doc-eyeL'), eyeR=document.getElementById('doc-eyeR');
+    var pupilL=document.getElementById('doc-pupilL'), pupilR=document.getElementById('doc-pupilR');
+    var lidL=document.getElementById('doc-lidL'), lidR=document.getElementById('doc-lidR');
+    if(!eyeL) return;
+    function movePupil(pupilEl,eyeEl,mx,my){ var rect=eyeEl.getBoundingClientRect(); if(!rect.width) return; var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2,dx=mx-cx,dy=my-cy,dist=Math.sqrt(dx*dx+dy*dy),r=4.5,s=Math.min(dist,r)/Math.max(dist,0.001); pupilEl.style.transform='translate('+(dx*s).toFixed(2)+'px,'+(dy*s).toFixed(2)+'px)'; }
+    document.addEventListener('mousemove',function(e){ movePupil(pupilL,eyeL,e.clientX,e.clientY); movePupil(pupilR,eyeR,e.clientX,e.clientY); });
+    function setLid(speed){ lidL.style.transition='height '+speed+' ease'; lidR.style.transition='height '+speed+' ease'; }
+    function scheduleBlink(){ setTimeout(function(){ setLid('0.08s'); lidL.style.height='21px'; lidR.style.height='21px'; setTimeout(function(){ lidL.style.height='0'; lidR.style.height='0'; setTimeout(function(){setLid('0.28s');scheduleBlink();},120); },100); },3000+Math.random()*3000); }
+    scheduleBlink();
+  });
+  </script>
+
+  <!-- ── App Demo ── -->
+  <script>
+  (function() {
+    var JOBS = [
+      { title:'Barista', company:'Kavárna Zlatý Jelen', location:'Praha 1', distance:'0.8 km', pay:'180', payUnit:'Kč/h', date:'So 8. 6.', time:'8:00 – 16:00', type:'Brigáda', tags:['Gastro','Víkendy'], grad:'linear-gradient(145deg,#0e1060,#1a3aff)' },
+      { title:'Číšník', company:'Restaurant Maxim', location:'Praha 2', distance:'1.4 km', pay:'170', payUnit:'Kč/h', date:'Ne 9. 6.', time:'16:00 – 24:00', type:'Brigáda', tags:['Gastro','Večery'], grad:'linear-gradient(145deg,#1a0a6e,#3d1fa3)' },
+      { title:'Skladník', company:'LogiPro s.r.o.', location:'Praha – Letňany', distance:'8.2 km', pay:'160', payUnit:'Kč/h', date:'Po 10. 6.', time:'6:00 – 14:00', type:'Jednorázová', tags:['Sklad','Fyzická práce'], grad:'linear-gradient(145deg,#0c2a4a,#1a5276)' },
+      { title:'Promotér', company:'Event Agency CZ', location:'Praha 3', distance:'2.1 km', pay:'165', payUnit:'Kč/h', date:'So 8. 6.', time:'10:00 – 18:00', type:'Brigáda', tags:['Marketing','Venkovní'], grad:'linear-gradient(145deg,#2d0a6e,#6b21a8)' },
+      { title:'Recepční', company:'Hotel Central', location:'Praha 1', distance:'1.0 km', pay:'190', payUnit:'Kč/h', date:'Po – Pá', time:'8:00 – 16:00', type:'Part-time', tags:['Hotely','Angličtina'], grad:'linear-gradient(145deg,#0c3a3a,#0f766e)' },
+      { title:'Pomocný kuchař', company:"McDonald's", location:'Praha 6', distance:'3.5 km', pay:'155', payUnit:'Kč/h', date:'So 8. 6.', time:'12:00 – 20:00', type:'Brigáda', tags:['Gastro','Flexibilní'], grad:'linear-gradient(145deg,#3a1a00,#7c3a00)' },
+    ];
+
+    var THREADS = [
+      { id:1, company:'Kavárna Zlatý Jelen', job:'Barista', initials:'KZ', color:'#0020f6', unread:true,
+        msgs:[
+          { from:'them', text:'Dobrý den! Zaujal nás váš profil, máte zájem o pozici baristu?' },
+          { from:'me',   text:'Dobrý den, moc děkuji za zájem! Ano, mám zájem.' },
+          { from:'them', text:'Super! Kdy byste mohl nastoupit?' },
+        ]},
+      { id:2, company:'Hotel Central', job:'Recepční', initials:'HC', color:'#292978', unread:false,
+        msgs:[
+          { from:'them', text:'Gratulujeme! Váš profil nás zaujal na pozici recepčního.' },
+          { from:'me',   text:'Výborně, mám zájem!' },
+          { from:'them', text:'Nastoupit byste mohl od pondělí. Hodí se to?' },
+        ]},
+    ];
+
+    // Deep-copy threads so messages persist only in session
+    var threads = THREADS.map(function(t) {
+      return { id:t.id, company:t.company, job:t.job, initials:t.initials, color:t.color, unread:t.unread,
+        msgs: t.msgs.map(function(m) { return { from:m.from, text:m.text }; }) };
+    });
+
+    var jobIdx = 0;
+    var activePanel = 'jobs';
+    var openThreadId = null;
+    var drag = { on:false, startX:0, dx:0, el:null };
+
+    // ── Tutorial state ──
+    var tutStep    = 0;          // 0=swipe hint | 1=match notify | 2=go to messages | 3=accept offer | 4=done
+    var tutEnabled = true;       // false = user skipped; re-enabled by swipe right
+    var tutPopupEl = null;
+    var tutRingEl  = null;
+    var tutHandEl  = null;
+    var tutBadgeEl = null;
+    var tutThreadAdded = false;
+    var TUT_THREAD = {
+      id:99, company:'Kavárna Zlatý Jelen', job:'Barista', initials:'KZ',
+      color:'#0020f6', unread:true,
+      msgs:[
+        { from:'them', text:'Gratulujeme! Váš profil se nám moc líbil. 🎉' },
+        { from:'them', text:'Nabízíme vám směnu v So 8. 6. od 8:00 do 16:00. Odměna 180 Kč/h. Přijmete nabídku?' },
+      ]
+    };
+
+    function $(id) { return document.getElementById(id); }
+
+    function showPanel(name) {
+      activePanel = name;
+      ['dp-jobs','dp-messages','dp-chat','dp-profile'].forEach(function(id) {
+        var el = $(id);
+        if (el) el.classList.remove('dp-active');
+      });
+      var target = name === 'chat' ? 'dp-chat' : 'dp-' + name;
+      var el = $(target);
+      if (el) el.classList.add('dp-active');
+      document.querySelectorAll('.demo-nav-btn').forEach(function(btn) {
+        var p = btn.getAttribute('data-panel');
+        btn.classList.toggle('nav-active', p === name || (name === 'chat' && p === 'messages'));
+      });
+      // Tutorial: navigating away from jobs at step 0 = user skipped → disable
+      if (tutStep === 0 && tutEnabled && name !== 'jobs') {
+        tutEnabled = false;
+        tutHide();
+      }
+      // Tutorial: going to messages at step 1 → show step 2
+      if (tutEnabled && tutStep === 1 && name === 'messages') {
+        if (tutBadgeEl) tutBadgeEl.classList.remove('show');
+        renderThreads(); // re-render so tutorial thread appears
+        setTimeout(function() { tutShow(2); }, 250);
+      }
+    }
+
+    // ── Tutorial functions ──────────────────────────────────
+    function tutInit() {
+      var screen = document.querySelector('.demo-screen');
+      if (!screen) return;
+
+      // Spotlight ring (transparent div; huge box-shadow creates dim overlay around it)
+      tutRingEl = document.createElement('div');
+      tutRingEl.className = 'tut-ring';
+      screen.appendChild(tutRingEl);
+
+      // Swipe-hand (step 0 only) — swipe gesture image
+      tutHandEl = document.createElement('div');
+      tutHandEl.className = 'tut-swipe-hand';
+      tutHandEl.innerHTML = '<img src="swipe-hand.png?v=1" alt="" draggable="false" />';
+      screen.appendChild(tutHandEl);
+
+      // Popup tooltip (steps 1-3)
+      tutPopupEl = document.createElement('div');
+      tutPopupEl.className = 'tut-popup tut-hide';
+      screen.appendChild(tutPopupEl);
+
+      // Unread badge on Messages nav button
+      document.querySelectorAll('.demo-nav-btn').forEach(function(btn) {
+        if (btn.getAttribute('data-panel') === 'messages') {
+          var badge = document.createElement('span');
+          badge.className = 'tut-nav-badge';
+          btn.appendChild(badge);
+          tutBadgeEl = badge;
+        }
+      });
+
+      tutShow(0);
+    }
+
+    // Position ring over a target element (coords relative to .demo-screen)
+    function tutRing(targetEl) {
+      if (!tutRingEl || !targetEl) return;
+      var screen = document.querySelector('.demo-screen');
+      if (!screen) return;
+      var sr = screen.getBoundingClientRect();
+      var tr = targetEl.getBoundingClientRect();
+      var P = 6;
+      tutRingEl.style.top    = (tr.top  - sr.top  - P) + 'px';
+      tutRingEl.style.left   = (tr.left - sr.left - P) + 'px';
+      tutRingEl.style.width  = (tr.width  + P * 2) + 'px';
+      tutRingEl.style.height = (tr.height + P * 2) + 'px';
+      tutRingEl.classList.remove('show');
+      void tutRingEl.offsetWidth; // re-trigger animation
+      tutRingEl.classList.add('show');
+    }
+
+    // Position popup near a target element, arrow pointing toward it
+    function tutPopupNear(targetEl, html) {
+      if (!tutPopupEl || !targetEl) return;
+      var screen = document.querySelector('.demo-screen');
+      if (!screen) return;
+      var sr = screen.getBoundingClientRect();
+      var tr = targetEl.getBoundingClientRect();
+
+      var W  = sr.width - 20;   // popup width
+      var H  = 54;               // estimated popup height
+      var G  = 10;               // gap between popup and target
+      var AH = 8;                // arrow height
+
+      var tTop = tr.top  - sr.top;
+      var tBot = tr.bottom - sr.top;
+      var tCX  = tr.left - sr.left + tr.width / 2;
+
+      // Prefer above; fall back to below
+      var popTop, arrowDir;
+      if (tTop - H - G - AH >= 46) {
+        popTop   = tTop - H - G - AH;
+        arrowDir = 'down';
+      } else {
+        popTop   = tBot + G;
+        arrowDir = 'up';
+      }
+      popTop = Math.max(8, Math.min(sr.height - H - 8, popTop));
+
+      tutPopupEl.innerHTML = html;
+      tutPopupEl.className = 'tut-popup arrow-' + arrowDir;
+      tutPopupEl.style.top   = popTop + 'px';
+      tutPopupEl.style.left  = '10px';
+      tutPopupEl.style.right = 'auto';
+      tutPopupEl.style.width = W + 'px';
+
+      // Arrow X: centered on target, clamped within popup
+      var arrowX = Math.max(16, Math.min(W - 16, tCX - 10));
+      tutPopupEl.style.setProperty('--arrow-x', arrowX + 'px');
+
+      // Re-trigger entrance animation
+      tutPopupEl.style.animation = 'none';
+      void tutPopupEl.offsetWidth;
+      tutPopupEl.style.animation = 'tut-in .32s cubic-bezier(.23,1,.32,1)';
+    }
+
+    var TUT_CONTENTS = [
+      '<span class="tut-popup-emoji">👆</span><div class="tut-popup-body"><div class="tut-popup-title">Swajpni doprava nebo klikni ♥</div><div class="tut-popup-sub">Dej like brigádě, která tě zaujala</div></div>',
+      '<span class="tut-popup-emoji">🎉</span><div class="tut-popup-body"><div class="tut-popup-title">Match! Kavárna tě přijala</div><div class="tut-popup-sub">Klikni na Zprávy a přečti si zprávu</div></div>',
+      '<span class="tut-popup-emoji">💬</span><div class="tut-popup-body"><div class="tut-popup-title">Nová zpráva!</div><div class="tut-popup-sub">Klikni na chat od Kavárny</div></div>',
+      '<span class="tut-popup-emoji">✅</span><div class="tut-popup-body"><div class="tut-popup-title">Nabídka směny!</div><div class="tut-popup-sub">Přijmi nabídku a brigádu máš</div></div>',
+    ];
+
+    function tutShow(step) {
+      tutStep = step;
+      if (!tutPopupEl) return;
+      if (step === 4) { tutHide(); tutShowSuccess(); return; }
+
+      var html = TUT_CONTENTS[step] || '';
+
+      if (step === 0) {
+        // Step 0: swipe-hand shows the gesture + card demonstrates the right-swipe
+        if (tutRingEl) tutRingEl.classList.remove('show');
+        tutPopupEl.className = 'tut-popup tut-hide';
+        if (tutHandEl) tutHandEl.classList.add('show');
+        var card0 = $('dp-card');
+        if (card0) card0.classList.add('dp-card-demo-swipe');
+        return;
+      }
+
+      // Steps 1-3: stop card demo + hide hand, show ring + popup
+      var cardX = $('dp-card');
+      if (cardX) cardX.classList.remove('dp-card-demo-swipe');
+      if (tutHandEl) tutHandEl.classList.remove('show');
+
+      // Steps 1-3: spotlight ring + popup positioned next to target
+      var targetEl = null;
+      if (step === 1) targetEl = document.querySelector('.demo-nav-btn[data-panel="messages"]');
+      if (step === 2) targetEl = document.querySelector('[data-tid="99"]');
+      if (step === 3) targetEl = document.querySelector('.dp-accept-offer');
+
+      if (targetEl) {
+        tutRing(targetEl);
+        tutPopupNear(targetEl, html);
+      }
+    }
+
+    function tutHide() {
+      if (tutPopupEl) tutPopupEl.className = 'tut-popup tut-hide';
+      if (tutRingEl)  tutRingEl.classList.remove('show');
+      if (tutHandEl)  tutHandEl.classList.remove('show');
+    }
+
+    function tutShowSuccess() {
+      var screen = document.querySelector('.demo-screen');
+      if (!screen) return;
+      var el = document.createElement('div');
+      el.className = 'tut-success';
+      el.innerHTML =
+        '<div class="tut-success-emoji">🎉</div>' +
+        '<div class="tut-success-title">Brigáda domluvena!</div>' +
+        '<div class="tut-success-sub">Makej! propojil tě se zaměstnavatelem za méně než minutu.</div>' +
+        '<div class="tut-success-divider"></div>' +
+        '<button class="tut-success-restart" id="tut-restart">Zkusit znovu →</button>';
+      screen.appendChild(el);
+      var rb = el.querySelector('#tut-restart');
+      if (rb) rb.addEventListener('click', function() { location.reload(); });
+    }
+    // ────────────────────────────────────────────────────────
+
+    function renderCard() {
+      var area = $('dp-cards-area');
+      if (!area) return;
+      if (jobIdx >= JOBS.length) {
+        area.innerHTML = '<div class="dp-empty"><div class="dp-empty-icon">✅</div><strong>Všechny nabídky prohlédnuty!</strong><div>Obnov stránku pro reset.</div></div>';
+        return;
+      }
+      var j = JOBS[jobIdx];
+      var card = document.createElement('div');
+      card.className = 'dp-job-card';
+      card.id = 'dp-card';
+      card.style.background = j.grad;
+      card.innerHTML =
+        '<div class="dp-card-overlay"></div>' +
+        '<div class="dp-stamp dp-stamp-like">SUPER ✓</div>' +
+        '<div class="dp-stamp dp-stamp-nope">NOPE ✕</div>' +
+        '<div class="dp-card-content">' +
+          '<div class="dp-card-tags">' +
+            '<span class="dp-card-tag dp-tag-type">' + j.type + '</span>' +
+            j.tags.map(function(t){ return '<span class="dp-card-tag">'+t+'</span>'; }).join('') +
+          '</div>' +
+          '<div class="dp-card-title-row">' +
+            '<div>' +
+              '<div class="dp-card-title">' + j.title + '</div>' +
+              '<div class="dp-card-company">@ ' + j.company + '</div>' +
+            '</div>' +
+            '<div class="dp-card-pay-col">' +
+              '<span class="dp-card-pay-num">' + j.pay + '</span>' +
+              '<span class="dp-card-pay-unit">' + j.payUnit + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="dp-card-infos">' +
+            '<div class="dp-info-pill">' +
+              '<span class="dp-info-icon">📍</span>' +
+              '<div><div class="dp-info-main">' + j.location + '</div><div class="dp-info-sub">' + j.distance + '</div></div>' +
+            '</div>' +
+            '<div class="dp-info-pill">' +
+              '<span class="dp-info-icon">📅</span>' +
+              '<div><div class="dp-info-main">' + j.date + '</div><div class="dp-info-sub">' + j.time + '</div></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="dp-card-btns">' +
+          '<button class="dp-reject-btn" id="dp-reject-btn"><iconify-icon icon="solar:close-circle-bold" width="56"></iconify-icon></button>' +
+          '<button class="dp-heart-btn" id="dp-heart-btn"><iconify-icon icon="solar:check-circle-bold" width="56"></iconify-icon></button>' +
+        '</div>';
+
+      card.addEventListener('mousedown', dragStart);
+      card.addEventListener('touchstart', dragStart, { passive: true });
+      area.innerHTML = '';
+      area.appendChild(card);
+
+      var rb = card.querySelector('#dp-reject-btn'), hb = card.querySelector('#dp-heart-btn');
+      if (rb) rb.addEventListener('click', function(e){ e.stopPropagation(); doSwipe('left'); });
+      if (hb) hb.addEventListener('click', function(e){ e.stopPropagation(); doSwipe('right'); });
+
+      // Tutorial step 0: pulse the heart button + auto-demo the swipe on the card
+      if (tutStep === 0 && hb) hb.classList.add('tut-pulse');
+      if (tutStep === 0 && tutEnabled) card.classList.add('dp-card-demo-swipe');
+    }
+
+    function dragStart(e) {
+      if (e.target && (e.target.id === 'dp-reject-btn' || e.target.id === 'dp-heart-btn')) return;
+      var card = $('dp-card');
+      if (!card) return;
+      // Remove pulse + stop auto-demo when user starts dragging
+      var hb = card.querySelector('.dp-heart-btn');
+      if (hb) hb.classList.remove('tut-pulse');
+      card.classList.remove('dp-card-demo-swipe');
+      drag.on = true; drag.el = card;
+      drag.startX = (e.touches ? e.touches[0].clientX : e.clientX);
+      drag.dx = 0;
+      card.style.transition = 'none';
+      document.addEventListener('mousemove', dragMove);
+      document.addEventListener('mouseup', dragEnd);
+      document.addEventListener('touchmove', dragMove, { passive: false });
+      document.addEventListener('touchend', dragEnd);
+    }
+
+    function dragMove(e) {
+      if (!drag.on || !drag.el) return;
+      if (e.cancelable) e.preventDefault();
+      var cx = e.touches ? e.touches[0].clientX : e.clientX;
+      drag.dx = cx - drag.startX;
+      var rot = drag.dx * 0.07;
+      drag.el.style.transform = 'translateX(' + drag.dx + 'px) rotate(' + rot + 'deg)';
+      var like = drag.el.querySelector('.dp-stamp-like');
+      var nope = drag.el.querySelector('.dp-stamp-nope');
+      if (drag.dx > 20)       { like.style.opacity = Math.min((drag.dx-20)/60,1); nope.style.opacity = 0; }
+      else if (drag.dx < -20) { nope.style.opacity = Math.min((-drag.dx-20)/60,1); like.style.opacity = 0; }
+      else                    { like.style.opacity = 0; nope.style.opacity = 0; }
+    }
+
+    function dragEnd() {
+      document.removeEventListener('mousemove', dragMove);
+      document.removeEventListener('mouseup', dragEnd);
+      document.removeEventListener('touchmove', dragMove);
+      document.removeEventListener('touchend', dragEnd);
+      if (!drag.on) return;
+      drag.on = false;
+      if (!drag.el) return;
+      if (drag.dx > 70)       doSwipe('right');
+      else if (drag.dx < -70) doSwipe('left');
+      else {
+        drag.el.style.transition = 'transform .3s cubic-bezier(.23,1,.32,1)';
+        drag.el.style.transform = 'none';
+        var like = drag.el.querySelector('.dp-stamp-like'), nope = drag.el.querySelector('.dp-stamp-nope');
+        if (like) like.style.opacity = 0;
+        if (nope) nope.style.opacity = 0;
+      }
+    }
+
+    function doSwipe(dir) {
+      var card = $('dp-card');
+      if (!card) return;
+      // Remove pulse + stop auto-demo before animating
+      var hb = card.querySelector('.dp-heart-btn');
+      if (hb) hb.classList.remove('tut-pulse');
+      card.classList.remove('dp-card-demo-swipe');
+      var tx = dir === 'right' ? 380 : -380;
+      card.style.transition = 'transform .32s ease';
+      card.style.transform = 'translateX(' + tx + 'px) rotate(' + (dir==='right'?22:-22) + 'deg)';
+      var stamp = card.querySelector(dir==='right' ? '.dp-stamp-like' : '.dp-stamp-nope');
+      if (stamp) stamp.style.opacity = '1';
+      setTimeout(function() {
+        jobIdx++;
+        renderCard();
+        // Tutorial: swipe right at step 0 → (re-)enable and advance to match notification
+        if (tutStep === 0 && dir === 'right') {
+          tutEnabled = true; // re-enable if user had previously skipped
+          if (!tutThreadAdded) {
+            tutThreadAdded = true;
+            threads.unshift({
+              id:99, company:'Kavárna Zlatý Jelen', job:'Barista', initials:'KZ',
+              color:'#0020f6', unread:true,
+              msgs: TUT_THREAD.msgs.map(function(m){ return { from:m.from, text:m.text }; })
+            });
+          }
+          setTimeout(function() {
+            if (!tutEnabled) return; // user navigated away during the 900ms window
+            tutShow(1);
+            if (tutBadgeEl) tutBadgeEl.classList.add('show');
+          }, 900);
+        }
+      }, 320);
+    }
+
+    function renderThreads() {
+      var list = $('dp-threads-list');
+      if (!list) return;
+      list.innerHTML = threads.map(function(t) {
+        var last = t.msgs[t.msgs.length-1];
+        return '<div class="dp-thread-item" data-tid="'+t.id+'">' +
+          '<div class="dp-thread-avatar" style="background:'+t.color+'">'+t.initials+'</div>' +
+          '<div class="dp-thread-body">' +
+            '<div class="dp-thread-name">'+t.company+'</div>' +
+            '<div class="dp-thread-job">'+t.job+'</div>' +
+            '<div class="dp-thread-preview">'+(last?last.text:'')+'</div>' +
+          '</div>' +
+          '<div class="dp-thread-meta">' +
+            '<div class="dp-thread-time">Dnes</div>' +
+            (t.unread ? '<div class="dp-thread-dot"></div>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('');
+      list.querySelectorAll('.dp-thread-item').forEach(function(item) {
+        item.addEventListener('click', function() { openThread(parseInt(item.getAttribute('data-tid'))); });
+        // Highlight tutorial thread when at step 2
+        // (ring in tutShow handles highlight for step 2)
+      });
+    }
+
+    function openThread(id) {
+      openThreadId = id;
+      var t = threads.find(function(t){ return t.id===id; });
+      if (!t) return;
+      t.unread = false;
+      var cn = $('dp-chat-name'), cj = $('dp-chat-subjob');
+      if (cn) cn.textContent = t.company;
+      if (cj) cj.textContent = t.job;
+      renderMsgs(t);
+      showPanel('chat');
+      renderThreads();
+      // Tutorial: opening any thread at step 2 → show step 3
+      if (tutEnabled && tutStep === 2) {
+        setTimeout(function() { tutShow(3); }, 250);
+      }
+    }
+
+    function renderMsgs(t) {
+      var box = $('dp-chat-msgs');
+      if (!box) return;
+      box.innerHTML = t.msgs.map(function(m) {
+        return '<div class="dp-msg '+(m.from==='me'?'from-me':'from-them')+'">'+m.text+'</div>';
+      }).join('');
+      // Tutorial thread: inject accept offer card
+      if (t.id === 99 && tutStep >= 2 && tutEnabled) {
+        var offer = document.createElement('div');
+        offer.className = 'dp-accept-offer';
+        offer.innerHTML =
+          '<div class="dp-accept-offer-label">Nabídka směny</div>' +
+          '<button class="dp-accept-btn tut-glow" id="tut-accept-btn">✓ Přijmout nabídku</button>';
+        box.appendChild(offer);
+        var abtn = offer.querySelector('#tut-accept-btn');
+        if (abtn) abtn.addEventListener('click', function() {
+          if (tutEnabled && tutStep < 4) {
+            // Add acceptance message from me
+            t.msgs.push({ from:'me', text:'Super, přijímám! Těším se na spolupráci. 🙌' });
+            abtn.disabled = true;
+            abtn.textContent = '✓ Přijato!';
+            abtn.classList.remove('tut-glow');
+            abtn.style.background = 'rgba(41,41,120,.3)';
+            setTimeout(function() {
+              tutShow(4);
+            }, 800);
+          }
+        });
+      }
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function sendMsg() {
+      var inp = $('dp-chat-input');
+      if (!inp || !inp.value.trim()) return;
+      var t = threads.find(function(t){ return t.id===openThreadId; });
+      if (!t) return;
+      t.msgs.push({ from:'me', text: inp.value.trim() });
+      inp.value = '';
+      renderMsgs(t);
+      renderThreads();
+    }
+
+    function renderProfile() {
+      var el = $('dp-profile-scroll');
+      if (!el) return;
+      el.innerHTML =
+        '<div class="dp-prof-avatar-wrap">' +
+          '<div class="dp-prof-avatar">TN</div>' +
+          '<div class="dp-prof-name">Tomáš Novák</div>' +
+          '<div class="dp-prof-sub">Praha · Student · 22 let</div>' +
+          '<div class="dp-prof-stars">★★★★★ <span style="color:rgba(208,208,255,.45);font-size:.73rem">4.8</span></div>' +
+        '</div>' +
+        '<div class="dp-prof-stats">' +
+          '<div class="dp-prof-stat"><div class="dp-prof-stat-val">12</div><div class="dp-prof-stat-lbl">Brigád</div></div>' +
+          '<div class="dp-prof-stat"><div class="dp-prof-stat-val">4.8</div><div class="dp-prof-stat-lbl">Hodnocení</div></div>' +
+          '<div class="dp-prof-stat"><div class="dp-prof-stat-val">3</div><div class="dp-prof-stat-lbl">Matche</div></div>' +
+        '</div>' +
+        '<div class="dp-prof-sec-title">Dovednosti</div>' +
+        '<div class="dp-skills">' +
+          ['Gastro','Čeština','Angličtina','Fyzická práce','Flexibilní','Praha'].map(function(s){ return '<span class="dp-skill">'+s+'</span>'; }).join('') +
+        '</div>';
+    }
+
+    function init() {
+      renderCard();
+      renderThreads();
+      renderProfile();
+
+      var back = $('dp-chat-back');
+      if (back) back.addEventListener('click', function(){ showPanel('messages'); });
+
+      var send = $('dp-chat-send'), inp = $('dp-chat-input');
+      if (send) send.addEventListener('click', sendMsg);
+      if (inp) inp.addEventListener('keydown', function(e){ if (e.key==='Enter') sendMsg(); });
+
+      document.querySelectorAll('.demo-nav-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(){ showPanel(btn.getAttribute('data-panel')); });
+      });
+
+      tutInit();
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
+
+  <script>
+    (function() {
+      var navbar = document.getElementById('navbar');
+      var blueSection = document.querySelector('.sup-cards-wrap');
+      if (!navbar) return;
+      function updatePodrNav() {
+        var onBlue = blueSection && blueSection.getBoundingClientRect().top <= 70;
+        navbar.classList.toggle('pnav-blue', !!onBlue);
+        navbar.classList.toggle('pnav-white', !onBlue);
+      }
+      window.addEventListener('scroll', updatePodrNav, { passive: true });
+      updatePodrNav();
+    })();
+  </script>
 </body>
-</html>

@@ -147,7 +147,7 @@ img { max-width: 100%; display: block; }
 /* Animated gradient wash — landing-page hero background (our palette) */
 .hero-bg-particles {
   position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background: linear-gradient(120deg, #0020f6, #16268c, #2433a0, #0d1040, #0020f6);
+  background: linear-gradient(120deg, #0020f6, #0040ff, #0010cc, #0030ee, #0020f6);
   background-size: 300% 300%;
   animation: hero-wash 14s ease infinite;
 }
