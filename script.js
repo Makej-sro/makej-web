@@ -657,3 +657,79 @@ function showToast(msg) {
   });
 })();
 
+
+/* ═══════════ MAKÁČI CAROUSEL ═══════════ */
+(function () {
+  var N = 8;
+  var center = 2; // Makač basic starts in center
+  var wrappers = Array.from(document.querySelectorAll('.makac-wrap[data-makac]'));
+  var dots = Array.from(document.querySelectorAll('.makaci-dot[data-dot]'));
+  var timer;
+
+  if (!wrappers.length) return;
+
+  function getPos(i) {
+    var diff = ((i - center) % N + N) % N;
+    if (diff > 2) diff -= N;
+    return diff;
+  }
+
+  function update() {
+    wrappers.forEach(function (el, i) {
+      var oldPos = parseInt(el.getAttribute('data-pos') || '99');
+      var newPos = getPos(i);
+
+      // Both off-screen — teleport instantly to avoid cross-screen animation
+      if (Math.abs(oldPos) >= 2 && Math.abs(newPos) >= 2 && oldPos !== newPos) {
+        el.classList.add('no-transition');
+        el.setAttribute('data-pos', newPos);
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            el.classList.remove('no-transition');
+          });
+        });
+      } else {
+        el.setAttribute('data-pos', newPos);
+      }
+    });
+
+    dots.forEach(function (d) {
+      d.classList.toggle('active', parseInt(d.getAttribute('data-dot')) === center);
+    });
+  }
+
+  function rotate() {
+    center = (center + 1) % N;
+    update();
+  }
+
+  function startTimer() {
+    clearInterval(timer);
+    timer = setInterval(rotate, 5000);
+  }
+
+  // Click dot to jump to character
+  dots.forEach(function (d) {
+    d.addEventListener('click', function () {
+      center = parseInt(d.getAttribute('data-dot'));
+      update();
+      startTimer();
+    });
+  });
+
+  // Click side characters to bring them to center
+  wrappers.forEach(function (el) {
+    el.addEventListener('click', function () {
+      var pos = parseInt(el.getAttribute('data-pos') || '0');
+      if (pos !== 0) {
+        center = (center + pos + N) % N;
+        update();
+        startTimer();
+      }
+    });
+  });
+
+  update();
+  startTimer();
+})();
+
