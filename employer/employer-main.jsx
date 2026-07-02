@@ -389,9 +389,152 @@ function EToast({ toasts, onRemove }) {
   );
 }
 
+// ── Plný profil brigádníka: reálná data + recenze (žádný mock) ──
+function EWorkerProfileModal({ workerId, fallback, onClose }) {
+  const [p, setP]       = useStateE(fallback || null);
+  const [reviews, setR] = useStateE(null);   // null = načítá se
+  const [loading, setL] = useStateE(true);
+
+  useEffectE(() => {
+    if (!workerId) return;
+    let alive = true;
+    (async () => {
+      const [profRes, revRes] = await Promise.all([
+        sb.from('profiles').select('*').eq('id', workerId).single(),
+        sb.from('reviews')
+          .select('*, reviewer:profiles!reviews_reviewer_id_fkey(name, company_name)')
+          .eq('reviewed_id', workerId)
+          .order('created_at', { ascending: false }),
+      ]);
+      if (!alive) return;
+      if (profRes.data) setP(profRes.data);
+      setR(revRes.data || []);
+      setL(false);
+    })();
+    return () => { alive = false; };
+  }, [workerId]);
+
+  const name    = p?.name || 'Kandidát';
+  const initials = name.split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase() || '??';
+  const skills  = Array.isArray(p?.skills) ? p.skills : [];
+  const rating  = Number(p?.rating || 0);
+  const card    = { background: 'rgba(22,22,59,0.5)', border: '1px solid ' + T.border, borderRadius: 12, padding: 14 };
+  const secTitle = { color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 };
+
+  function stars(n) {
+    return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
+  }
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: '#101028', border: '1px solid ' + T.border, borderRadius: 20,
+        width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto',
+        animation: 'empPop .3s cubic-bezier(.2,.8,.2,1)',
+      }}>
+        {/* Header */}
+        <div style={{ padding: '22px 24px', borderBottom: '1px solid ' + T.border, display: 'flex', gap: 16, alignItems: 'center' }}>
+          <div style={{ width: 64, height: 64, borderRadius: 999, background: _strColor(workerId || name), display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 24, flexShrink: 0, overflow: 'hidden' }}>
+            {p?.avatar_url ? <img src={p.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 22, fontWeight: 800 }}>{name}</span>
+              {p?.verified && <Icon name="verified-check-bold" size={18} color="#5B6BFF" />}
+            </div>
+            <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12.5, marginTop: 3 }}>
+              {[p?.address, p?.level ? 'Makač L' + p.level : null].filter(Boolean).join(' · ') || 'Brigádník'}
+            </div>
+          </div>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.muted, cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0 }}>✕</button>
+        </div>
+
+        <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* Reálné statistiky */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+            {[
+              { l: 'Hodnocení', v: rating > 0 ? rating.toFixed(1) + '★' : '–', c: '#FFD166' },
+              { l: 'Brigád', v: p?.jobs_done || 0, c: '#5B6BFF' },
+              { l: 'Hodin', v: p?.hours_logged || 0, c: '#5BD68A' },
+              { l: 'Vyděláno', v: (Number(p?.total_earned || 0)).toLocaleString('cs-CZ') + ' Kč', c: '#8AB4FF' },
+            ].map((s, i) => (
+              <div key={i} style={{ ...card, textAlign: 'center', padding: 12 }}>
+                <div style={{ color: s.c, fontFamily: T.fontMono, fontSize: 16, fontWeight: 700 }}>{s.v}</div>
+                <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 9.5, marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.5 }}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* O kandidátovi */}
+          {p?.bio && (
+            <div><div style={secTitle}>O kandidátovi</div>
+              <div style={{ color: T.light, fontSize: 13, fontFamily: T.fontUI, lineHeight: 1.6, whiteSpace: 'pre-line' }}>{p.bio}</div>
+            </div>
+          )}
+
+          {/* Vzdělání */}
+          {p?.education && (
+            <div><div style={secTitle}>Vzdělání</div>
+              <div style={{ color: T.light, fontSize: 13, fontFamily: T.fontUI }}>{p.education}</div>
+            </div>
+          )}
+
+          {/* Dovednosti */}
+          <div><div style={secTitle}>Dovednosti</div>
+            {skills.length ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {skills.map((t, i) => (
+                  <span key={i} style={{ padding: '5px 11px', borderRadius: 7, background: 'rgba(91,107,255,0.12)', border: '1px solid rgba(91,107,255,0.25)', color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600 }}>{t}</span>
+                ))}
+              </div>
+            ) : <div style={{ color: T.mutedSoft, fontSize: 12.5, fontFamily: T.fontUI, fontStyle: 'italic' }}>Brigádník zatím neuvedl žádné dovednosti.</div>}
+          </div>
+
+          {/* Životopis */}
+          <div><div style={secTitle}>Životopis</div>
+            {p?.cv_url ? (
+              <a href={p.cv_url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 14px', borderRadius: 9, background: 'rgba(91,107,255,0.14)', border: '1px solid rgba(91,107,255,0.3)', color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}>
+                <Icon name="document-text-bold" size={14} color="#fff" />Otevřít životopis
+              </a>
+            ) : <div style={{ color: T.mutedSoft, fontSize: 12.5, fontFamily: T.fontUI, fontStyle: 'italic' }}>Brigádník nenahrál životopis.</div>}
+          </div>
+
+          {/* Recenze z minulých brigád */}
+          <div><div style={secTitle}>Recenze z minulých brigád</div>
+            {reviews === null ? (
+              <div style={{ color: T.mutedSoft, fontSize: 12.5, fontFamily: T.fontUI }}>Načítám recenze…</div>
+            ) : reviews.length === 0 ? (
+              <div style={{ ...card, color: T.mutedSoft, fontSize: 12.5, fontFamily: T.fontUI, fontStyle: 'italic', textAlign: 'center', padding: 18 }}>
+                Brigádník zatím nemá žádné recenze.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {reviews.map((r, i) => (
+                  <div key={i} style={card}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700 }}>{r.reviewer?.company_name || r.reviewer?.name || 'Firma'}</span>
+                      <span style={{ color: '#FFD166', fontSize: 13, letterSpacing: 1 }}>{stars(Number(r.rating) || 0)}</span>
+                    </div>
+                    {r.text && <div style={{ color: T.light, fontSize: 12.5, fontFamily: T.fontUI, lineHeight: 1.55 }}>{r.text}</div>}
+                    <div style={{ color: T.mutedSoft, fontSize: 11, fontFamily: T.fontUI, marginTop: 6 }}>{_relTime(r.created_at)}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function EmployerApp() {
   const [tab,       setTab]       = useStateE('dash');
-  if (typeof window !== 'undefined') window.empGoTab = setTab;  // bridge pro navigaci z child komponent
+  const [profileWorker, setProfileWorker] = useStateE(null);
+  if (typeof window !== 'undefined') {
+    window.empGoTab = setTab;  // bridge pro navigaci z child komponent
+    window.empOpenProfile = (workerId, fallback) => setProfileWorker({ workerId, fallback });
+  }
   const [loaded,    setLoaded]    = useStateE(false);
   const [tick,      setTick]      = useStateE(0);
   const [showNewJob, setShowNewJob] = useStateE(false);
@@ -524,6 +667,14 @@ function EmployerApp() {
             await fetchEmployerData(empId.current);
             setTick(t => t + 1);
           }}
+        />
+      )}
+
+      {profileWorker && (
+        <EWorkerProfileModal
+          workerId={profileWorker.workerId}
+          fallback={profileWorker.fallback}
+          onClose={() => setProfileWorker(null)}
         />
       )}
 

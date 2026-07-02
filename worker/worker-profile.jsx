@@ -3,7 +3,8 @@
 function WProfile({ tick, onSignOut }) {
   const [editing, setEditing] = useStateW(false);
   const [saving,  setSaving]  = useStateW(false);
-  const [form,    setForm]    = useStateW({ name: '', bio: '' });
+  const [form,    setForm]    = useStateW({ name: '', bio: '', skills: [], education: '', cv_url: '' });
+  const [skillInput, setSkillInput] = useStateW('');
   const [userId,  setUserId]  = useStateW(null);
 
   useEffectW(() => {
@@ -16,13 +17,30 @@ function WProfile({ tick, onSignOut }) {
     setForm({
       name: W_PROFILE.name || W_PROFILE.full_name || '',
       bio:  W_PROFILE.bio  || '',
+      skills: Array.isArray(W_PROFILE.skills) ? [...W_PROFILE.skills] : [],
+      education: W_PROFILE.education || '',
+      cv_url: W_PROFILE.cv_url || '',
     });
   }, [tick]);
+
+  function addSkill() {
+    const s = skillInput.trim();
+    if (!s || form.skills.includes(s)) { setSkillInput(''); return; }
+    setForm(f => ({ ...f, skills: [...f.skills, s] }));
+    setSkillInput('');
+  }
+  function removeSkill(idx) {
+    setForm(f => ({ ...f, skills: f.skills.filter((_, i) => i !== idx) }));
+  }
 
   async function handleSave() {
     if (!userId || saving) return;
     setSaving(true);
-    await updateProfileW(userId, { name: form.name, bio: form.bio });
+    await updateProfileW(userId, {
+      name: form.name, bio: form.bio,
+      skills: form.skills, education: form.education.trim(),
+      cv_url: form.cv_url.trim(),
+    });
     setSaving(false);
     setEditing(false);
   }
@@ -32,11 +50,13 @@ function WProfile({ tick, onSignOut }) {
   const bio     = W_PROFILE.bio   || '';
   const initials = name.split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase() || '?';
 
-  const skills  = Array.isArray(W_PROFILE.skills) ? W_PROFILE.skills : [];
+  const skills    = Array.isArray(W_PROFILE.skills) ? W_PROFILE.skills : [];
+  const education = W_PROFILE.education || '';
+  const cvUrl     = W_PROFILE.cv_url || '';
   const rating  = W_PROFILE.rating  || 0;
   const jobs    = W_PROFILE.jobs_done || 0;
-  const hours   = W_PROFILE.hours_total || 0;
-  const earned  = W_PROFILE.earned_total || 0;
+  const hours   = W_PROFILE.hours_logged || 0;
+  const earned  = W_PROFILE.total_earned || 0;
 
   const STATS = [
     { label: 'Hodnocení', value: rating > 0 ? rating.toFixed(1) + ' ★' : '—', icon: 'star-bold', color: T.super },
@@ -149,23 +169,91 @@ function WProfile({ tick, onSignOut }) {
       </div>
 
       {/* Skills */}
-      {(skills.length > 0 || editing) && (
-        <div style={{ padding: '0 20px 16px' }}>
-          <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Dovednosti</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {skills.map((sk, i) => (
-              <span key={i} style={{
-                padding: '5px 11px', borderRadius: 999,
-                background: 'rgba(91,107,255,0.12)', border: '1px solid rgba(91,107,255,0.25)',
-                color: T.light, fontFamily: T.fontUI, fontSize: 11, fontWeight: 600,
-              }}>{sk}</span>
-            ))}
-            {skills.length === 0 && (
-              <span style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12 }}>Žádné dovednosti zatím</span>
-            )}
+      <div style={{ padding: '0 20px 16px' }}>
+        <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Dovednosti</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: editing ? 10 : 0 }}>
+          {(editing ? form.skills : skills).map((sk, i) => (
+            <span key={i} style={{
+              padding: '5px 11px', borderRadius: 999,
+              background: 'rgba(91,107,255,0.12)', border: '1px solid rgba(91,107,255,0.25)',
+              color: T.light, fontFamily: T.fontUI, fontSize: 11, fontWeight: 600,
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+            }}>{sk}
+              {editing && <span onClick={() => removeSkill(i)} style={{ cursor: 'pointer', color: '#f43f5e', fontWeight: 800, lineHeight: 1 }}>×</span>}
+            </span>
+          ))}
+          {!editing && skills.length === 0 && (
+            <span style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12 }}>Zatím žádné dovednosti. Klikni „Upravit" a přidej je.</span>
+          )}
+        </div>
+        {editing && (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              value={skillInput}
+              onChange={e => setSkillInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } }}
+              placeholder="Např. Pokladna, Latte art…"
+              style={{
+                flex: 1, padding: '9px 12px', borderRadius: 9,
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(91,107,255,0.4)',
+                color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, outline: 'none',
+              }}
+            />
+            <button onClick={addSkill} style={{
+              padding: '9px 16px', borderRadius: 9,
+              background: 'rgba(91,107,255,0.2)', border: '1px solid rgba(91,107,255,0.4)',
+              color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', flexShrink: 0,
+            }}>Přidat</button>
           </div>
+        )}
+      </div>
+
+      {/* Vzdělání */}
+      {(editing || education) && (
+        <div style={{ padding: '0 20px 16px' }}>
+          <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Vzdělání</div>
+          {editing ? (
+            <input
+              value={form.education}
+              onChange={e => setForm(f => ({ ...f, education: e.target.value }))}
+              placeholder="Např. SŠ / VŠ — obor, ročník…"
+              style={{
+                width: '100%', padding: '10px 12px', borderRadius: 10,
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(91,107,255,0.4)',
+                color: '#fff', fontFamily: T.fontUI, fontSize: 13, outline: 'none',
+              }}
+            />
+          ) : (
+            <div style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, color: '#fff', fontFamily: T.fontUI, fontSize: 13 }}>{education}</div>
+          )}
         </div>
       )}
+
+      {/* Životopis (CV) — nepovinné */}
+      <div style={{ padding: '0 20px 16px' }}>
+        <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Životopis <span style={{ color: T.mutedSoft, fontWeight: 500, textTransform: 'none', letterSpacing: 0 }}>· nepovinné</span></div>
+        {editing ? (
+          <>
+            <input
+              value={form.cv_url}
+              onChange={e => setForm(f => ({ ...f, cv_url: e.target.value }))}
+              placeholder="Odkaz na životopis (PDF / Disk / LinkedIn)…"
+              style={{
+                width: '100%', padding: '10px 12px', borderRadius: 10,
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(91,107,255,0.4)',
+                color: '#fff', fontFamily: T.fontUI, fontSize: 13, outline: 'none',
+              }}
+            />
+            <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 11, marginTop: 6, lineHeight: 1.4 }}>Vlož veřejný odkaz na svůj životopis. Je to dobrovolné — zaměstnavatel ho uvidí u tvého profilu.</div>
+          </>
+        ) : cvUrl ? (
+          <a href={cvUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 14px', borderRadius: 10, background: 'rgba(91,107,255,0.14)', border: '1px solid rgba(91,107,255,0.3)', color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+            <Icon name="document-text-bold" size={15} color="#fff" />Můj životopis
+          </a>
+        ) : (
+          <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12.5, fontStyle: 'italic' }}>Zatím nenahraný. Klikni „Upravit" a přidej odkaz (nepovinné).</div>
+        )}
+      </div>
 
       {/* Save button (only in edit mode) */}
       {editing && (

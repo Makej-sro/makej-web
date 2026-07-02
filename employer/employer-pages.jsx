@@ -378,10 +378,10 @@ function CandidateDrawer({ c, onClose, onAccepted }) {
           <div style={{ width: 72, height: 72, borderRadius: 999, background: c.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 26 }}>{c.avatar}</div>
           <div style={{ flex: 1 }}>
             <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 20, fontWeight: 800 }}>{c.name}</div>
-            <div style={{ color: T.muted, fontSize: 12, fontFamily: T.fontUI, marginTop: 2 }}>{c.age} let · Brno · {c.distance} km</div>
+            <div style={{ color: T.muted, fontSize: 12, fontFamily: T.fontUI, marginTop: 2 }}>{[c.city, c.jobTitle ? 'reaguje na: ' + c.jobTitle : null].filter(Boolean).join(' · ') || 'Brigádník'}</div>
             <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
-              <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,214,138,0.2)', color: '#5BD68A', fontFamily: T.fontMono, fontSize: 11, fontWeight: 800 }}>{c.match}% match</span>
               <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,107,255,0.2)', color: '#5B6BFF', fontFamily: T.fontMono, fontSize: 11, fontWeight: 800 }}>Makač L{c.level}</span>
+              {c.verified && <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,214,138,0.2)', color: '#5BD68A', fontFamily: T.fontMono, fontSize: 11, fontWeight: 800 }}>Ověřený</span>}
             </div>
           </div>
         </div>
@@ -389,9 +389,9 @@ function CandidateDrawer({ c, onClose, onAccepted }) {
         {/* Stats grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
           {[
-            { l: 'Hodnocení', v: c.rating + '★', c: '#FFD166' },
+            { l: 'Hodnocení', v: Number(c.rating) > 0 ? c.rating + '★' : '–', c: '#FFD166' },
             { l: 'Brigád', v: c.jobsDone, c: '#5B6BFF' },
-            { l: 'Spolehlivost', v: '98%', c: '#5BD68A' },
+            { l: 'Hodin', v: c.hoursLogged || 0, c: '#5BD68A' },
           ].map((s, i) => (
             <div key={i} style={{ padding: 12, borderRadius: 10, background: 'rgba(22,22,59,0.6)', border: '1px solid ' + T.border, textAlign: 'center' }}>
               <div style={{ color: s.c, fontFamily: T.fontMono, fontSize: 18, fontWeight: 700 }}>{s.v}</div>
@@ -400,54 +400,40 @@ function CandidateDrawer({ c, onClose, onAccepted }) {
           ))}
         </div>
 
-        {/* Why match */}
-        <div>
-          <div style={{ color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 }}>Proč je to dobrý match</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {[
-              { i: 'check-circle-bold', t: 'Má 23 brigád v gastru s hodnocením 4.9★', c: '#5BD68A' },
-              { i: 'check-circle-bold', t: 'Bydlí 1.2 km od vaší kavárny', c: '#5BD68A' },
-              { i: 'check-circle-bold', t: 'Volný v požadovaných slotech (Po-Pá ráno)', c: '#5BD68A' },
-              { i: 'info-circle-bold', t: 'Maturuje na jaře — preferuje odpolední směny', c: '#FFD166' },
-            ].map((x, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.03)' }}>
-                <Icon name={x.i} size={14} color={x.c}/>
-                <span style={{ color: T.light, fontSize: 12, fontFamily: T.fontUI }}>{x.t}</span>
-              </div>
-            ))}
+        {/* O kandidátovi */}
+        {c.bio && (
+          <div>
+            <div style={{ color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 }}>O kandidátovi</div>
+            <div style={{ color: T.light, fontSize: 12.5, fontFamily: T.fontUI, lineHeight: 1.6, whiteSpace: 'pre-line' }}>{c.bio}</div>
           </div>
-        </div>
+        )}
 
-        {/* Skills */}
+        {/* Vzdělání */}
+        {c.education && (
+          <div>
+            <div style={{ color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 }}>Vzdělání</div>
+            <div style={{ color: T.light, fontSize: 12.5, fontFamily: T.fontUI }}>{c.education}</div>
+          </div>
+        )}
+
+        {/* Skills — jen reálné */}
         <div>
           <div style={{ color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 }}>Dovednosti</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-            {[...c.tags, 'Pokladna', 'AJ B2', 'Týmovost'].map((t, i) => (
-              <span key={i} style={{ padding: '5px 10px', borderRadius: 7, background: 'rgba(91,107,255,0.12)', border: '1px solid rgba(91,107,255,0.25)', color: T.light, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600 }}>{t}</span>
-            ))}
-          </div>
+          {c.tags && c.tags.length ? (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+              {c.tags.map((t, i) => (
+                <span key={i} style={{ padding: '5px 10px', borderRadius: 7, background: 'rgba(91,107,255,0.12)', border: '1px solid rgba(91,107,255,0.25)', color: T.light, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600 }}>{t}</span>
+              ))}
+            </div>
+          ) : <div style={{ color: T.mutedSoft, fontSize: 12, fontFamily: T.fontUI, fontStyle: 'italic' }}>Zatím neuvedl žádné dovednosti.</div>}
         </div>
 
-        {/* Reliability radar-ish bars */}
-        <div>
-          <div style={{ color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 }}>Profil spolehlivosti</div>
-          {[
-            { l: 'Dochvilnost', v: 98 },
-            { l: 'Komunikace', v: 92 },
-            { l: 'Stálost', v: 88 },
-            { l: 'Recenze od firem', v: 96 },
-          ].map((r, i) => (
-            <div key={i} style={{ marginBottom: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontFamily: T.fontUI, marginBottom: 3 }}>
-                <span style={{ color: T.light }}>{r.l}</span>
-                <span style={{ color: '#fff', fontFamily: T.fontMono, fontWeight: 700 }}>{r.v}%</span>
-              </div>
-              <div style={{ height: 5, borderRadius: 3, background: 'rgba(0,0,0,0.3)', overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: r.v + '%', background: 'linear-gradient(90deg, #5BD68A, #5BD68Aaa)' }} />
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Plný profil + recenze */}
+        <button onClick={() => window.empOpenProfile && window.empOpenProfile(c.worker_id, { name: c.name, address: c.city, level: c.level, jobs_done: c.jobsDone, rating: c.rating, verified: c.verified })} style={{
+          padding: '11px 14px', borderRadius: 10, background: 'rgba(91,107,255,0.14)', border: '1px solid rgba(91,107,255,0.3)',
+          color: '#fff', cursor: 'pointer', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700,
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+        }}><Icon name="user-id-bold" size={14} color="#fff"/>Otevřít plný profil + recenze</button>
       </div>
 
       <div style={{ padding: 16, borderTop: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', gap: 8 }}>

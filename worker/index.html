@@ -97,6 +97,8 @@
       <input class="gate-input" type="text" id="reg-name" placeholder="Jméno a příjmení" autocomplete="name" />
       <input class="gate-input" type="email" id="reg-email" placeholder="tvuj@email.cz" autocomplete="email" />
       <input class="gate-input" type="password" id="reg-password" placeholder="Heslo (min. 6 znaků)" autocomplete="new-password" />
+      <input class="gate-input" type="url" id="reg-cv" placeholder="Odkaz na životopis (nepovinné)" autocomplete="off" />
+      <div style="font-size:11px;color:rgba(153,153,204,0.7);margin:-4px 2px 4px;line-height:1.4;">Životopis je dobrovolný — můžeš ho přidat teď nebo kdykoliv později v profilu.</div>
       <button class="gate-btn" id="reg-submit">Vytvořit účet brigádníka</button>
     </div>
 
@@ -165,11 +167,12 @@
     const name = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
-    if (!name || !email || !password) { showErr('Vyplň všechna pole.'); return; }
+    const cvUrl = document.getElementById('reg-cv').value.trim();
+    if (!name || !email || !password) { showErr('Vyplň jméno, email a heslo.'); return; }
     if (password.length < 6) { showErr('Heslo musí mít alespoň 6 znaků.'); return; }
     const btn = document.getElementById('reg-submit');
     btn.disabled = true; btn.textContent = 'Registruji...';
-    const { error } = await sb.auth.signUp({ email, password, options: { data: { name, role: 'worker' } } });
+    const { error } = await sb.auth.signUp({ email, password, options: { data: { name, role: 'worker', cv_url: cvUrl } } });
     if (error) { showErr(translateErr(error.message)); btn.disabled = false; btn.textContent = 'Vytvořit účet brigádníka'; return; }
     showErr('');
     gateError.style.display = 'block';
@@ -190,10 +193,10 @@
 </script>
 
 <script type="text/babel" src="../employer/app.jsx"></script>
-<script type="text/babel" src="worker-supabase.jsx"></script>
-<script type="text/babel" src="worker-swipe.jsx"></script>
-<script type="text/babel" src="worker-messages.jsx"></script>
-<script type="text/babel" src="worker-profile.jsx"></script>
-<script type="text/babel" src="worker-main.jsx"></script>
+<script type="text/babel" src="worker-supabase.jsx?v=2"></script>
+<script type="text/babel" src="worker-swipe.jsx?v=2"></script>
+<script type="text/babel" src="worker-messages.jsx?v=2"></script>
+<script type="text/babel" src="worker-profile.jsx?v=2"></script>
+<script type="text/babel" src="worker-main.jsx?v=2"></script>
 </body>
 </html>

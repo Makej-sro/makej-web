@@ -239,7 +239,7 @@ function EMessages() {
             <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 14, fontWeight: 700 }}>{thread.name}</div>
             <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI }}>{thread.role} · {thread.online ? <span style={{ color: '#5BD68A' }}>online</span> : 'offline'}</div>
           </div>
-          <button onClick={() => window.empToast && window.empToast('Profil kandidáta', 'Detail najdeš v panelu vpravo. Plný profil připravujeme.', '👤', 'info')} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(91,107,255,0.18)', border: '1px solid rgba(91,107,255,0.3)', color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl })} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(91,107,255,0.18)', border: '1px solid rgba(91,107,255,0.3)', color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <Icon name="user-id-bold" size={13} color="#fff"/>Profil
           </button>
           <button onClick={() => setShowShiftModal(true)} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -311,17 +311,16 @@ function EMessages() {
         <div style={{ textAlign: 'center', marginBottom: 14 }}>
           <div style={{ width: 64, height: 64, borderRadius: 999, background: thread.color, margin: '0 auto', display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 22 }}>{thread.avatar}</div>
           <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 15, fontWeight: 800, marginTop: 8 }}>{thread.name}</div>
-          <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, marginTop: 2 }}>22 let · Brno · 1.2 km</div>
+          <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, marginTop: 2 }}>{[thread.city, thread.role].filter(Boolean).join(' · ') || 'Brigádník'}</div>
           <div style={{ display: 'inline-flex', gap: 5, marginTop: 8 }}>
-            <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,214,138,0.2)', color: '#5BD68A', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 800 }}>96 % match</span>
-            <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,107,255,0.2)', color: '#5B6BFF', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 800 }}>L7</span>
+            <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,107,255,0.2)', color: '#5B6BFF', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 800 }}>L{thread.level || 1}</span>
+            {thread.verified && <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,214,138,0.2)', color: '#5BD68A', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 800 }}>Ověřený</span>}
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginBottom: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6, marginBottom: 14 }}>
           {[
-            { l: '★', v: '4.9' },
-            { l: 'brigád', v: '23' },
-            { l: 'odp.', v: '4 min' },
+            { l: 'hodnocení', v: Number(thread.rating) > 0 ? thread.rating + '★' : '–' },
+            { l: 'brigád', v: thread.jobsDone || 0 },
           ].map((s, i) => (
             <div key={i} style={{ padding: 8, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, textAlign: 'center' }}>
               <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 14, fontWeight: 700 }}>{s.v}</div>
@@ -329,20 +328,14 @@ function EMessages() {
             </div>
           ))}
         </div>
-        <div style={{ color: T.muted, fontSize: 10, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 6 }}>Sdílené dokumenty</div>
-        {[
-          { i: 'document-text-bold', n: 'CV — Tomáš Marek.pdf', s: '142 kB' },
-          { i: 'shield-check-bold', n: 'Potvrzení o studiu', s: 'ověřeno' },
-        ].map((d, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, marginBottom: 6 }}>
-            <Icon name={d.i} size={14} color={T.light}/>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.n}</div>
-              <div style={{ color: T.mutedSoft, fontSize: 10, fontFamily: T.fontMono }}>{d.s}</div>
-            </div>
-          </div>
-        ))}
-        <button onClick={() => window.empToast && window.empToast('Plný profil', 'Kompletní profil kandidáta připravujeme.', '👤', 'info')} style={{ width: '100%', marginTop: 10, padding: '9px 12px', borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Otevřít plný profil →</button>
+        <div style={{ color: T.muted, fontSize: 10, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 6 }}>Životopis</div>
+        {thread.cvUrl ? (
+          <a href={thread.cvUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, marginBottom: 6, textDecoration: 'none' }}>
+            <Icon name="document-text-bold" size={14} color={T.light}/>
+            <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600 }}>Otevřít životopis</div>
+          </a>
+        ) : <div style={{ color: T.mutedSoft, fontSize: 11, fontFamily: T.fontUI, fontStyle: 'italic', marginBottom: 6 }}>Bez životopisu</div>}
+        <button onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl })} style={{ width: '100%', marginTop: 10, padding: '9px 12px', borderRadius: 9, background: 'rgba(91,107,255,0.14)', border: '1px solid rgba(91,107,255,0.3)', color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Otevřít plný profil + recenze →</button>
       </aside>
 
       {/* Shift offer modal */}

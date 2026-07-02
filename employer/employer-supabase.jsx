@@ -126,9 +126,14 @@ async function fetchEmployerData(employerId) {
         name,
         avatar: name.split(' ').map(p => p[0] || '').join('').slice(0,2).toUpperCase() || '??',
         color: _strColor(m.worker_id || m.id),
-        age: null, rating: Number(w.rating || 0).toFixed(1),
-        jobsDone: w.jobs_done || 0, distance: null, level: w.level || 1, match: 0,
+        rating: Number(w.rating || 0).toFixed(1),
+        jobsDone: w.jobs_done || 0, level: w.level || 1,
+        hoursLogged: w.hours_logged || 0, totalEarned: Number(w.total_earned || 0),
+        punctuality: w.punctuality != null ? w.punctuality : null,
         tags: Array.isArray(w.skills) ? w.skills : [],
+        bio: w.bio || '', education: w.education || '',
+        city: w.address || '', cvUrl: w.cv_url || '', verified: !!w.verified,
+        avatarUrl: w.avatar_url || '',
         lastSeen: _relTime(m.created_at), jobTitle: m.job?.title || '',
         status: m.status,
       };
@@ -169,13 +174,17 @@ async function fetchEmployerData(employerId) {
           text: msg.text, t: _fmtTime(msg.created_at), id: msg.id,
         }));
       const lastMsg = threadMsgs[threadMsgs.length - 1];
-      const wName   = match.worker?.name || 'Kandidát';
+      const w       = match.worker || {};
+      const wName   = w.name || 'Kandidát';
       return {
         id: match.id, match_id: match.id, worker_id: match.worker_id,
         name: wName,
         avatar: wName.split(' ').map(p => p[0] || '').join('').slice(0,2).toUpperCase() || '??',
         color: _strColor(match.worker_id || match.id),
         role: match.job?.title || '',
+        city: w.address || '', rating: Number(w.rating || 0).toFixed(1),
+        jobsDone: w.jobs_done || 0, level: w.level || 1, cvUrl: w.cv_url || '',
+        verified: !!w.verified,
         last: lastMsg?.text || 'Nová shoda',
         time: _relTime(match.created_at),
         unread: 0, online: false, msgs: threadMsgs,
