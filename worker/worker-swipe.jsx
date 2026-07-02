@@ -97,8 +97,15 @@ function WSwipe({ tick }) {
           </div>
         </div>
       ) : (
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px', minHeight: 0 }}>
         <div
-          style={{ flex: 1, position: 'relative', margin: '0 16px', userSelect: 'none', touchAction: 'none', minHeight: 0 }}
+          style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: 420,
+            height: 'min(560px, calc(100vh - 200px))',
+            userSelect: 'none', touchAction: 'none',
+          }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -117,6 +124,7 @@ function WSwipe({ tick }) {
               />
             );
           })}
+        </div>
         </div>
       )}
 
