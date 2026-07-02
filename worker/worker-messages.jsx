@@ -201,11 +201,22 @@ function WMessages({ tick }) {
           <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
             {thread.msgs.map((m, i) => {
               if (m.kind === 'shift') {
+                const laterMsgs = thread.msgs.slice(i + 1);
+                const responseMsg = laterMsgs.find(lm =>
+                  lm.from === 'me' && (
+                    lm.text === '✓ Přijímám nabídku směny!' ||
+                    lm.text === 'Bohužel tuto směnu nemohu přijmout.'
+                  )
+                );
+                const alreadyResponded = responseMsg
+                  ? (responseMsg.text.includes('Přijímám') ? 'accepted' : 'rejected')
+                  : null;
                 return (
                   <WShiftCard
                     key={m.id || i}
                     msg={m}
                     isMe={m.from === 'me'}
+                    alreadyResponded={alreadyResponded}
                     onAccept={() => handleRespondToShift('accepted')}
                     onReject={() => handleRespondToShift('rejected')}
                   />
@@ -263,16 +274,17 @@ function WMessages({ tick }) {
 }
 
 // ── Shift offer card (worker view) ─────────────────────────────
-function WShiftCard({ msg, isMe, onAccept, onReject }) {
-  const [responded, setResponded] = useStateW(null); // 'accepted' | 'rejected'
+function WShiftCard({ msg, isMe, alreadyResponded, onAccept, onReject }) {
+  const [localResponded, setLocalResponded] = useStateW(null);
+  const responded = localResponded || alreadyResponded;
   const s = msg.shift || {};
 
   const handleAccept = () => {
-    setResponded('accepted');
+    setLocalResponded('accepted');
     onAccept?.();
   };
   const handleReject = () => {
-    setResponded('rejected');
+    setLocalResponded('rejected');
     onReject?.();
   };
 
