@@ -357,6 +357,13 @@ async function confirmShiftW(matchId) {
   return true;
 }
 
+// Brigádník zruší potvrzenou směnu → match 'cancelled' (trigger uvolní inzerát zpět na 'active')
+async function cancelShiftW(matchId) {
+  const { error } = await sb.from('matches').update({ status: 'cancelled' }).eq('id', matchId);
+  if (error) { console.error('cancelShiftW:', error); return false; }
+  return true;
+}
+
 async function createRejectionW(workerId, jobId) {
   const { error } = await sb.from('rejections').insert({ worker_id: workerId, job_id: jobId });
   if (error && error.code !== '23505') console.error('createRejectionW:', error);
@@ -380,6 +387,6 @@ async function updateProfileW(workerId, updates) {
 
 Object.assign(window, {
   W_PROFILE, W_JOBS, W_THREADS, W_HISTORY, W_REVIEWS,
-  fetchWorkerData, createMatchW, createRejectionW, sendMessageW, updateProfileW, submitReviewW, confirmShiftW,
+  fetchWorkerData, createMatchW, createRejectionW, sendMessageW, updateProfileW, submitReviewW, confirmShiftW, cancelShiftW,
   jobToCard, makejLevel, _wColor, _wFmtTime, _wFmtDate, _wFmtDateY, _wJobPassed, _wPlural, _wShiftHours,
 });

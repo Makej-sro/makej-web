@@ -562,6 +562,32 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
 }
 
 // ── Modal hodnocení (firma → brigádník po dokončené brigádě) ────
+// ── Rozhodnutí o zrušené směně (znovu zveřejnit / nechat zavřený) ──
+function ECancelModal({ target, onDone }) {
+  const [busy, setBusy] = useStateE(false);
+  async function reopen() { if (busy) return; setBusy(true); await reopenJobE(target.match_id, target.job_id); setBusy(false); onDone?.(); }
+  async function keep()   { if (busy) return; setBusy(true); await dismissCancelE(target.match_id); setBusy(false); onDone?.(); }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'grid', placeItems: 'center', padding: 20 }}>
+      <div style={{ background: '#16163b', border: '1px solid rgba(208,208,255,0.12)', borderRadius: 20, padding: 28, width: '100%', maxWidth: 400, textAlign: 'center', animation: 'empPop .3s cubic-bezier(.2,.8,.2,1)' }}>
+        <div style={{ width: 54, height: 54, borderRadius: 15, background: 'rgba(244,63,94,0.14)', display: 'grid', placeItems: 'center', margin: '0 auto 14px' }}>
+          <Icon name="close-circle-bold" size={26} color="#f43f5e" />
+        </div>
+        <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 19, fontWeight: 800 }}>Brigádník zrušil směnu</div>
+        <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13.5, marginTop: 6, lineHeight: 1.5 }}>
+          <b style={{ color: '#fff' }}>{target.workerName}</b> zrušil/a potvrzenou směnu na <b style={{ color: '#fff' }}>{target.jobTitle}</b>. Chceš inzerát znovu zveřejnit a hledat dál?
+        </div>
+
+        <button onClick={reopen} disabled={busy} style={{ width: '100%', marginTop: 20, padding: '13px', borderRadius: 12, background: 'linear-gradient(135deg, #0020F6, #3a3a99)', border: 'none', color: '#fff', fontFamily: T.fontHead, fontSize: 15, fontWeight: 800, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <Icon name="refresh-bold" size={16} color="#fff" /> Znovu zveřejnit inzerát
+        </button>
+        <button onClick={keep} disabled={busy} style={{ width: '100%', marginTop: 10, padding: '12px', borderRadius: 12, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(208,208,255,0.14)', color: T.light, fontFamily: T.fontHead, fontSize: 14, fontWeight: 800, cursor: busy ? 'default' : 'pointer' }}>Nechat zavřený</button>
+      </div>
+    </div>
+  );
+}
+
 function EReviewModal({ target, onClose, onDone }) {
   const [rating, setRating] = useStateE(0);
   const [hover,  setHover]  = useStateE(0);
@@ -634,6 +660,7 @@ function EmployerApp() {
   const [showNewJob, setShowNewJob] = useStateE(false);
   const [editJob,    setEditJob]    = useStateE(null);
   const [reviewTarget, setReviewTarget] = useStateE(null);
+  const [cancelTarget, setCancelTarget] = useStateE(null);
   const [toasts,    setToasts]    = useStateE([]);
   const empId                     = useRefE(null);
 
@@ -653,8 +680,13 @@ function EmployerApp() {
       fetchEmployerData(session.user.id).then(() => {
         setLoaded(true);
         setTick(1);
-        // Výzva k ohodnocení dokončených brigád
-        if (E_REVIEW_QUEUE.length > 0) {
+        // Rozhodnutí o zrušených směnách má přednost
+        if (E_CANCELLED.length > 0) {
+          setTimeout(() => {
+            addToast('Zrušená směna', `${E_CANCELLED.length === 1 ? 'Jeden brigádník zrušil' : E_CANCELLED.length + ' brigádníků zrušilo'} potvrzenou směnu.`, '⚠️', 'info');
+            setCancelTarget(E_CANCELLED[0]);
+          }, 1000);
+        } else if (E_REVIEW_QUEUE.length > 0) {
           setTimeout(() => {
             addToast('Ohodnoť brigádníky', `Máš ${E_REVIEW_QUEUE.length} ${E_REVIEW_QUEUE.length === 1 ? 'dokončenou brigádu' : 'dokončených brigád'} k ohodnocení.`, '⭐', 'info');
             setReviewTarget(E_REVIEW_QUEUE[0]);
@@ -681,9 +713,15 @@ function EmployerApp() {
         const job = E_JOBS.find(j => j.id === jobId);
         addToast('Nový zájem o brigádu', job?.title || 'Někdo projevil zájem', '👤', 'info');
       })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches' }, async () => {
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches' }, async (payload) => {
+        const justCancelled = payload.new?.status === 'cancelled' && payload.old?.status !== 'cancelled';
         await fetchEmployerData(id);
         setTick(t => t + 1);
+        if (justCancelled) {
+          const c = E_CANCELLED.find(x => x.match_id === payload.new.id);
+          addToast('Zrušená směna', `${c?.workerName || 'Brigádník'} zrušil/a potvrzenou směnu.`, '⚠️', 'info');
+          if (c) setCancelTarget(c);
+        }
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'jobs' }, async () => {
         await fetchEmployerData(id);
@@ -789,6 +827,17 @@ function EmployerApp() {
             await fetchEmployerData(empId.current);
             setTick(t => t + 1);
             setReviewTarget(E_REVIEW_QUEUE.length > 0 ? E_REVIEW_QUEUE[0] : null);
+          }}
+        />
+      )}
+
+      {cancelTarget && (
+        <ECancelModal
+          target={cancelTarget}
+          onDone={async () => {
+            await fetchEmployerData(empId.current);
+            setTick(t => t + 1);
+            setCancelTarget(E_CANCELLED.length > 0 ? E_CANCELLED[0] : null);
           }}
         />
       )}

@@ -7,6 +7,25 @@ function WProfile({ tick, onSignOut }) {
   const [skillInput, setSkillInput] = useStateW('');
   const [userId,  setUserId]  = useStateW(null);
   const [showAllReviews, setShowAllReviews] = useStateW(false);
+  const [notifsOn, setNotifsOn] = useStateW(() => (typeof localStorage === 'undefined' || localStorage.getItem('makej-notifs') !== 'off'));
+  const [confirmDel, setConfirmDel] = useStateW(false);
+  const [deleting, setDeleting] = useStateW(false);
+
+  function toggleNotifs() {
+    setNotifsOn(v => {
+      const nv = !v;
+      try { localStorage.setItem('makej-notifs', nv ? 'on' : 'off'); } catch (e) {}
+      return nv;
+    });
+  }
+  async function handleDeleteAccount() {
+    if (deleting) return;
+    setDeleting(true);
+    const { error } = await sb.rpc('delete_my_account');
+    if (error) { setDeleting(false); alert('Účet se nepodařilo smazat. Zkus to prosím znovu.'); return; }
+    await sb.auth.signOut();
+    window.location.href = '/';
+  }
 
   useEffectW(() => {
     sb.auth.getSession().then(({ data: { session } }) => {
@@ -283,13 +302,88 @@ function WProfile({ tick, onSignOut }) {
           </>
         )}
 
-        {/* Sign out */}
-        <div style={{ height: 1, background: T.border, margin: '8px 0 18px' }} />
-        <button onClick={onSignOut} style={{ padding: '12px 20px', borderRadius: 12, background: '#fff', border: '1px solid rgba(244,63,94,0.25)', color: '#f43f5e', fontFamily: T.fontHead, fontSize: 14, fontWeight: 800, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <Icon name="logout-2-bold" size={16} color="#f43f5e" />
-          Odhlásit se
-        </button>
+        {/* Nastavení */}
+        {!editing && (
+          <div style={{ marginTop: 8, maxWidth: 520 }}>
+            <div style={labelStyle}>Nastavení</div>
+            <div style={{ background: '#fff', border: '1px solid ' + T.border, borderRadius: 16, boxShadow: cardShadow, overflow: 'hidden' }}>
+              {/* Notifikace */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px' }}>
+                <div style={{ width: 38, height: 38, borderRadius: 11, background: 'rgba(0,32,246,0.08)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                  <Icon name="bell-bold" size={17} color={T.primary} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 14, fontWeight: 800 }}>Upozornění</div>
+                  <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12.5 }}>Zprávy a nabídky směn</div>
+                </div>
+                <button onClick={toggleNotifs} title="Zapnout/vypnout upozornění" style={{
+                  width: 48, height: 28, borderRadius: 999, flexShrink: 0, cursor: 'pointer', position: 'relative',
+                  background: notifsOn ? T.primary : 'rgba(18,18,26,0.18)', border: 'none', transition: 'background .2s',
+                }}>
+                  <span style={{ position: 'absolute', top: 3, left: notifsOn ? 23 : 3, width: 22, height: 22, borderRadius: 999, background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'left .2s' }} />
+                </button>
+              </div>
+
+              <div style={{ height: 1, background: T.border }} />
+
+              {/* Odhlásit se */}
+              <button onClick={onSignOut} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                <div style={{ width: 38, height: 38, borderRadius: 11, background: 'rgba(18,18,26,0.05)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                  <Icon name="logout-2-bold" size={17} color={T.ink} />
+                </div>
+                <span style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 14, fontWeight: 800 }}>Odhlásit se</span>
+              </button>
+
+              <div style={{ height: 1, background: T.border }} />
+
+              {/* Smazat účet */}
+              <button onClick={() => setConfirmDel(true)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                <div style={{ width: 38, height: 38, borderRadius: 11, background: 'rgba(244,63,94,0.1)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                  <Icon name="trash-bin-trash-bold" size={17} color="#f43f5e" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: '#f43f5e', fontFamily: T.fontHead, fontSize: 14, fontWeight: 800 }}>Smazat účet</div>
+                  <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12.5 }}>Trvale odstraní tvůj profil a data</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Potvrzení smazání účtu */}
+      {confirmDel && (
+        <div onClick={() => !deleting && setConfirmDel(false)} style={{
+          position: 'fixed', inset: 0, zIndex: 150,
+          background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(10px)',
+          display: 'grid', placeItems: 'center', padding: 20,
+          animation: 'wPop .28s cubic-bezier(.2,.8,.2,1)',
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            width: '100%', maxWidth: 380, background: T.card,
+            borderRadius: 24, border: '1px solid ' + T.border, padding: 26, textAlign: 'center',
+            boxShadow: '0 24px 60px rgba(20,22,40,0.28)',
+          }}>
+            <div style={{ width: 60, height: 60, borderRadius: 17, background: 'rgba(244,63,94,0.12)', display: 'grid', placeItems: 'center', margin: '0 auto 16px' }}>
+              <Icon name="trash-bin-trash-bold" size={28} color="#f43f5e" />
+            </div>
+            <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 21, fontWeight: 800, letterSpacing: -0.4 }}>Smazat účet?</div>
+            <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>
+              Trvale se odstraní tvůj profil, brigády, zprávy i recenze. Tuhle akci nelze vrátit.
+            </div>
+            <button onClick={handleDeleteAccount} disabled={deleting} style={{
+              width: '100%', marginTop: 20, padding: '14px', borderRadius: 14,
+              background: '#f43f5e', border: 'none', color: '#fff',
+              fontFamily: T.fontHead, fontSize: 15, fontWeight: 800, cursor: deleting ? 'default' : 'pointer', opacity: deleting ? 0.6 : 1,
+            }}>{deleting ? 'Mažu…' : 'Ano, smazat účet'}</button>
+            <button onClick={() => !deleting && setConfirmDel(false)} style={{
+              width: '100%', marginTop: 10, padding: '13px', borderRadius: 14,
+              background: T.surfaceAlt, border: '1px solid ' + T.border, color: T.muted,
+              fontFamily: T.fontHead, fontSize: 14.5, fontWeight: 800, cursor: 'pointer',
+            }}>Zpět</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

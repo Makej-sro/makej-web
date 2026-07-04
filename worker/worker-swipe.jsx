@@ -89,7 +89,7 @@ function WSwipe({ tick }) {
       {/* Header */}
       <div style={{ padding: '12px 20px 12px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
-          <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 28, fontWeight: 800, letterSpacing: -0.8, lineHeight: 1 }}>Najdi brigádu</div>
+          <div style={{ color: '#0020F6', fontFamily: T.fontHead, fontSize: 28, fontWeight: 900, letterSpacing: -0.8, lineHeight: 1 }}>Makej!</div>
           <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13.5, marginTop: 4 }}>{remaining} {_wPlural(remaining, 'nabídka', 'nabídky', 'nabídek')} v okolí</div>
         </div>
         <div title={`Level ${lvl.level} · ${lvl.title}`} style={{
@@ -412,7 +412,7 @@ function WJobCard({ job, drag, isTop, depth = 0, onTap }) {
 }
 
 // ── Detail inzerátu (reálná data od zaměstnavatele) ────────────
-function WJobDetailModal({ job, onClose, onLike, onSuper, onPass, readOnly, statusLabel, onChat }) {
+function WJobDetailModal({ job, onClose, onLike, onSuper, onPass, readOnly, statusLabel, onChat, onCancel }) {
   const JOB_TYPE_LABEL = {
     jednrazova_vypomoc: 'Jednorázová výpomoc',
     brigada: 'Brigáda', part_time: 'Part-time', full_time: 'Full-time',
@@ -563,6 +563,14 @@ function WJobDetailModal({ job, onClose, onLike, onSuper, onPass, readOnly, stat
                 }}><Icon name="chat-round-bold" size={17} color="#fff" /> Otevřít chat</button>
               )}
             </div>
+            {onCancel && (
+              <button onClick={onCancel} style={{
+                width: '100%', marginTop: 10, borderRadius: 12, padding: '11px 0',
+                background: 'none', border: 'none',
+                color: '#f43f5e', fontFamily: T.fontHead, fontSize: 13.5, fontWeight: 800, cursor: 'pointer',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}><Icon name="close-circle-bold" size={15} color="#f43f5e" /> Zrušit směnu</button>
+            )}
           </div>
         ) : (
         <div style={{ flexShrink: 0, padding: '12px 22px calc(14px + env(safe-area-inset-bottom))', borderTop: '1px solid ' + T.border, display: 'flex', gap: 10, background: T.card }}>

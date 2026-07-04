@@ -4,6 +4,8 @@ function WHistory({ tick, onReviewed }) {
   const [items,  setItems]  = useStateW(() => [...W_HISTORY]);
   const [review, setReview] = useStateW(null); // položka, kterou právě hodnotím
   const [detail, setDetail] = useStateW(null); // brigáda, jejíž detail zobrazuju
+  const [cancelTarget, setCancelTarget] = useStateW(null); // směna ke zrušení
+  const [cancelling, setCancelling] = useStateW(false);
 
   useEffectW(() => { setItems([...W_HISTORY]); }, [tick]);
 
@@ -129,8 +131,53 @@ function WHistory({ tick, onReviewed }) {
           readOnly
           statusLabel={detail.phase === 'completed' ? 'Odpracováno' : detail.phase === 'discuss' ? 'Domlouváte se — směnu potvrdíš v chatu' : 'Potvrzená směna'}
           onChat={() => { const m = detail.match_id; setDetail(null); window.wOpenChat && window.wOpenChat(m); }}
+          onCancel={detail.phase === 'upcoming' ? () => { const it = detail; setDetail(null); setCancelTarget(it); } : undefined}
           onClose={() => setDetail(null)}
         />
+      )}
+
+      {cancelTarget && (
+        <div onClick={() => !cancelling && setCancelTarget(null)} style={{
+          position: 'fixed', inset: 0, zIndex: 150,
+          background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(10px)',
+          display: 'grid', placeItems: 'center', padding: 20,
+          animation: 'wPop .28s cubic-bezier(.2,.8,.2,1)',
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            width: '100%', maxWidth: 380, background: T.card,
+            borderRadius: 24, border: '1px solid ' + T.border, padding: 26, textAlign: 'center',
+            boxShadow: '0 24px 60px rgba(20,22,40,0.28)',
+          }}>
+            <div style={{ width: 60, height: 60, borderRadius: 17, background: 'rgba(244,63,94,0.12)', display: 'grid', placeItems: 'center', margin: '0 auto 16px' }}>
+              <Icon name="close-circle-bold" size={28} color="#f43f5e" />
+            </div>
+            <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 21, fontWeight: 800, letterSpacing: -0.4 }}>Zrušit směnu?</div>
+            <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>
+              {cancelTarget.jobTitle} u <b style={{ color: T.ink }}>{cancelTarget.company}</b>. Zaměstnavateli se směna zruší a tuhle akci nevrátíš.
+            </div>
+            <div style={{ marginTop: 12, padding: '11px 13px', borderRadius: 12, background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)', color: '#f43f5e', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600, lineHeight: 1.45, display: 'flex', alignItems: 'flex-start', gap: 8, textAlign: 'left' }}>
+              <Icon name="star-bold" size={15} color="#f43f5e" />
+              <span>Za zrušení potvrzené směny dostaneš od zaměstnavatele hodnocení <b>1★</b>, které ti stáhne průměr.</span>
+            </div>
+            <button onClick={async () => {
+              if (cancelling) return;
+              setCancelling(true);
+              await cancelShiftW(cancelTarget.match_id);
+              setCancelling(false);
+              setCancelTarget(null);
+              onReviewed?.();
+            }} disabled={cancelling} style={{
+              width: '100%', marginTop: 20, padding: '14px', borderRadius: 14,
+              background: '#f43f5e', border: 'none', color: '#fff',
+              fontFamily: T.fontHead, fontSize: 15, fontWeight: 800, cursor: cancelling ? 'default' : 'pointer', opacity: cancelling ? 0.6 : 1,
+            }}>{cancelling ? 'Ruším…' : 'Ano, zrušit směnu'}</button>
+            <button onClick={() => !cancelling && setCancelTarget(null)} style={{
+              width: '100%', marginTop: 10, padding: '13px', borderRadius: 14,
+              background: T.surfaceAlt, border: '1px solid ' + T.border, color: T.muted,
+              fontFamily: T.fontHead, fontSize: 14.5, fontWeight: 800, cursor: 'pointer',
+            }}>Zpět</button>
+          </div>
+        </div>
       )}
 
       {review && (

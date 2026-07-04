@@ -23,9 +23,9 @@ function WToast({ toasts, onRemove }) {
   if (!toasts.length) return null;
   return (
     <div style={{
-      position: 'fixed', top: 14, left: '50%', transform: 'translateX(-50%)',
+      position: 'fixed', top: 66, right: 16,
       zIndex: 9000, display: 'flex', flexDirection: 'column', gap: 10,
-      width: 'min(380px, calc(100vw - 24px))',
+      width: 'min(360px, calc(100vw - 32px))',
     }}>
       {toasts.map(t => {
         const st = W_NOTIF_STYLE[t.type] || W_NOTIF_STYLE.info;
@@ -208,8 +208,14 @@ function WorkerApp() {
     window.wOpenEmployer = (employerId, fallback) => { if (employerId) setEmployerTarget({ employerId, fallback }); };
   }
 
+  // Uživatel může upozornění vypnout v profilu (Nastavení)
+  function notifsEnabled() {
+    try { return localStorage.getItem('makej-notifs') !== 'off'; } catch (e) { return true; }
+  }
+
   // Toast (objekt: { title, text, type, accent, avatar, action, ttl })
   function addToast(opts) {
+    if (!notifsEnabled()) return;
     const id = Date.now() + Math.random();
     setToasts(prev => [...prev, { id, ...opts }]);
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), opts.ttl || 6000);
@@ -217,6 +223,7 @@ function WorkerApp() {
 
   // Upozornění do zvonečku (přežije, dokud je appka otevřená)
   function addNotif(n) {
+    if (!notifsEnabled()) return;
     const id = Date.now() + Math.random();
     setNotifs(prev => [{ id, ts: Date.now(), read: false, ...n }, ...prev].slice(0, 40));
   }

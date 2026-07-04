@@ -29,6 +29,9 @@ function _fmtTime(iso) {
 // Fronta brigád k ohodnocení (dokončené, ještě neohodnocené firmou)
 const E_REVIEW_QUEUE = [];
 
+// Fronta zrušených směn — firma rozhodne, zda inzerát znovu zveřejnit
+const E_CANCELLED = [];
+
 // Vrátí ISO datum (YYYY-MM-DD) pokud je vstup validní ISO, jinak null
 function _isoDate(v) {
   return (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : null;
@@ -209,6 +212,24 @@ async function fetchEmployerData(employerId) {
       });
     E_REVIEW_QUEUE.length = 0;
     reviewQueue.forEach(r => E_REVIEW_QUEUE.push(r));
+
+    // ── E_CANCELLED (zrušené směny čekající na rozhodnutí firmy) ──────────────
+    const cancelledQueue = matches
+      .filter(m => m.status === 'cancelled' && !m.cancel_handled)
+      .map(m => {
+        const w = m.worker || {};
+        const nm = w.name || 'Brigádník';
+        return {
+          match_id: m.id, job_id: m.job_id, workerName: nm,
+          avatar: nm.split(/\s+/).map(x => x[0] || '').join('').slice(0, 2).toUpperCase() || '??',
+          color: _strColor(m.worker_id || m.id),
+          jobTitle: m.job?.title || 'Brigáda',
+          dateText: m.job?.date || '',
+          jobFilled: m.job?.status === 'filled',
+        };
+      });
+    E_CANCELLED.length = 0;
+    cancelledQueue.forEach(c => E_CANCELLED.push(c));
 
     // ── E_ACTIVITY ───────────────────────────────────────────────────────────
     const acts = [
@@ -417,4 +438,23 @@ async function submitReviewE(matchId, workerId, rating, text) {
   return true;
 }
 
-Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, submitReviewE, E_REVIEW_QUEUE, _strColor, _relTime, _fmtTime });
+// Zrušená směna: firma znovu zveřejní inzerát (job -> active) a označí jako vyřízené
+async function reopenJobE(matchId, jobId) {
+  const { error: jErr } = await sb.from('jobs').update({ status: 'active' }).eq('id', jobId);
+  if (jErr) { console.error('reopenJobE job error:', jErr); return false; }
+  await sb.from('matches').update({ cancel_handled: true }).eq('id', matchId);
+  const i = E_CANCELLED.findIndex(c => c.match_id === matchId);
+  if (i >= 0) E_CANCELLED.splice(i, 1);
+  return true;
+}
+
+// Zrušená směna: firma nechá inzerát zavřený, jen označí jako vyřízené
+async function dismissCancelE(matchId) {
+  const { error } = await sb.from('matches').update({ cancel_handled: true }).eq('id', matchId);
+  if (error) { console.error('dismissCancelE error:', error); return false; }
+  const i = E_CANCELLED.findIndex(c => c.match_id === matchId);
+  if (i >= 0) E_CANCELLED.splice(i, 1);
+  return true;
+}
+
+Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, submitReviewE, reopenJobE, dismissCancelE, E_REVIEW_QUEUE, E_CANCELLED, _strColor, _relTime, _fmtTime });
