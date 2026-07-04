@@ -263,10 +263,15 @@ function JobCard({ job, drag, onTap, isTop, depth = 0 }) {
           }}>
             <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 600, fontFamily: T.fontUI, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
               {job.company}
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: T.super }}>
-                <Icon name="star-bold" size={12} color={T.super} />
-                <span style={{ fontFamily: T.fontMono, fontWeight: 700, fontSize: 12 }}>{job.rating.toFixed(1)}</span>
-              </span>
+              {job.rating > 0 && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: T.super }}>
+                  <Icon name="star-bold" size={12} color={T.super} />
+                  <span style={{ fontFamily: T.fontMono, fontWeight: 700, fontSize: 12 }}>{job.rating.toFixed(1)}</span>
+                </span>
+              )}
+              {job.verified && (
+                <Icon name="verified-check-bold" size={13} color="#5B6BFF" />
+              )}
             </div>
             <div style={{
               color: '#fff', fontSize: 22, lineHeight: 1.15, fontWeight: 700,

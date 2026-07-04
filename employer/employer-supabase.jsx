@@ -26,6 +26,45 @@ function _fmtTime(iso) {
   return new Date(iso).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
 }
 
+// Fronta brigád k ohodnocení (dokončené, ještě neohodnocené firmou)
+const E_REVIEW_QUEUE = [];
+
+// Vrátí ISO datum (YYYY-MM-DD) pokud je vstup validní ISO, jinak null
+function _isoDate(v) {
+  return (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : null;
+}
+
+// Je datum brigády už minulé? (ISO 'YYYY-MM-DD')
+function _eJobPassed(eventDate) {
+  if (!eventDate) return false;
+  const d = new Date(eventDate + 'T23:59:59');
+  return !isNaN(d) && d < new Date();
+}
+
+// Zjistí ISO datum brigády; u starých dat bez roku odhadne rok podle vzniku matche
+function _eResolveEventDate(job, matchCreatedAt) {
+  if (!job) return null;
+  if (job.event_date) return job.event_date;
+  const raw = (job.date || '').trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const m = raw.match(/(\d{1,2})\s*\.\s*(\d{1,2})/);
+  if (!m) return null;
+  const day = parseInt(m[1], 10), mon = parseInt(m[2], 10);
+  if (!(day >= 1 && day <= 31 && mon >= 1 && mon <= 12)) return null;
+  const anchor = matchCreatedAt ? new Date(matchCreatedAt) : new Date();
+  const ay = anchor.getFullYear();
+  let best = null, bestDiff = Infinity;
+  for (const y of [ay - 1, ay, ay + 1]) {
+    const d = new Date(y, mon - 1, day);
+    const diff = Math.abs(d - anchor);
+    if (diff < bestDiff) { bestDiff = diff; best = d; }
+  }
+  if (!best) return null;
+  const mm = String(best.getMonth() + 1).padStart(2, '0');
+  const dd = String(best.getDate()).padStart(2, '0');
+  return `${best.getFullYear()}-${mm}-${dd}`;
+}
+
 async function fetchEmployerData(employerId) {
   try {
     const [profileRes, jobsRes] = await Promise.all([
@@ -38,6 +77,7 @@ async function fetchEmployerData(employerId) {
     const jobIds  = jobs.map(j => j.id);
 
     let matches = [], messages = [], reviews = [];
+    let reviewedMatchIds = new Set();
 
     if (jobIds.length > 0) {
       const [matchRes, reviewRes] = await Promise.all([
@@ -52,6 +92,10 @@ async function fetchEmployerData(employerId) {
       ]);
       matches = matchRes.data || [];
       reviews = reviewRes.data || [];
+
+      // Recenze, které firma sama napsala (abych podruhé nevyzýval)
+      const myRevRes = await sb.from('reviews').select('match_id').eq('reviewer_id', employerId);
+      reviewedMatchIds = new Set((myRevRes.data || []).map(r => r.match_id));
 
       const matchIds = matches.map(m => m.id);
       if (matchIds.length > 0) {
@@ -135,15 +179,36 @@ async function fetchEmployerData(employerId) {
         city: w.address || '', cvUrl: w.cv_url || '', verified: !!w.verified,
         avatarUrl: w.avatar_url || '',
         lastSeen: _relTime(m.created_at), jobTitle: m.job?.title || '',
-        status: m.status,
+        status: m.status, super: !!m.super,
       };
     };
-    const pending  = matches.filter(m => m.status === 'pending');
-    const accepted = matches.filter(m => m.status === 'accepted');
-    E_CANDIDATES.new       = pending.map(toCandidate);
+    const pending   = matches.filter(m => m.status === 'pending');
+    const accepted  = matches.filter(m => m.status === 'accepted');   // domlouvá se v chatu
+    const confirmed = matches.filter(m => m.status === 'confirmed');  // potvrzená směna
+    const hired     = [...confirmed, ...accepted];
+    // Super zájemci přednostně navrch
+    E_CANDIDATES.new       = pending.map(toCandidate).sort((a, b) => (b.super ? 1 : 0) - (a.super ? 1 : 0));
     E_CANDIDATES.shortlist = [];
     E_CANDIDATES.interview = [];
-    E_CANDIDATES.hired     = accepted.map(toCandidate);
+    E_CANDIDATES.hired     = hired.map(toCandidate);
+
+    // ── E_REVIEW_QUEUE (brigády k ohodnocení firmou) ─────────────────────────
+    // jen skutečně potvrzené směny, které už proběhly
+    const reviewQueue = confirmed
+      .filter(m => _eJobPassed(_eResolveEventDate(m.job, m.created_at)) && !reviewedMatchIds.has(m.id))
+      .map(m => {
+        const w = m.worker || {};
+        const nm = w.name || 'Brigádník';
+        return {
+          match_id: m.id, worker_id: m.worker_id, workerName: nm,
+          avatar: nm.split(/\s+/).map(x => x[0] || '').join('').slice(0, 2).toUpperCase() || '??',
+          color: _strColor(m.worker_id || m.id),
+          jobTitle: m.job?.title || 'Brigáda',
+          dateText: m.job?.date || '',
+        };
+      });
+    E_REVIEW_QUEUE.length = 0;
+    reviewQueue.forEach(r => E_REVIEW_QUEUE.push(r));
 
     // ── E_ACTIVITY ───────────────────────────────────────────────────────────
     const acts = [
@@ -195,7 +260,7 @@ async function fetchEmployerData(employerId) {
 
     // ── E_KPIS ───────────────────────────────────────────────────────────────
     const totalM = matches.length;
-    const totalH = accepted.length;
+    const totalH = hired.length;
     const avgR   = reviews.length
       ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : '–';
     const spark  = n => Array.from({ length: 12 }, (_, i) => n === 0 ? 0 : Math.max(0, Math.round(n * (0.15 + i * 0.07))));
@@ -232,14 +297,12 @@ async function fetchEmployerData(employerId) {
   }
 }
 
-// Accept a candidate: mark match as accepted + mark job as filled
+// Accept a candidate: pouze otevře chat (match 'accepted').
+// Inzerát se NENAPLNÍ — zůstává aktivní pro ostatní, dokud brigádník
+// nepotvrdí nabídku směny v chatu (match -> 'confirmed', job -> filled přes trigger).
 async function acceptCandidate(matchId, jobId) {
   const { error: mErr } = await sb.from('matches').update({ status: 'accepted' }).eq('id', matchId);
   if (mErr) { console.error('acceptCandidate match error:', mErr); return false; }
-
-  const { error: jErr } = await sb.from('jobs').update({ status: 'filled' }).eq('id', jobId);
-  if (jErr) { console.error('acceptCandidate job error:', jErr); return false; }
-
   return true;
 }
 
@@ -274,6 +337,7 @@ async function createJobE(employerId, fields) {
     duration = Math.max(0, (eh * 60 + em) - (sh * 60 + sm));
   } catch (_) {}
 
+  const dateVal = fields.date || new Date().toISOString().slice(0, 10);
   const payload = {
     employer_id: employerId,
     title:       fields.title,
@@ -282,12 +346,17 @@ async function createJobE(employerId, fields) {
     pay:         parseInt(fields.pay) || 0,
     pay_unit:    fields.pay_unit || 'Kč/h',
     location:    fields.location || '',
-    date:        fields.date || new Date().toISOString().slice(0, 10),
+    date:        dateVal,
+    event_date:  _isoDate(dateVal),
     time_start:  ts,
     time_end:    te,
     duration,
     tags:        Array.isArray(fields.tags) ? fields.tags : [],
     requirements: Array.isArray(fields.requirements) ? fields.requirements : [],
+    benefits:    Array.isArray(fields.benefits) ? fields.benefits : [],
+    positions:   parseInt(fields.positions) || 1,
+    dress_code:  fields.dress_code || null,
+    contact_note: fields.contact_note || null,
     job_type:    fields.job_type || 'brigada',
     status:      'active',
   };
@@ -306,18 +375,24 @@ async function updateJobE(jobId, fields) {
     duration = Math.max(0, (eh * 60 + em) - (sh * 60 + sm));
   } catch (_) {}
 
+  const dateVal = fields.date || new Date().toISOString().slice(0, 10);
   const payload = {
     title:       fields.title,
     description: fields.description || '',
     pay:         parseInt(fields.pay) || 0,
     pay_unit:    fields.pay_unit || 'Kč/h',
     location:    fields.location || '',
-    date:        fields.date || new Date().toISOString().slice(0, 10),
+    date:        dateVal,
+    event_date:  _isoDate(dateVal),
     time_start:  ts,
     time_end:    te,
     duration,
     tags:        Array.isArray(fields.tags) ? fields.tags : [],
     requirements: Array.isArray(fields.requirements) ? fields.requirements : [],
+    benefits:    Array.isArray(fields.benefits) ? fields.benefits : [],
+    positions:   parseInt(fields.positions) || 1,
+    dress_code:  fields.dress_code || null,
+    contact_note: fields.contact_note || null,
     job_type:    fields.job_type || 'brigada',
   };
   const { data, error } = await sb.from('jobs').update(payload).eq('id', jobId).select().single();
@@ -325,4 +400,21 @@ async function updateJobE(jobId, fields) {
   return data;
 }
 
-Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, _strColor, _relTime, _fmtTime });
+// Firma hodnotí brigádníka po dokončené brigádě
+async function submitReviewE(matchId, workerId, rating, text) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session?.user) return false;
+  const { error } = await sb.from('reviews').insert({
+    reviewer_id: session.user.id,
+    reviewed_id: workerId,
+    match_id: matchId,
+    rating: Math.max(1, Math.min(5, parseInt(rating) || 0)),
+    text: (text || '').trim(),
+  });
+  if (error) { console.error('submitReviewE:', error); return false; }
+  const i = E_REVIEW_QUEUE.findIndex(r => r.match_id === matchId);
+  if (i >= 0) E_REVIEW_QUEUE.splice(i, 1);
+  return true;
+}
+
+Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, submitReviewE, E_REVIEW_QUEUE, _strColor, _relTime, _fmtTime });

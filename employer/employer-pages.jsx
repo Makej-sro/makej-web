@@ -277,15 +277,18 @@ function CandidateCard({ c, stage, active, onClick }) {
         }}>{c.avatar}</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</div>
-          <div style={{ color: T.muted, fontSize: 10.5, fontFamily: T.fontUI, marginTop: 1 }}>
-            {c.distance != null ? <><span style={{ fontFamily: T.fontMono }}>{c.age}</span> · {c.distance} km</> : (c.age != null ? <span style={{ fontFamily: T.fontMono }}>{c.age}</span> : null)}
+          <div style={{ color: T.muted, fontSize: 10.5, fontFamily: T.fontUI, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {[c.city, c.jobTitle ? 'reaguje na: ' + c.jobTitle : null].filter(Boolean).join(' · ') || 'Brigádník'}
           </div>
         </div>
-        <div style={{
-          padding: '2px 7px', borderRadius: 6,
-          background: 'rgba(91,214,138,0.18)', color: '#5BD68A',
-          fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 800,
-        }}>{c.match}%</div>
+        {c.super && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 3,
+            padding: '2px 7px', borderRadius: 6,
+            background: 'rgba(255,209,102,0.18)', color: '#FFD166',
+            fontFamily: T.fontUI, fontSize: 10, fontWeight: 800, flexShrink: 0,
+          }}><Icon name="star-bold" size={10} color="#FFD166" /> Super</div>
+        )}
       </div>
 
       {/* metrics */}

@@ -54,6 +54,7 @@ const EMPTY_JOB_FORM = {
   tags: '', requirements: '', job_type: 'brigada',
   hours_per_week: '', start_date: '', contract_duration: '',
   contract_type: 'HPP', benefits: '',
+  positions: '1', dress_code: '', contact_note: '',
 };
 
 const JOB_TYPES = [
@@ -87,7 +88,10 @@ function ENewJobModal({ onClose, onCreated, editJob }) {
         requirements: Array.isArray(data.requirements) ? data.requirements.join(', ') : '',
         job_type: data.job_type || 'brigada',
         hours_per_week: '', start_date: '', contract_duration: '',
-        contract_type: 'HPP', benefits: '',
+        contract_type: 'HPP',
+        benefits: Array.isArray(data.benefits) ? data.benefits.join(', ') : '',
+        positions: data.positions != null ? String(data.positions) : '1',
+        dress_code: data.dress_code || '', contact_note: data.contact_note || '',
       });
     });
   }, []);
@@ -106,9 +110,11 @@ function ENewJobModal({ onClose, onCreated, editJob }) {
     const { data: { session } } = await sb.auth.getSession();
     const tags = form.tags.split(',').map(t => t.trim()).filter(Boolean);
     const reqs = form.requirements.split(',').map(r => r.trim()).filter(Boolean);
+    const benefits = form.benefits.split(/[,\n]/).map(b => b.trim()).filter(Boolean);
+    const extra = { tags, requirements: reqs, benefits, positions: parseInt(form.positions) || 1 };
     const result = isEdit
-      ? await updateJobE(editJob.id, { ...form, tags, requirements: reqs })
-      : await createJobE(session.user.id, { ...form, tags, requirements: reqs });
+      ? await updateJobE(editJob.id, { ...form, ...extra })
+      : await createJobE(session.user.id, { ...form, ...extra });
     setSaving(false);
     if (!result) { setErr(isEdit ? 'Nepodařilo se uložit změny. Zkus to znovu.' : 'Nepodařilo se přidat inzerát. Zkus to znovu.'); return; }
     onCreated();
@@ -296,19 +302,46 @@ function ENewJobModal({ onClose, onCreated, editJob }) {
           />
         </div>
 
-        {/* Benefity — jen full-time */}
-        {isFullTime && (
-          <div style={rowStyle}>
-            <label style={labelStyle}>Benefity</label>
-            <textarea
-              style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
-              rows={2}
-              placeholder="Stravenky, home office, 5 týdnů dovolené, sick days, cafeterie…"
-              value={form.benefits}
-              onChange={e => setF('benefits', e.target.value)}
-            />
+        {/* Co nabízíme (benefity) — vždy */}
+        <div style={rowStyle}>
+          <label style={labelStyle}>Co nabízíme <span style={{ textTransform: 'none', fontWeight: 500, color: T.mutedSoft }}>· oddělené čárkou</span></label>
+          <textarea
+            style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
+            rows={2}
+            placeholder={
+              isFullTime  ? 'Stravenky, home office, 5 týdnů dovolené, sick days…' :
+                            'Jídlo zdarma, spropitné, flexibilní směny, možnost stálé spolupráce…'
+            }
+            value={form.benefits}
+            onChange={e => setF('benefits', e.target.value)}
+          />
+        </div>
+
+        {/* Počet míst + dress code */}
+        <div style={{ ...rowStyle, display: 'grid', gridTemplateColumns: isShortTerm ? '1fr 1.5fr' : '1fr', gap: 10 }}>
+          {isShortTerm && (
+            <div>
+              <label style={labelStyle}>Volných míst</label>
+              <input style={inputStyle} type="number" min="1" placeholder="1" value={form.positions} onChange={e => setF('positions', e.target.value)} />
+            </div>
+          )}
+          <div>
+            <label style={labelStyle}>Dress code <span style={{ textTransform: 'none', fontWeight: 500, color: T.mutedSoft }}>· nepovinné</span></label>
+            <input style={inputStyle} placeholder="např. Černé tričko a kalhoty, uzavřená obuv" value={form.dress_code} onChange={e => setF('dress_code', e.target.value)} />
           </div>
-        )}
+        </div>
+
+        {/* Kam dorazit / kontakt */}
+        <div style={rowStyle}>
+          <label style={labelStyle}>Kam dorazit / kontakt <span style={{ textTransform: 'none', fontWeight: 500, color: T.mutedSoft }}>· nepovinné</span></label>
+          <textarea
+            style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
+            rows={2}
+            placeholder="např. Vchod z dvora, zeptej se na Petru na baru. Tel: 777 123 456"
+            value={form.contact_note}
+            onChange={e => setF('contact_note', e.target.value)}
+          />
+        </div>
 
         {/* Tagy — vždy */}
         <div style={rowStyle}>
@@ -528,6 +561,67 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
   );
 }
 
+// ── Modal hodnocení (firma → brigádník po dokončené brigádě) ────
+function EReviewModal({ target, onClose, onDone }) {
+  const [rating, setRating] = useStateE(0);
+  const [hover,  setHover]  = useStateE(0);
+  const [text,   setText]   = useStateE('');
+  const [saving, setSaving] = useStateE(false);
+  const [err,    setErr]    = useStateE('');
+
+  const LABELS = ['', 'Špatné', 'Slabší', 'Dobré', 'Skvělé', 'Perfektní'];
+  const shown = hover || rating;
+
+  async function submit() {
+    if (rating < 1) { setErr('Vyber počet hvězdiček.'); return; }
+    setSaving(true); setErr('');
+    const ok = await submitReviewE(target.match_id, target.worker_id, rating, text);
+    setSaving(false);
+    if (!ok) { setErr('Hodnocení se nepodařilo uložit.'); return; }
+    onDone?.();
+  }
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'grid', placeItems: 'center', padding: 20 }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: '#16163b', border: '1px solid rgba(208,208,255,0.12)', borderRadius: 20,
+        padding: 28, width: '100%', maxWidth: 400, textAlign: 'center',
+        animation: 'empPop .3s cubic-bezier(.2,.8,.2,1)',
+      }}>
+        <div style={{ width: 54, height: 54, borderRadius: 14, background: target.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 19, margin: '0 auto 12px' }}>{target.avatar}</div>
+        <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 18, fontWeight: 800 }}>Ohodnoť brigádníka</div>
+        <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13, marginTop: 4 }}>{target.workerName} · {target.jobTitle}</div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, margin: '20px 0 6px' }}>
+          {[1, 2, 3, 4, 5].map(n => (
+            <button key={n}
+              onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(0)}
+              onClick={() => { setRating(n); setErr(''); }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, lineHeight: 0 }}>
+              <Icon name="star-bold" size={36} color={n <= shown ? '#FFD166' : 'rgba(255,255,255,0.15)'} />
+            </button>
+          ))}
+        </div>
+        <div style={{ color: shown ? '#FFD166' : T.mutedSoft, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, height: 18 }}>{LABELS[shown] || 'Vyber hodnocení'}</div>
+
+        <textarea
+          value={text} onChange={e => setText(e.target.value)}
+          placeholder="Jak se brigádník osvědčil? Dochvilnost, přístup… (nepovinné)"
+          rows={3}
+          style={{ width: '100%', marginTop: 16, padding: '11px 13px', borderRadius: 12, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(208,208,255,0.14)', color: '#fff', fontFamily: T.fontUI, fontSize: 13, outline: 'none', resize: 'vertical', lineHeight: 1.5 }}
+        />
+
+        {err && <div style={{ color: '#f43f5e', fontFamily: T.fontUI, fontSize: 12, marginTop: 10 }}>{err}</div>}
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
+          <button onClick={onClose} style={{ flex: '0 0 auto', padding: '12px 18px', borderRadius: 12, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(208,208,255,0.14)', color: T.light, fontFamily: T.fontUI, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Později</button>
+          <button onClick={submit} disabled={saving} style={{ flex: 1, padding: '12px', borderRadius: 12, background: 'linear-gradient(135deg, #0020F6, #3a3a99)', border: 'none', color: '#fff', fontFamily: T.fontHead, fontSize: 15, fontWeight: 800, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Ukládám…' : 'Odeslat hodnocení'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function EmployerApp() {
   const [tab,       setTab]       = useStateE('dash');
   const [profileWorker, setProfileWorker] = useStateE(null);
@@ -539,6 +633,7 @@ function EmployerApp() {
   const [tick,      setTick]      = useStateE(0);
   const [showNewJob, setShowNewJob] = useStateE(false);
   const [editJob,    setEditJob]    = useStateE(null);
+  const [reviewTarget, setReviewTarget] = useStateE(null);
   const [toasts,    setToasts]    = useStateE([]);
   const empId                     = useRefE(null);
 
@@ -558,6 +653,13 @@ function EmployerApp() {
       fetchEmployerData(session.user.id).then(() => {
         setLoaded(true);
         setTick(1);
+        // Výzva k ohodnocení dokončených brigád
+        if (E_REVIEW_QUEUE.length > 0) {
+          setTimeout(() => {
+            addToast('Ohodnoť brigádníky', `Máš ${E_REVIEW_QUEUE.length} ${E_REVIEW_QUEUE.length === 1 ? 'dokončenou brigádu' : 'dokončených brigád'} k ohodnocení.`, '⭐', 'info');
+            setReviewTarget(E_REVIEW_QUEUE[0]);
+          }, 1000);
+        }
       }).catch((err) => {
         console.error('[employer] načtení dat selhalo:', err);
         setLoaded(true);   // degraduj gracefully místo věčného „Načítám data…"
@@ -675,6 +777,19 @@ function EmployerApp() {
           workerId={profileWorker.workerId}
           fallback={profileWorker.fallback}
           onClose={() => setProfileWorker(null)}
+        />
+      )}
+
+      {reviewTarget && (
+        <EReviewModal
+          target={reviewTarget}
+          onClose={() => setReviewTarget(null)}
+          onDone={async () => {
+            const next = E_REVIEW_QUEUE.find(r => r.match_id !== reviewTarget.match_id);
+            await fetchEmployerData(empId.current);
+            setTick(t => t + 1);
+            setReviewTarget(E_REVIEW_QUEUE.length > 0 ? E_REVIEW_QUEUE[0] : null);
+          }}
         />
       )}
 
