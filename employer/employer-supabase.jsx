@@ -81,9 +81,10 @@ async function fetchEmployerData(employerId) {
 
     let matches = [], messages = [], reviews = [];
     let reviewedMatchIds = new Set();
+    const viewsByJob = {};
 
     if (jobIds.length > 0) {
-      const [matchRes, reviewRes] = await Promise.all([
+      const [matchRes, reviewRes, viewsRes] = await Promise.all([
         sb.from('matches')
           .select('*, worker:profiles!matches_worker_id_fkey(*), job:jobs(*)')
           .in('job_id', jobIds)
@@ -92,9 +93,11 @@ async function fetchEmployerData(employerId) {
           .select('*, reviewer:profiles!reviews_reviewer_id_fkey(name)')
           .eq('reviewed_id', employerId)
           .order('created_at', { ascending: false }),
+        sb.from('job_views').select('job_id').in('job_id', jobIds),
       ]);
       matches = matchRes.data || [];
       reviews = reviewRes.data || [];
+      (viewsRes.data || []).forEach(v => { viewsByJob[v.job_id] = (viewsByJob[v.job_id] || 0) + 1; });
 
       // Recenze, které firma sama napsala (abych podruhé nevyzýval)
       const myRevRes = await sb.from('reviews').select('match_id').eq('reviewer_id', employerId);
@@ -120,11 +123,15 @@ async function fetchEmployerData(employerId) {
 
     // ── ECOMPANY ─────────────────────────────────────────────────────────────
     const logo = companyName.split(/\s+/).map(w => w[0] || '').join('').slice(0,2).toUpperCase() || '??';
+    // Tarif z DB (+ kontrola expirace → padá na starter)
+    let planVal = (profile?.plan || 'starter');
+    const planExp = profile?.plan_expires_at;
+    if (planExp && new Date(planExp) < new Date()) planVal = 'starter';
     Object.keys(ECOMPANY).forEach(k => delete ECOMPANY[k]);
     Object.assign(ECOMPANY, {
       name: companyName, logo,
       logoColor: _strColor(companyName),
-      plan: 'Standard', city: 'Česká republika', team: '',
+      plan: planVal, city: 'Česká republika', team: '',
     });
 
     // ── E_JOBS ───────────────────────────────────────────────────────────────
@@ -148,19 +155,28 @@ async function fetchEmployerData(employerId) {
       let status = job.status === 'filled' ? 'filled' : (job.status === 'expired' ? 'paused' : 'active');
       if (status === 'active' && daysLeft > 0 && daysLeft <= 2) status = 'urgent';
 
+      const views = viewsByJob[job.id] || 0;
+      const ctr   = views > 0 ? (jm.length / views) * 100 : 0;
+      const boosted   = job.top_until && new Date(job.top_until) > today;
+      const scheduled = job.publish_at && new Date(job.publish_at) > today;
+      if (scheduled && status === 'active') status = 'scheduled';
       return {
         id: job.id, title: job.title,
         company: job.company || companyName,
         status, plan: 'Standard',
-        views: 0, swipes: jm.length, matches: jm.length, hired, ctr: 0,
+        views, swipes: jm.length, matches: jm.length, hired, ctr,
         daysLeft, pay: job.pay, payUnit: job.pay_unit || 'Kč/h',
         accent: _strColor(job.id),
         location: job.location, date: job.date,
         description: job.description,
         tags: Array.isArray(job.tags) ? job.tags : [],
         created_at: job.created_at,
+        boosted, boostedUntil: job.top_until || null,
+        scheduled, publishAt: job.publish_at || null,
       };
     });
+    // boostnuté nahoru, pak podle data vytvoření
+    newJobs.sort((a, b) => (b.boosted ? 1 : 0) - (a.boosted ? 1 : 0) || new Date(b.created_at) - new Date(a.created_at));
     E_JOBS.length = 0;
     newJobs.forEach(j => E_JOBS.push(j));
 
@@ -182,6 +198,7 @@ async function fetchEmployerData(employerId) {
         city: w.address || '', cvUrl: w.cv_url || '', verified: !!w.verified,
         avatarUrl: w.avatar_url || '',
         lastSeen: _relTime(m.created_at), jobTitle: m.job?.title || '',
+        createdAt: m.created_at,
         status: m.status, super: !!m.super,
       };
     };
@@ -255,10 +272,20 @@ async function fetchEmployerData(employerId) {
       const threadMsgs = messages
         .filter(msg => msg.match_id === match.id)
         .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-        .map(msg => ({
-          from: msg.sender_id === employerId ? 'me' : 'them',
-          text: msg.text, t: _fmtTime(msg.created_at), id: msg.id,
-        }));
+        .map(msg => {
+          const from = msg.sender_id === employerId ? 'me' : 'them';
+          if (msg.type === 'shift_offer' && msg.metadata) return {
+            from, kind: 'shift',
+            shift: { role: msg.metadata.role, date: msg.metadata.date, time: msg.metadata.time, pay: msg.metadata.pay },
+            t: _fmtTime(msg.created_at), id: msg.id,
+          };
+          if (msg.type === 'interview_offer' && msg.metadata) return {
+            from, kind: 'interview',
+            interview: { date: msg.metadata.date, time: msg.metadata.time, location: msg.metadata.location, note: msg.metadata.note },
+            t: _fmtTime(msg.created_at), id: msg.id,
+          };
+          return { from, text: msg.text, t: _fmtTime(msg.created_at), id: msg.id };
+        });
       const lastMsg = threadMsgs[threadMsgs.length - 1];
       const w       = match.worker || {};
       const wName   = w.name || 'Kandidát';
@@ -271,7 +298,8 @@ async function fetchEmployerData(employerId) {
         city: w.address || '', rating: Number(w.rating || 0).toFixed(1),
         jobsDone: w.jobs_done || 0, level: w.level || 1, cvUrl: w.cv_url || '',
         verified: !!w.verified,
-        last: lastMsg?.text || 'Nová shoda',
+        skills: Array.isArray(w.skills) ? w.skills : [],
+        last: lastMsg ? (lastMsg.kind === 'shift' ? '📅 Nabídka směny' : lastMsg.kind === 'interview' ? '🗓️ Pozvánka na pohovor' : lastMsg.text) || 'Nová shoda' : 'Nová shoda',
         time: _relTime(match.created_at),
         unread: 0, online: false, msgs: threadMsgs,
       };
@@ -380,6 +408,7 @@ async function createJobE(employerId, fields) {
     contact_note: fields.contact_note || null,
     job_type:    fields.job_type || 'brigada',
     status:      'active',
+    publish_at:  fields.publish_at || null,
   };
   const { data, error } = await sb.from('jobs').insert(payload).select().single();
   if (error) { console.error('createJobE error:', error); return null; }
@@ -421,6 +450,60 @@ async function updateJobE(jobId, fields) {
   return data;
 }
 
+// Smazat inzerát (natvrdo — díky FK CASCADE zmizí i matche/zhlédnutí k němu)
+async function deleteJobE(jobId) {
+  const { error } = await sb.from('jobs').delete().eq('id', jobId);
+  if (error) { console.error('deleteJobE error:', error); return false; }
+  // odeber lokálně, ať zmizí hned bez refetchu
+  const i = E_JOBS.findIndex(j => j.id === jobId);
+  if (i !== -1) E_JOBS.splice(i, 1);
+  return true;
+}
+
+// Boost / topování inzerátu — nastaví top_until na now + days
+async function boostJobE(jobId, days) {
+  const until = new Date(Date.now() + (days || 7) * 86400000).toISOString();
+  const { error } = await sb.from('jobs').update({ top_until: until }).eq('id', jobId);
+  if (error) { console.error('boostJobE error:', error); return false; }
+  const j = E_JOBS.find(x => x.id === jobId);
+  if (j) { j.boosted = true; j.boostedUntil = until; }
+  return true;
+}
+
+// ── TÝM ──────────────────────────────────────────────────────────────────────
+const E_TEAM = [];
+async function fetchTeamE(ownerId) {
+  const { data, error } = await sb.from('team_members')
+    .select('*').eq('owner_id', ownerId).order('created_at', { ascending: true });
+  if (error) { console.error('fetchTeamE:', error); return E_TEAM; }
+  E_TEAM.length = 0;
+  (data || []).forEach(m => E_TEAM.push(m));
+  return E_TEAM;
+}
+async function inviteTeamMemberE(email, role) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session?.user) return { ok: false, msg: 'Nejsi přihlášený.' };
+  const clean = (email || '').trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clean)) return { ok: false, msg: 'Zadej platný e-mail.' };
+  const { data, error } = await sb.from('team_members')
+    .insert({ owner_id: session.user.id, email: clean, role: role || 'recruiter', status: 'invited' })
+    .select().single();
+  if (error) {
+    if (error.code === '23505') return { ok: false, msg: 'Tento e-mail už je v týmu.' };
+    console.error('inviteTeamMemberE:', error);
+    return { ok: false, msg: 'Pozvánku se nepodařilo vytvořit.' };
+  }
+  E_TEAM.push(data);
+  return { ok: true };
+}
+async function removeTeamMemberE(id) {
+  const { error } = await sb.from('team_members').delete().eq('id', id);
+  if (error) { console.error('removeTeamMemberE:', error); return false; }
+  const i = E_TEAM.findIndex(m => m.id === id);
+  if (i !== -1) E_TEAM.splice(i, 1);
+  return true;
+}
+
 // Firma hodnotí brigádníka po dokončené brigádě
 async function submitReviewE(matchId, workerId, rating, text) {
   const { data: { session } } = await sb.auth.getSession();
@@ -457,4 +540,4 @@ async function dismissCancelE(matchId) {
   return true;
 }
 
-Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, submitReviewE, reopenJobE, dismissCancelE, E_REVIEW_QUEUE, E_CANCELLED, _strColor, _relTime, _fmtTime });
+Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, deleteJobE, boostJobE, fetchTeamE, inviteTeamMemberE, removeTeamMemberE, E_TEAM, submitReviewE, reopenJobE, dismissCancelE, E_REVIEW_QUEUE, E_CANCELLED, _strColor, _relTime, _fmtTime });

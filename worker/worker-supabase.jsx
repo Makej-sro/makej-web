@@ -145,6 +145,7 @@ function jobToCard(job) {
     verified:  !!emp.verified,
     tags:      Array.isArray(job.tags) ? job.tags : [],
     accent,
+    boosted:   !!(job.top_until && new Date(job.top_until) > new Date()),
     distance:  job.distance || null,
     desc:      job.description || '',
     requirements: Array.isArray(job.requirements) ? job.requirements : [],
@@ -183,8 +184,17 @@ async function fetchWorkerData(workerId) {
       .eq('status', 'active').order('created_at', { ascending: false });
     if (excludeIds.length > 0) q = q.not('id', 'in', `(${excludeIds.join(',')})`);
     const { data: jobs } = await q;
+    const nowMs = Date.now();
+    // skryj naplánované (publish_at v budoucnu); boostnuté (top_until v budoucnu) nahoru
+    const visible = (jobs || [])
+      .filter(j => !j.publish_at || new Date(j.publish_at).getTime() <= nowMs)
+      .sort((a, b) => {
+        const ab = a.top_until && new Date(a.top_until).getTime() > nowMs ? 1 : 0;
+        const bb = b.top_until && new Date(b.top_until).getTime() > nowMs ? 1 : 0;
+        return bb - ab;
+      });
     W_JOBS.length = 0;
-    (jobs || []).forEach(j => W_JOBS.push(j));
+    visible.forEach(j => W_JOBS.push(j));
 
     // All matches → threads (accepted + pending that may have messages)
     const { data: matches } = await sb.from('matches')
@@ -247,14 +257,15 @@ async function fetchWorkerData(workerId) {
         .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
         .map(msg => {
           const isMe    = msg.sender_id === workerId;
-          const isShift = msg.type === 'shift_offer' && msg.metadata;
-          if (isShift) return { from: isMe ? 'me' : 'them', kind: 'shift', shift: msg.metadata, t: _wFmtTime(msg.created_at), id: msg.id };
-          return { from: isMe ? 'me' : 'them', text: msg.text, t: _wFmtTime(msg.created_at), id: msg.id };
+          const from    = isMe ? 'me' : 'them';
+          if (msg.type === 'shift_offer' && msg.metadata) return { from, kind: 'shift', shift: msg.metadata, t: _wFmtTime(msg.created_at), id: msg.id };
+          if (msg.type === 'interview_offer' && msg.metadata) return { from, kind: 'interview', interview: msg.metadata, t: _wFmtTime(msg.created_at), id: msg.id };
+          return { from, text: msg.text, t: _wFmtTime(msg.created_at), id: msg.id };
         });
 
       const lastMsg = threadMsgs[threadMsgs.length - 1];
       const lastPreview = lastMsg
-        ? (lastMsg.kind === 'shift' ? '📅 Nabídka směny' : lastMsg.text)
+        ? (lastMsg.kind === 'shift' ? '📅 Nabídka směny' : lastMsg.kind === 'interview' ? '🗓️ Pozvánka na pohovor' : lastMsg.text)
         : 'Nová shoda!';
       const lastTime = lastMsg
         ? _wFmtTime(messages.find(m => m.id === lastMsg.id)?.created_at || '')
@@ -332,6 +343,20 @@ async function createMatchW(workerId, jobId, isSuper) {
   return data;
 }
 
+// Zaznamenat zhlédnutí inzerátu (1× na brigádníka/inzerát díky unikátnímu indexu)
+const _wLoggedViews = new Set();
+async function logJobViewW(jobId) {
+  if (!jobId || _wLoggedViews.has(jobId)) return;
+  _wLoggedViews.add(jobId);
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session?.user) { _wLoggedViews.delete(jobId); return; }
+  const { error } = await sb.from('job_views').upsert(
+    { job_id: jobId, viewer_id: session.user.id },
+    { onConflict: 'job_id,viewer_id', ignoreDuplicates: true }
+  );
+  if (error) { console.error('logJobViewW:', error); _wLoggedViews.delete(jobId); }
+}
+
 // Napsat recenzi (brigádník → zaměstnavatel po dokončené brigádě)
 async function submitReviewW(matchId, reviewedId, rating, text) {
   const { data: { session } } = await sb.auth.getSession();
@@ -387,6 +412,6 @@ async function updateProfileW(workerId, updates) {
 
 Object.assign(window, {
   W_PROFILE, W_JOBS, W_THREADS, W_HISTORY, W_REVIEWS,
-  fetchWorkerData, createMatchW, createRejectionW, sendMessageW, updateProfileW, submitReviewW, confirmShiftW, cancelShiftW,
+  fetchWorkerData, createMatchW, createRejectionW, sendMessageW, updateProfileW, submitReviewW, confirmShiftW, cancelShiftW, logJobViewW,
   jobToCard, makejLevel, _wColor, _wFmtTime, _wFmtDate, _wFmtDateY, _wJobPassed, _wPlural, _wShiftHours,
 });

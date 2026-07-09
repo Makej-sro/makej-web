@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-25X9CMKGRD"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-25X9CMKGRD');
+  </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>makej. for business — analytika & nábor</title>
@@ -18,14 +26,14 @@
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
   <style>
-    :root { color-scheme: dark; }
+    :root { color-scheme: light; }
     *, *::before, *::after { box-sizing: border-box; }
     html, body, #root { width: 100%; height: 100%; }
     html, body {
       margin: 0; padding: 0;
-      background: #07071a;
+      background: #e8ecfb;
       font-family: "Plus Jakarta Sans", -apple-system, system-ui, sans-serif;
-      color: #fff;
+      color: #0f1222;
       -webkit-font-smoothing: antialiased;
       overflow: hidden;
     }
@@ -188,13 +196,15 @@
   </script>
 
   <script type="text/babel" src="app.jsx?v=6"></script>
+  <script type="text/babel" src="employer-theme.jsx?v=2"></script>
   <script type="text/babel" src="employer-data.jsx?v=6"></script>
-  <script type="text/babel" src="employer-shell.jsx?v=6"></script>
-  <script type="text/babel" src="employer-dashboard.jsx?v=6"></script>
-  <script type="text/babel" src="employer-pages.jsx?v=6"></script>
-  <script type="text/babel" src="employer-pages3.jsx?v=6"></script>
-  <script type="text/babel" src="_premium/analytics.jsx?v=6"></script>
-  <script type="text/babel" src="employer-supabase.jsx?v=9"></script>
-  <script type="text/babel" src="employer-main.jsx?v=7"></script>
+  <script type="text/babel" src="employer-plans.jsx?v=2"></script>
+  <script type="text/babel" src="employer-shell.jsx?v=12"></script>
+  <script type="text/babel" src="employer-dashboard.jsx?v=11"></script>
+  <script type="text/babel" src="employer-pages.jsx?v=15"></script>
+  <script type="text/babel" src="employer-pages3.jsx?v=20"></script>
+  <script type="text/babel" src="_premium/analytics.jsx?v=13"></script>
+  <script type="text/babel" src="employer-supabase.jsx?v=17"></script>
+  <script type="text/babel" src="employer-main.jsx?v=15"></script>
 </body>
 </html>

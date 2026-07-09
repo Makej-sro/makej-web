@@ -14,7 +14,7 @@ function EAnalytics() {
 
   return (
     <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto' }}>
-      <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, alignSelf: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 12, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, alignSelf: 'flex-start' }}>
         {segs.map(s => (
           <button key={s.k} onClick={() => setSeg(s.k)} style={{
             padding: '8px 16px', borderRadius: 8,
@@ -54,14 +54,14 @@ function AnalyticsOverview() {
               return (
                 <div key={i}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 7, color: T.ink, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600 }}>
                       <span style={{ width: 8, height: 8, borderRadius: 2, background: c.color }} />
                       {c.l}
                     </span>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'baseline' }}>
                       <span style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10.5 }}>{c.views.toLocaleString('cs-CZ').replace(/,/g,' ')} views</span>
                       <span style={{ color: '#5BD68A', fontFamily: T.fontMono, fontSize: 11.5, fontWeight: 700 }}>{c.hires} najato</span>
-                      <span style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 11.5, fontWeight: 700, minWidth: 44, textAlign: 'right' }}>{conv}%</span>
+                      <span style={{ color: T.ink, fontFamily: T.fontMono, fontSize: 11.5, fontWeight: 700, minWidth: 44, textAlign: 'right' }}>{conv}%</span>
                     </div>
                   </div>
                   <div style={{ height: 6, borderRadius: 3, background: 'rgba(0,0,0,0.3)', overflow: 'hidden' }}>
@@ -85,7 +85,7 @@ function AnalyticsOverview() {
             { i: 'graph-down-bold', c: '#E0B0FF', tag: 'Anomálie', t: 'Time-to-hire klesl o 28 % po zapnutí Premium tarifu — odhad ROI je +14 200 Kč/měsíc.' },
             { i: 'medal-ribbon-star-bold', c: '#FFD166', tag: 'Výkon', t: 'Vaše firma je v top 8 % gastro segmentu v Brně podle hodnocení i rychlosti odpovědí.' },
           ].map((x, i) => (
-            <div key={i} style={{ padding: 14, borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={i} style={{ padding: 14, borderRadius: 12, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 26, height: 26, borderRadius: 7, background: x.c + '22', border: '1px solid ' + x.c + '44', display: 'grid', placeItems: 'center' }}>
                   <Icon name={x.i} size={13} color={x.c}/>
@@ -113,7 +113,7 @@ function AnalyticsOverview() {
             ]}
           />
           <div style={{ marginTop: 8, color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 11 }}>
-            Váš průměr: <span style={{ color: '#fff', fontFamily: T.fontMono, fontWeight: 700 }}>14 minut</span> · Top 5 % v segmentu
+            Váš průměr: <span style={{ color: T.ink, fontFamily: T.fontMono, fontWeight: 700 }}>14 minut</span> · Top 5 % v segmentu
           </div>
         </ECard>
         <ECard>
@@ -154,7 +154,7 @@ function CohortTable() {
               const op = 0.2 + (v / 100) * 0.7;
               return (
                 <td key={j} style={{ padding: 0 }}>
-                  <div style={{ height: 26, borderRadius: 5, background: `rgba(0, 32, 246, ${op})`, color: '#fff', display: 'grid', placeItems: 'center', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 700 }}>{v}%</div>
+                  <div style={{ height: 26, borderRadius: 5, background: `rgba(0, 32, 246, ${op})`, color: T.ink, display: 'grid', placeItems: 'center', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 700 }}>{v}%</div>
                 </td>
               );
             })}
@@ -200,9 +200,9 @@ function DistroChart() {
         <text x={padL} y={H - 2} fill={T.mutedSoft} fontFamily={T.fontUI} fontSize="9">Kč/h</text>
       </svg>
       <div style={{ display: 'flex', gap: 20, marginTop: 6, fontFamily: T.fontMono, fontSize: 11 }}>
-        <div><span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Medián segmentu</span><div style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>162 Kč</div></div>
+        <div><span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Medián segmentu</span><div style={{ color: T.ink, fontWeight: 700, fontSize: 14 }}>162 Kč</div></div>
         <div><span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Vy</span><div style={{ color: '#FFD166', fontWeight: 700, fontSize: 14 }}>180 Kč</div></div>
-        <div><span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Top 10 %</span><div style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>220+ Kč</div></div>
+        <div><span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Top 10 %</span><div style={{ color: T.ink, fontWeight: 700, fontSize: 14 }}>220+ Kč</div></div>
       </div>
     </div>
   );
@@ -232,7 +232,7 @@ function AnalyticsDemo() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span style={{ width: 8, height: 8, borderRadius: 2, background: x.c }} />
                     <span style={{ color: T.light, flex: 1 }}>{x.l}</span>
-                    <span style={{ color: '#fff', fontFamily: T.fontMono, fontWeight: 700 }}>{x.v}</span>
+                    <span style={{ color: T.ink, fontFamily: T.fontMono, fontWeight: 700 }}>{x.v}</span>
                   </div>
                   <div style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10, marginLeft: 14 }}>{x.n} kandidátů</div>
                 </div>
@@ -251,7 +251,7 @@ function AnalyticsDemo() {
             <div key={i} style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontFamily: T.fontUI, marginBottom: 4 }}>
                 <span style={{ color: T.light }}>{x.l}</span>
-                <span style={{ color: '#fff', fontFamily: T.fontMono, fontWeight: 700 }}>{x.v} %</span>
+                <span style={{ color: T.ink, fontFamily: T.fontMono, fontWeight: 700 }}>{x.v} %</span>
               </div>
               <div style={{ height: 6, borderRadius: 3, background: 'rgba(0,0,0,0.3)' }}>
                 <div style={{ height: '100%', width: x.v + '%', borderRadius: 3, background: x.c }} />
@@ -282,7 +282,7 @@ function BrnoMap() {
     { x: 80, y: 38, r: 12, l: 'Maloměřice', n: 14 },
   ];
   return (
-    <div style={{ position: 'relative', width: '100%', height: 360, borderRadius: 14, background: 'linear-gradient(135deg, rgba(0,32,246,0.08), rgba(15,15,40,0.6))', border: '1px solid ' + T.border, overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width: '100%', height: 360, borderRadius: 14, background: 'linear-gradient(135deg, rgba(0,32,246,0.08), rgba(0,32,246,0.05))', border: '1px solid ' + T.border, overflow: 'hidden' }}>
       {/* grid lines suggesting map */}
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
         {Array.from({length: 12}, (_, i) => <line key={'h'+i} x1="0" y1={i*8.3} x2="100" y2={i*8.3} stroke="rgba(91,107,255,0.06)" strokeWidth="0.1" />)}
@@ -302,12 +302,12 @@ function BrnoMap() {
             border: '1px solid rgba(91,107,255,0.5)',
           }} />
           <div style={{ position: 'absolute', textAlign: 'center', pointerEvents: 'none' }}>
-            <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 13, fontWeight: 700 }}>{d.n}</div>
+            <div style={{ color: T.ink, fontFamily: T.fontMono, fontSize: 13, fontWeight: 700 }}>{d.n}</div>
             <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 9.5, fontWeight: 600, whiteSpace: 'nowrap' }}>{d.l}</div>
           </div>
         </div>
       ))}
-      <div style={{ position: 'absolute', bottom: 12, left: 12, padding: '6px 10px', borderRadius: 8, background: 'rgba(7,7,26,0.7)', border: '1px solid ' + T.border, color: T.muted, fontSize: 10.5, fontFamily: T.fontUI }}>
+      <div style={{ position: 'absolute', bottom: 12, left: 12, padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.85)', border: '1px solid ' + T.border, color: T.muted, fontSize: 10.5, fontFamily: T.fontUI }}>
         <Icon name="point-on-map-bold" size={11} color={T.super}/> 287 kandidátů v okolí 5 km
       </div>
     </div>
@@ -326,7 +326,7 @@ function AnalyticsCost() {
         ].map((x, i) => (
           <ECard key={i} padding={16}>
             <div style={{ color: T.muted, fontSize: 11, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.4, textTransform: 'uppercase' }}>{x.l}</div>
-            <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 26, fontWeight: 700, marginTop: 6, letterSpacing: -0.8 }}>{x.v}</div>
+            <div style={{ color: T.ink, fontFamily: T.fontMono, fontSize: 26, fontWeight: 700, marginTop: 6, letterSpacing: -0.8 }}>{x.v}</div>
             <div style={{ color: x.c, fontSize: 11.5, fontFamily: T.fontUI, marginTop: 4, fontWeight: 600 }}>{x.sub}</div>
           </ECard>
         ))}
@@ -360,7 +360,7 @@ function AnalyticsRetention() {
           { d: 60, v: 67, c: '#FFD166' },
           { d: 90, v: 52, c: '#5B6BFF' },
         ].map((x, i) => (
-          <div key={i} style={{ padding: 18, borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, textAlign: 'center' }}>
+          <div key={i} style={{ padding: 18, borderRadius: 12, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, textAlign: 'center' }}>
             <div style={{ color: T.muted, fontSize: 11, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.5, textTransform: 'uppercase' }}>{x.d} dní</div>
             <div style={{ color: x.c, fontFamily: T.fontMono, fontSize: 38, fontWeight: 700, marginTop: 8, letterSpacing: -1.5 }}>{x.v}%</div>
             <div style={{ color: T.mutedSoft, fontSize: 11, fontFamily: T.fontUI, marginTop: 4 }}>průměr segmentu {x.v - 14}%</div>
@@ -378,7 +378,7 @@ function AnalyticsRetention() {
         <div key={i} style={{ marginBottom: 8 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontFamily: T.fontUI, marginBottom: 4 }}>
             <span style={{ color: T.light }}>{x.l}</span>
-            <span style={{ color: '#fff', fontFamily: T.fontMono, fontWeight: 700 }}>{x.v} %</span>
+            <span style={{ color: T.ink, fontFamily: T.fontMono, fontWeight: 700 }}>{x.v} %</span>
           </div>
           <div style={{ height: 6, borderRadius: 3, background: 'rgba(0,0,0,0.3)' }}>
             <div style={{ height: '100%', width: (x.v * 3) + '%', borderRadius: 3, background: 'linear-gradient(90deg, #5B6BFF, #0020F6)' }} />
@@ -444,11 +444,11 @@ function ECalendar() {
 
       <ECard padding={0} style={{ overflow: 'hidden' }}>
         <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid ' + T.border }}>
-          <button style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
+          <button style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
             <Icon name="alt-arrow-left-line-duotone" size={14} color={T.light}/>
           </button>
-          <div style={{ fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, color: '#fff' }}>Květen 2025</div>
-          <button style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
+          <div style={{ fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, color: T.ink }}>Květen 2025</div>
+          <button style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
             <Icon name="alt-arrow-right-line-duotone" size={14} color={T.light}/>
           </button>
           <div style={{ flex: 1 }} />
@@ -499,7 +499,7 @@ function ECalendar() {
                           background: s.c + '22', borderLeft: '2px solid ' + s.c,
                           fontFamily: T.fontUI, fontSize: 10.5,
                         }}>
-                          <div style={{ color: '#fff', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.role}</div>
+                          <div style={{ color: T.ink, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.role}</div>
                           <div style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 9.5 }}>{s.n}/{s.of}</div>
                         </div>
                       ))}
@@ -522,18 +522,18 @@ function ECalendar() {
           ].map((x, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < 2 ? '1px solid ' + T.border : 'none' }}>
               <div style={{ textAlign: 'center', width: 60 }}>
-                <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 16, fontWeight: 700 }}>{x.day.split(' ')[1]}</div>
+                <div style={{ color: T.ink, fontFamily: T.fontMono, fontSize: 16, fontWeight: 700 }}>{x.day.split(' ')[1]}</div>
                 <div style={{ color: T.muted, fontSize: 10, fontFamily: T.fontUI }}>{x.day.split(' ')[0]}</div>
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{x.role}</div>
+                <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{x.role}</div>
                 <div style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 10.5, marginTop: 2 }}>{x.time}</div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ color: x.applied >= x.need ? '#5BD68A' : x.applied > 0 ? '#FFD166' : '#f43f5e', fontFamily: T.fontMono, fontSize: 13, fontWeight: 700 }}>{x.applied}/{x.need}</div>
                 <div style={{ color: T.mutedSoft, fontSize: 10, fontFamily: T.fontUI }}>přihlášeno</div>
               </div>
-              <button style={{ padding: '7px 12px', borderRadius: 8, background: 'rgba(91,107,255,0.18)', border: '1px solid rgba(91,107,255,0.3)', color: '#fff', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}>Najít</button>
+              <button style={{ padding: '7px 12px', borderRadius: 8, background: 'rgba(91,107,255,0.18)', border: '1px solid rgba(91,107,255,0.3)', color: T.ink, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}>Najít</button>
             </div>
           ))}
         </ECard>
@@ -543,10 +543,10 @@ function ECalendar() {
           <div style={{ padding: 12, borderRadius: 10, background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.25)', display: 'flex', alignItems: 'center', gap: 10 }}>
             <Icon name="shield-warning-bold" size={18} color="#f43f5e" />
             <div style={{ flex: 1 }}>
-              <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700 }}>Klára Novotná — Pá 9.5.</div>
+              <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700 }}>Klára Novotná — Pá 9.5.</div>
               <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, marginTop: 2 }}>Přijala směnu 17–23 a má i pohovor v 18:00</div>
             </div>
-            <button style={{ padding: '6px 10px', borderRadius: 7, background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, color: '#fff', fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Vyřešit</button>
+            <button style={{ padding: '6px 10px', borderRadius: 7, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Vyřešit</button>
           </div>
           <div style={{ marginTop: 14, color: T.mutedSoft, fontSize: 11, fontFamily: T.fontUI, textAlign: 'center' }}>
             Žádné další konflikty.

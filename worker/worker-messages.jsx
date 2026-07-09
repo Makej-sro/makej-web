@@ -44,7 +44,7 @@ function WMessages({ tick, chatTarget, onChatOpened }) {
     const chan = sb.channel('w-msgs-global')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
         const msg = payload.new;
-        const preview = msg.type === 'shift_offer' ? '📅 Nabídka směny' : msg.text;
+        const preview = msg.type === 'shift_offer' ? '📅 Nabídka směny' : msg.type === 'interview_offer' ? '🗓️ Pozvánka na pohovor' : msg.text;
         setThreads(prev => prev.map(t => {
           if (t.id !== msg.match_id) return t;
           const isMine = msg.sender_id === userId.current;
@@ -68,13 +68,17 @@ function WMessages({ tick, chatTarget, onChatOpened }) {
         setThreads(prev => prev.map(t => {
           if (t.id !== active) return t;
           if (t.msgs.some(m => m.id === msg.id)) return t;
+          const from = msg.sender_id === userId.current ? 'me' : 'them';
           const isShift = msg.type === 'shift_offer' && msg.metadata;
+          const isInterview = msg.type === 'interview_offer' && msg.metadata;
           const newMsg = isShift
-            ? { from: msg.sender_id === userId.current ? 'me' : 'them', kind: 'shift', shift: msg.metadata, t: _wFmtTime(msg.created_at), id: msg.id }
-            : { from: msg.sender_id === userId.current ? 'me' : 'them', text: msg.text, t: _wFmtTime(msg.created_at), id: msg.id };
+            ? { from, kind: 'shift', shift: msg.metadata, t: _wFmtTime(msg.created_at), id: msg.id }
+            : isInterview
+            ? { from, kind: 'interview', interview: msg.metadata, t: _wFmtTime(msg.created_at), id: msg.id }
+            : { from, text: msg.text, t: _wFmtTime(msg.created_at), id: msg.id };
           return {
             ...t,
-            last: isShift ? '📅 Nabídka směny' : msg.text,
+            last: isShift ? '📅 Nabídka směny' : isInterview ? '🗓️ Pozvánka na pohovor' : msg.text,
             msgs: [...t.msgs, newMsg],
           };
         }));
@@ -110,6 +114,26 @@ function WMessages({ tick, chatTarget, onChatOpened }) {
       ? '✓ Přijímám nabídku směny!'
       : 'Bohužel tuto směnu nemohu přijmout.';
     const tempId = 'tmp-resp-' + Date.now();
+    setThreads(prev => prev.map(t => t.id !== active ? t : {
+      ...t, last: text,
+      msgs: [...t.msgs, { from: 'me', text, t: _wFmtTime(new Date().toISOString()), id: tempId }],
+    }));
+    const { data } = await sb.from('messages').insert({
+      match_id: active, sender_id: userId.current, text,
+    }).select().single();
+    if (data) {
+      setThreads(prev => prev.map(t => t.id !== active ? t : {
+        ...t, msgs: t.msgs.map(m => m.id === tempId ? { ...m, id: data.id } : m),
+      }));
+    }
+  }
+
+  async function handleRespondToInterview(response) {
+    if (!active || !userId.current) return;
+    const text = response === 'accepted'
+      ? '✓ Přijímám pozvánku na pohovor!'
+      : 'Bohužel se pohovoru nemohu zúčastnit.';
+    const tempId = 'tmp-int-resp-' + Date.now();
     setThreads(prev => prev.map(t => t.id !== active ? t : {
       ...t, last: text,
       msgs: [...t.msgs, { from: 'me', text, t: _wFmtTime(new Date().toISOString()), id: tempId }],
@@ -261,6 +285,26 @@ function WMessages({ tick, chatTarget, onChatOpened }) {
                     alreadyResponded={alreadyResponded}
                     onAccept={() => setConfirmShift({ shift: m.shift, company: thread.name })}
                     onReject={() => handleRespondToShift('rejected')}
+                  />
+                );
+              }
+              if (m.kind === 'interview') {
+                const laterMsgs = thread.msgs.slice(i + 1);
+                const responseMsg = laterMsgs.find(lm =>
+                  lm.from === 'me' && (
+                    lm.text === '✓ Přijímám pozvánku na pohovor!' ||
+                    lm.text === 'Bohužel se pohovoru nemohu zúčastnit.'
+                  )
+                );
+                const alreadyResponded = responseMsg ? (responseMsg.text.includes('Přijímám') ? 'accepted' : 'rejected') : null;
+                return (
+                  <WInterviewCard
+                    key={m.id || i}
+                    msg={m}
+                    isMe={m.from === 'me'}
+                    alreadyResponded={alreadyResponded}
+                    onAccept={() => handleRespondToInterview('accepted')}
+                    onReject={() => handleRespondToInterview('rejected')}
                   />
                 );
               }
@@ -441,6 +485,70 @@ function WShiftCard({ msg, isMe, alreadyResponded, onAccept, onReject }) {
                   flex: 1, padding: '13px 0', border: 'none', background: '#fff',
                   color: '#f43f5e', fontFamily: T.fontHead, fontSize: 14, fontWeight: 800, cursor: 'pointer',
                 }}>Odmítnout</button>
+              <button
+                onClick={handleAccept}
+                style={{
+                  flex: 1, padding: '13px 0', border: 'none', background: T.primary,
+                  color: '#fff', fontFamily: T.fontHead, fontSize: 14, fontWeight: 800, cursor: 'pointer',
+                }}>Přijmout</button>
+            </div>
+          )
+        )}
+      </div>
+      <div style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10, marginTop: 3, textAlign: isMe ? 'right' : 'left' }}>{msg.t}</div>
+    </div>
+  );
+}
+
+function WInterviewCard({ msg, isMe, alreadyResponded, onAccept, onReject }) {
+  const [localResponded, setLocalResponded] = useStateW(null);
+  const responded = localResponded || alreadyResponded;
+  const iv = msg.interview || {};
+
+  const handleAccept = () => { setLocalResponded('accepted'); onAccept?.(); };
+  const handleReject = () => { setLocalResponded('rejected'); onReject?.(); };
+
+  return (
+    <div style={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
+      <div style={{
+        borderRadius: 18, overflow: 'hidden',
+        background: '#fff', border: '1px solid ' + T.border,
+        boxShadow: '0 8px 20px rgba(20,22,40,0.08)',
+      }}>
+        <div style={{ padding: '16px 18px 14px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: T.primary, fontSize: 11, fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase', fontFamily: T.fontUI, marginBottom: 12 }}>
+            <span style={{ width: 24, height: 24, borderRadius: 7, background: 'rgba(0,32,246,0.1)', display: 'grid', placeItems: 'center' }}>
+              <Icon name="users-group-rounded-bold" size={13} color={T.primary} />
+            </span>
+            Pozvánka na pohovor
+          </div>
+          <div style={{ color: T.inkSoft, fontFamily: T.fontUI, fontSize: 14, display: 'flex', flexDirection: 'column', gap: 9 }}>
+            {iv.date && <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9 }}><Icon name="calendar-minimalistic-bold" size={16} color={T.muted} /> {iv.date}{iv.time ? (' · ' + iv.time) : ''}</div>}
+            {iv.location && <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9 }}><Icon name="map-point-bold" size={16} color={T.muted} /> {iv.location}</div>}
+            {iv.note && <div style={{ color: T.muted, fontSize: 13 }}>{iv.note}</div>}
+          </div>
+        </div>
+
+        {!isMe && (
+          responded ? (
+            <div style={{
+              padding: '13px', textAlign: 'center',
+              background: responded === 'accepted' ? 'rgba(22,163,74,0.12)' : 'rgba(244,63,94,0.1)',
+              color: responded === 'accepted' ? '#16a34a' : '#f43f5e',
+              fontFamily: T.fontHead, fontSize: 14.5, fontWeight: 800,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+            }}>
+              <Icon name={responded === 'accepted' ? 'check-circle-bold' : 'close-circle-bold'} size={16} color={responded === 'accepted' ? '#16a34a' : '#f43f5e'} />
+              {responded === 'accepted' ? 'Přijato' : 'Odmítnuto'}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: 1, borderTop: '1px solid ' + T.border }}>
+              <button
+                onClick={handleReject}
+                style={{
+                  flex: 1, padding: '13px 0', border: 'none', background: '#fff',
+                  color: '#f43f5e', fontFamily: T.fontHead, fontSize: 14, fontWeight: 800, cursor: 'pointer',
+                }}>Nemohu</button>
               <button
                 onClick={handleAccept}
                 style={{

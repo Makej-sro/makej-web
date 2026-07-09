@@ -29,12 +29,18 @@ const E_THREADS = [
 function EMessages() {
   // Local thread state — initialized from (possibly mutated) global E_THREADS
   const [threads, setThreads]   = useStateE(() => [...E_THREADS]);
-  const [active,  setActive]    = useStateE(() => E_THREADS[0]?.id || null);
+  const [active,  setActive]    = useStateE(() => {
+    const preset = window._empPresetThread;
+    if (preset) { window._empPresetThread = null; return preset; }
+    return E_THREADS[0]?.id || null;
+  });
   const [filter,  setFilter]    = useStateE('all');
   const [msgInput, setMsgInput] = useStateE('');
   const [sending,  setSending]  = useStateE(false);
   const [showShiftModal, setShowShiftModal] = useStateE(false);
   const [shiftForm, setShiftForm] = useStateE({ role: '', date: '', time: '', pay: '', location: '' });
+  const [showInterviewModal, setShowInterviewModal] = useStateE(false);
+  const [interviewForm, setInterviewForm] = useStateE({ date: '', time: '', location: '', note: '' });
   const userId                  = useRefE(null);
   const scrollRef               = useRefE(null);
 
@@ -51,7 +57,7 @@ function EMessages() {
     const chan = sb.channel('e-msgs-global')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
         const msg = payload.new;
-        const preview = msg.type === 'shift_offer' ? '📅 Nabídka směny' : msg.text;
+        const preview = msg.type === 'shift_offer' ? '📅 Nabídka směny' : msg.type === 'interview_offer' ? '🗓️ Pozvánka na pohovor' : msg.text;
         setThreads(prev => prev.map(t => {
           if (t.id !== msg.match_id) return t;
           const isMine = msg.sender_id === userId.current;
@@ -79,17 +85,22 @@ function EMessages() {
         filter: 'match_id=eq.' + active,
       }, (payload) => {
         const msg = payload.new;
+        // Skip own messages — already added optimistically in handleSend / handleSendShift
+        if (msg.sender_id === userId.current) return;
         setThreads(prev => prev.map(t => {
           if (t.id !== active) return t;
-          // Avoid duplicate if it's our own optimistic message
           if (t.msgs.some(m => m.id === msg.id)) return t;
+          const from = msg.sender_id === userId.current ? 'me' : 'them';
           const isShift = msg.type === 'shift_offer' && msg.metadata;
+          const isInterview = msg.type === 'interview_offer' && msg.metadata;
           const newMsg = isShift
-            ? { from: msg.sender_id === userId.current ? 'me' : 'them', kind: 'shift', shift: { role: msg.metadata.role, date: msg.metadata.date, time: msg.metadata.time, pay: msg.metadata.pay }, t: _fmtTime(msg.created_at), id: msg.id }
-            : { from: msg.sender_id === userId.current ? 'me' : 'them', text: msg.text, t: _fmtTime(msg.created_at), id: msg.id };
+            ? { from, kind: 'shift', shift: { role: msg.metadata.role, date: msg.metadata.date, time: msg.metadata.time, pay: msg.metadata.pay }, t: _fmtTime(msg.created_at), id: msg.id }
+            : isInterview
+            ? { from, kind: 'interview', interview: { date: msg.metadata.date, time: msg.metadata.time, location: msg.metadata.location, note: msg.metadata.note }, t: _fmtTime(msg.created_at), id: msg.id }
+            : { from, text: msg.text, t: _fmtTime(msg.created_at), id: msg.id };
           return {
             ...t,
-            last: isShift ? '📅 Nabídka směny' : msg.text,
+            last: isShift ? '📅 Nabídka směny' : isInterview ? '🗓️ Pozvánka na pohovor' : msg.text,
             msgs: [...t.msgs, newMsg],
           };
         }));
@@ -144,7 +155,7 @@ function EMessages() {
     }));
     setShowShiftModal(false);
     setShiftForm({ role: '', date: '', time: '', pay: '', location: '' });
-    const { error } = await sb.from('messages').insert({
+    const { data: insertedShift, error } = await sb.from('messages').insert({
       match_id: active,
       sender_id: userId.current,
       text: 'Nabídka směny',
@@ -157,7 +168,64 @@ function EMessages() {
       setThreads(prev => prev.map(t => t.id !== active ? t : {
         ...t, msgs: t.msgs.filter(m => m.id !== tempId),
       }));
-      alert('Nepodařilo se odeslat nabídku. Je potřeba spustit DB migraci: ALTER TABLE messages ADD COLUMN IF NOT EXISTS type TEXT NOT NULL DEFAULT \'text\'; ALTER TABLE messages ADD COLUMN IF NOT EXISTS metadata JSONB;');
+    } else if (insertedShift) {
+      // Nahradit temp ID skutečným DB ID, aby realtime event poznal duplikát a přeskočil ho
+      setThreads(prev => prev.map(t => t.id !== active ? t : {
+        ...t, msgs: t.msgs.map(m => m.id === tempId ? { ...m, id: insertedShift.id, t: _fmtTime(insertedShift.created_at) } : m),
+      }));
+    }
+  }
+
+  async function handleSendInterview() {
+    if (!active || !userId.current) return;
+    const meta = {
+      date: interviewForm.date,
+      time: interviewForm.time,
+      location: interviewForm.location,
+      note: interviewForm.note,
+    };
+    const tempId = 'tmp-int-' + Date.now();
+    const intMsg = { from: 'me', kind: 'interview', interview: { ...meta }, t: _fmtTime(new Date().toISOString()), id: tempId };
+    setThreads(prev => prev.map(t => t.id !== active ? t : {
+      ...t, last: '🗓️ Pozvánka na pohovor',
+      msgs: [...t.msgs, intMsg],
+    }));
+    setShowInterviewModal(false);
+    setInterviewForm({ date: '', time: '', location: '', note: '' });
+    const { data: inserted, error } = await sb.from('messages').insert({
+      match_id: active,
+      sender_id: userId.current,
+      text: 'Pozvánka na pohovor',
+      type: 'interview_offer',
+      metadata: meta,
+    }).select().single();
+    if (error) {
+      console.error('sendInterviewOffer error:', error);
+      setThreads(prev => prev.map(t => t.id !== active ? t : {
+        ...t, msgs: t.msgs.filter(m => m.id !== tempId),
+      }));
+    } else if (inserted) {
+      setThreads(prev => prev.map(t => t.id !== active ? t : {
+        ...t, msgs: t.msgs.map(m => m.id === tempId ? { ...m, id: inserted.id, t: _fmtTime(inserted.created_at) } : m),
+      }));
+    }
+  }
+
+  // Odeslání libovolného textu jako zprávy (pro tlačítko „Zaslat pravidla")
+  async function sendQuickText(text) {
+    if (!text || !active || !userId.current) return;
+    const tempId = 'tmp-' + Date.now();
+    setThreads(prev => prev.map(t => t.id !== active ? t : {
+      ...t, last: text,
+      msgs: [...t.msgs, { from: 'me', text, t: _fmtTime(new Date().toISOString()), id: tempId }],
+    }));
+    const { data } = await sb.from('messages').insert({
+      match_id: active, sender_id: userId.current, text,
+    }).select().single();
+    if (data) {
+      setThreads(prev => prev.map(t => t.id !== active ? t : {
+        ...t, msgs: t.msgs.map(m => m.id === tempId ? { ...m, id: data.id, t: _fmtTime(data.created_at) } : m),
+      }));
     }
   }
 
@@ -180,18 +248,18 @@ function EMessages() {
   return (
     <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
       {/* List */}
-      <aside style={{ width: 320, flexShrink: 0, borderRight: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', background: 'rgba(15,15,40,0.3)' }}>
+      <aside style={{ width: 320, flexShrink: 0, borderRight: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', background: '#ffffff' }}>
         <div style={{ padding: 16, borderBottom: '1px solid ' + T.border }}>
           <div style={{ position: 'relative' }}>
             <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}><Icon name="magnifer-linear" size={14} color={T.mutedSoft}/></span>
-            <input placeholder="Hledat v konverzacích…" style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: '#fff', fontSize: 12.5, outline: 'none' }} />
+            <input placeholder="Hledat v konverzacích…" style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontSize: 12.5, outline: 'none' }} />
           </div>
           <div style={{ display: 'flex', gap: 4, marginTop: 10 }}>
             {[{k:'all',l:'Všechny'},{k:'unread',l:'Nepřečtené'},{k:'pinned',l:'Připnuté'}].map(f => (
               <button key={f.k} onClick={() => setFilter(f.k)} style={{
                 padding: '5px 10px', borderRadius: 6,
-                background: filter === f.k ? 'rgba(91,107,255,0.2)' : 'transparent',
-                border: '1px solid ' + (filter === f.k ? 'rgba(91,107,255,0.35)' : T.border),
+                background: filter === f.k ? T.primary : 'transparent',
+                border: '1px solid ' + (filter === f.k ? T.primary : T.border),
                 color: filter === f.k ? '#fff' : T.muted,
                 fontFamily: T.fontUI, fontSize: 11, fontWeight: 600, cursor: 'pointer',
               }}>{f.l}</button>
@@ -205,18 +273,18 @@ function EMessages() {
               <button key={t.id} onClick={() => setActive(t.id)} style={{
                 width: '100%', display: 'flex', alignItems: 'flex-start', gap: 10,
                 padding: '12px 16px', textAlign: 'left',
-                background: isActive ? 'rgba(91,107,255,0.12)' : 'transparent',
+                background: isActive ? 'rgba(0,32,246,0.09)' : 'transparent',
                 border: 'none', borderLeft: '3px solid ' + (isActive ? T.primary : 'transparent'),
                 cursor: 'pointer', color: 'inherit',
                 fontFamily: 'inherit',
               }}>
                 <div style={{ position: 'relative', flexShrink: 0 }}>
                   <div style={{ width: 38, height: 38, borderRadius: 999, background: t.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13 }}>{t.avatar}</div>
-                  {t.online ? <span style={{ position: 'absolute', bottom: 0, right: 0, width: 10, height: 10, borderRadius: 999, background: '#5BD68A', border: '2px solid #07071a' }} /> : null}
+                  {t.online ? <span style={{ position: 'absolute', bottom: 0, right: 0, width: 10, height: 10, borderRadius: 999, background: '#5BD68A', border: '2px solid #fff' }} /> : null}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 2 }}>
-                    <span style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {t.pinned ? '📌 ' : ''}{t.name}
                     </span>
                     <span style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10, flexShrink: 0 }}>{t.time}</span>
@@ -233,16 +301,16 @@ function EMessages() {
 
       {/* Thread */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <div style={{ padding: '14px 22px', borderBottom: '1px solid ' + T.border, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ padding: '14px 22px', borderBottom: '1px solid ' + T.border, display: 'flex', alignItems: 'center', gap: 12, background: '#ffffff' }}>
           <div style={{ width: 38, height: 38, borderRadius: 999, background: thread.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13 }}>{thread.avatar}</div>
           <div style={{ flex: 1 }}>
-            <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 14, fontWeight: 700 }}>{thread.name}</div>
+            <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 14, fontWeight: 700 }}>{thread.name}</div>
             <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI }}>{thread.role} · {thread.online ? <span style={{ color: '#5BD68A' }}>online</span> : 'offline'}</div>
           </div>
-          <button onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl })} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(91,107,255,0.18)', border: '1px solid rgba(91,107,255,0.3)', color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl })} style={{ padding: '8px 12px', borderRadius: 8, background: T.primary, border: '1px solid ' + T.primary, color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <Icon name="user-id-bold" size={13} color="#fff"/>Profil
           </button>
-          <button onClick={() => setShowShiftModal(true)} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => setShowShiftModal(true)} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <Icon name="calendar-bold" size={13} color={T.light}/>Nabídnout směnu
           </button>
         </div>
@@ -252,12 +320,29 @@ function EMessages() {
             if (m.kind === 'shift') {
               return (
                 <div key={i} style={{ alignSelf: m.from === 'me' ? 'flex-end' : 'flex-start', maxWidth: '70%' }}>
-                  <div style={{ padding: 14, borderRadius: 14, background: 'linear-gradient(135deg, rgba(0,32,246,0.25), rgba(91,107,255,0.1))', border: '1px solid rgba(91,107,255,0.3)' }}>
-                    <div style={{ color: T.super, fontSize: 10, fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase', fontFamily: T.fontUI }}>Nabídka směny</div>
-                    <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, marginTop: 4 }}>{m.shift.role}</div>
+                  <div style={{ padding: 14, borderRadius: 14, background: 'linear-gradient(135deg, rgba(0,32,246,0.10), rgba(91,107,255,0.06))', border: '1px solid rgba(0,32,246,0.22)' }}>
+                    <div style={{ color: T.primary, fontSize: 10, fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase', fontFamily: T.fontUI }}>Nabídka směny</div>
+                    <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, marginTop: 4 }}>{m.shift.role}</div>
                     <div style={{ color: T.light, fontFamily: T.fontUI, fontSize: 12, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 3 }}>
                       <div><Icon name="calendar-bold" size={11} color={T.muted}/> {m.shift.date} · {m.shift.time}</div>
-                      <div><Icon name="dollar-bold" size={11} color={T.muted}/> Odhad odměny <span style={{ color: '#fff', fontWeight: 700, fontFamily: T.fontMono }}>{m.shift.pay} Kč</span></div>
+                      <div><Icon name="dollar-bold" size={11} color={T.muted}/> Odhad odměny <span style={{ color: T.ink, fontWeight: 700, fontFamily: T.fontMono }}>{m.shift.pay} Kč</span></div>
+                    </div>
+                  </div>
+                  <div style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10, marginTop: 4, textAlign: m.from === 'me' ? 'right' : 'left' }}>{m.t}</div>
+                </div>
+              );
+            }
+            if (m.kind === 'interview') {
+              return (
+                <div key={i} style={{ alignSelf: m.from === 'me' ? 'flex-end' : 'flex-start', maxWidth: '70%' }}>
+                  <div style={{ padding: 14, borderRadius: 14, background: 'linear-gradient(135deg, rgba(0,32,246,0.10), rgba(91,107,255,0.06))', border: '1px solid rgba(0,32,246,0.22)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: T.primary, fontSize: 10, fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase', fontFamily: T.fontUI }}>
+                      <Icon name="users-group-rounded-bold" size={12} color={T.primary}/> Pozvánka na pohovor
+                    </div>
+                    <div style={{ color: T.light, fontFamily: T.fontUI, fontSize: 12, marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <div><Icon name="calendar-bold" size={11} color={T.muted}/> {m.interview.date}{m.interview.time ? ' · ' + m.interview.time : ''}</div>
+                      {m.interview.location ? <div><Icon name="map-point-bold" size={11} color={T.muted}/> {m.interview.location}</div> : null}
+                      {m.interview.note ? <div style={{ color: T.muted, marginTop: 2 }}>{m.interview.note}</div> : null}
                     </div>
                   </div>
                   <div style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10, marginTop: 4, textAlign: m.from === 'me' ? 'right' : 'left' }}>{m.t}</div>
@@ -268,8 +353,8 @@ function EMessages() {
               <div key={i} style={{ alignSelf: m.from === 'me' ? 'flex-end' : 'flex-start', maxWidth: '65%' }}>
                 <div style={{
                   padding: '10px 14px', borderRadius: 14,
-                  background: m.from === 'me' ? 'linear-gradient(135deg, #0020F6, #2D2CA7)' : 'rgba(255,255,255,0.06)',
-                  color: '#fff', fontFamily: T.fontUI, fontSize: 13, lineHeight: 1.45,
+                  background: m.from === 'me' ? 'linear-gradient(135deg, #0020F6, #2D2CA7)' : 'rgba(0,32,246,0.05)',
+                  color: m.from === 'me' ? '#fff' : T.ink, fontFamily: T.fontUI, fontSize: 13, lineHeight: 1.45,
                   borderBottomRightRadius: m.from === 'me' ? 4 : 14,
                   borderBottomLeftRadius: m.from === 'me' ? 14 : 4,
                 }}>{m.text}</div>
@@ -279,13 +364,13 @@ function EMessages() {
           })}
         </div>
 
-        <div style={{ padding: 16, borderTop: '1px solid ' + T.border, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ padding: 16, borderTop: '1px solid ' + T.border, display: 'flex', gap: 8, alignItems: 'center', background: '#ffffff' }}>
           <input
             placeholder="Napište zprávu…"
             value={msgInput}
             onChange={e => setMsgInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-            style={{ flex: 1, padding: '11px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: '#fff', fontSize: 13, outline: 'none', fontFamily: T.fontUI }}
+            style={{ flex: 1, padding: '11px 14px', borderRadius: 10, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontSize: 13, outline: 'none', fontFamily: T.fontUI }}
           />
           <button
             onClick={handleSend}
@@ -296,54 +381,93 @@ function EMessages() {
         </div>
 
         {/* Quick replies */}
-        <div style={{ padding: '0 16px 14px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div style={{ padding: '0 16px 14px', display: 'flex', gap: 6, flexWrap: 'wrap', background: '#ffffff' }}>
           {['Nabídnout směnu','Pozvat na pohovor','Zaslat pravidla','Bohužel ne'].map(q => (
             <button key={q} onClick={() => {
               if (q === 'Nabídnout směnu') { setShowShiftModal(true); return; }
+              if (q === 'Pozvat na pohovor') { setShowInterviewModal(true); return; }
+              if (q === 'Zaslat pravidla') {
+                const rules = ((typeof EPROFILE !== 'undefined' && EPROFILE.chat_rules) || '').trim();
+                if (!rules) {
+                  window.empToast && window.empToast('Pravidla nejsou nastavená', 'Nastav si vlastní text v Nastavení → Pravidla do chatu a pak ho odešleš jedním klikem.', 'ℹ️', 'info');
+                  window.empGoTab && window.empGoTab('settings');
+                  return;
+                }
+                sendQuickText(rules);
+                return;
+              }
+              if (q === 'Bohužel ne') {
+                setMsgInput('Děkujeme za váš zájem o tuto pozici! Tentokrát jsme se rozhodli pro jiného kandidáta. Budeme rádi, když se ozvete na naše další nabídky. 🙏');
+                return;
+              }
               setMsgInput(q);
-            }} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>{q}</button>
+            }} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>{q}</button>
           ))}
         </div>
       </main>
 
       {/* Right: candidate context */}
-      <aside style={{ width: 280, flexShrink: 0, borderLeft: '1px solid ' + T.border, padding: 18, overflowY: 'auto', background: 'rgba(15,15,40,0.3)' }}>
-        <div style={{ textAlign: 'center', marginBottom: 14 }}>
-          <div style={{ width: 64, height: 64, borderRadius: 999, background: thread.color, margin: '0 auto', display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 22 }}>{thread.avatar}</div>
-          <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 15, fontWeight: 800, marginTop: 8 }}>{thread.name}</div>
-          <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, marginTop: 2 }}>{[thread.city, thread.role].filter(Boolean).join(' · ') || 'Brigádník'}</div>
-          <div style={{ display: 'inline-flex', gap: 5, marginTop: 8 }}>
-            <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,107,255,0.2)', color: '#5B6BFF', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 800 }}>L{thread.level || 1}</span>
-            {thread.verified && <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,214,138,0.2)', color: '#5BD68A', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 800 }}>Ověřený</span>}
+      <aside style={{ width: 280, flexShrink: 0, borderLeft: '1px solid ' + T.border, padding: 20, overflowY: 'auto', background: '#ffffff', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div style={{ width: 84, height: 84, borderRadius: 24, margin: '0 auto', background: 'linear-gradient(160deg, rgba(255,255,255,0.30), rgba(255,255,255,0)), ' + thread.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 28, boxShadow: '0 10px 24px rgba(20,22,40,0.14)' }}>{thread.avatar}</div>
+          <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, marginTop: 12 }}>{thread.name}</div>
+          <div style={{ color: T.muted, fontSize: 12.5, fontFamily: T.fontUI, marginTop: 3 }}>{[thread.city, thread.role].filter(Boolean).join(' · ') || 'Brigádník'}</div>
+          <div style={{ display: 'inline-flex', gap: 6, marginTop: 10 }}>
+            <span style={{ padding: '4px 12px', borderRadius: 999, background: 'rgba(0,32,246,0.10)', color: T.primary, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 800 }}>Level {thread.level || 1}</span>
+            {thread.verified && <span style={{ padding: '4px 12px', borderRadius: 999, background: 'rgba(34,160,107,0.14)', color: '#16a34a', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 800 }}>Ověřený</span>}
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6, marginBottom: 14 }}>
+
+        {/* Stats — jednoduché karty */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 22 }}>
           {[
-            { l: 'hodnocení', v: Number(thread.rating) > 0 ? thread.rating + '★' : '–' },
-            { l: 'brigád', v: thread.jobsDone || 0 },
+            { l: 'hodnocení', v: Number(thread.rating) > 0 ? thread.rating : '–', star: Number(thread.rating) > 0 },
+            { l: 'brigád', v: thread.jobsDone || 0, star: false },
           ].map((s, i) => (
-            <div key={i} style={{ padding: 8, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, textAlign: 'center' }}>
-              <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 14, fontWeight: 700 }}>{s.v}</div>
-              <div style={{ color: T.mutedSoft, fontSize: 9.5, fontFamily: T.fontUI, marginTop: 1 }}>{s.l}</div>
+            <div key={i} style={{ padding: '16px 12px', borderRadius: 16, background: T.surfaceAlt, border: '1px solid ' + T.border, textAlign: 'center' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: T.ink, fontFamily: T.fontHead, fontSize: 21, fontWeight: 800, lineHeight: 1 }}>
+                {s.v}{s.star && <Icon name="star-bold" size={15} color="#F5A623" />}
+              </div>
+              <div style={{ color: T.mutedSoft, fontSize: 11, fontWeight: 600, marginTop: 6, fontFamily: T.fontUI }}>{s.l}</div>
             </div>
           ))}
         </div>
-        <div style={{ color: T.muted, fontSize: 10, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 6 }}>Životopis</div>
+
+        {/* Životopis */}
+        <div style={{ color: T.mutedSoft, fontSize: 10.5, fontWeight: 800, fontFamily: T.fontUI, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Životopis</div>
         {thread.cvUrl ? (
-          <a href={thread.cvUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, marginBottom: 6, textDecoration: 'none' }}>
-            <Icon name="document-text-bold" size={14} color={T.light}/>
-            <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600 }}>Otevřít životopis</div>
+          <a href={thread.cvUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, borderRadius: 14, background: T.surfaceAlt, border: '1px solid ' + T.border, marginBottom: 20, textDecoration: 'none' }}>
+            <span style={{ width: 34, height: 34, borderRadius: 9, background: 'rgba(0,32,246,0.08)', display: 'grid', placeItems: 'center', flexShrink: 0 }}><Icon name="document-text-bold" size={16} color={T.primary}/></span>
+            <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600 }}>Otevřít životopis</div>
           </a>
-        ) : <div style={{ color: T.mutedSoft, fontSize: 11, fontFamily: T.fontUI, fontStyle: 'italic', marginBottom: 6 }}>Bez životopisu</div>}
-        <button onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl })} style={{ width: '100%', marginTop: 10, padding: '9px 12px', borderRadius: 9, background: 'rgba(91,107,255,0.14)', border: '1px solid rgba(91,107,255,0.3)', color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Otevřít plný profil + recenze →</button>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, borderRadius: 14, background: 'transparent', border: '1.5px dashed ' + T.border, marginBottom: 20 }}>
+            <span style={{ width: 34, height: 34, borderRadius: 9, background: 'rgba(15,18,40,0.04)', display: 'grid', placeItems: 'center', flexShrink: 0 }}><Icon name="document-text-bold" size={16} color={T.mutedSoft}/></span>
+            <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12.5, fontStyle: 'italic' }}>Bez životopisu</div>
+          </div>
+        )}
+
+        {/* Dovednosti */}
+        {Array.isArray(thread.skills) && thread.skills.length > 0 && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ color: T.mutedSoft, fontSize: 10.5, fontWeight: 800, fontFamily: T.fontUI, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Dovednosti</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+              {thread.skills.map((sk, i) => (
+                <span key={i} style={{ padding: '6px 12px', borderRadius: 999, background: 'rgba(0,32,246,0.06)', border: '1px solid ' + T.border, color: T.ink, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600 }}>{sk}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl })} style={{ width: '100%', marginTop: 'auto', padding: '13px 12px', borderRadius: 12, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Otevřít plný profil + recenze →</button>
       </aside>
 
       {/* Shift offer modal */}
       {showShiftModal && (
         <div onClick={e => { if (e.target === e.currentTarget) setShowShiftModal(false); }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', display: 'grid', placeItems: 'center', zIndex: 200 }}>
-          <div style={{ background: '#0d0d28', border: '1px solid rgba(208,208,255,.14)', borderRadius: 18, padding: 28, width: 380, position: 'relative' }}>
+          <div style={{ background: '#ffffff', border: '1px solid ' + T.border, borderRadius: 18, padding: 28, width: 380, position: 'relative' }}>
             <button onClick={() => setShowShiftModal(false)} style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(208,208,255,.08)', border: 'none', borderRadius: 8, padding: 6, color: T.muted, cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>✕</button>
-            <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Nabídnout směnu</div>
+            <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Nabídnout směnu</div>
             <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginBottom: 20 }}>Nabídka bude odeslána jako zpráva — brigádník ji může přijmout nebo odmítnout.</div>
             {[
               { label: 'Pozice / název směny', key: 'role', placeholder: 'např. Barista, Servírka…', type: 'text' },
@@ -359,7 +483,7 @@ function EMessages() {
                   placeholder={field.placeholder}
                   value={shiftForm[field.key]}
                   onChange={e => setShiftForm(f => ({ ...f, [field.key]: e.target.value }))}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: 9, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(208,208,255,.14)', color: '#fff', fontSize: 13, outline: 'none', fontFamily: T.fontUI, boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid rgba(208,208,255,.14)', color: T.ink, fontSize: 13, outline: 'none', fontFamily: T.fontUI, boxSizing: 'border-box' }}
                 />
               </div>
             ))}
@@ -368,6 +492,40 @@ function EMessages() {
               disabled={!shiftForm.date || !shiftForm.time}
               style={{ width: '100%', padding: '12px 0', borderRadius: 10, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontHead, fontSize: 14, fontWeight: 800, cursor: (!shiftForm.date || !shiftForm.time) ? 'not-allowed' : 'pointer', opacity: (!shiftForm.date || !shiftForm.time) ? 0.5 : 1, marginTop: 4 }}>
               Odeslat nabídku směny
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Interview offer modal */}
+      {showInterviewModal && (
+        <div onClick={e => { if (e.target === e.currentTarget) setShowInterviewModal(false); }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', display: 'grid', placeItems: 'center', zIndex: 200 }}>
+          <div style={{ background: '#ffffff', border: '1px solid ' + T.border, borderRadius: 18, padding: 28, width: 380, position: 'relative' }}>
+            <button onClick={() => setShowInterviewModal(false)} style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(208,208,255,.08)', border: 'none', borderRadius: 8, padding: 6, color: T.muted, cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>✕</button>
+            <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Pozvat na pohovor</div>
+            <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginBottom: 20 }}>Pozvánka se odešle jako zpráva. Je to jen pohovor — inzerát zůstává aktivní.</div>
+            {[
+              { label: 'Datum', key: 'date', placeholder: 'např. Čt 15.5.', type: 'text' },
+              { label: 'Čas', key: 'time', placeholder: 'např. 14:00', type: 'text' },
+              { label: 'Místo / online odkaz', key: 'location', placeholder: 'např. Náměstí Míru 3, Praha 2 nebo Google Meet', type: 'text' },
+              { label: 'Poznámka (nepovinné)', key: 'note', placeholder: 'např. Vezmi si s sebou OP, potrvá cca 20 min', type: 'text' },
+            ].map(field => (
+              <div key={field.key} style={{ marginBottom: 14 }}>
+                <div style={{ color: T.light, fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.5 }}>{field.label}</div>
+                <input
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  value={interviewForm[field.key]}
+                  onChange={e => setInterviewForm(f => ({ ...f, [field.key]: e.target.value }))}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid rgba(208,208,255,.14)', color: T.ink, fontSize: 13, outline: 'none', fontFamily: T.fontUI, boxSizing: 'border-box' }}
+                />
+              </div>
+            ))}
+            <button
+              onClick={handleSendInterview}
+              disabled={!interviewForm.date || !interviewForm.time}
+              style={{ width: '100%', padding: '12px 0', borderRadius: 10, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontHead, fontSize: 14, fontWeight: 800, cursor: (!interviewForm.date || !interviewForm.time) ? 'not-allowed' : 'pointer', opacity: (!interviewForm.date || !interviewForm.time) ? 0.5 : 1, marginTop: 4 }}>
+              Odeslat pozvánku na pohovor
             </button>
           </div>
         </div>
@@ -391,6 +549,7 @@ function ESettings() {
       <aside style={{ width: 220, padding: 22, borderRight: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', gap: 4 }}>
         {[
           { k: 'profile', l: 'Firemní profil', i: 'buildings-3-bold' },
+          { k: 'team', l: 'Tým', i: 'users-group-two-rounded-bold' },
           { k: 'notif', l: 'Notifikace', i: 'bell-bold' },
           { k: 'priv', l: 'Soukromí + GDPR', i: 'shield-keyhole-bold' },
           { k: 'danger', l: 'Nebezpečná zóna', i: 'shield-warning-bold' },
@@ -430,6 +589,7 @@ function ESettings() {
       </aside>
       <div style={{ flex: 1, padding: '24px 28px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 760 }}>
         {seg === 'profile' && <SettingsProfile />}
+        {seg === 'team' && <SettingsTeam />}
         {seg === 'notif' && <SettingsNotif />}
         {seg === 'priv' && <SettingsPrivacy />}
         {seg === 'danger' && <SettingsDanger />}
@@ -438,11 +598,98 @@ function ESettings() {
   );
 }
 
+const TEAM_ROLES = { admin: 'Admin', recruiter: 'Náborář', accountant: 'Účetní', viewer: 'Jen ke čtení' };
+
+function SettingsTeam() {
+  const entitled = (typeof can !== 'function') || can('teamRoles');
+  const [members, setMembers] = useStateE(() => (typeof E_TEAM !== 'undefined' ? [...E_TEAM] : []));
+  const [email, setEmail] = useStateE('');
+  const [role,  setRole]  = useStateE('recruiter');
+  const [busy,  setBusy]  = useStateE(false);
+  const [err,   setErr]   = useStateE('');
+
+  useEffectE(() => {
+    if (!entitled) return;
+    sb.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) { await fetchTeamE(session.user.id); setMembers([...E_TEAM]); }
+    });
+  }, []);
+
+  if (!entitled) {
+    return (
+      <div style={{ padding: '28px 4px' }}>
+        <div style={{ maxWidth: 460, padding: 28, borderRadius: 16, background: '#fff', border: '1px solid ' + T.border, boxShadow: '0 6px 20px rgba(15,18,40,0.06)', textAlign: 'center' }}>
+          <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(0,32,246,0.08)', border: '1px solid rgba(0,32,246,0.18)', display: 'grid', placeItems: 'center', margin: '0 auto 16px' }}>
+            <Icon name="users-group-two-rounded-bold" size={28} color={T.primary} />
+          </div>
+          <div style={{ fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, color: T.ink, marginBottom: 8 }}>Týmové role jsou v tarifu Business</div>
+          <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13, lineHeight: 1.6, marginBottom: 18 }}>Přizvi kolegy (náboráře, účetní), rozděl role a spravujte nábor společně.</div>
+          <button onClick={() => window.empGoTab && window.empGoTab('pricing')} style={{ padding: '11px 22px', borderRadius: 11, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}>Zobrazit tarify</button>
+        </div>
+      </div>
+    );
+  }
+
+  async function invite() {
+    setBusy(true); setErr('');
+    const r = await inviteTeamMemberE(email, role);
+    setBusy(false);
+    if (!r.ok) { setErr(r.msg); return; }
+    setEmail(''); setMembers([...E_TEAM]);
+    window.empToast && window.empToast('Pozvánka vytvořena', email + ' se přidá do týmu, jakmile se přihlásí.', '✉️', 'success');
+  }
+  async function remove(id) {
+    const ok = await removeTeamMemberE(id);
+    if (ok) setMembers([...E_TEAM]);
+  }
+
+  return (
+    <div>
+      <div style={{ fontFamily: T.fontHead, fontSize: 17, fontWeight: 800, color: T.ink, marginBottom: 4 }}>Tým</div>
+      <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12.5, marginBottom: 18 }}>Pozvi kolegy e-mailem a přiřaď jim roli. Přístup získají, jakmile se přihlásí stejným e-mailem.</div>
+
+      {/* Invite */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'stretch', marginBottom: 8, flexWrap: 'wrap' }}>
+        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="kolega@firma.cz" type="email"
+          style={{ flex: 1, minWidth: 200, padding: '10px 12px', borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontFamily: T.fontUI, fontSize: 13, outline: 'none' }} />
+        <select value={role} onChange={e => setRole(e.target.value)}
+          style={{ padding: '10px 12px', borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontFamily: T.fontUI, fontSize: 13, outline: 'none', appearance: 'auto' }}>
+          {Object.keys(TEAM_ROLES).map(k => <option key={k} value={k}>{TEAM_ROLES[k]}</option>)}
+        </select>
+        <button onClick={invite} disabled={busy || !email.trim()} style={{ padding: '10px 18px', borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, cursor: (busy || !email.trim()) ? 'default' : 'pointer', opacity: (busy || !email.trim()) ? 0.6 : 1 }}>{busy ? 'Zvu…' : 'Pozvat'}</button>
+      </div>
+      {err && <div style={{ color: '#f43f5e', fontFamily: T.fontUI, fontSize: 12, marginBottom: 8 }}>{err}</div>}
+
+      {/* Members */}
+      <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {members.length === 0 ? (
+          <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12.5, fontStyle: 'italic', padding: '10px 0' }}>Zatím jsi nikoho nepozval.</div>
+        ) : members.map(m => (
+          <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 12, background: '#fff', border: '1px solid ' + T.border }}>
+            <div style={{ width: 36, height: 36, borderRadius: 999, background: _strColorSafe(m.email), display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{(m.email[0] || '?').toUpperCase()}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.email}</div>
+              <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, marginTop: 1 }}>{TEAM_ROLES[m.role] || m.role} · {m.status === 'active' ? 'aktivní' : 'čeká na přihlášení'}</div>
+            </div>
+            <button onClick={() => remove(m.id)} style={{ padding: '6px 8px', borderRadius: 8, background: 'transparent', border: '1px solid ' + T.border, color: '#f43f5e', cursor: 'pointer', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700 }}>Odebrat</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function _strColorSafe(s) {
+  const palette = ['#5B6BFF', '#0020F6', '#8AB4FF', '#5BD68A', '#F5A623', '#9B59D0'];
+  let h = 0; for (let i = 0; i < (s || '').length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return palette[h % palette.length];
+}
+
 function FormRow({ label, sub, children }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 16, padding: '14px 0', borderBottom: '1px solid ' + T.border, alignItems: 'flex-start' }}>
       <div>
-        <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700 }}>{label}</div>
+        <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700 }}>{label}</div>
         {sub ? <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, marginTop: 3 }}>{sub}</div> : null}
       </div>
       <div>{children}</div>
@@ -453,7 +700,7 @@ function FormRow({ label, sub, children }) {
 const inputStyle = {
   width: '100%', padding: '9px 12px', borderRadius: 8,
   background: 'rgba(0,0,0,0.3)', border: '1px solid ' + T.border,
-  color: '#fff', fontFamily: T.fontUI, fontSize: 13, outline: 'none',
+  color: T.ink, fontFamily: T.fontUI, fontSize: 13, outline: 'none',
 };
 
 // ── Pomocné prvky profilu ──────────────────────────────────────────────────
@@ -472,7 +719,7 @@ function ImageField({ label, sub, value, onChange, fallback, color }) {
         {value ? <img src={value} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; }} /> : fallback}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 14.5, fontWeight: 800 }}>{label}</div>
+        <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 14.5, fontWeight: 800 }}>{label}</div>
         <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, margin: '2px 0 7px' }}>{sub}</div>
         <input style={{ ...inputStyle, fontSize: 12 }} value={value} onChange={onChange} placeholder="Vlož odkaz na obrázek (URL)" />
       </div>
@@ -494,6 +741,7 @@ function SettingsProfile() {
     ic:        EPROFILE.ic || '',
     industry:  EPROFILE.industry || '',
     bio:       EPROFILE.bio || '',
+    chat_rules: EPROFILE.chat_rules || '',
     website:   EPROFILE.website || '',
     address:   EPROFILE.address || '',
     avatar_url: EPROFILE.avatar_url || '',
@@ -517,6 +765,7 @@ function SettingsProfile() {
     const ok = await updateEmployerProfile({
       company_name: form.company_name,
       ic: form.ic, industry: form.industry, bio: form.bio,
+      chat_rules: form.chat_rules,
       website: form.website, address: form.address,
       avatar_url: form.avatar_url, logo_url: form.logo_url,
       socials: form.socials,
@@ -553,7 +802,7 @@ function SettingsProfile() {
               <Icon name="verified-check-bold" size={14} color="#5B6BFF" /> Ověřená firma
             </span>
           ) : (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 999, background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 999, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600 }}>
               <Icon name="shield-warning-bold" size={14} color={T.muted} /> Neověřeno — kontaktuj podporu pro ověření
             </span>
           )}
@@ -579,6 +828,9 @@ function SettingsProfile() {
         <FormRow label="Krátký popis" sub="Max. 280 znaků — vidí se v kartě firmy">
           <textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical', fontFamily: T.fontUI }} value={form.bio} onChange={set('bio')} maxLength={280} placeholder="Napiš něco o firmě…" />
         </FormRow>
+        <FormRow label="Pravidla do chatu" sub="Tvůj vlastní text — pošleš ho brigádníkovi jedním klikem přes tlačítko Zaslat pravidla v chatu">
+          <textarea style={{ ...inputStyle, minHeight: 110, resize: 'vertical', fontFamily: T.fontUI }} value={form.chat_rules} onChange={set('chat_rules')} placeholder={'Např.:\n• Dochvilnost je základ — přijď 10 min předem.\n• Dress code: černé triko, pohodlná obuv.\n• Vezmi si OP a číslo účtu.\n• Kontakt na místě: Jana, 777 123 456.'} />
+        </FormRow>
 
         {/* Kontakt */}
         <FormRow label="Web">
@@ -603,7 +855,7 @@ function SettingsProfile() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {SOCIAL_FIELDS.map(s => (
               <div key={s.k} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <span style={{ width: 30, height: 30, flexShrink: 0, borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, display: 'grid', placeItems: 'center' }}>
+                <span style={{ width: 30, height: 30, flexShrink: 0, borderRadius: 8, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, display: 'grid', placeItems: 'center' }}>
                   <Icon name={s.icon} size={15} color={T.light} />
                 </span>
                 <input style={{ ...inputStyle, fontSize: 12 }} value={form.socials[s.k] || ''} onChange={setSocial(s.k)} placeholder={s.ph} />
@@ -620,7 +872,7 @@ function SettingsProfile() {
             )}
             {form.photos.map((url, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, display: 'grid', placeItems: 'center' }}>
+                <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: 8, overflow: 'hidden', background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, display: 'grid', placeItems: 'center' }}>
                   {url ? <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; }} /> : <Icon name="gallery-bold" size={15} color={T.mutedSoft} />}
                 </div>
                 <input style={{ ...inputStyle, fontSize: 12 }} value={url} onChange={e => setPhoto(i, e.target.value)} placeholder="URL fotky" />
@@ -629,7 +881,7 @@ function SettingsProfile() {
                 </button>
               </div>
             ))}
-            <button onClick={addPhoto} style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px dashed ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+            <button onClick={addPhoto} style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, background: 'rgba(0,32,246,0.05)', border: '1px dashed ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
               <Icon name="add-circle-bold" size={14} color={T.light} /> Přidat fotku
             </button>
           </div>
@@ -660,7 +912,7 @@ function SettingsProfile() {
               <div key={j.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < activeJobs.length - 1 ? '1px solid ' + T.border : 'none' }}>
                 <div style={{ width: 8, height: 8, borderRadius: 999, flexShrink: 0, background: j.status === 'urgent' ? '#f43f5e' : '#5BD68A' }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.title}</div>
+                  <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.title}</div>
                   <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, marginTop: 2 }}>
                     {j.status === 'urgent' ? 'Spěchá' : 'Aktivní'}{j.location ? ' · ' + j.location : ''}{j.matches ? ' · ' + j.matches + ' kandidátů' : ''}
                   </div>
@@ -684,7 +936,7 @@ function SettingsProfile() {
                 <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: 999, background: (r.color || T.primary) + '22', border: '1px solid ' + (r.color || T.primary) + '55', display: 'grid', placeItems: 'center', color: r.color || T.light, fontFamily: T.fontHead, fontWeight: 800, fontSize: 13 }}>{r.avatar}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{r.author}</span>
+                    <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{r.author}</span>
                     <span style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 11 }}>{r.when}</span>
                   </div>
                   <div style={{ margin: '3px 0 5px' }}><Stars n={r.rating} /></div>
@@ -723,7 +975,7 @@ function SettingsNotif() {
       {rows.map((r, i) => (
         <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 80px 80px', gap: 0, padding: '14px 22px', alignItems: 'center', borderBottom: i < rows.length - 1 ? '1px solid ' + T.border : 'none' }}>
           <div>
-            <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{r.l}</div>
+            <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{r.l}</div>
             <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, marginTop: 2 }}>{r.s}</div>
           </div>
           {[r.e, r.p, r.push].map((on, j) => (
@@ -765,13 +1017,13 @@ function SettingsPrivacy() {
       ].map((r, i) => (
         <FormRow key={i} label={r.l} sub={r.sub}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, padding: '6px 10px', borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border }}>{r.v}</span>
+            <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, padding: '6px 10px', borderRadius: 7, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border }}>{r.v}</span>
             <button onClick={() => window.empToast && window.empToast('Nastavení soukromí', 'Úpravu těchto pravidel připravujeme.', '🔒', 'info')} style={{ padding: '6px 12px', borderRadius: 7, background: 'transparent', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600, cursor: 'pointer' }}>Změnit</button>
           </div>
         </FormRow>
       ))}
       <div style={{ marginTop: 18, padding: 14, borderRadius: 10, background: 'rgba(91,107,255,0.08)', border: '1px solid rgba(91,107,255,0.2)' }}>
-        <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700 }}>Export všech dat</div>
+        <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700 }}>Export všech dat</div>
         <div style={{ color: T.muted, fontSize: 11.5, fontFamily: T.fontUI, marginTop: 4 }}>Stáhněte JSON se všemi inzeráty, kandidáty a zprávami. Zpracování trvá ~10 minut.</div>
         <button onClick={() => {
           const data = {
@@ -785,7 +1037,7 @@ function SettingsPrivacy() {
           document.body.appendChild(a); a.click(); a.remove();
           setTimeout(() => URL.revokeObjectURL(url), 1000);
           if (window.empToast) window.empToast('Export hotový', 'Všechna data stažena jako JSON.', '📦', 'success');
-        }} style={{ marginTop: 10, padding: '8px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border, color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Vyžádat export</button>
+        }} style={{ marginTop: 10, padding: '8px 14px', borderRadius: 8, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Vyžádat export</button>
       </div>
     </ECard>
   );
@@ -802,7 +1054,7 @@ function SettingsDanger() {
       ].map((r, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 0', borderBottom: i < 2 ? '1px solid ' + T.border : 'none' }}>
           <div style={{ flex: 1 }}>
-            <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{r.l}</div>
+            <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{r.l}</div>
             <div style={{ color: T.muted, fontSize: 11.5, fontFamily: T.fontUI, marginTop: 3 }}>{r.s}</div>
           </div>
           <button onClick={async () => {
@@ -822,4 +1074,383 @@ function SettingsDanger() {
   );
 }
 
-Object.assign(window, { EMessages, ESettings });
+// ─────────────────────────────────────────────────────────────
+// CENÍK / TARIFY  (převzato z Yasinova dashboardu, přebarveno na světlý motiv)
+// ─────────────────────────────────────────────────────────────
+
+const PLANS = [
+  {
+    id: 'starter',
+    name: 'Starter',
+    price: 0,
+    period: 'navždy zdarma',
+    color: '#6677cc',
+    icon: 'hand-shake-bold',
+    badge: null,
+    features: [
+      { ok: true,  text: '1 aktivní inzerát' },
+      { ok: true,  text: '1 full-time inzerce' },
+      { ok: true,  text: 'Oslovování brigádníků (1×/měs)' },
+      { ok: true,  text: 'Základní statistiky' },
+      { ok: false, text: 'Topování inzerátu' },
+      { ok: false, text: 'Ověřená firma' },
+      { ok: false, text: 'SMS Urgent' },
+      { ok: false, text: 'Pokročilá analytika' },
+      { ok: false, text: 'Export dat (CSV)' },
+    ],
+    cta: 'Začít zdarma',
+    ctaDisabled: false,
+    contact: false,
+  },
+  {
+    id: 'standard',
+    name: 'Standard',
+    price: 499,
+    annualPrice: 424,
+    period: 'měsíc bez DPH',
+    color: '#8AB4FF',
+    icon: 'bolt-bold',
+    badge: 'Nejoblíbenější',
+    features: [
+      { ok: true,  text: '2 aktivní inzeráty' },
+      { ok: true,  text: 'Topování inzerátu (1×/měs)' },
+      { ok: true,  text: 'Ověřená firma + branding' },
+      { ok: true,  text: 'Oslovování brigádníků (10×/měs)' },
+      { ok: true,  text: 'Plné statistiky + CSV export' },
+      { ok: true,  text: 'Šablony inzerátů' },
+      { ok: false, text: 'SMS Urgent' },
+      { ok: false, text: 'Prémiový badge' },
+      { ok: false, text: 'Pokročilá analytika' },
+    ],
+    cta: 'Vybrat Standard',
+    ctaDisabled: false,
+    contact: false,
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    price: 4999,
+    annualPrice: 4249,
+    period: 'měsíc bez DPH',
+    color: '#F5A623',
+    icon: 'crown-star-bold',
+    badge: null,
+    features: [
+      { ok: true,  text: '10 aktivních inzerátů' },
+      { ok: true,  text: 'Topování inzerátu (5×/měs)' },
+      { ok: true,  text: 'SMS Urgent + prémiový badge' },
+      { ok: true,  text: 'Oslovování brigádníků (100×/měs)' },
+      { ok: true,  text: 'Pokročilá analytika' },
+      { ok: true,  text: 'Zmínka na FB + IG Makej' },
+      { ok: true,  text: 'Role uživatelů' },
+      { ok: true,  text: 'Plánování inzerátu' },
+      { ok: true,  text: 'Možnost konzultace' },
+    ],
+    cta: 'Vybrat Business',
+    ctaDisabled: false,
+    contact: false,
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 9999,
+    pricePrefix: 'od ',
+    period: 'kalkulace na míru',
+    color: '#9B59D0',
+    icon: 'buildings-2-bold',
+    badge: null,
+    features: [
+      { ok: true,  text: 'Vše z Business' },
+      { ok: true,  text: 'Custom integrace (HR systémy)' },
+      { ok: true,  text: 'Co-marketing s Makej' },
+      { ok: true,  text: 'Vlastní reporting na míru' },
+      { ok: true,  text: 'Neomezení uživatelé v týmu' },
+      { ok: true,  text: 'Onboarding a školení týmu' },
+      { ok: true,  text: 'SLA 99,99 % + prioritní podpora' },
+      { ok: true,  text: 'Dedikovaný account manager' },
+    ],
+    cta: 'Nezávazná poptávka',
+    ctaDisabled: false,
+    contact: true,
+  },
+];
+
+function animatePrice(el, from, to) {
+  if (!el) return;
+  var start = performance.now(), dur = 480;
+  function step(now) {
+    var t = Math.min((now - start) / dur, 1);
+    var eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(from + (to - from) * eased).toLocaleString('cs-CZ');
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function EPricing({ onTab, onPlanChange }) {
+  const [selected, setSelected] = useStateE(null);
+  const [success, setSuccess]   = useStateE(false);
+  const [hovered, setHovered]   = useStateE(null);
+  const [annual, setAnnual]     = useStateE(false);
+  const priceRefs               = useRefE({});
+
+  useEffectE(() => {
+    PLANS.forEach(plan => {
+      if (!plan.annualPrice) return;
+      const el = priceRefs.current[plan.id];
+      const from = annual ? plan.price : plan.annualPrice;
+      const to   = annual ? plan.annualPrice : plan.price;
+      animatePrice(el, from, to);
+    });
+  }, [annual]);
+
+  const currentPlanId = (() => {
+    const planName = (ECOMPANY.plan || '').toLowerCase();
+    if (planName.includes('enterprise')) return 'enterprise';
+    if (planName.includes('business') || planName.includes('premium')) return 'business';
+    if (planName.includes('standard')) return 'standard';
+    return 'starter';
+  })();
+
+  function handleSelect(planId) {
+    if (planId === currentPlanId) return;
+    setSelected(planId);
+  }
+
+  async function handlePay() {
+    const plan = PLANS.find(p => p.id === selected);
+    if (plan) {
+      ECOMPANY.plan = plan.name;
+      if (typeof EPROFILE !== 'undefined') EPROFILE.plan = plan.id;
+      // Ulož tarif do DB (profiles.plan)
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) await sb.from('profiles').update({ plan: plan.id }).eq('id', session.user.id);
+      } catch (e) { console.error('Uložení tarifu selhalo:', e); }
+      if (onPlanChange) onPlanChange(plan.name);
+    }
+    setSuccess(true);
+    setTimeout(() => { setSuccess(false); setSelected(null); }, 3000);
+  }
+
+  return (
+    <div style={{ padding: '28px 32px 48px', overflowY: 'auto' }}>
+      {/* Header */}
+      <div style={{ marginBottom: 32, textAlign: 'center' }}>
+        <div style={{ fontFamily: T.fontHead, fontSize: 28, fontWeight: 900, color: T.ink, marginBottom: 8 }}>Vyber si svůj plán</div>
+        <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 14, marginBottom: 20 }}>Bez závazků. Zrušení kdykoliv.</div>
+        {/* Billing toggle */}
+        <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: T.surfaceAlt, border: '1px solid ' + T.border, borderRadius: 99, padding: '6px 16px' }}>
+            <span style={{ color: annual ? T.muted : T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, transition: 'color .2s' }}>Měsíčně</span>
+            <div
+              onClick={() => setAnnual(a => !a)}
+              style={{ width: 44, height: 24, borderRadius: 999, background: annual ? '#22a06b' : 'rgba(15,18,40,0.15)', cursor: 'pointer', position: 'relative', transition: 'background .2s', flexShrink: 0 }}
+            >
+              <div style={{ position: 'absolute', top: 3, left: annual ? 23 : 3, width: 18, height: 18, borderRadius: 999, background: '#fff', transition: 'left .2s', boxShadow: '0 1px 4px rgba(0,0,0,0.25)' }} />
+            </div>
+            <span style={{ color: annual ? T.ink : T.muted, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, transition: 'color .2s' }}>Ročně</span>
+          </div>
+          <div style={{ height: 26, display: 'flex', alignItems: 'center' }}>
+            <span style={{ background: 'rgba(34,160,107,0.12)', border: '1px solid rgba(34,160,107,0.3)', color: '#22a06b', fontFamily: T.fontUI, fontSize: 11, fontWeight: 800, borderRadius: 10, padding: '4px 12px', opacity: annual ? 1 : 0, transition: 'opacity .2s' }}>chci šetřit</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Plans grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, maxWidth: 1100, margin: '0 auto 40px' }}>
+        {PLANS.map(plan => {
+          const isActive = plan.id === currentPlanId;
+          const isPop    = plan.badge != null;
+          const isSel    = selected === plan.id;
+          const isHov    = hovered === plan.id;
+          return (
+            <div key={plan.id} onClick={() => handleSelect(plan.id)}
+              onMouseEnter={() => setHovered(plan.id)}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+              borderRadius: 18,
+              border: '2.5px solid ' + (isActive ? plan.color : isSel ? plan.color : isHov ? 'rgba(15,18,40,0.28)' : T.border),
+              background: isPop
+                ? 'linear-gradient(160deg, rgba(245,166,35,0.10), rgba(0,32,246,0.06)), #ffffff'
+                : '#ffffff',
+              boxShadow: '0 6px 20px rgba(15,18,40,0.06)',
+              padding: '28px 24px 24px',
+              cursor: isActive ? 'default' : 'pointer',
+              position: 'relative',
+              transition: 'border-color 0.15s, transform 0.15s',
+              transform: isSel ? 'translateY(-4px)' : 'none',
+            }}>
+              {plan.badge && (
+                <div style={{
+                  position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)',
+                  background: 'linear-gradient(90deg, #F5A623, #FF9F43)',
+                  color: '#1a1000', fontFamily: T.fontUI, fontSize: 10.5, fontWeight: 800,
+                  borderRadius: 99, padding: '4px 14px', whiteSpace: 'nowrap',
+                }}>{plan.badge}</div>
+              )}
+              {isActive && (
+                <div style={{
+                  position: 'absolute', top: 12, right: 12,
+                  background: plan.color + '22', border: '1px solid ' + plan.color + '66',
+                  color: plan.color, fontSize: 9.5, fontWeight: 800, fontFamily: T.fontUI,
+                  borderRadius: 99, padding: '3px 9px', letterSpacing: 0.5,
+                }}>AKTUÁLNÍ</div>
+              )}
+              <div style={{ marginBottom: 16 }}>
+                <Icon name={plan.icon} size={24} color={plan.color} />
+              </div>
+              <div style={{ fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, color: T.ink, marginBottom: 4 }}>{plan.name}</div>
+              <div style={{ marginBottom: 20 }}>
+                {plan.price === 0 ? (
+                  <span style={{ fontFamily: T.fontMono, fontSize: 28, fontWeight: 700, color: plan.color }}>Zdarma</span>
+                ) : (
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexWrap: 'wrap' }}>
+                      {plan.pricePrefix && <span style={{ color: T.muted, fontSize: 13, fontFamily: T.fontUI }}>{plan.pricePrefix}</span>}
+                      <span
+                        ref={el => { if (el) priceRefs.current[plan.id] = el; }}
+                        style={{ fontFamily: T.fontMono, fontSize: 28, fontWeight: 700, color: plan.color }}
+                      >{plan.price.toLocaleString('cs-CZ')}</span>
+                      <span style={{ color: T.muted, fontSize: 12, fontFamily: T.fontUI }}>
+                        Kč / {annual && plan.annualPrice ? 'měs bez DPH' : plan.period}
+                      </span>
+                    </div>
+                    {plan.annualPrice ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 5, opacity: annual ? 1 : 0, transition: 'opacity .2s' }}>
+                        <span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11 }}>placeno ročně</span>
+                        <span style={{ background: 'rgba(34,160,107,0.12)', border: '1px solid rgba(34,160,107,0.3)', color: '#22a06b', fontFamily: T.fontUI, fontSize: 10.5, fontWeight: 800, borderRadius: 8, padding: '2px 8px' }}>
+                          ušetříš {((plan.price - plan.annualPrice) * 12).toLocaleString('cs-CZ')} Kč/rok
+                        </span>
+                      </div>
+                    ) : <div style={{ marginTop: 5, height: 22 }} />}
+                  </>
+                )}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 24 }}>
+                {plan.features.map((f, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Icon
+                      name={f.ok ? 'check-circle-bold' : 'close-circle-bold'}
+                      size={15}
+                      color={f.ok ? '#22a06b' : 'rgba(15,18,40,0.2)'}
+                    />
+                    <span style={{ color: f.ok ? T.ink : T.mutedSoft, fontSize: 13.5, fontWeight: 600, fontFamily: T.fontUI }}>
+                      {f.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {plan.contact ? (
+                <a href="mailto:hello@makej.eu" style={{
+                  display: 'block', width: '100%', padding: '10px 0', borderRadius: 10, textAlign: 'center',
+                  background: 'rgba(155,89,208,0.10)', border: '1px solid rgba(155,89,208,0.35)',
+                  color: '#9B59D0', fontFamily: T.fontUI, fontSize: 13, fontWeight: 800,
+                  textDecoration: 'none', boxSizing: 'border-box',
+                }}>{plan.cta}</a>
+              ) : (
+                <button
+                  onClick={e => { e.stopPropagation(); if (!isActive) handleSelect(plan.id); }}
+                  style={{
+                    width: '100%', padding: '10px 0', borderRadius: 10,
+                    background: isActive
+                      ? T.surfaceAlt
+                      : isPop
+                      ? 'linear-gradient(90deg, #F5A623, #FF9F43)'
+                      : plan.id === 'business'
+                      ? 'rgba(245,166,35,0.12)'
+                      : 'rgba(0,32,246,0.08)',
+                    border: isActive ? '1px solid ' + T.border : 'none',
+                    color: isActive ? T.muted : isPop ? '#1a1000' : plan.color,
+                    fontFamily: T.fontUI, fontSize: 13, fontWeight: 800,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {isActive ? 'Aktuální tarif' : plan.cta}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Checkout strip */}
+      {selected && !success && !PLANS.find(x => x.id === selected)?.contact && (
+        <div style={{
+          maxWidth: 900, margin: '0 auto',
+          background: '#ffffff',
+          border: '1px solid ' + T.border,
+          boxShadow: '0 6px 20px rgba(15,18,40,0.06)',
+          borderRadius: 16, padding: '20px 28px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20,
+          flexWrap: 'wrap',
+        }}>
+          {(() => {
+            const p = PLANS.find(x => x.id === selected);
+            return (
+              <>
+                <div>
+                  <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 16, fontWeight: 800 }}>
+                    {p.name} — {p.price.toLocaleString('cs-CZ')} Kč / měsíc
+                  </div>
+                  <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginTop: 3 }}>
+                    Fakturováno měsíčně · zrušení kdykoliv
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button onClick={() => setSelected(null)} style={{
+                    padding: '10px 18px', borderRadius: 9,
+                    background: 'transparent', border: '1px solid ' + T.border,
+                    color: T.muted, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                  }}>Zrušit</button>
+                  <button onClick={handlePay} style={{
+                    padding: '10px 22px', borderRadius: 9,
+                    background: 'linear-gradient(90deg, #F5A623, #FF9F43)',
+                    border: 'none', color: '#1a1000',
+                    fontFamily: T.fontUI, fontSize: 13, fontWeight: 800, cursor: 'pointer',
+                  }}>
+                    <Icon name="card-bold" size={14} color="#1a1000" /> Zaplatit kartou
+                  </button>
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      )}
+
+      {/* Success */}
+      {success && (
+        <div style={{
+          maxWidth: 900, margin: '0 auto',
+          background: 'rgba(34,160,107,0.08)', border: '1px solid rgba(34,160,107,0.3)',
+          borderRadius: 16, padding: '20px 28px', textAlign: 'center',
+        }}>
+          <Icon name="check-circle-bold" size={32} color="#22a06b" />
+          <div style={{ color: '#22a06b', fontFamily: T.fontHead, fontSize: 17, fontWeight: 800, marginTop: 10 }}>
+            Platba úspěšná! Tarif byl aktivován.
+          </div>
+        </div>
+      )}
+
+      {/* FAQ */}
+      <div style={{ maxWidth: 900, margin: '36px auto 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        {[
+          { q: 'Mohu kdykoliv zrušit?', a: 'Ano, zrušení je možné kdykoliv bez poplatku. Tarif zůstane aktivní do konce fakturačního období.' },
+          { q: 'Jak se tarif fakturuje?', a: 'Fakturujeme měsíčně přes kartu. Fakturu dostanete e-mailem.' },
+          { q: 'Mohu změnit tarif v průběhu?', a: 'Ano, upgrade je okamžitý. Downgrade proběhne na konci aktuálního období.' },
+          { q: 'Co je ASAP inzerát?', a: 'ASAP inzeráty mají prioritní zobrazení a jsou označeny červeným štítkem — ideální pro urgentní obsazení.' },
+        ].map((item, i) => (
+          <div key={i} style={{
+            background: '#ffffff', border: '1px solid ' + T.border,
+            borderRadius: 12, padding: '16px 18px',
+          }}>
+            <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{item.q}</div>
+            <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.6 }}>{item.a}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { EMessages, ESettings, EPricing });

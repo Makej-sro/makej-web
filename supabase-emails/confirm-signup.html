@@ -1,0 +1,115 @@
+<!--
+  Makej! — Potvrzení registrace (Confirm signup)
+  Vloz do: Supabase → Authentication → Emails → Templates → "Confirm signup"
+
+  SUBJECT (worker i employer, jednoduse):
+    Potvrď svůj email — Makej!
+  NEBO podminene (Supabase podporuje Go sablonu i v Subjectu):
+    {{ if eq .Data.role "employer" }}Vítejte v Makej! pro firmy — potvrďte email{{ else }}Vítej v Makej! — potvrď svůj email{{ end }}
+-->
+<!DOCTYPE html>
+<html lang="cs" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Potvrzení registrace</title>
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td, a { font-family: Arial, sans-serif !important; }
+  </style>
+  <![endif]-->
+</head>
+<body style="margin:0; padding:0; background-color:#e8ecfb; -webkit-font-smoothing:antialiased;">
+  <!-- preheader (skryty nahled v inboxu) -->
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#e8ecfb;">
+    Klikni na tlačítko a aktivuj svůj účet na Makej!
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#e8ecfb;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:100%; background-color:#ffffff; border-radius:20px; overflow:hidden; box-shadow:0 8px 30px rgba(15,18,40,0.08);">
+
+          <!-- Header / logo -->
+          <tr>
+            <td align="center" style="background:linear-gradient(135deg,#0020F6,#2D2CA7); padding:34px 24px;">
+              <div style="font-family:'Inter',Arial,sans-serif; font-size:30px; font-weight:900; color:#ffffff; letter-spacing:-0.5px;">Makej!</div>
+              <div style="font-family:Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; color:#c9d0ff; text-transform:uppercase; margin-top:4px;">
+                {{ if eq .Data.role "employer" }}pro firmy{{ else }}práce na pár swipů{{ end }}
+              </div>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:36px 40px 8px 40px; font-family:'Segoe UI',Arial,sans-serif;">
+              <h1 style="margin:0 0 14px 0; font-size:22px; font-weight:800; color:#0f1222;">
+                {{ if .Data.name }}Ahoj {{ .Data.name }}!{{ else }}Ahoj!{{ end }}
+              </h1>
+              <p style="margin:0 0 8px 0; font-size:15px; line-height:1.6; color:#4a4a66;">
+                {{ if eq .Data.role "employer" }}
+                  Díky za registraci do <strong>Makej! pro firmy</strong>. Ještě jeden krok — potvrď svůj email a můžeš začít nabírat brigádníky.
+                {{ else }}
+                  Díky, že ses přidal/a k <strong>Makej!</strong>. Ještě jeden krok — potvrď svůj email a můžeš začít swipovat nabídky práce.
+                {{ end }}
+              </p>
+            </td>
+          </tr>
+
+          <!-- Button -->
+          <tr>
+            <td align="center" style="padding:20px 40px 8px 40px;">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="border-radius:12px; background:linear-gradient(135deg,#0020F6,#2D2CA7);">
+                    <a href="{{ .ConfirmationURL }}" target="_blank"
+                       style="display:inline-block; padding:15px 40px; font-family:'Segoe UI',Arial,sans-serif; font-size:16px; font-weight:800; color:#ffffff; text-decoration:none; border-radius:12px;">
+                      Potvrdit email
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Fallback link -->
+          <tr>
+            <td style="padding:16px 40px 4px 40px; font-family:'Segoe UI',Arial,sans-serif;">
+              <p style="margin:0; font-size:12px; line-height:1.6; color:#9ca3af;">
+                Nefunguje tlačítko? Zkopíruj tento odkaz do prohlížeče:
+              </p>
+              <p style="margin:6px 0 0 0; font-size:12px; line-height:1.5; word-break:break-all;">
+                <a href="{{ .ConfirmationURL }}" style="color:#0020F6; text-decoration:underline;">{{ .ConfirmationURL }}</a>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Divider + note -->
+          <tr>
+            <td style="padding:24px 40px 0 40px;">
+              <div style="height:1px; background-color:#eaeefb; line-height:1px;">&nbsp;</div>
+              <p style="margin:16px 0 0 0; font-family:'Segoe UI',Arial,sans-serif; font-size:12px; line-height:1.6; color:#9ca3af;">
+                Pokud sis účet nezakládal/a, tento email klidně ignoruj — nic se nestane.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding:28px 40px 34px 40px; font-family:'Segoe UI',Arial,sans-serif;">
+              <div style="font-size:13px; font-weight:800; color:#0020F6;">Makej!</div>
+              <p style="margin:6px 0 0 0; font-size:11px; color:#9ca3af;">
+                © 2026 Makej! · <a href="{{ .SiteURL }}" style="color:#9ca3af; text-decoration:underline;">makej.eu</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

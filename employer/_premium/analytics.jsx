@@ -16,11 +16,11 @@
 // ─────────────────────────────────────────────────────────────
 
 function _isPro() {
+  // Centrální matice tarifů (employer-plans.jsx)
+  if (typeof can === 'function') return can('analytics');
+  // Fallback, kdyby se plans nenačetl
   const plan = (EPROFILE.plan || '').toLowerCase();
-  if (['pro', 'business', 'premium'].includes(plan)) return true;
-  const until = EPROFILE.premium_until || EPROFILE.plan_expires_at;
-  if (until && new Date(until) > new Date()) return true;
-  return false;
+  return ['pro', 'business', 'premium', 'enterprise'].includes(plan);
 }
 
 function ProGate({ feature, children }) {
@@ -37,34 +37,33 @@ function ProGate({ feature, children }) {
       <div style={{
         position: 'absolute', inset: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'linear-gradient(180deg, rgba(7,7,26,0.15) 0%, rgba(7,7,26,0.75) 40%, rgba(7,7,26,0.85) 100%)',
+        background: 'linear-gradient(180deg, rgba(0,32,246,0.05) 0%, rgba(255,255,255,0.85) 40%, rgba(255,255,255,0.9) 100%)',
       }}>
         <div style={{
           textAlign: 'center', maxWidth: 460, padding: '36px 32px',
-          background: 'rgba(16,16,48,0.92)',
-          border: '1px solid rgba(255,209,102,0.2)',
+          background: '#ffffff',
+          border: '1px solid ' + T.border,
           borderRadius: 20,
-          boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,209,102,0.08)',
-          backdropFilter: 'blur(12px)',
+          boxShadow: '0 24px 60px rgba(15,18,40,0.14)',
         }}>
           {/* Ikona */}
           <div style={{
             width: 68, height: 68, borderRadius: 18,
-            background: 'linear-gradient(135deg, rgba(255,209,102,0.18), rgba(255,209,102,0.06))',
-            border: '1px solid rgba(255,209,102,0.35)',
+            background: 'rgba(0,32,246,0.08)',
+            border: '1px solid rgba(0,32,246,0.18)',
             display: 'grid', placeItems: 'center', margin: '0 auto 20px',
           }}>
-            <Icon name="crown-star-bold" size={32} color="#FFD166" />
+            <Icon name="crown-star-bold" size={32} color={T.primary} />
           </div>
 
           {/* Titulek */}
-          <div style={{ fontSize: 21, fontWeight: 800, color: '#fff', fontFamily: T.fontHead, marginBottom: 8, lineHeight: 1.25 }}>
-            {feature || 'Tato sekce'} je dostupná v tarifu Pro
+          <div style={{ fontSize: 21, fontWeight: 800, color: T.ink, fontFamily: T.fontHead, marginBottom: 8, lineHeight: 1.25 }}>
+            {feature || 'Tato sekce'} je dostupná v tarifu {typeof requiredPlanLabel === 'function' ? requiredPlanLabel('analytics') : 'Business'}
           </div>
 
           {/* Popis */}
           <div style={{ fontSize: 13, color: T.muted, fontFamily: T.fontUI, lineHeight: 1.7, marginBottom: 24 }}>
-            Odemkněte <strong style={{ color: '#d0d0ff' }}>pokročilé reporty</strong>,{' '}
+            Odemkněte <strong style={{ color: T.primary }}>pokročilé reporty</strong>,{' '}
             demografii kandidátů, analýzu nákladů na nábor a retenci brigádníků.
           </div>
 
@@ -76,8 +75,8 @@ function ProGate({ feature, children }) {
               'Cost per hire vs. průměr trhu',
               'Retence brigádníků + AI insights',
             ].map((f, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: T.light, fontFamily: T.fontUI }}>
-                <Icon name="check-circle-bold" size={14} color="#FFD166" />
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: T.ink, fontFamily: T.fontUI }}>
+                <Icon name="check-circle-bold" size={14} color={T.primary} />
                 {f}
               </div>
             ))}
@@ -87,23 +86,23 @@ function ProGate({ feature, children }) {
           <button style={{
             width: '100%', padding: '13px',
             borderRadius: 12,
-            background: 'linear-gradient(135deg, #292978, #3a3a99)',
-            border: '1px solid rgba(91,107,255,0.4)',
-            color: '#fff', fontFamily: T.fontUI, fontSize: 15, fontWeight: 800,
+            background: 'linear-gradient(135deg, #0020F6, #2D2CA7)',
+            border: 'none',
+            color: '#ffffff', fontFamily: T.fontUI, fontSize: 15, fontWeight: 800,
             cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-            boxShadow: '0 4px 24px rgba(41,41,120,0.55)',
+            boxShadow: '0 8px 24px rgba(0,32,246,0.28)',
             transition: 'opacity .2s',
           }}
-            onClick={() => window.empToast && window.empToast('Makej! PRO', 'Prémiový tarif s pokročilou analytikou připravujeme. Ozveme se brzy!', '👑', 'info')}
-            onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+            onClick={() => window.empGoTab && window.empGoTab('pricing')}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >
-            <Icon name="crown-star-bold" size={16} color="#FFD166" />
-            Upgradovat na Pro
+            <Icon name="crown-star-bold" size={16} color="#ffffff" />
+            Zobrazit tarify
           </button>
 
           <div style={{ marginTop: 12, fontSize: 12, color: T.mutedSoft, fontFamily: T.fontUI }}>
-            Otázky? <a href="mailto:support@makej.eu" style={{ color: '#8AB4FF', textDecoration: 'none' }}>support@makej.eu</a>
+            Otázky? <a href="mailto:support@makej.eu" style={{ color: T.primary, textDecoration: 'none' }}>support@makej.eu</a>
           </div>
         </div>
       </div>
@@ -113,387 +112,109 @@ function ProGate({ feature, children }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// ANALYTIKA — 4 sub-sekce: Přehled / Demografie / Náklady / Retence
+// ANALYTIKA — reálná data z E_JOBS (zhlédnutí, konverze, matche, najato)
 // ─────────────────────────────────────────────────────────────
 function EAnalytics() {
-  const [seg, setSeg] = useStateE('overview');
-  const segs = [
-    { k: 'overview', l: 'Přehled' },
-    { k: 'demo', l: 'Demografie' },
-    { k: 'cost', l: 'Náklady' },
-    { k: 'retention', l: 'Retence' },
-  ];
-
   return (
     <ProGate feature="Analytika">
-      <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto' }}>
-        <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, alignSelf: 'flex-start' }}>
-          {segs.map(s => (
-            <button key={s.k} onClick={() => setSeg(s.k)} style={{
-              padding: '8px 16px', borderRadius: 8,
-              background: seg === s.k ? 'rgba(91,107,255,0.22)' : 'transparent',
-              border: 'none', color: seg === s.k ? '#fff' : T.muted,
-              fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
-            }}>{s.l}</button>
-          ))}
-        </div>
+      {(() => {
+        const jobs = (typeof E_JOBS !== 'undefined' ? E_JOBS : []) || [];
 
-        {seg === 'overview' && <AnalyticsOverview />}
-        {seg === 'demo' && <AnalyticsDemo />}
-        {seg === 'cost' && <AnalyticsCost />}
-        {seg === 'retention' && <AnalyticsRetention />}
-      </div>
+        if (jobs.length === 0) {
+          return (
+            <div style={{ flex: 1, display: 'grid', placeItems: 'center', padding: 40 }}>
+              <div style={{ textAlign: 'center', maxWidth: 420 }}>
+                <div style={{ width: 72, height: 72, borderRadius: 20, background: 'rgba(0,32,246,0.08)', border: '1px solid rgba(0,32,246,0.18)', display: 'grid', placeItems: 'center', margin: '0 auto 20px' }}>
+                  <Icon name="chart-2-bold" size={34} color={T.primary} />
+                </div>
+                <div style={{ fontFamily: T.fontHead, fontSize: 20, fontWeight: 800, color: T.ink, marginBottom: 8 }}>Zatím žádná data</div>
+                <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13.5, lineHeight: 1.7 }}>
+                  Jakmile vytvoříš inzeráty a brigádníci je začnou vidět a swajpovat, uvidíš tu reálná čísla o zhlédnutích, konverzi a náboru.
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        const totalViews   = jobs.reduce((a, j) => a + (j.views || 0), 0);
+        const totalMatches = jobs.reduce((a, j) => a + (j.matches || 0), 0);
+        const totalHired   = jobs.reduce((a, j) => a + (j.hired || 0), 0);
+        const avgCtr       = totalViews > 0 ? (totalMatches / totalViews) * 100 : 0;
+        const fmt = n => n.toLocaleString('cs-CZ').replace(/,/g, ' ');
+
+        const kpis = [
+          { label: 'Celkem zhlédnutí', value: fmt(totalViews),        sub: 'brigádníků vidělo inzeráty', icon: 'eye-bold',          color: '#5B6BFF' },
+          { label: 'Konverze',         value: avgCtr.toFixed(1) + '%', sub: 'zhlédnuto → match',           icon: 'chart-2-bold',      color: '#0020F6' },
+          { label: 'Celkem matchů',    value: fmt(totalMatches),       sub: 'swajpů doprava',             icon: 'heart-bold',        color: '#5BD68A' },
+          { label: 'Najato',           value: fmt(totalHired),         sub: 'potvrzených brigádníků',      icon: 'check-circle-bold', color: '#5BD68A' },
+        ];
+
+        const ranked = jobs.slice().sort((a, b) => (b.views || 0) - (a.views || 0));
+
+        return (
+          <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto' }}>
+            {/* KPI grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
+              {kpis.map((k, i) => (
+                <ECard key={i} padding={18}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 8, background: k.color + '1f', border: '1px solid ' + k.color + '33', display: 'grid', placeItems: 'center' }}>
+                      <Icon name={k.icon} size={14} color={k.color} />
+                    </div>
+                    <span style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase' }}>{k.label}</span>
+                  </div>
+                  <div style={{ fontFamily: T.fontMono, fontSize: 26, fontWeight: 700, color: T.ink, letterSpacing: -0.8 }}>{k.value}</div>
+                  <div style={{ color: T.mutedSoft, fontSize: 10.5, fontFamily: T.fontUI, marginTop: 3 }}>{k.sub}</div>
+                </ECard>
+              ))}
+            </div>
+
+            {/* Per-job performance */}
+            <ECard>
+              <SectionHeader title="Výkon inzerátů" subtitle="Zhlédnutí, matche a konverze podle jednotlivých inzerátů" />
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: T.fontUI }}>
+                  <thead>
+                    <tr>
+                      {['Inzerát', 'Zhlédnutí', 'Matche', 'Konverze', 'Najato'].map((h, i) => (
+                        <th key={i} style={{ textAlign: i === 0 ? 'left' : 'right', padding: '10px 12px', color: T.mutedSoft, fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, borderBottom: '1px solid ' + T.border }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ranked.map((j, i) => {
+                      const conv = (j.views || 0) > 0 ? ((j.matches || 0) / j.views * 100) : 0;
+                      return (
+                        <tr key={j.id || i}>
+                          <td style={{ padding: '11px 12px', borderBottom: '1px solid ' + T.border }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span style={{ width: 8, height: 8, borderRadius: 3, background: j.accent || T.primary, flexShrink: 0 }} />
+                              <span style={{ color: T.ink, fontSize: 13, fontWeight: 600 }}>{j.title}</span>
+                            </div>
+                          </td>
+                          <td style={{ padding: '11px 12px', textAlign: 'right', color: T.ink, fontFamily: T.fontMono, fontSize: 13, borderBottom: '1px solid ' + T.border }}>{fmt(j.views || 0)}</td>
+                          <td style={{ padding: '11px 12px', textAlign: 'right', color: T.ink, fontFamily: T.fontMono, fontSize: 13, borderBottom: '1px solid ' + T.border }}>{j.matches || 0}</td>
+                          <td style={{ padding: '11px 12px', textAlign: 'right', color: conv > 0 ? '#16a34a' : T.mutedSoft, fontFamily: T.fontMono, fontSize: 13, fontWeight: 700, borderBottom: '1px solid ' + T.border }}>{conv.toFixed(1)}%</td>
+                          <td style={{ padding: '11px 12px', textAlign: 'right', color: T.ink, fontFamily: T.fontMono, fontSize: 13, borderBottom: '1px solid ' + T.border }}>{j.hired || 0}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {totalViews === 0 && (
+                <div style={{ marginTop: 14, padding: '12px 14px', borderRadius: 10, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.6 }}>
+                  Zhlédnutí se začala počítat od zapojení trackování — čísla porostou, jak brigádníci uvidí tvoje inzeráty ve swipu.
+                </div>
+              )}
+            </ECard>
+          </div>
+        );
+      })()}
     </ProGate>
   );
 }
 
-// ── Přehled ──────────────────────────────────────────────────
-function AnalyticsOverview() {
-  return (
-    <>
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 14 }}>
-        <ECard>
-          <SectionHeader title="Cohort: konverze podle týdne nástupu" subtitle="% kandidátů, kteří po N týdnech stále chodí na směny" />
-          <CohortTable />
-        </ECard>
-        <ECard>
-          <SectionHeader title="Srovnání kanálů" subtitle="Kde se vám daří nejlépe" />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
-            {[
-              { l: 'Swajp feed', views: 8420, hires: 28, color: '#0020F6' },
-              { l: 'Search', views: 2140, hires: 9, color: '#5B6BFF' },
-              { l: 'Doporučení', views: 1280, hires: 11, color: '#5BD68A' },
-              { l: 'Boost (placený)', views: 1007, hires: 14, color: '#FFD166' },
-            ].map((c, i) => {
-              const conv = ((c.hires / c.views) * 100).toFixed(2);
-              return (
-                <div key={i}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 7, color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600 }}>
-                      <span style={{ width: 8, height: 8, borderRadius: 2, background: c.color }} />
-                      {c.l}
-                    </span>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'baseline' }}>
-                      <span style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10.5 }}>{c.views.toLocaleString('cs-CZ').replace(/,/g,' ')} views</span>
-                      <span style={{ color: '#5BD68A', fontFamily: T.fontMono, fontSize: 11.5, fontWeight: 700 }}>{c.hires} najato</span>
-                      <span style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 11.5, fontWeight: 700, minWidth: 44, textAlign: 'right' }}>{conv}%</span>
-                    </div>
-                  </div>
-                  <div style={{ height: 6, borderRadius: 3, background: 'rgba(0,0,0,0.3)', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: (parseFloat(conv) * 60) + '%', background: c.color }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </ECard>
-      </div>
-
-      <ECard>
-        <SectionHeader title="AI insights z vašich dat" subtitle="Generováno automaticky · obnoveno před 4 hodinami" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-          {[
-            { i: 'lightbulb-bold', c: '#FFD166', tag: 'Příležitost', t: 'Inzeráty s hodinovkou nad 180 Kč mají o 41 % vyšší swajp-right rate. Vaše konkurence platí v průměru 162 Kč.' },
-            { i: 'shield-warning-bold', c: '#f43f5e', tag: 'Pozor', t: 'Inzerát „Brand ambassador" má CTR jen 13 %. Doporučujeme přepsat headline a přidat fotky týmu.' },
-            { i: 'rocket-2-bold', c: '#5BD68A', tag: 'Trend', t: 'Pondělí 17–21h je vaše nejsilnější okno — 32 % všech matchů. Zvažte plánovaný boost na tento čas.' },
-            { i: 'target-bold', c: '#5B6BFF', tag: 'Doporučení', t: 'Kandidáti, kteří mají v profilu „latte art", u vás vydrží průměrně 3.2× déle. Filtrujte primárně podle této dovednosti.' },
-            { i: 'graph-down-bold', c: '#E0B0FF', tag: 'Anomálie', t: 'Time-to-hire klesl o 28 % po zapnutí Premium tarifu — odhad ROI je +14 200 Kč/měsíc.' },
-            { i: 'medal-ribbon-star-bold', c: '#FFD166', tag: 'Výkon', t: 'Vaše firma je v top 8 % gastro segmentu v Brně podle hodnocení i rychlosti odpovědí.' },
-          ].map((x, i) => (
-            <div key={i} style={{ padding: 14, borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 26, height: 26, borderRadius: 7, background: x.c + '22', border: '1px solid ' + x.c + '44', display: 'grid', placeItems: 'center' }}>
-                  <Icon name={x.i} size={13} color={x.c}/>
-                </div>
-                <span style={{ color: x.c, fontSize: 10, fontWeight: 800, fontFamily: T.fontUI, letterSpacing: 0.7, textTransform: 'uppercase' }}>{x.tag}</span>
-              </div>
-              <div style={{ color: T.light, fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.5 }}>{x.t}</div>
-            </div>
-          ))}
-        </div>
-      </ECard>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        <ECard>
-          <SectionHeader title="Doba odpovědi" subtitle="Kandidáti s odpovědí do 1h matchují 3.4× častěji" />
-          <BarChart
-            width={460} height={200}
-            data={[
-              { l: '<5 min', v: 142, color: '#5BD68A' },
-              { l: '5-30m', v: 98, color: '#5BD68A' },
-              { l: '30-1h', v: 64, color: '#FFD166' },
-              { l: '1-3h', v: 41, color: '#FFD166' },
-              { l: '3-12h', v: 22, color: '#f43f5e' },
-              { l: '>12h', v: 8, color: '#f43f5e' },
-            ]}
-          />
-          <div style={{ marginTop: 8, color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 11 }}>
-            Váš průměr: <span style={{ color: '#fff', fontFamily: T.fontMono, fontWeight: 700 }}>14 minut</span> · Top 5 % v segmentu
-          </div>
-        </ECard>
-        <ECard>
-          <SectionHeader title="Distribuce hodinovky v segmentu" subtitle="Brno · gastro · poslední 30 dní" />
-          <DistroChart />
-        </ECard>
-      </div>
-    </>
-  );
-}
-
-function CohortTable() {
-  const cohorts = [
-    { week: '6.4. – 12.4.', size: 12, vals: [100, 92, 83, 75, 75, 67] },
-    { week: '13.4. – 19.4.', size: 18, vals: [100, 89, 78, 72, 67] },
-    { week: '20.4. – 26.4.', size: 14, vals: [100, 86, 79, 71] },
-    { week: '27.4. – 3.5.', size: 22, vals: [100, 91, 82] },
-    { week: '4.5. – 10.5.', size: 16, vals: [100, 88] },
-    { week: 'Tento týden', size: 9, vals: [100] },
-  ];
-  return (
-    <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 3, fontFamily: T.fontUI, fontSize: 11.5 }}>
-      <thead>
-        <tr style={{ color: T.mutedSoft, fontSize: 10, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
-          <th style={{ textAlign: 'left', padding: '4px 8px' }}>Týden nástupu</th>
-          <th style={{ textAlign: 'right', padding: '4px 8px' }}>Vel.</th>
-          {['T0','T+1','T+2','T+3','T+4','T+5'].map(h => <th key={h} style={{ padding: '4px 6px', textAlign: 'center' }}>{h}</th>)}
-        </tr>
-      </thead>
-      <tbody>
-        {cohorts.map((c, i) => (
-          <tr key={i}>
-            <td style={{ color: T.light, padding: '6px 8px', fontWeight: 600 }}>{c.week}</td>
-            <td style={{ color: T.muted, fontFamily: T.fontMono, padding: '6px 8px', textAlign: 'right' }}>{c.size}</td>
-            {[0,1,2,3,4,5].map(j => {
-              const v = c.vals[j];
-              if (v == null) return <td key={j} style={{ padding: 0 }}><div style={{ height: 26, borderRadius: 5, background: 'rgba(255,255,255,0.02)' }}/></td>;
-              const op = 0.2 + (v / 100) * 0.7;
-              return (
-                <td key={j} style={{ padding: 0 }}>
-                  <div style={{ height: 26, borderRadius: 5, background: `rgba(0, 32, 246, ${op})`, color: '#fff', display: 'grid', placeItems: 'center', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 700 }}>{v}%</div>
-                </td>
-              );
-            })}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-function DistroChart() {
-  const buckets = [
-    { l: '120', v: 8 },
-    { l: '140', v: 24 },
-    { l: '160', v: 41 },
-    { l: '180', v: 35 }, // YOU
-    { l: '200', v: 18 },
-    { l: '220', v: 7 },
-    { l: '240+', v: 3 },
-  ];
-  const max = Math.max(...buckets.map(b => b.v));
-  const W = 460, H = 180, padL = 28, padB = 28, padT = 8;
-  const innerW = W - padL - 8, innerH = H - padT - padB;
-  const bw = (innerW / buckets.length) * 0.7;
-  const gap = (innerW / buckets.length) * 0.3;
-  return (
-    <div>
-      <svg width={W} height={H} style={{ display: 'block' }}>
-        {buckets.map((b, i) => {
-          const h = (b.v / max) * innerH;
-          const x = padL + i * (bw + gap) + gap / 2;
-          const y = padT + innerH - h;
-          const isYou = b.l === '180';
-          return (
-            <g key={i}>
-              <rect x={x} y={y} width={bw} height={h} rx="4" fill={isYou ? '#FFD166' : '#5B6BFF'} opacity={isYou ? 1 : 0.6} />
-              {isYou && <text x={x + bw/2} y={y - 8} textAnchor="middle" fill="#FFD166" fontFamily={T.fontUI} fontSize="9.5" fontWeight="800">VY</text>}
-              <text x={x + bw/2} y={H - 12} textAnchor="middle" fill={T.mutedSoft} fontFamily={T.fontMono} fontSize="9.5">{b.l}</text>
-            </g>
-          );
-        })}
-        <text x={padL} y={H - 2} fill={T.mutedSoft} fontFamily={T.fontUI} fontSize="9">Kč/h</text>
-      </svg>
-      <div style={{ display: 'flex', gap: 20, marginTop: 6, fontFamily: T.fontMono, fontSize: 11 }}>
-        <div><span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Medián segmentu</span><div style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>162 Kč</div></div>
-        <div><span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Vy</span><div style={{ color: '#FFD166', fontWeight: 700, fontSize: 14 }}>180 Kč</div></div>
-        <div><span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Top 10 %</span><div style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>220+ Kč</div></div>
-      </div>
-    </div>
-  );
-}
-
-// ── Demografie ────────────────────────────────────────────────
-function AnalyticsDemo() {
-  return (
-    <>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
-        <ECard>
-          <SectionHeader title="Věk" />
-          <BarChart width={300} height={200} data={[
-            { l: '15-17', v: 22 }, { l: '18-21', v: 87 }, { l: '22-25', v: 68 }, { l: '26-30', v: 31 }, { l: '30+', v: 14 },
-          ]} color="#0020F6" />
-        </ECard>
-        <ECard>
-          <SectionHeader title="Pohlaví" />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <Donut size={130} thickness={20} data={[{ v: 58, color: '#5B6BFF' }, { v: 41, color: '#FFD166' }, { v: 1, color: '#E0B0FF' }]} />
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, fontFamily: T.fontUI, fontSize: 12 }}>
-              {[
-                { l: 'Žena', v: '58 %', n: 130, c: '#5B6BFF' },
-                { l: 'Muž', v: '41 %', n: 92, c: '#FFD166' },
-                { l: 'Jiné', v: '1 %', n: 2, c: '#E0B0FF' },
-              ].map((x, i) => (
-                <div key={i}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: 2, background: x.c }} />
-                    <span style={{ color: T.light, flex: 1 }}>{x.l}</span>
-                    <span style={{ color: '#fff', fontFamily: T.fontMono, fontWeight: 700 }}>{x.v}</span>
-                  </div>
-                  <div style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10, marginLeft: 14 }}>{x.n} kandidátů</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </ECard>
-        <ECard>
-          <SectionHeader title="Zaměstnanecký status" />
-          {[
-            { l: 'Středoškolák', v: 38, c: '#0020F6' },
-            { l: 'Vysokoškolák', v: 42, c: '#5B6BFF' },
-            { l: 'Pracující na vedlejšák', v: 14, c: '#FFD166' },
-            { l: 'Bez práce', v: 6, c: '#E0B0FF' },
-          ].map((x, i) => (
-            <div key={i} style={{ marginBottom: 10 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, fontFamily: T.fontUI, marginBottom: 4 }}>
-                <span style={{ color: T.light }}>{x.l}</span>
-                <span style={{ color: '#fff', fontFamily: T.fontMono, fontWeight: 700 }}>{x.v} %</span>
-              </div>
-              <div style={{ height: 6, borderRadius: 3, background: 'rgba(0,0,0,0.3)' }}>
-                <div style={{ height: '100%', width: x.v + '%', borderRadius: 3, background: x.c }} />
-              </div>
-            </div>
-          ))}
-        </ECard>
-      </div>
-      <ECard>
-        <SectionHeader title="Mapa kandidátů — Brno" subtitle="Hustota podle čtvrti" />
-        <BrnoMap />
-      </ECard>
-    </>
-  );
-}
-
-function BrnoMap() {
-  const dots = [
-    { x: 50, y: 50, r: 28, l: 'Brno-střed', n: 89 },
-    { x: 35, y: 38, r: 22, l: 'Veveří', n: 64 },
-    { x: 58, y: 28, r: 18, l: 'Královo Pole', n: 41 },
-    { x: 28, y: 55, r: 15, l: 'Žabovřesky', n: 28 },
-    { x: 78, y: 60, r: 14, l: 'Líšeň', n: 22 },
-    { x: 70, y: 75, r: 11, l: 'Jih', n: 12 },
-    { x: 22, y: 70, r: 10, l: 'Bohunice', n: 9 },
-    { x: 45, y: 78, r: 9, l: 'Komárov', n: 8 },
-    { x: 80, y: 38, r: 12, l: 'Maloměřice', n: 14 },
-  ];
-  return (
-    <div style={{ position: 'relative', width: '100%', height: 360, borderRadius: 14, background: 'linear-gradient(135deg, rgba(0,32,246,0.08), rgba(15,15,40,0.6))', border: '1px solid ' + T.border, overflow: 'hidden' }}>
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-        {Array.from({length: 12}, (_, i) => <line key={'h'+i} x1="0" y1={i*8.3} x2="100" y2={i*8.3} stroke="rgba(91,107,255,0.06)" strokeWidth="0.1" />)}
-        {Array.from({length: 12}, (_, i) => <line key={'v'+i} x1={i*8.3} y1="0" x2={i*8.3} y2="100" stroke="rgba(91,107,255,0.06)" strokeWidth="0.1" />)}
-        <path d="M 5 80 C 20 65, 40 55, 50 60 S 75 75, 95 70" stroke="rgba(91,107,255,0.25)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-      </svg>
-      {dots.map((d, i) => (
-        <div key={i} style={{ position: 'absolute', left: d.x + '%', top: d.y + '%', transform: 'translate(-50%,-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: d.r * 2, height: d.r * 2, borderRadius: 999, background: 'radial-gradient(circle, rgba(0,32,246,0.5), rgba(0,32,246,0.05))', border: '1px solid rgba(91,107,255,0.5)' }} />
-          <div style={{ position: 'absolute', textAlign: 'center', pointerEvents: 'none' }}>
-            <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 13, fontWeight: 700 }}>{d.n}</div>
-            <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 9.5, fontWeight: 600, whiteSpace: 'nowrap' }}>{d.l}</div>
-          </div>
-        </div>
-      ))}
-      <div style={{ position: 'absolute', bottom: 12, left: 12, padding: '6px 10px', borderRadius: 8, background: 'rgba(7,7,26,0.7)', border: '1px solid ' + T.border, color: T.muted, fontSize: 10.5, fontFamily: T.fontUI }}>
-        <Icon name="point-on-map-bold" size={11} color={T.super}/> 287 kandidátů v okolí 5 km
-      </div>
-    </div>
-  );
-}
-
-// ── Náklady ───────────────────────────────────────────────────
-function AnalyticsCost() {
-  return (
-    <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
-        {[
-          { l: 'Cost per hire', v: '480 Kč', sub: '↓ 8 % vs. min. měsíc', c: '#5BD68A' },
-          { l: 'Marketing výdaje', v: '12 480 Kč', sub: 'Boost + Premium', c: '#5B6BFF' },
-          { l: 'ROI Premium tarifu', v: '+ 280 %', sub: '14 200 Kč ušetřeno', c: '#FFD166' },
-          { l: 'Cost per match', v: '40 Kč', sub: 'medián segmentu 64 Kč', c: '#5BD68A' },
-        ].map((x, i) => (
-          <ECard key={i} padding={16}>
-            <div style={{ color: T.muted, fontSize: 11, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.4, textTransform: 'uppercase' }}>{x.l}</div>
-            <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 26, fontWeight: 700, marginTop: 6, letterSpacing: -0.8 }}>{x.v}</div>
-            <div style={{ color: x.c, fontSize: 11.5, fontFamily: T.fontUI, marginTop: 4, fontWeight: 600 }}>{x.sub}</div>
-          </ECard>
-        ))}
-      </div>
-      <ECard>
-        <SectionHeader title="Náklady na nábor v čase" subtitle="Cost per hire vs. trh" />
-        <AreaChart
-          width={1200} height={240}
-          labels={['Led','Úno','Bře','Dub','Kvě','Čer','Čec','Srp','Zář','Říj','Lis','Pro']}
-          series={[
-            { color: '#0020F6', data: [780, 720, 690, 640, 600, 580, 560, 540, 520, 510, 495, 480] },
-            { color: '#6e6ea8', data: [820, 810, 790, 770, 760, 740, 720, 710, 700, 690, 685, 680] },
-          ]}
-        />
-        <div style={{ display: 'flex', gap: 20, marginTop: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: 2, background: '#0020F6' }} /><span style={{ fontSize: 11.5, color: T.light, fontFamily: T.fontUI }}>Vy</span></div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: 2, background: '#6e6ea8' }} /><span style={{ fontSize: 11.5, color: T.muted, fontFamily: T.fontUI }}>Průměr trhu</span></div>
-        </div>
-      </ECard>
-    </>
-  );
-}
-
-// ── Retence ───────────────────────────────────────────────────
-function AnalyticsRetention() {
-  return (
-    <ECard>
-      <SectionHeader title="Retence brigádníků" subtitle="Kolik zůstává po 30 / 60 / 90 dnech" />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 18 }}>
-        {[
-          { d: 30, v: 84, c: '#5BD68A' },
-          { d: 60, v: 67, c: '#FFD166' },
-          { d: 90, v: 52, c: '#5B6BFF' },
-        ].map((x, i) => (
-          <div key={i} style={{ padding: 18, borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid ' + T.border, textAlign: 'center' }}>
-            <div style={{ color: T.muted, fontSize: 11, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.5, textTransform: 'uppercase' }}>{x.d} dní</div>
-            <div style={{ color: x.c, fontFamily: T.fontMono, fontSize: 38, fontWeight: 700, marginTop: 8, letterSpacing: -1.5 }}>{x.v}%</div>
-            <div style={{ color: T.mutedSoft, fontSize: 11, fontFamily: T.fontUI, marginTop: 4 }}>průměr segmentu {x.v - 14}%</div>
-          </div>
-        ))}
-      </div>
-      <SectionHeader title="Důvody odchodu" />
-      {[
-        { l: 'Dokončili semestr / školu', v: 32 },
-        { l: 'Lepší nabídka jinde', v: 24 },
-        { l: 'Změna životní situace', v: 18 },
-        { l: 'Nespokojenost s rozvrhem', v: 14 },
-        { l: 'Jiné', v: 12 },
-      ].map((x, i) => (
-        <div key={i} style={{ marginBottom: 8 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontFamily: T.fontUI, marginBottom: 4 }}>
-            <span style={{ color: T.light }}>{x.l}</span>
-            <span style={{ color: '#fff', fontFamily: T.fontMono, fontWeight: 700 }}>{x.v} %</span>
-          </div>
-          <div style={{ height: 6, borderRadius: 3, background: 'rgba(0,0,0,0.3)' }}>
-            <div style={{ height: '100%', width: (x.v * 3) + '%', borderRadius: 3, background: 'linear-gradient(90deg, #5B6BFF, #0020F6)' }} />
-          </div>
-        </div>
-      ))}
-    </ECard>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────
 // PLÁN SMĚN — reálný kalendář z Supabase dat (E_JOBS)
@@ -503,6 +224,7 @@ function ECalendar() {
   const now = new Date();
   const [viewYear,  setViewYear]  = useStateE(now.getFullYear());
   const [viewMonth, setViewMonth] = useStateE(now.getMonth()); // 0-indexed
+  const [selected,  setSelected]  = useStateE(null); // { job, candidates }
 
   const MONTH_NAMES = ['Leden','Únor','Březen','Duben','Květen','Červen',
                        'Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
@@ -594,13 +316,13 @@ function ECalendar() {
 
         {/* Header */}
         <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid ' + T.border }}>
-          <button onClick={prevMonth} style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
+          <button onClick={prevMonth} style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
             <Icon name="alt-arrow-left-line-duotone" size={14} color={T.light}/>
           </button>
-          <div style={{ fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, color: '#fff', minWidth: 160 }}>
+          <div style={{ fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, color: T.ink, minWidth: 160 }}>
             {MONTH_NAMES[viewMonth]} {viewYear}
           </div>
-          <button onClick={nextMonth} style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
+          <button onClick={nextMonth} style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
             <Icon name="alt-arrow-right-line-duotone" size={14} color={T.light}/>
           </button>
           <div style={{ flex: 1 }} />
@@ -642,15 +364,23 @@ function ECalendar() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                       {dayJobs.map((job, j) => {
                         const c = jobColor(job);
+                        const allCands = [...(E_CANDIDATES.new || []), ...(E_CANDIDATES.hired || [])];
+                        const cands = allCands.filter(cx => cx.job_id === job.id);
                         return (
-                          <div key={j} style={{ padding: '3px 6px', borderRadius: 5, background: c + '22', borderLeft: '2px solid ' + c }}>
-                            <div style={{ color: '#fff', fontWeight: 700, fontSize: 10.5, fontFamily: T.fontUI, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{job.title}</div>
+                          <button key={j} onClick={() => setSelected({ job, candidates: cands })} style={{
+                            display: 'block', width: '100%', textAlign: 'left',
+                            padding: '3px 6px', borderRadius: 5,
+                            background: c + '22',
+                            borderWidth: '0 0 0 2px', borderStyle: 'solid', borderColor: c,
+                            cursor: 'pointer', outline: 'none',
+                          }}>
+                            <div style={{ color: T.ink, fontWeight: 700, fontSize: 10.5, fontFamily: T.fontUI, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{job.title}</div>
                             {(job.time_start || job.time_end) && (
                               <div style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 9.5 }}>
                                 {[job.time_start, job.time_end].filter(Boolean).join('–')}
                               </div>
                             )}
-                          </div>
+                          </button>
                         );
                       })}
                     </div>
@@ -681,7 +411,7 @@ function ECalendar() {
                     <div style={{ color: T.muted, fontSize: 10, fontFamily: T.fontUI }}>{dayName}</div>
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{j.title}</div>
+                    <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{j.title}</div>
                     {(j.time_start || j.time_end || j.location) && (
                       <div style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 10.5, marginTop: 2 }}>
                         {[j.time_start && j.time_end ? j.time_start + '–' + j.time_end : j.time_start, j.location].filter(Boolean).join(' · ')}
@@ -715,6 +445,125 @@ function ECalendar() {
           </div>
         </div>
       )}
+
+      {/* Detail drawer */}
+      {selected && (() => {
+        const { job, candidates } = selected;
+        const c = jobColor(job);
+        const STATUS = {
+          pending:   { label: 'Nová přihláška',   color: '#5B6BFF', bg: 'rgba(91,107,255,0.1)' },
+          accepted:  { label: 'Přijat — v chatu', color: '#5BD68A', bg: 'rgba(91,214,138,0.1)' },
+          confirmed: { label: 'Potvrzeno',         color: '#0020F6', bg: 'rgba(0,32,246,0.08)' },
+          rejected:  { label: 'Odmítnuto',         color: '#f43f5e', bg: 'rgba(244,63,94,0.08)' },
+        };
+        return (
+          <div onClick={() => setSelected(null)} style={{ position: 'fixed', inset: 0, zIndex: 250, background: 'rgba(15,18,40,0.35)', backdropFilter: 'blur(4px)' }}>
+            <div onClick={e => e.stopPropagation()} style={{
+              position: 'absolute', right: 0, top: 0, bottom: 0, width: 440,
+              background: '#fff', boxShadow: '-8px 0 48px rgba(15,18,40,0.16)',
+              display: 'flex', flexDirection: 'column', overflowY: 'auto',
+              animation: 'empPop .2s cubic-bezier(.2,.8,.2,1)',
+            }}>
+
+              {/* Header */}
+              <div style={{ padding: '20px 22px 16px', borderBottom: '1px solid ' + T.border, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <div style={{ width: 10, height: 10, borderRadius: 3, background: c, marginTop: 6, flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 19, fontWeight: 800, lineHeight: 1.2 }}>{job.title}</div>
+                  <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginTop: 3 }}>
+                    {[job.date, job.location].filter(Boolean).join(' · ')}
+                  </div>
+                </div>
+                <button onClick={() => setSelected(null)} style={{ width: 32, height: 32, borderRadius: 8, background: T.surfaceAlt, border: '1px solid ' + T.border, color: T.muted, cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0, fontSize: 16 }}>✕</button>
+              </div>
+
+              {/* Detaily brigády */}
+              <div style={{ padding: '16px 22px', borderBottom: '1px solid ' + T.border }}>
+                <div style={{ color: T.mutedSoft, fontSize: 10, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.7, textTransform: 'uppercase', marginBottom: 10 }}>Detaily brigády</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {[
+                    job.pay        && { l: 'Mzda',   v: job.pay + ' ' + (job.payUnit || 'Kč/h') },
+                    job.time_start && { l: 'Čas',    v: [job.time_start, job.time_end].filter(Boolean).join(' – ') },
+                    job.location   && { l: 'Místo',  v: job.location },
+                    job.positions  && { l: 'Míst',   v: job.positions + ' × ' + (job.hired || 0) + ' obsazeno' },
+                  ].filter(Boolean).map((r, i) => (
+                    <div key={i} style={{ padding: '8px 10px', borderRadius: 8, background: T.surfaceAlt, border: '1px solid ' + T.border }}>
+                      <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>{r.l}</div>
+                      <div style={{ color: T.ink, fontFamily: T.fontMono, fontSize: 12.5, fontWeight: 700, marginTop: 2 }}>{r.v}</div>
+                    </div>
+                  ))}
+                </div>
+                {job.description && (
+                  <div style={{ marginTop: 10, color: T.light, fontFamily: T.fontUI, fontSize: 12.5, lineHeight: 1.55 }}>{job.description}</div>
+                )}
+                {Array.isArray(job.tags) && job.tags.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 10 }}>
+                    {job.tags.map((tag, i) => (
+                      <span key={i} style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(0,32,246,0.06)', border: '1px solid rgba(0,32,246,0.15)', color: T.ink, fontFamily: T.fontUI, fontSize: 11, fontWeight: 600 }}>{tag}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Uchazeči */}
+              <div style={{ padding: '16px 22px', flex: 1 }}>
+                <div style={{ color: T.mutedSoft, fontSize: 10, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.7, textTransform: 'uppercase', marginBottom: 10 }}>
+                  Uchazeči ({candidates.length})
+                </div>
+                {candidates.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px 0', color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12.5, fontStyle: 'italic' }}>
+                    Zatím žádní uchazeči.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {candidates.map((cand, i) => {
+                      const st = STATUS[cand.status] || STATUS.pending;
+                      const canChat = cand.status === 'accepted' || cand.status === 'confirmed'
+                        || (E_THREADS || []).some(t => t.id === cand.id || t.match_id === cand.id);
+                      return (
+                        <div key={i} style={{ padding: '12px 14px', borderRadius: 12, background: T.surfaceAlt, border: '1px solid ' + T.border }}>
+                          {/* Řádek info */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                            <div style={{ width: 42, height: 42, borderRadius: 999, background: cand.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
+                              {cand.avatar}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{cand.name}</div>
+                              <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, marginTop: 1 }}>
+                                {[cand.city, Number(cand.rating) > 0 ? cand.rating + '★' : null, cand.jobsDone > 0 ? cand.jobsDone + ' brigád' : null].filter(Boolean).join(' · ') || 'Brigádník'}
+                              </div>
+                            </div>
+                            <span style={{ padding: '3px 8px', borderRadius: 6, background: st.bg, color: st.color, fontFamily: T.fontUI, fontSize: 10.5, fontWeight: 700, flexShrink: 0 }}>{st.label}</span>
+                          </div>
+                          {/* Akce */}
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            <button
+                              onClick={() => window.empOpenProfile && window.empOpenProfile(cand.worker_id, { name: cand.name, address: cand.city, level: cand.level, jobs_done: cand.jobsDone, rating: cand.rating, verified: cand.verified })}
+                              style={{ flex: 1, padding: '7px 10px', borderRadius: 8, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}>
+                              Profil
+                            </button>
+                            {canChat && (
+                              <button
+                                onClick={() => {
+                                  window._empPresetThread = cand.id;
+                                  window.empGoTab && window.empGoTab('chat');
+                                  setSelected(null);
+                                }}
+                                style={{ flex: 2, padding: '7px 10px', borderRadius: 8, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                                <Icon name="chat-round-line-bold" size={13} color="#fff" />Otevřít chat
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
     </div>
   );

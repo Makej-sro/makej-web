@@ -5,11 +5,29 @@ const STATUS_META = {
   urgent: { label: 'ASAP · spěchá', color: '#f43f5e', dot: true, pulse: true },
   paused: { label: 'Pozastaveno', color: '#FFD166' },
   filled: { label: 'Naplněno', color: '#8AB4FF' },
+  scheduled: { label: 'Naplánováno', color: '#5B6BFF' },
 };
 
 function EJobs({ onTab, onEdit }) {
   const [filter, setFilter] = useStateE('all');
   const [q, setQ] = useStateE('');
+  const [refresh, setRefresh] = useStateE(0);
+
+  async function handleBoost(j) {
+    if (typeof can === 'function' && !can('topJob')) {
+      window.empToast && window.empToast('Topování je prémiové', 'Zvýhodněné zobrazení je od tarifu Standard výš. Přejdi na vyšší tarif a inzerát vystřelí nahoru.', '🚀', 'info');
+      window.empGoTab && window.empGoTab('pricing');
+      return;
+    }
+    const ok = await boostJobE(j.id, 7);
+    if (ok) {
+      window.empToast && window.empToast('Inzerát boostnutý 🚀', j.title + ' se teď 7 dní zobrazuje nahoře ve feedu brigádníků.', '🚀', 'success');
+      setRefresh(x => x + 1);
+    } else {
+      window.empToast && window.empToast('Chyba', 'Boost se nepodařilo zapnout.', '⚠️', 'error');
+    }
+  }
+
   const byStatus = filter === 'all' ? E_JOBS : E_JOBS.filter(j => j.status === filter);
   const filtered = q.trim()
     ? byStatus.filter(j => (j.title || '').toLowerCase().includes(q.trim().toLowerCase()))
@@ -18,17 +36,15 @@ function EJobs({ onTab, onEdit }) {
   return (
     <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto' }}>
       {/* Summary */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 14 }}>
         {[
           { label: 'Aktivních', value: E_JOBS.filter(j=>j.status==='active'||j.status==='urgent').length, sub: 'inzerátů', color: '#5BD68A' },
-          { label: 'Celkem zhlédnutí', value: E_JOBS.reduce((a,j)=>a+j.views,0).toLocaleString('cs-CZ').replace(/,/g,' '), sub: 'za 30 dní', color: '#5B6BFF' },
-          { label: 'Průměrný CTR', value: (E_JOBS.reduce((a,j)=>a+j.ctr,0)/E_JOBS.length).toFixed(1)+'%', sub: 'swajp → match', color: '#FFD166' },
           { label: 'Najato celkem', value: E_JOBS.reduce((a,j)=>a+j.hired,0), sub: 'v tomto měsíci', color: '#5BD68A' },
         ].map((s, i) => (
           <ECard key={i} padding={16}>
             <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase' }}>{s.label}</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 6 }}>
-              <div style={{ fontFamily: T.fontMono, fontSize: 24, fontWeight: 700, color: '#fff', letterSpacing: -0.8 }}>{s.value}</div>
+              <div style={{ fontFamily: T.fontMono, fontSize: 24, fontWeight: 700, color: T.ink, letterSpacing: -0.8 }}>{s.value}</div>
               <div style={{ fontFamily: T.fontUI, fontSize: 11, color: T.mutedSoft }}>{s.sub}</div>
             </div>
           </ECard>
@@ -46,7 +62,7 @@ function EJobs({ onTab, onEdit }) {
         ].map(f => (
           <button key={f.k} onClick={() => setFilter(f.k)} style={{
             padding: '8px 14px', borderRadius: 9,
-            background: filter === f.k ? 'rgba(91,107,255,0.2)' : 'rgba(255,255,255,0.03)',
+            background: filter === f.k ? 'rgba(0,32,246,0.1)' : 'rgba(0,32,246,0.05)',
             border: '1px solid ' + (filter === f.k ? 'rgba(91,107,255,0.4)' : T.border),
             color: filter === f.k ? '#fff' : T.muted,
             fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
@@ -61,8 +77,8 @@ function EJobs({ onTab, onEdit }) {
           <Icon name="magnifer-bold" size={14} color={T.mutedSoft} />
           <input placeholder="Hledat inzerát…" value={q} onChange={e => setQ(e.target.value)} style={{
             paddingLeft: 30, padding: '8px 12px 8px 30px',
-            borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
-            color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, width: 220, outline: 'none',
+            borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border,
+            color: T.ink, fontFamily: T.fontUI, fontSize: 12.5, width: 220, outline: 'none',
           }} />
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}>
             <Icon name="magnifer-linear" size={14} color={T.mutedSoft} />
@@ -93,14 +109,24 @@ function EJobs({ onTab, onEdit }) {
                       {status.dot ? <span style={{ width: 6, height: 6, borderRadius: 999, background: status.color, animation: status.pulse ? 'mkBubbleIn 1s infinite alternate' : 'none' }} /> : null}
                       {status.label}
                     </span>
+                    {j.boosted && (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 6, background: 'rgba(245,166,35,0.16)', color: '#F5A623', fontSize: 10, fontWeight: 800, fontFamily: T.fontUI, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                        <Icon name="bolt-bold" size={11} color="#F5A623" /> Top
+                      </span>
+                    )}
                     <span style={{ fontSize: 10, fontFamily: T.fontMono, color: T.mutedSoft }}>{j.plan}</span>
                   </div>
+                  {j.scheduled && j.publishAt && (
+                    <div style={{ paddingLeft: 8, marginTop: -4, color: '#5B6BFF', fontFamily: T.fontUI, fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                      <Icon name="calendar-bold" size={11} color="#5B6BFF" /> Zveřejní se {new Date(j.publishAt).toLocaleString('cs-CZ', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  )}
                   <div style={{ paddingLeft: 8 }}>
-                    <div style={{ fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: -0.3, lineHeight: 1.2 }}>{j.title}</div>
+                    <div style={{ fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, color: T.ink, letterSpacing: -0.3, lineHeight: 1.2 }}>{j.title}</div>
                     <div style={{ fontFamily: T.fontUI, fontSize: 11.5, color: T.muted, marginTop: 5, display: 'flex', alignItems: 'center', gap: 10 }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                         <Icon name="dollar-bold" size={12} color={T.muted} />
-                        <span style={{ fontFamily: T.fontMono, color: '#fff', fontWeight: 700 }}>{j.pay}</span> {j.payUnit}
+                        <span style={{ fontFamily: T.fontMono, color: T.ink, fontWeight: 700 }}>{j.pay}</span> {j.payUnit}
                       </span>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                         <Icon name="clock-circle-bold" size={12} color={T.muted} />
@@ -121,7 +147,7 @@ function EJobs({ onTab, onEdit }) {
                     ].map((m, i) => (
                       <div key={i}>
                         <div style={{ color: T.mutedSoft, fontSize: 10, fontFamily: T.fontUI, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>{m.l}</div>
-                        <div style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 20, fontWeight: 700, marginTop: 3, letterSpacing: -0.6 }}>{m.v}</div>
+                        <div style={{ color: T.ink, fontFamily: T.fontMono, fontSize: 20, fontWeight: 700, marginTop: 3, letterSpacing: -0.6 }}>{m.v}</div>
                       </div>
                     ))}
                   </div>
@@ -134,20 +160,24 @@ function EJobs({ onTab, onEdit }) {
 
                 {/* Right: actions */}
                 <div style={{ padding: 18, borderLeft: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center' }}>
-                  <button onClick={() => onTab?.('candidates')} style={{
+                  <button onClick={() => {
+                    window._empPresetJobIds = [j.id];
+                    onTab?.('candidates');
+                  }} style={{
                     padding: '10px 12px', borderRadius: 9,
                     background: 'linear-gradient(135deg, #0020F6, #2D2CA7)',
                     border: 'none', color: '#fff', cursor: 'pointer',
                     fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700,
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   }}><Icon name="users-group-rounded-bold" size={14} color="#fff"/>Kandidáti ({j.matches})</button>
-                  <button onClick={() => window.empToast && window.empToast('Boost inzerátu', 'Zvýhodněné zobrazení je prémiová funkce — připravujeme ji.', '🚀', 'info')} style={{
+                  <button onClick={() => handleBoost(j)} disabled={j.boosted} style={{
                     padding: '8px 12px', borderRadius: 9,
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
-                    color: T.light, cursor: 'pointer',
+                    background: j.boosted ? 'rgba(245,166,35,0.12)' : 'rgba(0,32,246,0.05)',
+                    border: '1px solid ' + (j.boosted ? 'rgba(245,166,35,0.35)' : T.border),
+                    color: j.boosted ? '#F5A623' : T.light, cursor: j.boosted ? 'default' : 'pointer',
                     fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600,
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  }}><Icon name="rocket-2-bold" size={12} color={T.super}/>Boostnout</button>
+                  }}><Icon name={j.boosted ? 'bolt-bold' : 'rocket-2-bold'} size={12} color={j.boosted ? '#F5A623' : T.super}/>{j.boosted ? 'Boostnuto' : 'Boostnout'}</button>
                   <button onClick={() => onEdit && onEdit(j)} style={{
                     padding: '8px 12px', borderRadius: 9,
                     background: 'transparent', border: '1px solid ' + T.border,
@@ -171,7 +201,7 @@ function BarMetric({ label, value, max, suffix = '' }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
         <span style={{ color: T.muted, fontSize: 10.5, fontFamily: T.fontUI, fontWeight: 600 }}>{label}</span>
-        <span style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 11.5, fontWeight: 700 }}>{value}{suffix}</span>
+        <span style={{ color: T.ink, fontFamily: T.fontMono, fontSize: 11.5, fontWeight: 700 }}>{value}{suffix}</span>
       </div>
       <div style={{ height: 5, borderRadius: 3, background: 'rgba(0,0,0,0.3)', overflow: 'hidden' }}>
         <div style={{ height: '100%', width: pct + '%', background: 'linear-gradient(90deg, #5B6BFF, #0020F6)' }} />
@@ -181,140 +211,463 @@ function BarMetric({ label, value, max, suffix = '' }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// CANDIDATES — kanban
+// CANDIDATES — list view s filtry (inspirace Yasin, reálná data)
 // ─────────────────────────────────────────────────────────────
-function ECandidates() {
-  const [selected, setSelected] = useStateE(null);
-  const columns = [
-    { k: 'new', label: 'Noví matche', count: E_CANDIDATES.new.length, color: '#5B6BFF', icon: 'star-bold' },
-    { k: 'shortlist', label: 'Shortlist', count: E_CANDIDATES.shortlist.length, color: '#FFD166', icon: 'bookmark-bold' },
-    { k: 'interview', label: 'Pohovor', count: E_CANDIDATES.interview.length, color: '#E0B0FF', icon: 'phone-bold' },
-    { k: 'hired', label: 'Najato', count: E_CANDIDATES.hired.length, color: '#5BD68A', icon: 'check-circle-bold' },
+
+// Flatten všech kandidátů do jednoho pole s relStatus
+function _eAllCands() {
+  const out = [];
+  (E_CANDIDATES.new || []).forEach(c => out.push({ ...c, relStatus: 'pending' }));
+  (E_CANDIDATES.hired || []).forEach(c => out.push({
+    ...c,
+    relStatus: c.status,
+    workedHere: c.status === 'confirmed',
+  }));
+  return out;
+}
+
+// Generuje důvody proč je to dobrý match z reálných dat
+function _matchReasons(c, jobTags) {
+  const reasons = [];
+  const r = parseFloat(c.rating) || 0;
+  if (c.jobsDone > 0) reasons.push({ ok: true, text: `${c.jobsDone} dokončených brigád` });
+  if (r >= 4.0) reasons.push({ ok: true, text: `Hodnocení ${c.rating}★ od předchozích firem` });
+  if (c.verified) reasons.push({ ok: true, text: 'Ověřený profil' });
+  if (c.super) reasons.push({ ok: true, text: 'Projevil super zájem o tuto pozici' });
+  if (c.workedHere) reasons.push({ ok: true, text: 'Potvrzená směna u vás' });
+  if (jobTags && jobTags.length && c.tags && c.tags.length) {
+    const matching = c.tags.filter(t => jobTags.some(jt => jt.toLowerCase() === t.toLowerCase()));
+    if (matching.length) reasons.push({ ok: true, text: `Relevantní dovednosti: ${matching.slice(0, 2).join(', ')}` });
+  }
+  if (c.level >= 3) reasons.push({ ok: true, text: `Level ${c.level} — zkušený makač` });
+  if (reasons.length < 2) reasons.push({ ok: false, text: 'Nový na platformě — zatím málo dat' });
+  return reasons.slice(0, 4);
+}
+
+// Spolehlivost z reálných dat
+function _reliabilityBars(c) {
+  const r = parseFloat(c.rating) || 0;
+  const jobs = c.jobsDone || 0;
+  const punct = c.punctuality != null ? Math.round(c.punctuality) : Math.min(100, Math.round(r * 18 + jobs * 0.5));
+  return [
+    { label: 'Dochvilnost',        value: punct },
+    { label: 'Komunikace',         value: Math.min(100, Math.round(r * 17 + (jobs > 5 ? 8 : 0))) },
+    { label: 'Stálost',            value: Math.min(100, Math.round(jobs * 5 + r * 8)) },
+    { label: 'Hodnocení od firem', value: Math.min(100, Math.round(r * 20)) },
   ];
+}
+
+const CAND_FILTERS = [
+  { k: 'all',        label: 'Všichni' },
+  { k: 'favorites',  label: 'Oblíbení',   desc: 'Kandidáti s hodnocením ≥ 4.8 a alespoň 15 brigádami.' },
+  { k: 'known',      label: 'Známe se',   desc: 'Kandidáti, se kterými jste již potvrdili spolupráci.' },
+  { k: 'experience', label: 'Zkušenost', desc: 'Kandidáti s dovednostmi relevantnímí pro vaše inzeráty.' },
+];
+
+function _passFilter(c, filter, jobTags) {
+  if (filter === 'all') return true;
+  if (filter === 'favorites')  return parseFloat(c.rating) >= 4.8 && c.jobsDone >= 15;
+  if (filter === 'known')      return !!c.workedHere;
+  if (filter === 'experience') {
+    if (!jobTags || !jobTags.length) return !!(c.tags && c.tags.length);
+    return !!(c.tags && c.tags.some(t => jobTags.some(jt => jt.toLowerCase() === t.toLowerCase())));
+  }
+  return true;
+}
+
+const CAND_STATUS_PILL = {
+  pending:   { label: 'Nový match',        color: '#5B6BFF', bg: 'rgba(91,107,255,0.12)' },
+  accepted:  { label: 'Přijat — v chatu', color: '#5BD68A', bg: 'rgba(91,214,138,0.12)' },
+  confirmed: { label: 'Potvrzeno',         color: '#0020F6', bg: 'rgba(0,32,246,0.10)'  },
+  rejected:  { label: 'Odmítnuto',         color: '#f43f5e', bg: 'rgba(244,63,94,0.08)' },
+};
+
+function ECandidates() {
+  const [filter, setFilter]       = useStateE('all');
+  const [jobIds, setJobIds]       = useStateE([]);   // [] = všechny, jinak array vybraných job IDs
+  const [dropOpen, setDropOpen]   = useStateE(false);
+  const [q, setQ]                 = useStateE('');
+  const [selected, setSelected]   = useStateE(null);
+  const dropRef = useRefE(null);
+
+  // Přijmout předfiltr z EJobs — čte globální proměnnou nastavenou před přepnutím tabu
+  useEffectE(() => {
+    if (window._empPresetJobIds) {
+      setJobIds(window._empPresetJobIds);
+      window._empPresetJobIds = null;
+    }
+  }, []);
+
+  // Zavřít dropdown kliknutím mimo
+  useEffectE(() => {
+    if (!dropOpen) return;
+    function handle(e) {
+      if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false);
+    }
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
+  }, [dropOpen]);
+
+  const allCands = _eAllCands();
+
+  const STATUS_DOT   = { active: '#5BD68A', urgent: '#f43f5e', paused: '#FFD166', filled: '#8AB4FF' };
+  const STATUS_LABEL = { active: 'Aktivní', urgent: 'ASAP', paused: 'Pozastaveno', filled: 'Naplněno' };
+
+  // Tagy ze všech vybraných inzerátů (pro filtr Zkušenost a drawer)
+  const selectedJobs = jobIds.length ? E_JOBS.filter(j => jobIds.includes(j.id)) : E_JOBS;
+  const jobTags = [...new Set(selectedJobs.flatMap(j => j.tags || []))];
+
+  // Kandidáti filtrovaní podle inzerátů
+  const jobFiltered = jobIds.length
+    ? allCands.filter(c => jobIds.includes(c.job_id))
+    : allCands;
+
+  const visible = jobFiltered.filter(c => {
+    if (!_passFilter(c, filter, jobTags)) return false;
+    if (q.trim()) {
+      const sq = q.toLowerCase();
+      return (c.name || '').toLowerCase().includes(sq)
+        || (c.jobTitle || '').toLowerCase().includes(sq)
+        || (c.tags || []).some(t => t.toLowerCase().includes(sq));
+    }
+    return true;
+  });
+
+  const activeF = CAND_FILTERS.find(f => f.k === filter);
+
+  function toggleJob(id) {
+    setJobIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }
+
+  // Label tlačítka dropdown
+  const btnLabel = jobIds.length === 0
+    ? 'Všechny inzeráty'
+    : jobIds.length === 1
+      ? (E_JOBS.find(j => j.id === jobIds[0])?.title || '1 inzerát')
+      : `${jobIds.length} inzeráty`;
+
+  async function onAccepted() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      await fetchEmployerData(session.user.id);
+      setSelected(null);
+    }
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-      <div style={{ padding: '24px 28px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13 }}>
-          Inzerát: <span style={{ color: '#fff', fontWeight: 700 }}>{E_JOBS[0]?.title || 'Všechny inzeráty'}</span>
+
+      {/* ── Řádek 1: dropdown inzerátů + search ── */}
+      <div style={{ padding: '18px 28px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
+
+        {/* Dropdown trigger */}
+        <div ref={dropRef} style={{ position: 'relative' }}>
+          <button
+            onClick={() => setDropOpen(o => !o)}
+            style={{
+              padding: '8px 14px', borderRadius: 10,
+              background: jobIds.length ? 'rgba(0,32,246,0.07)' : '#fff',
+              border: '1px solid ' + (jobIds.length ? 'rgba(0,32,246,0.28)' : T.border),
+              color: jobIds.length ? '#0020F6' : T.ink,
+              fontFamily: T.fontUI, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              boxShadow: '0 1px 4px rgba(15,18,40,0.06)',
+              transition: 'all .15s',
+            }}>
+            <Icon name="document-text-bold" size={14} color={jobIds.length ? '#0020F6' : T.muted} />
+            <span style={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {btnLabel}
+            </span>
+            {jobIds.length > 0 && (
+              <span style={{ padding: '1px 7px', borderRadius: 6, background: '#0020F6', color: '#fff', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 700 }}>
+                {jobIds.length}
+              </span>
+            )}
+            <svg width="10" height="6" viewBox="0 0 10 6" style={{ transform: dropOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s', flexShrink: 0 }}>
+              <path d="M0 0l5 6 5-6z" fill={jobIds.length ? '#0020F6' : T.mutedSoft} />
+            </svg>
+          </button>
+
+          {/* Dropdown panel */}
+          {dropOpen && (
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 200,
+              background: '#fff', borderRadius: 14,
+              border: '1px solid ' + T.border,
+              boxShadow: '0 8px 32px rgba(15,18,40,0.14)',
+              minWidth: 280, maxWidth: 360,
+              animation: 'mkBubbleIn .18s',
+              overflow: 'hidden',
+            }}>
+              {/* Header */}
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid ' + T.border, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>Filtr podle inzerátu</span>
+                {jobIds.length > 0 && (
+                  <button onClick={() => setJobIds([])} style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)', color: '#f43f5e', fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                    Zrušit výběr
+                  </button>
+                )}
+              </div>
+              {/* "Vše" row */}
+              <button onClick={() => { setJobIds([]); setDropOpen(false); }} style={{
+                width: '100%', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10,
+                background: jobIds.length === 0 ? 'rgba(0,32,246,0.05)' : 'transparent',
+                border: 'none', cursor: 'pointer', borderBottom: '1px solid ' + T.border,
+              }}>
+                <div style={{
+                  width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                  background: jobIds.length === 0 ? '#0020F6' : '#fff',
+                  border: '1.5px solid ' + (jobIds.length === 0 ? '#0020F6' : T.border),
+                  display: 'grid', placeItems: 'center',
+                }}>
+                  {jobIds.length === 0 && <Icon name="check-bold" size={10} color="#fff" />}
+                </div>
+                <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: jobIds.length === 0 ? 700 : 500 }}>Všechny inzeráty</span>
+                <span style={{ marginLeft: 'auto', fontFamily: T.fontMono, fontSize: 11, color: T.mutedSoft }}>{allCands.length}</span>
+              </button>
+              {/* Job rows */}
+              <div style={{ maxHeight: 320, overflowY: 'auto' }}>
+                {E_JOBS.map(j => {
+                  const checked = jobIds.includes(j.id);
+                  const cnt = allCands.filter(c => c.job_id === j.id).length;
+                  const dot = STATUS_DOT[j.status] || T.mutedSoft;
+                  const lbl = STATUS_LABEL[j.status] || j.status;
+                  return (
+                    <button key={j.id} onClick={() => toggleJob(j.id)} style={{
+                      width: '100%', padding: '11px 16px', display: 'flex', alignItems: 'center', gap: 10,
+                      background: checked ? 'rgba(0,32,246,0.04)' : 'transparent',
+                      border: 'none', borderBottom: '1px solid ' + T.border, cursor: 'pointer',
+                    }}>
+                      <div style={{
+                        width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                        background: checked ? '#0020F6' : '#fff',
+                        border: '1.5px solid ' + (checked ? '#0020F6' : T.border),
+                        display: 'grid', placeItems: 'center',
+                      }}>
+                        {checked && <Icon name="check-bold" size={10} color="#fff" />}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                        <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: checked ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{j.title}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                          <span style={{ width: 6, height: 6, borderRadius: 999, background: dot, flexShrink: 0 }} />
+                          <span style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 10.5 }}>{lbl}</span>
+                        </div>
+                      </div>
+                      <span style={{ fontFamily: T.fontMono, fontSize: 11.5, fontWeight: 700, color: cnt > 0 ? T.ink : T.mutedSoft, flexShrink: 0 }}>{cnt}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Footer */}
+              {jobIds.length > 0 && (
+                <div style={{ padding: '10px 16px', borderTop: '1px solid ' + T.border }}>
+                  <button onClick={() => setDropOpen(false)} style={{
+                    width: '100%', padding: '9px', borderRadius: 9,
+                    background: '#0020F6', border: 'none', color: '#fff',
+                    fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                  }}>
+                    Použít filtr ({jobFiltered.length} kandidátů)
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        <span style={{ width: 3, height: 3, borderRadius: 999, background: T.mutedSoft }} />
-        <span style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 12 }}>{Object.values(E_CANDIDATES).flat().length} matchů · {E_CANDIDATES.hired.length} najato</span>
+
         <div style={{ flex: 1 }} />
-        <button onClick={() => window.empToast && window.empToast('Filtry kandidátů', 'Filtrování podle hodnocení, vzdálenosti a dovedností připravujeme.', '⚙️', 'info')} style={{ padding: '8px 12px', borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <Icon name="filter-bold" size={12} color={T.light}/>
-          Filtry
-        </button>
+
+        {/* Search */}
+        <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+          <span style={{ position: 'absolute', left: 10, pointerEvents: 'none', display: 'flex' }}>
+            <Icon name="magnifer-linear" size={13} color={T.mutedSoft} />
+          </span>
+          <input
+            placeholder="Hledat kandidáta…"
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            style={{
+              paddingLeft: 30, padding: '8px 12px 8px 30px',
+              borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border,
+              color: T.ink, fontFamily: T.fontUI, fontSize: 12.5, width: 200, outline: 'none',
+            }}
+          />
+        </div>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, padding: '0 28px 28px', overflow: 'hidden' }}>
-        {columns.map(col => (
-          <div key={col.k} style={{
-            display: 'flex', flexDirection: 'column', minHeight: 0,
-            borderRadius: 14,
-            background: 'rgba(15,15,40,0.4)',
-            border: '1px solid ' + T.border,
-            overflow: 'hidden',
-          }}>
-            <div style={{
-              padding: '12px 14px', borderBottom: '1px solid ' + T.border,
-              display: 'flex', alignItems: 'center', gap: 8,
-              background: col.color + '11',
+      {/* ── Řádek 2: filter tabs ── */}
+      <div style={{ padding: '10px 28px 0', display: 'flex', gap: 6 }}>
+        {CAND_FILTERS.map(f => {
+          const cnt = f.k === 'all' ? jobFiltered.length
+            : jobFiltered.filter(c => _passFilter(c, f.k, jobTags)).length;
+          const active = filter === f.k;
+          return (
+            <button key={f.k} onClick={() => setFilter(f.k)} style={{
+              padding: '7px 14px', borderRadius: 9,
+              background: active ? '#0020F6' : 'rgba(0,32,246,0.05)',
+              border: '1px solid ' + (active ? '#0020F6' : T.border),
+              color: active ? '#fff' : T.muted,
+              fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 6, transition: 'all .15s',
             }}>
-              <Icon name={col.icon} size={14} color={col.color} />
-              <span style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{col.label}</span>
+              {f.label}
               <span style={{
-                padding: '1px 7px', borderRadius: 999,
-                background: col.color + '22', color: col.color,
+                padding: '1px 6px', borderRadius: 6,
+                background: active ? 'rgba(255,255,255,0.2)' : 'rgba(15,18,40,0.06)',
                 fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 700,
-              }}>{col.count}</span>
-              <div style={{ flex: 1 }} />
-              <Icon name="menu-dots-bold" size={14} color={T.mutedSoft}/>
-            </div>
-            <div style={{ flex: 1, overflowY: 'auto', padding: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {E_CANDIDATES[col.k].map(c => (
-                <CandidateCard key={c.id} c={c} stage={col.k} active={selected?.id === c.id} onClick={() => setSelected({ ...c, stage: col.k })} />
-              ))}
+                color: active ? '#fff' : T.mutedSoft,
+              }}>{cnt}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Filter banner ── */}
+      {filter !== 'all' && activeF?.desc && (
+        <div style={{
+          margin: '8px 28px 0', padding: '9px 14px', borderRadius: 10,
+          background: 'rgba(0,32,246,0.04)', border: '1px solid rgba(0,32,246,0.12)',
+          color: T.ink, fontFamily: T.fontUI, fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <Icon name="info-circle-bold" size={14} color="#5B6BFF" />
+          {activeF.desc}
+        </div>
+      )}
+
+      {/* ── Count row ── */}
+      <div style={{ padding: '7px 28px 0', color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span>{visible.length} {visible.length === 1 ? 'kandidát' : visible.length >= 2 && visible.length <= 4 ? 'kandidáti' : 'kandidátů'}</span>
+        {jobIds.length > 0 && selectedJobs.map(j => (
+          <span key={j.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 6, background: 'rgba(0,32,246,0.07)', border: '1px solid rgba(0,32,246,0.18)', color: '#0020F6', fontFamily: T.fontUI, fontSize: 11, fontWeight: 600 }}>
+            {j.title}
+            <button onClick={() => toggleJob(j.id)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', lineHeight: 0 }}>
+              <Icon name="close-circle-bold" size={12} color="rgba(0,32,246,0.5)" />
+            </button>
+          </span>
+        ))}
+        {q && <span>· hledání: &quot;{q}&quot;</span>}
+      </div>
+
+      {/* ── List ── */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '10px 28px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {visible.map(c => (
+          <CandidateListCard
+            key={c.id}
+            c={c}
+            jobTags={jobTags}
+            active={selected?.id === c.id}
+            onClick={() => setSelected(c)}
+          />
+        ))}
+        {visible.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '60px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+            <Icon name="users-group-rounded-bold" size={36} color={T.border} />
+            <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 13 }}>
+              {q ? 'Žádný kandidát neodpovídá hledání.' : 'Žádní kandidáti v této kategorii.'}
             </div>
           </div>
-        ))}
+        )}
       </div>
 
-      {selected ? (
+      {selected && (
         <CandidateDrawer
           c={selected}
+          jobTags={jobTags}
           onClose={() => setSelected(null)}
-          onAccepted={async () => {
-            // Refresh global data so dashboard reflects the change
-            const { data: { session } } = await sb.auth.getSession();
-            if (session?.user) {
-              await fetchEmployerData(session.user.id);
-              setSelected(null);
-            }
-          }}
+          onAccepted={onAccepted}
         />
-      ) : null}
+      )}
     </div>
   );
 }
 
-function CandidateCard({ c, stage, active, onClick }) {
+// ── Kandidát — řádkový card ──
+function CandidateListCard({ c, jobTags, active, onClick }) {
+  const isFavorite = parseFloat(c.rating) >= 4.8 && c.jobsDone >= 15;
+  const hasExp = !!(jobTags && jobTags.length && c.tags && c.tags.some(
+    t => jobTags.some(jt => jt.toLowerCase() === t.toLowerCase())
+  ));
+  const pill = CAND_STATUS_PILL[c.relStatus] || CAND_STATUS_PILL[c.status] || CAND_STATUS_PILL.pending;
+
   return (
     <button onClick={onClick} style={{
-      textAlign: 'left', padding: 12, borderRadius: 11,
-      background: active ? 'linear-gradient(135deg, rgba(0,32,246,0.2), rgba(91,107,255,0.08))' : 'rgba(22,22,59,0.6)',
-      border: '1px solid ' + (active ? 'rgba(91,107,255,0.4)' : T.border),
-      cursor: 'pointer', color: 'inherit',
-      display: 'flex', flexDirection: 'column', gap: 10,
-      fontFamily: 'inherit',
+      textAlign: 'left', padding: '14px 18px', borderRadius: 14,
+      background: active ? 'rgba(0,32,246,0.04)' : '#fff',
+      border: '1px solid ' + (active ? 'rgba(0,32,246,0.25)' : T.border),
+      boxShadow: active ? '0 0 0 3px rgba(0,32,246,0.08)' : '0 1px 4px rgba(0,32,246,0.06)',
+      cursor: 'pointer', color: 'inherit', fontFamily: 'inherit',
+      display: 'flex', alignItems: 'center', gap: 14,
+      transition: 'all .15s',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-        <div style={{
-          width: 36, height: 36, borderRadius: 999,
-          background: c.color, display: 'grid', placeItems: 'center',
-          color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13,
-          flexShrink: 0,
-        }}>{c.avatar}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</div>
-          <div style={{ color: T.muted, fontSize: 10.5, fontFamily: T.fontUI, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {[c.city, c.jobTitle ? 'reaguje na: ' + c.jobTitle : null].filter(Boolean).join(' · ') || 'Brigádník'}
-          </div>
+      {/* Avatar */}
+      <div style={{
+        width: 50, height: 50, borderRadius: 999, flexShrink: 0,
+        background: c.color, display: 'grid', placeItems: 'center',
+        color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 17,
+      }}>{c.avatar}</div>
+
+      {/* Střed: jméno + meta + metriky */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 2 }}>
+          <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 14, fontWeight: 700 }}>{c.name}</span>
+          {c.city ? <span style={{ color: T.mutedSoft, fontSize: 12, fontFamily: T.fontUI }}>· {c.city}</span> : null}
+          {c.super && (
+            <span style={{ padding: '2px 7px', borderRadius: 6, background: 'rgba(245,166,35,0.13)', color: '#F5A623', fontFamily: T.fontUI, fontSize: 10, fontWeight: 800 }}>
+              ⭐ Super zájem
+            </span>
+          )}
+          {isFavorite && (
+            <span style={{ padding: '2px 7px', borderRadius: 6, background: 'rgba(91,214,138,0.12)', color: '#5BD68A', fontFamily: T.fontUI, fontSize: 10, fontWeight: 700 }}>
+              Oblíbený
+            </span>
+          )}
+          {c.workedHere && (
+            <span style={{ padding: '2px 7px', borderRadius: 6, background: 'rgba(255,209,102,0.14)', color: '#C99A00', fontFamily: T.fontUI, fontSize: 10, fontWeight: 700 }}>
+              Známe se
+            </span>
+          )}
+          {hasExp && !c.workedHere && (
+            <span style={{ padding: '2px 7px', borderRadius: 6, background: 'rgba(91,107,255,0.10)', color: '#5B6BFF', fontFamily: T.fontUI, fontSize: 10, fontWeight: 700 }}>
+              Zkušenost
+            </span>
+          )}
         </div>
-        {c.super && (
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 3,
-            padding: '2px 7px', borderRadius: 6,
-            background: 'rgba(255,209,102,0.18)', color: '#FFD166',
-            fontFamily: T.fontUI, fontSize: 10, fontWeight: 800, flexShrink: 0,
-          }}><Icon name="star-bold" size={10} color="#FFD166" /> Super</div>
-        )}
+
+        <div style={{ color: T.muted, fontSize: 12, fontFamily: T.fontUI, marginBottom: 8 }}>
+          {c.jobTitle ? `Reaguje na: ${c.jobTitle}` : 'Brigádník'}
+        </div>
+
+        {/* Metriky + tagy */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: T.fontMono, fontSize: 12, fontWeight: 700, color: T.ink }}>
+            <Icon name="star-bold" size={11} color="#FFD166" />
+            {parseFloat(c.rating) > 0 ? c.rating : '–'}
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: T.muted, fontFamily: T.fontUI, fontSize: 12 }}>
+            <Icon name="medal-ribbon-star-bold" size={11} color="#5B6BFF" />
+            {c.jobsDone} brigád
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: T.muted, fontFamily: T.fontUI, fontSize: 12 }}>
+            <Icon name="cup-star-bold" size={11} color="#5BD68A" />
+            L{c.level}
+          </span>
+          {(c.tags || []).slice(0, 2).map((t, i) => (
+            <span key={i} style={{
+              padding: '2px 8px', borderRadius: 5,
+              background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border,
+              color: T.light, fontFamily: T.fontUI, fontSize: 10.5, fontWeight: 600,
+            }}>{t}</span>
+          ))}
+        </div>
       </div>
 
-      {/* metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
-        <MiniMetric icon="star-bold" v={c.rating} c="#FFD166" />
-        <MiniMetric icon="medal-ribbon-star-bold" v={c.jobsDone} c="#5B6BFF" />
-        <MiniMetric icon="cup-star-bold" v={'L' + c.level} c="#5BD68A" />
-      </div>
-
-      {/* tags */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-        {c.tags.slice(0, 3).map((t, i) => (
-          <span key={i} style={{
-            padding: '2px 7px', borderRadius: 5,
-            background: 'rgba(255,255,255,0.05)', border: '1px solid ' + T.border,
-            color: T.light, fontFamily: T.fontUI, fontSize: 10, fontWeight: 600,
-          }}>{t}</span>
-        ))}
-      </div>
-
-      {/* footer */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid ' + T.border, paddingTop: 8 }}>
-        <span style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 9.5 }}>{c.lastSeen}</span>
-        {stage === 'interview' ? <span style={{ color: '#E0B0FF', fontFamily: T.fontMono, fontSize: 9.5, fontWeight: 700 }}>{c.interview}</span> : null}
-        {stage === 'hired' ? <span style={{ color: '#5BD68A', fontFamily: T.fontMono, fontSize: 9.5, fontWeight: 700 }}>{c.shift}</span> : null}
-        {(stage === 'new' || stage === 'shortlist') ? <Icon name="alt-arrow-right-line-duotone" size={12} color={T.muted}/> : null}
+      {/* Pravá strana: status pill + čas */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, flexShrink: 0 }}>
+        <span style={{
+          padding: '5px 12px', borderRadius: 8,
+          background: pill.bg, color: pill.color,
+          fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700,
+        }}>{pill.label}</span>
+        <span style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10.5 }}>{c.lastSeen}</span>
       </div>
     </button>
   );
@@ -325,28 +678,30 @@ function MiniMetric({ icon, v, c }) {
     <div style={{
       display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center',
       padding: '5px 6px', borderRadius: 6,
-      background: 'rgba(0,0,0,0.25)', border: '1px solid ' + T.border,
+      background: T.surfaceAlt, border: '1px solid ' + T.border,
     }}>
       <Icon name={icon} size={11} color={c} />
-      <span style={{ color: '#fff', fontFamily: T.fontMono, fontSize: 11, fontWeight: 700 }}>{v}</span>
+      <span style={{ color: T.ink, fontFamily: T.fontMono, fontSize: 11, fontWeight: 700 }}>{v}</span>
     </div>
   );
 }
 
-function CandidateDrawer({ c, onClose, onAccepted }) {
+// ── Kandidát — detail drawer ──
+function CandidateDrawer({ c, jobTags, onClose, onAccepted }) {
   const [accepting, setAccepting] = useStateE(false);
   const [rejecting, setRejecting] = useStateE(false);
-  const accepted = c.status === 'accepted';
-  const rejected = c.status === 'rejected';
+  const accepted  = c.status === 'accepted' || c.status === 'confirmed';
+  const rejected  = c.status === 'rejected';
+  const isPending = c.relStatus === 'pending' || c.status === 'pending';
+
+  const reasons  = _matchReasons(c, jobTags);
+  const relBars  = _reliabilityBars(c);
 
   async function handleAccept() {
     if (!c.match_id || !c.job_id || accepting) return;
     setAccepting(true);
     const ok = await acceptCandidate(c.match_id, c.job_id);
-    if (ok) {
-      onAccepted?.();
-      onClose();
-    }
+    if (ok) { onAccepted?.(); }
     setAccepting(false);
   }
 
@@ -354,64 +709,85 @@ function CandidateDrawer({ c, onClose, onAccepted }) {
     if (!c.match_id || rejecting) return;
     setRejecting(true);
     await rejectCandidate(c.match_id);
-    onAccepted?.(); // refresh parent
-    onClose();
+    onAccepted?.();
     setRejecting(false);
   }
 
   return (
     <div style={{
-      position: 'fixed', top: 0, right: 0, bottom: 0, width: 420,
-      background: 'rgba(7,7,26,0.96)', backdropFilter: 'blur(24px)',
+      position: 'fixed', top: 0, right: 0, bottom: 0, width: 440,
+      background: '#fff',
       borderLeft: '1px solid ' + T.border,
-      boxShadow: '-20px 0 60px rgba(0,0,0,0.5)',
+      boxShadow: '-16px 0 50px rgba(20,22,40,0.14)',
       zIndex: 100, display: 'flex', flexDirection: 'column',
-      animation: 'mkBubbleIn .25s',
+      animation: 'mkBubbleIn .22s',
     }}>
+      {/* ── Header ── */}
       <div style={{ padding: '16px 20px', borderBottom: '1px solid ' + T.border, display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ flex: 1, color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Detail kandidáta</span>
-        <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border, color: T.light, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
-          <Icon name="close-square-bold" size={16} color={T.muted}/>
+        <span style={{ flex: 1, color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>Detail kandidáta</span>
+        <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, background: T.surfaceAlt, border: '1px solid ' + T.border, cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
+          <Icon name="close-square-bold" size={16} color={T.muted} />
         </button>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 18 }}>
-        {/* Hero */}
-        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: 999, background: c.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 26 }}>{c.avatar}</div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+        {/* ── Hero ── */}
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          <div style={{ width: 72, height: 72, borderRadius: 999, background: c.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 26, flexShrink: 0 }}>
+            {c.avatar}
+          </div>
           <div style={{ flex: 1 }}>
-            <div style={{ color: '#fff', fontFamily: T.fontHead, fontSize: 20, fontWeight: 800 }}>{c.name}</div>
-            <div style={{ color: T.muted, fontSize: 12, fontFamily: T.fontUI, marginTop: 2 }}>{[c.city, c.jobTitle ? 'reaguje na: ' + c.jobTitle : null].filter(Boolean).join(' · ') || 'Brigádník'}</div>
-            <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
-              <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,107,255,0.2)', color: '#5B6BFF', fontFamily: T.fontMono, fontSize: 11, fontWeight: 800 }}>Makač L{c.level}</span>
-              {c.verified && <span style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(91,214,138,0.2)', color: '#5BD68A', fontFamily: T.fontMono, fontSize: 11, fontWeight: 800 }}>Ověřený</span>}
+            <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 20, fontWeight: 800, lineHeight: 1.2 }}>{c.name}</div>
+            <div style={{ color: T.muted, fontSize: 12, fontFamily: T.fontUI, marginTop: 3 }}>
+              {[c.city, c.jobTitle ? `Reaguje na: ${c.jobTitle}` : null].filter(Boolean).join(' · ') || 'Brigádník'}
+            </div>
+            <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+              <span style={{ padding: '3px 9px', borderRadius: 6, background: 'rgba(91,107,255,0.12)', color: '#5B6BFF', fontFamily: T.fontMono, fontSize: 11, fontWeight: 800 }}>Makač L{c.level}</span>
+              {c.verified && <span style={{ padding: '3px 9px', borderRadius: 6, background: 'rgba(91,214,138,0.12)', color: '#5BD68A', fontFamily: T.fontMono, fontSize: 11, fontWeight: 800 }}>Ověřený</span>}
+              {c.super && <span style={{ padding: '3px 9px', borderRadius: 6, background: 'rgba(245,166,35,0.12)', color: '#F5A623', fontFamily: T.fontMono, fontSize: 11, fontWeight: 800 }}>⭐ Super zájem</span>}
             </div>
           </div>
         </div>
 
-        {/* Stats grid */}
+        {/* ── Stats ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
           {[
-            { l: 'Hodnocení', v: Number(c.rating) > 0 ? c.rating + '★' : '–', c: '#FFD166' },
-            { l: 'Brigád', v: c.jobsDone, c: '#5B6BFF' },
-            { l: 'Hodin', v: c.hoursLogged || 0, c: '#5BD68A' },
+            { l: 'Hodnocení', v: parseFloat(c.rating) > 0 ? c.rating + '★' : '–', col: '#FFD166' },
+            { l: 'Brigád',    v: c.jobsDone,              col: '#5B6BFF' },
+            { l: 'Hodin',     v: c.hoursLogged || 0,       col: '#5BD68A' },
           ].map((s, i) => (
-            <div key={i} style={{ padding: 12, borderRadius: 10, background: 'rgba(22,22,59,0.6)', border: '1px solid ' + T.border, textAlign: 'center' }}>
-              <div style={{ color: s.c, fontFamily: T.fontMono, fontSize: 18, fontWeight: 700 }}>{s.v}</div>
-              <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 10, marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.5 }}>{s.l}</div>
+            <div key={i} style={{ padding: 12, borderRadius: 10, background: T.surfaceAlt, border: '1px solid ' + T.border, textAlign: 'center' }}>
+              <div style={{ color: s.col, fontFamily: T.fontMono, fontSize: 20, fontWeight: 700 }}>{s.v}</div>
+              <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 10, marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.5 }}>{s.l}</div>
             </div>
           ))}
         </div>
 
-        {/* O kandidátovi */}
+        {/* ── Proč je to dobrý match ── */}
+        <div style={{ padding: 16, borderRadius: 12, background: 'rgba(0,32,246,0.04)', border: '1px solid rgba(0,32,246,0.10)' }}>
+          <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Proč je to dobrý match</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+            {reasons.map((r, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 18, height: 18, borderRadius: 999, flexShrink: 0, display: 'grid', placeItems: 'center', background: r.ok ? 'rgba(91,214,138,0.15)' : 'rgba(244,63,94,0.10)' }}>
+                  <Icon name={r.ok ? 'check-circle-bold' : 'info-circle-bold'} size={12} color={r.ok ? '#5BD68A' : '#f43f5e'} />
+                </div>
+                <span style={{ color: T.light, fontFamily: T.fontUI, fontSize: 12.5 }}>{r.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── O kandidátovi ── */}
         {c.bio && (
           <div>
             <div style={{ color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 }}>O kandidátovi</div>
-            <div style={{ color: T.light, fontSize: 12.5, fontFamily: T.fontUI, lineHeight: 1.6, whiteSpace: 'pre-line' }}>{c.bio}</div>
+            <div style={{ color: T.light, fontSize: 12.5, fontFamily: T.fontUI, lineHeight: 1.65, whiteSpace: 'pre-line' }}>{c.bio}</div>
           </div>
         )}
 
-        {/* Vzdělání */}
+        {/* ── Vzdělání ── */}
         {c.education && (
           <div>
             <div style={{ color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 }}>Vzdělání</div>
@@ -419,74 +795,118 @@ function CandidateDrawer({ c, onClose, onAccepted }) {
           </div>
         )}
 
-        {/* Skills — jen reálné */}
+        {/* ── Dovednosti ── */}
         <div>
           <div style={{ color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 }}>Dovednosti</div>
           {c.tags && c.tags.length ? (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-              {c.tags.map((t, i) => (
-                <span key={i} style={{ padding: '5px 10px', borderRadius: 7, background: 'rgba(91,107,255,0.12)', border: '1px solid rgba(91,107,255,0.25)', color: T.light, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600 }}>{t}</span>
-              ))}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {c.tags.map((t, i) => {
+                const matched = jobTags && jobTags.some(jt => jt.toLowerCase() === t.toLowerCase());
+                return (
+                  <span key={i} style={{
+                    padding: '5px 11px', borderRadius: 7,
+                    background: matched ? 'rgba(0,32,246,0.08)' : 'rgba(91,107,255,0.08)',
+                    border: '1px solid ' + (matched ? 'rgba(0,32,246,0.20)' : 'rgba(91,107,255,0.18)'),
+                    color: matched ? '#0020F6' : T.light,
+                    fontFamily: T.fontUI, fontSize: 11.5, fontWeight: matched ? 700 : 600,
+                  }}>{t}</span>
+                );
+              })}
             </div>
-          ) : <div style={{ color: T.mutedSoft, fontSize: 12, fontFamily: T.fontUI, fontStyle: 'italic' }}>Zatím neuvedl žádné dovednosti.</div>}
+          ) : (
+            <div style={{ color: T.mutedSoft, fontSize: 12, fontFamily: T.fontUI, fontStyle: 'italic' }}>Zatím neuvedl žádné dovednosti.</div>
+          )}
         </div>
 
-        {/* Plný profil + recenze */}
-        <button onClick={() => window.empOpenProfile && window.empOpenProfile(c.worker_id, { name: c.name, address: c.city, level: c.level, jobs_done: c.jobsDone, rating: c.rating, verified: c.verified })} style={{
-          padding: '11px 14px', borderRadius: 10, background: 'rgba(91,107,255,0.14)', border: '1px solid rgba(91,107,255,0.3)',
-          color: '#fff', cursor: 'pointer', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700,
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-        }}><Icon name="user-id-bold" size={14} color="#fff"/>Otevřít plný profil + recenze</button>
+        {/* ── Spolehlivost ── */}
+        {(parseFloat(c.rating) > 0 || c.jobsDone > 0) && (
+          <div>
+            <div style={{ color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 10 }}>Spolehlivost</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {relBars.map((bar, i) => (
+                <div key={i}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ color: T.light, fontSize: 12, fontFamily: T.fontUI, fontWeight: 500 }}>{bar.label}</span>
+                    <span style={{ color: T.ink, fontFamily: T.fontMono, fontSize: 12, fontWeight: 700 }}>{bar.value}%</span>
+                  </div>
+                  <div style={{ height: 6, borderRadius: 4, background: T.surfaceAlt, overflow: 'hidden', border: '1px solid ' + T.border }}>
+                    <div style={{
+                      height: '100%', width: bar.value + '%',
+                      background: bar.value >= 70
+                        ? 'linear-gradient(90deg, #5BD68A, #1a8f52)'
+                        : bar.value >= 40
+                          ? 'linear-gradient(90deg, #FFD166, #C99A00)'
+                          : 'linear-gradient(90deg, #f43f5e, #c0002a)',
+                      borderRadius: 4, transition: 'width .4s',
+                    }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Plný profil ── */}
+        <button
+          onClick={() => window.empOpenProfile && window.empOpenProfile(c.worker_id, { name: c.name, address: c.city, level: c.level, jobs_done: c.jobsDone, rating: c.rating, verified: c.verified })}
+          style={{
+            padding: '11px 14px', borderRadius: 10,
+            background: T.surfaceAlt, border: '1px solid ' + T.border,
+            color: T.ink, cursor: 'pointer', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+          }}>
+          <Icon name="user-id-bold" size={14} color="#5B6BFF" />
+          Otevřít plný profil + recenze
+        </button>
       </div>
 
+      {/* ── Footer akce ── */}
       <div style={{ padding: 16, borderTop: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {accepted ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 14px', borderRadius: 10, background: 'rgba(91,214,138,0.12)', border: '1px solid rgba(91,214,138,0.3)', color: '#5BD68A', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>
-            <Icon name="check-circle-bold" size={16} color="#5BD68A"/>Kandidát přijat — inzerát uzavřen
+        {accepted && !isPending ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 14px', borderRadius: 10, background: 'rgba(91,214,138,0.10)', border: '1px solid rgba(91,214,138,0.25)', color: '#5BD68A', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>
+            <Icon name="check-circle-bold" size={16} color="#5BD68A" />
+            {c.status === 'confirmed' ? 'Směna potvrzena' : 'Kandidát přijat — domlouvá se v chatu'}
           </div>
         ) : rejected ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 14px', borderRadius: 10, background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.25)', color: '#f43f5e', fontFamily: T.fontUI, fontSize: 13, fontWeight: 600 }}>
-            <Icon name="close-circle-bold" size={16} color="#f43f5e"/>Odmítnuto
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 14px', borderRadius: 10, background: 'rgba(244,63,94,0.07)', border: '1px solid rgba(244,63,94,0.2)', color: '#f43f5e', fontFamily: T.fontUI, fontSize: 13, fontWeight: 600 }}>
+            <Icon name="close-circle-bold" size={16} color="#f43f5e" />Odmítnuto
           </div>
-        ) : (
+        ) : isPending ? (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <button
-              onClick={handleAccept}
-              disabled={accepting}
-              style={{
-                padding: '12px 14px', borderRadius: 10,
-                background: accepting ? 'rgba(91,214,138,0.2)' : 'linear-gradient(135deg, #1a8f52, #15713f)',
-                border: '1px solid rgba(91,214,138,0.4)', color: '#fff', cursor: 'pointer',
-                fontFamily: T.fontUI, fontSize: 13, fontWeight: 700,
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                opacity: accepting ? 0.7 : 1,
-              }}>
-              <Icon name="check-circle-bold" size={14} color="#fff"/>
+            <button onClick={handleAccept} disabled={accepting} style={{
+              padding: '12px 14px', borderRadius: 10,
+              background: accepting ? 'rgba(91,214,138,0.2)' : 'linear-gradient(135deg, #1a8f52, #15713f)',
+              border: '1px solid rgba(91,214,138,0.4)', color: '#fff', cursor: 'pointer',
+              fontFamily: T.fontUI, fontSize: 13, fontWeight: 700,
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              opacity: accepting ? 0.7 : 1,
+            }}>
+              <Icon name="check-circle-bold" size={14} color="#fff" />
               {accepting ? 'Přijímám…' : 'Přijmout'}
             </button>
-            <button
-              onClick={handleReject}
-              disabled={rejecting}
-              style={{
-                padding: '12px 14px', borderRadius: 10,
-                background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.3)',
-                color: '#f43f5e', cursor: 'pointer',
-                fontFamily: T.fontUI, fontSize: 13, fontWeight: 700,
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                opacity: rejecting ? 0.7 : 1,
-              }}>
-              <Icon name="close-circle-bold" size={14} color="#f43f5e"/>
+            <button onClick={handleReject} disabled={rejecting} style={{
+              padding: '12px 14px', borderRadius: 10,
+              background: 'rgba(244,63,94,0.07)', border: '1px solid rgba(244,63,94,0.25)',
+              color: '#f43f5e', cursor: 'pointer',
+              fontFamily: T.fontUI, fontSize: 13, fontWeight: 700,
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              opacity: rejecting ? 0.7 : 1,
+            }}>
+              <Icon name="close-circle-bold" size={14} color="#f43f5e" />
               {rejecting ? 'Odmítám…' : 'Odmítnout'}
             </button>
           </div>
-        )}
+        ) : null}
         <button style={{
           padding: '10px 14px', borderRadius: 10,
-          background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
+          background: T.surfaceAlt, border: '1px solid ' + T.border,
           color: T.light, cursor: 'pointer',
           fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600,
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-        }} onClick={() => window.empGoTab && window.empGoTab('chat')}><Icon name="chat-round-line-bold" size={13} color={T.light}/>Napsat zprávu</button>
+        }} onClick={() => window.empGoTab && window.empGoTab('chat')}>
+          <Icon name="chat-round-line-bold" size={13} color={T.light} />
+          Napsat zprávu
+        </button>
       </div>
     </div>
   );

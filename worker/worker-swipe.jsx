@@ -21,6 +21,11 @@ function WSwipe({ tick }) {
 
   const currentJob   = jobs[topIdx] || null;
   const visibleCards = jobs.slice(topIdx, topIdx + 3);
+
+  // Zaznamenat zhlédnutí, když se inzerát dostane navrch
+  useEffectW(() => {
+    if (currentJob && currentJob.id && typeof logJobViewW === 'function') logJobViewW(currentJob.id);
+  }, [currentJob && currentJob.id]);
   const lvl          = makejLevel(W_PROFILE.xp);
   const remaining    = Math.max(0, jobs.length - topIdx);
 
@@ -318,6 +323,13 @@ function WJobCard({ job, drag, isTop, depth = 0, onTap }) {
                 color: job.accent || '#2f4bff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 20,
                 boxShadow: '0 6px 16px rgba(0,0,0,0.14)',
               }}>{job.logo}</div>
+
+            {/* boost štítek */}
+            {job.boosted && (
+              <div style={{ position: 'absolute', top: 82, left: 16, display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 999, background: 'rgba(255,255,255,0.95)', color: '#F5A623', fontFamily: T.fontHead, fontSize: 11, fontWeight: 800, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+                <Icon name="bolt-bold" size={12} color="#F5A623" /> TOP
+              </div>
+            )}
 
             {/* vzdálenost */}
             {distanceTxt && (
