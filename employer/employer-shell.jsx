@@ -49,6 +49,7 @@ function ESidebar({ tab, onTab }) {
     {
       label: 'Firma',
       items: [
+        { k: 'team', label: 'Tým', icon: 'users-group-two-rounded-bold', iconLine: 'users-group-two-rounded-linear' },
         { k: 'settings', label: 'Nastavení', icon: 'settings-bold', iconLine: 'settings-linear' },
       ],
     },
@@ -192,7 +193,6 @@ function ESidebar({ tab, onTab }) {
           <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ECOMPANY.name}</div>
           <div style={{ color: T.muted, fontSize: 10.5, fontFamily: T.fontUI }}>{ECOMPANY.city}</div>
         </div>
-        <Icon name="alt-arrow-down-line-duotone" size={14} color={T.mutedSoft} />
       </div>
     </aside>
   );

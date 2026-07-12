@@ -8,6 +8,7 @@ const TITLES = {
   chat:       { title: 'Zprávy',     subtitle: 'Komunikace s kandidáty' },
   calendar:   { title: 'Plán směn',  subtitle: 'Kalendář obsazení a otevřené sloty' },
   settings:   { title: 'Nastavení',  subtitle: 'Firemní profil a nastavení' },
+  team:       { title: 'Tým',        subtitle: 'Pozvi kolegy a spravuj přístupy' },
   pricing:    { title: 'Tarify',     subtitle: 'Správa předplatného a ceník' },
 };
 
@@ -51,12 +52,22 @@ function EEmptyState() {
 
 const EMPTY_JOB_FORM = {
   title: '', description: '', pay: '', pay_unit: 'Kč/h',
-  location: '', date: '', time_start: '', time_end: '',
+  location: '', kraj: '', date: '', time_start: '', time_end: '',
   tags: '', requirements: '', job_type: 'brigada',
   hours_per_week: '', start_date: '', contract_duration: '',
   contract_type: 'HPP', benefits: '',
   positions: '1', dress_code: '', contact_note: '',
 };
+
+const KRAJE = [
+  { id: 'praha', name: 'Praha' }, { id: 'stredocesky', name: 'Středočeský' },
+  { id: 'jihocesky', name: 'Jihočeský' }, { id: 'plzensky', name: 'Plzeňský' },
+  { id: 'karlovarsky', name: 'Karlovarský' }, { id: 'ustecky', name: 'Ústecký' },
+  { id: 'liberecky', name: 'Liberecký' }, { id: 'kralovehradecky', name: 'Královéhradecký' },
+  { id: 'pardubicky', name: 'Pardubický' }, { id: 'vysocina', name: 'Vysočina' },
+  { id: 'jihomoravsky', name: 'Jihomoravský' }, { id: 'olomoucky', name: 'Olomoucký' },
+  { id: 'zlinsky', name: 'Zlínský' }, { id: 'moravskoslezsky', name: 'Moravskoslezský' },
+];
 
 const JOB_TYPES = [
   { value: 'jednrazova_vypomoc', label: 'Jednorázová výpomoc', icon: '⚡', desc: 'Jednorázová akce' },
@@ -67,8 +78,9 @@ const JOB_TYPES = [
 
 const CONTRACT_TYPES = ['HPP', 'DPP', 'DPČ', 'Živnostenský list'];
 
-function ENewJobModal({ onClose, onCreated, editJob }) {
+function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
   const isEdit = !!editJob;
+  const isDup  = !!duplicateJob;
   const [form,   setForm]   = useStateE(EMPTY_JOB_FORM);
   const [saving, setSaving] = useStateE(false);
   const [err,    setErr]    = useStateE('');
@@ -89,16 +101,20 @@ function ENewJobModal({ onClose, onCreated, editJob }) {
 
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
-  // Editace: předvyplň formulář ze syrového řádku v DB
+  // Editace/duplikace: předvyplň formulář ze syrového řádku v DB
+  // (u duplikace necháme datum a čas prázdné, ať si je nastaví znovu)
   useEffectE(() => {
-    if (!editJob) return;
-    sb.from('jobs').select('*').eq('id', editJob.id).single().then(({ data }) => {
+    const src = editJob || duplicateJob;
+    if (!src) return;
+    sb.from('jobs').select('*').eq('id', src.id).single().then(({ data }) => {
       if (!data) return;
       setForm({
         title: data.title || '', description: data.description || '',
         pay: data.pay != null ? String(data.pay) : '', pay_unit: data.pay_unit || 'Kč/h',
-        location: data.location || '', date: data.date || '',
-        time_start: data.time_start || '', time_end: data.time_end || '',
+        location: data.location || '', kraj: data.kraj || '',
+        date: isDup ? '' : (data.date || ''),
+        time_start: isDup ? '' : (data.time_start || ''),
+        time_end: isDup ? '' : (data.time_end || ''),
         tags: Array.isArray(data.tags) ? data.tags.join(', ') : '',
         requirements: Array.isArray(data.requirements) ? data.requirements.join(', ') : '',
         job_type: data.job_type || 'brigada',
@@ -121,6 +137,7 @@ function ENewJobModal({ onClose, onCreated, editJob }) {
     if (!form.title.trim())    { setErr('Vyplň název pozice.'); return; }
     if (!form.pay)             { setErr('Vyplň mzdu.'); return; }
     if (!form.location.trim()) { setErr('Vyplň místo.'); return; }
+    if (!form.kraj) { setErr('Vyber kraj.'); return; }
     setSaving(true); setErr('');
     const { data: { session } } = await sb.auth.getSession();
     const tags = form.tags.split(',').map(t => t.trim()).filter(Boolean);
@@ -130,7 +147,7 @@ function ENewJobModal({ onClose, onCreated, editJob }) {
     const extra = { tags, requirements: reqs, benefits, positions: parseInt(form.positions) || 1, publish_at: publishIso };
     const result = isEdit
       ? await updateJobE(editJob.id, { ...form, ...extra })
-      : await createJobE(session.user.id, { ...form, ...extra });
+      : await createJobE(window._makejActingId || session.user.id, { ...form, ...extra });
     setSaving(false);
     if (!result) { setErr(isEdit ? 'Nepodařilo se uložit změny. Zkus to znovu.' : 'Nepodařilo se přidat inzerát. Zkus to znovu.'); return; }
     onCreated();
@@ -155,7 +172,7 @@ function ENewJobModal({ onClose, onCreated, editJob }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 18, fontWeight: 800 }}>{isEdit ? 'Upravit inzerát' : 'Nový inzerát'}</div>
+            <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 18, fontWeight: 800 }}>{isEdit ? 'Upravit inzerát' : isDup ? 'Duplikovat inzerát' : 'Nový inzerát'}</div>
             <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, marginTop: 2 }}>
               {isOneshot  ? 'Vyplň základní info — datum, čas a odměnu' :
                isBrigada  ? 'Krátkodobá brigáda s konkrétním termínem' :
@@ -239,6 +256,15 @@ function ENewJobModal({ onClose, onCreated, editJob }) {
         <div style={rowStyle}>
           <label style={labelStyle}>Místo *</label>
           <input style={inputStyle} placeholder="např. Brno — Veveří" value={form.location} onChange={e => setF('location', e.target.value)} />
+        </div>
+
+        {/* Kraj — vždy (povinné, kvůli filtru brigádníků) */}
+        <div style={rowStyle}>
+          <label style={labelStyle}>Kraj *</label>
+          <select style={{ ...inputStyle, appearance: 'auto' }} value={form.kraj} onChange={e => setF('kraj', e.target.value)}>
+            <option value="">Vyber kraj…</option>
+            {KRAJE.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
+          </select>
         </div>
 
         {/* Krátkodobé: datum + čas (jednorázová / brigáda) */}
@@ -739,6 +765,7 @@ function EmployerApp() {
   const [tick,      setTick]      = useStateE(0);
   const [showNewJob, setShowNewJob] = useStateE(false);
   const [editJob,    setEditJob]    = useStateE(null);
+  const [dupJob,     setDupJob]     = useStateE(null);
   const [reviewTarget, setReviewTarget] = useStateE(null);
   const [cancelTarget, setCancelTarget] = useStateE(null);
   const [toasts,    setToasts]    = useStateE([]);
@@ -754,10 +781,13 @@ function EmployerApp() {
 
   // Initial data fetch on mount
   useEffectE(() => {
+    function start() {
     sb.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) return;
-      empId.current = session.user.id;
-      fetchEmployerData(session.user.id).then(() => {
+      // ID firmy, za kterou pracuju (z rozcestníku); fallback = vlastní účet
+      const actId = window._makejActingId || session.user.id;
+      empId.current = actId;
+      fetchEmployerData(actId).then(() => {
         setLoaded(true);
         setTick(1);
         // Rozhodnutí o zrušených směnách má přednost
@@ -778,6 +808,11 @@ function EmployerApp() {
         setTick(1);
       });
     });
+    }
+    // Počkej na výběr pracovního prostoru z rozcestníku (auth gate)
+    if (window._makejActingId) start();
+    else window.addEventListener('makej-workspace', start, { once: true });
+    return () => window.removeEventListener('makej-workspace', start);
   }, []);
 
   // Realtime: refresh data when matches or jobs change
@@ -831,11 +866,12 @@ function EmployerApp() {
     body = <EEmptyState />;
   } else if (tab === 'dash')        body = <EDashboard key={tick} period={period} />;
   else if (tab === 'analytics')     body = <EAnalytics key={tick} />;
-  else if (tab === 'jobs')          body = <EJobs key={tick} onTab={setTab} onEdit={setEditJob} />;
+  else if (tab === 'jobs')          body = <EJobs key={tick} onTab={setTab} onEdit={setEditJob} onDuplicate={setDupJob} />;
   else if (tab === 'candidates')    body = <ECandidates key={tick} />;
   else if (tab === 'chat')          body = <EMessages key={tick} />;
   else if (tab === 'calendar')      body = <ECalendar key={tick} />;
   else if (tab === 'settings')      body = <ESettings key={tick} />;
+  else if (tab === 'team')          body = <ETeamTab key={tick} />;
   else if (tab === 'pricing')       body = <EPricing key={tick} onTab={setTab} onPlanChange={() => setTick(t => t + 1)} />;
   else body = (
     <div style={{ flex: 1, display: 'grid', placeItems: 'center', color: T.muted, fontFamily: T.fontUI }}>
@@ -895,6 +931,18 @@ function EmployerApp() {
           onClose={() => setEditJob(null)}
           onCreated={async () => {
             setEditJob(null);
+            await fetchEmployerData(empId.current);
+            setTick(t => t + 1);
+          }}
+        />
+      )}
+
+      {dupJob && (
+        <ENewJobModal
+          duplicateJob={dupJob}
+          onClose={() => setDupJob(null)}
+          onCreated={async () => {
+            setDupJob(null);
             await fetchEmployerData(empId.current);
             setTick(t => t + 1);
           }}

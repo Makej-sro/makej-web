@@ -1,5 +1,16 @@
 // Makej Worker — Swipe UI
 
+const KRAJE_W = [
+  { id: 'praha', name: 'Praha' }, { id: 'stredocesky', name: 'Středočeský' },
+  { id: 'jihocesky', name: 'Jihočeský' }, { id: 'plzensky', name: 'Plzeňský' },
+  { id: 'karlovarsky', name: 'Karlovarský' }, { id: 'ustecky', name: 'Ústecký' },
+  { id: 'liberecky', name: 'Liberecký' }, { id: 'kralovehradecky', name: 'Královéhradecký' },
+  { id: 'pardubicky', name: 'Pardubický' }, { id: 'vysocina', name: 'Vysočina' },
+  { id: 'jihomoravsky', name: 'Jihomoravský' }, { id: 'olomoucky', name: 'Olomoucký' },
+  { id: 'zlinsky', name: 'Zlínský' }, { id: 'moravskoslezsky', name: 'Moravskoslezský' },
+];
+const _krajName = id => (KRAJE_W.find(k => k.id === id) || {}).name || id;
+
 function WSwipe({ tick }) {
   const [jobs,       setJobs]       = useStateW(() => W_JOBS.map(jobToCard));
   const [topIdx,     setTopIdx]     = useStateW(0);
@@ -8,16 +19,29 @@ function WSwipe({ tick }) {
   const [isSuperAnim,setIsSuperAnim]= useStateW(false);
   const [actionAnim, setActionAnim] = useStateW(null); // 'like' | 'pass' | 'super'
   const [detailJob,  setDetailJob]  = useStateW(null);
+  const [kraje,      setKraje]      = useStateW(() => { try { return JSON.parse(localStorage.getItem('makej-worker-kraje') || '[]'); } catch (e) { return []; } });
+  const [filterOpen, setFilterOpen] = useStateW(false);
   const userId  = useRefW(null);
   const dragRef = useRefW(drag);
+
+  const _filterKraj = list => kraje.length ? list.filter(j => kraje.includes(j.kraj)) : list;
 
   useEffectW(() => { dragRef.current = drag; }, [drag]);
 
   useEffectW(() => {
     sb.auth.getSession().then(({ data: { session } }) => { userId.current = session?.user?.id || null; });
-    setJobs(W_JOBS.map(jobToCard));
+    setJobs(_filterKraj(W_JOBS.map(jobToCard)));
     setTopIdx(0);
   }, [tick]);
+
+  // Filtr krajů — ulož + přefiltruj feed
+  useEffectW(() => {
+    try { localStorage.setItem('makej-worker-kraje', JSON.stringify(kraje)); } catch (e) {}
+    setJobs(_filterKraj(W_JOBS.map(jobToCard)));
+    setTopIdx(0);
+  }, [kraje]);
+
+  const toggleKraj = id => setKraje(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
 
   const currentJob   = jobs[topIdx] || null;
   const visibleCards = jobs.slice(topIdx, topIdx + 3);
@@ -112,14 +136,45 @@ function WSwipe({ tick }) {
         </div>
       </div>
 
+      {/* Filtr krajů */}
+      <div style={{ padding: '0 20px 10px', flexShrink: 0, position: 'relative' }}>
+        <button onClick={() => setFilterOpen(o => !o)} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 14px', borderRadius: 999, background: kraje.length ? 'rgba(0,32,246,0.10)' : '#fff', border: '1px solid ' + (kraje.length ? 'rgba(0,32,246,0.3)' : T.border), color: kraje.length ? T.primary : T.muted, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+          <Icon name="map-point-bold" size={15} color={kraje.length ? T.primary : T.muted} />
+          {kraje.length === 0 ? 'Všechny kraje' : kraje.length === 1 ? _krajName(kraje[0]) : kraje.length + ' krajů'}
+          <Icon name="alt-arrow-down-bold" size={13} color={kraje.length ? T.primary : T.muted} />
+        </button>
+        {filterOpen && (
+          <>
+            <div onClick={() => setFilterOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+            <div style={{ position: 'absolute', top: '100%', left: 20, zIndex: 41, marginTop: 6, width: 260, maxHeight: 340, overflowY: 'auto', background: '#fff', border: '1px solid ' + T.border, borderRadius: 14, boxShadow: '0 12px 30px rgba(20,22,40,0.16)', padding: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 8px 8px' }}>
+                <span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>Kde chceš pracovat</span>
+                {kraje.length > 0 && <button onClick={() => setKraje([])} style={{ background: 'none', border: 'none', color: T.primary, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Vše</button>}
+              </div>
+              {KRAJE_W.map(k => {
+                const on = kraje.includes(k.id);
+                return (
+                  <button key={k.id} onClick={() => toggleKraj(k.id)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 9, background: on ? 'rgba(0,32,246,0.08)' : 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                    <span style={{ width: 18, height: 18, borderRadius: 5, border: '1.5px solid ' + (on ? T.primary : T.border), background: on ? T.primary : '#fff', display: 'grid', placeItems: 'center', flexShrink: 0 }}>{on && <Icon name="check-read-bold" size={12} color="#fff" />}</span>
+                    <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13.5, fontWeight: on ? 700 : 500 }}>{k.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+
       {/* Card stack */}
       {visibleCards.length === 0 ? (
         <div style={{ flex: 1, display: 'grid', placeItems: 'center', padding: '20px 40px' }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 64, marginBottom: 12 }}>🎉</div>
-            <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Konec zásobníku!</div>
+            <div style={{ fontSize: 64, marginBottom: 12 }}>{kraje.length ? '📍' : '🎉'}</div>
+            <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 20, fontWeight: 800, marginBottom: 8 }}>{kraje.length ? 'Ve vybraných krajích nic není' : 'Konec zásobníku!'}</div>
             <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13, lineHeight: 1.6 }}>
-              Prošel/la jsi všechny dostupné nabídky.<br />Zaměstnavatelé přidávají nové brigády každý den.
+              {kraje.length
+                ? <>V {kraje.length === 1 ? 'tomto kraji' : 'těchto krajích'} teď nejsou žádné brigády.<br />Zkus přidat další kraj ve filtru nahoře.</>
+                : <>Prošel/la jsi všechny dostupné nabídky.<br />Zaměstnavatelé přidávají nové brigády každý den.</>}
             </div>
           </div>
         </div>

@@ -263,6 +263,12 @@ function initAuth() {
       role === 'worker' ? 'Brigádník' : 'Zaměstnavatel';
     document.getElementById('reg-company-group').style.display =
       role === 'employer' ? 'block' : 'none';
+    document.getElementById('reg-birth-group').style.display =
+      role === 'worker' ? 'block' : 'none';
+    document.getElementById('reg-gender-group').style.display =
+      role === 'worker' ? 'block' : 'none';
+    document.getElementById('reg-kraj-label').textContent =
+      role === 'worker' ? 'Z jakého jsi kraje?' : 'Kraj firmy';
   }
 
   // ─── Nav update ───
@@ -419,10 +425,22 @@ function initAuth() {
     const password = document.getElementById('reg-password').value;
     const password2 = document.getElementById('reg-password2').value;
     const company  = document.getElementById('reg-company').value.trim();
+    const birth    = document.getElementById('reg-birth').value;  // 'YYYY-MM-DD'
+    const gender   = document.getElementById('reg-gender').value; // 'zena'|'muz'|'jine'|''
+    const kraj     = document.getElementById('reg-kraj').value;   // 'praha'|…
 
     if (!name) {
       showError('register-error', 'Zadejte své jméno.');
       return;
+    }
+    if (selectedRole === 'worker') {
+      if (!birth) { showError('register-error', 'Zadej datum narození.'); return; }
+      const bd = new Date(birth);
+      const age = (Date.now() - bd.getTime()) / (365.25 * 24 * 3600 * 1000);
+      if (isNaN(bd.getTime()) || bd > new Date() || age < 15 || age > 100) {
+        showError('register-error', 'Zadej platné datum narození (min. 15 let).');
+        return;
+      }
     }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       showError('register-error', 'Zadejte platný email.');
@@ -434,6 +452,10 @@ function initAuth() {
     }
     if (password !== password2) {
       showError('register-error', 'Hesla se neshodují. Zkontroluj je a zkus to znovu.');
+      return;
+    }
+    if (!kraj) {
+      showError('register-error', 'Vyber kraj.');
       return;
     }
 
@@ -448,6 +470,9 @@ function initAuth() {
           name,
           role: selectedRole,
           company_name: selectedRole === 'employer' ? company : null,
+          birth_date: selectedRole === 'worker' ? birth : null,
+          gender: selectedRole === 'worker' ? (gender || null) : null,
+          kraj: kraj || null,
         }
       }
     });

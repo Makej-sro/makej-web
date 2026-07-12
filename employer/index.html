@@ -117,6 +117,18 @@
     </div>
   </div>
 
+  <!-- Rozcestník pracovních prostorů -->
+  <div id="ws-chooser" style="position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:linear-gradient(180deg,#2a2ab5 0%,#050510 100%); z-index:9998; padding:20px;">
+    <div class="gate-card">
+      <div class="gate-logo">makej!</div>
+      <div class="gate-sub">for business</div>
+      <div class="gate-title">Kam chceš jít?</div>
+      <div class="gate-desc">Vyber pracovní prostor.</div>
+      <div id="ws-list" style="display:flex; flex-direction:column; gap:10px; text-align:left; margin-bottom:14px;"></div>
+      <button class="gate-back" id="ws-signout">Odhlásit se</button>
+    </div>
+  </div>
+
   <div id="root"></div>
 
   <script>
@@ -130,14 +142,14 @@
     const gate = document.getElementById('auth-gate');
     const gateError = document.getElementById('gate-error');
     const gateSubmit = document.getElementById('gate-submit');
+    const chooser = document.getElementById('ws-chooser');
 
     function showGate() { gate.classList.remove('hidden'); }
     function hideGate() { gate.classList.add('hidden'); }
-
-    function showGateError(msg) {
-      gateError.textContent = msg;
-      gateError.style.display = 'block';
-    }
+    function showChooser() { chooser.style.display = 'flex'; }
+    function hideChooser() { chooser.style.display = 'none'; }
+    function resetSubmit() { gateSubmit.disabled = false; gateSubmit.textContent = 'Přihlásit se'; }
+    function showGateError(msg) { gateError.textContent = msg; gateError.style.display = 'block'; }
 
     function translateGateError(msg) {
       if (msg.includes('Invalid login credentials'))  return 'Nesprávný email nebo heslo.';
@@ -148,63 +160,100 @@
       if (msg.includes('invalid') && msg.includes('email')) return 'Zadejte platný email.';
       return msg;
     }
+    function roleLabel(r) { return ({ admin:'Admin', recruiter:'Náborář', accountant:'Účetní', viewer:'Jen ke čtení', member:'Člen týmu' })[r] || 'Člen týmu'; }
+    function escapeHtml(s) { return (s || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+
+    // Vstup do vybraného prostoru → oznam React appce
+    function enterWorkspace(ownerId) {
+      window._makejActingId = ownerId;
+      hideChooser(); hideGate();
+      window.dispatchEvent(new CustomEvent('makej-workspace', { detail: ownerId }));
+    }
+
+    function renderChooser(options) {
+      const list = document.getElementById('ws-list');
+      list.innerHTML = '';
+      options.forEach(o => {
+        const b = document.createElement('button');
+        b.className = 'gate-btn';
+        b.style.cssText = 'display:flex; align-items:center; gap:12px; text-align:left; margin-bottom:0;';
+        const sub = o.personal ? 'Tvůj osobní účet' : ('Firma · ' + roleLabel(o.role));
+        b.innerHTML = '<span style="font-size:1.4rem; line-height:1;">' + (o.personal ? '🧍' : '🏢') + '</span>'
+          + '<span style="display:flex; flex-direction:column; gap:2px;">'
+          + '<span style="font-weight:800;">' + escapeHtml(o.name) + '</span>'
+          + '<span style="font-size:0.72rem; font-weight:600; opacity:0.85;">' + sub + '</span></span>';
+        b.addEventListener('click', () => enterWorkspace(o.id));
+        list.appendChild(b);
+      });
+    }
+
+    async function proceed(session) {
+      // 1) přijetí pozvánky z odkazu ?join=<token>
+      const params = new URLSearchParams(window.location.search);
+      const joinToken = params.get('join');
+      if (joinToken) {
+        try { await sb.rpc('claim_team_invite', { p_token: joinToken }); } catch (e) { console.error('claim invite:', e); }
+        params.delete('join');
+        const qs = params.toString();
+        history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+      }
+      // 2) sestav dostupné pracovní prostory
+      const isEmployer = session.user?.user_metadata?.role === 'employer';
+      let memberships = [];
+      try { const { data } = await sb.rpc('my_workspaces'); memberships = data || []; } catch (e) { console.error('my_workspaces:', e); }
+
+      const options = [];
+      if (isEmployer) options.push({ id: session.user.id, name: 'Můj účet', personal: true });
+      memberships.forEach(m => options.push({ id: m.owner_id, name: m.company_name, personal: false, role: m.role }));
+
+      if (options.length === 0) {
+        await sb.auth.signOut();
+        showGateError('Tento účet nemá přístup k firemnímu dashboardu. Požádej správce firmy o pozvací odkaz.');
+        resetSubmit(); hideChooser(); showGate();
+        return;
+      }
+      if (options.length === 1 && options[0].personal) { enterWorkspace(options[0].id); return; }
+      renderChooser(options);
+      hideGate(); showChooser();
+    }
 
     gateSubmit.addEventListener('click', async () => {
       gateError.style.display = 'none';
       const email = document.getElementById('gate-email').value.trim();
       const password = document.getElementById('gate-password').value;
       if (!email || !password) { showGateError('Vyplň email a heslo.'); return; }
-
-      gateSubmit.disabled = true;
-      gateSubmit.textContent = 'Přihlašuji...';
-
+      gateSubmit.disabled = true; gateSubmit.textContent = 'Přihlašuji...';
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        showGateError(translateGateError(error.message));
-        gateSubmit.disabled = false;
-        gateSubmit.textContent = 'Přihlásit se';
-        return;
-      }
-
-      const role = data.user?.user_metadata?.role;
-      if (role !== 'employer') {
-        await sb.auth.signOut();
-        showGateError('Tento dashboard je pouze pro zaměstnavatele.');
-        gateSubmit.disabled = false;
-        gateSubmit.textContent = 'Přihlásit se';
-        return;
-      }
-
-      hideGate();
+      if (error) { showGateError(translateGateError(error.message)); resetSubmit(); return; }
+      await proceed(data.session);
+      resetSubmit();
     });
 
     // Enter key
-    document.getElementById('gate-password').addEventListener('keydown', e => {
-      if (e.key === 'Enter') gateSubmit.click();
+    document.getElementById('gate-password').addEventListener('keydown', e => { if (e.key === 'Enter') gateSubmit.click(); });
+    // Odhlášení z rozcestníku
+    document.getElementById('ws-signout').addEventListener('click', async () => {
+      await sb.auth.signOut(); window._makejActingId = null; hideChooser(); showGate();
     });
 
-    // Check existing session on load
+    // Existující session při načtení
     sb.auth.getSession().then(({ data: { session } }) => {
-      const role = session?.user?.user_metadata?.role;
-      if (session && role === 'employer') {
-        hideGate();
-      } else {
-        showGate();
-      }
+      if (session) proceed(session);
+      else showGate();
     });
   </script>
 
   <script type="text/babel" src="app.jsx?v=6"></script>
-  <script type="text/babel" src="employer-theme.jsx?v=2"></script>
+  <script type="text/babel" src="employer-theme.jsx?v=3"></script>
   <script type="text/babel" src="employer-data.jsx?v=6"></script>
   <script type="text/babel" src="employer-plans.jsx?v=2"></script>
-  <script type="text/babel" src="employer-shell.jsx?v=12"></script>
+  <script type="text/babel" src="employer-shell.jsx?v=14"></script>
   <script type="text/babel" src="employer-dashboard.jsx?v=11"></script>
-  <script type="text/babel" src="employer-pages.jsx?v=15"></script>
-  <script type="text/babel" src="employer-pages3.jsx?v=20"></script>
-  <script type="text/babel" src="_premium/analytics.jsx?v=13"></script>
-  <script type="text/babel" src="employer-supabase.jsx?v=17"></script>
-  <script type="text/babel" src="employer-main.jsx?v=15"></script>
+  <script type="text/babel" src="employer-pages.jsx?v=19"></script>
+  <script type="text/babel" src="employer-pages3.jsx?v=24"></script>
+  <script type="text/babel" src="_premium/kraje-map.jsx?v=2"></script>
+  <script type="text/babel" src="_premium/analytics.jsx?v=17"></script>
+  <script type="text/babel" src="employer-supabase.jsx?v=23"></script>
+  <script type="text/babel" src="employer-main.jsx?v=19"></script>
 </body>
 </html>

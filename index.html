@@ -281,28 +281,21 @@
   <!-- ═══════════ DOWNLOAD CTA ═══════════ -->
   <section id="download">
     <div class="container">
-      <div class="download-card">
-        <div class="download-glow"></div>
-        <div class="download-content">
-          <h2>Připraven<span class="gradient-text"> Makat?</span></h2>
-          <p>Stáhni si aplikaci zdarma a prozkoumej pracovní příležitosti ve tvém okolí ještě dnes.</p>
-          <div class="download-buttons">
-            <a href="#" class="store-btn store-btn--soon" aria-disabled="true">
-              <iconify-icon icon="logos:apple" width="28"></iconify-icon>
-              <div>
-                <small>Brzy dostupné na</small>
-                <strong>App Store</strong>
-              </div>
+      <div class="dl-stage">
+        <div class="dl-card">
+          <h2 class="dl-title">Připraven <span>Makat?</span></h2>
+          <p class="dl-sub">Stáhni si aplikaci zdarma a prozkoumej pracovní příležitosti ve tvém okolí ještě dnes.</p>
+          <div class="dl-btns">
+            <a href="#" class="dl-btn" aria-disabled="true">
+              <iconify-icon icon="logos:apple"></iconify-icon>
+              <span><small>Brzy dostupné na</small><strong>App Store</strong></span>
             </a>
-            <a href="#" class="store-btn store-btn--soon" aria-disabled="true">
-              <iconify-icon icon="logos:google-play-icon" width="24"></iconify-icon>
-              <div>
-                <small>Brzy dostupné na</small>
-                <strong>Google Play</strong>
-              </div>
+            <a href="#" class="dl-btn" aria-disabled="true">
+              <iconify-icon icon="logos:google-play-icon"></iconify-icon>
+              <span><small>Brzy dostupné na</small><strong>Google Play</strong></span>
             </a>
           </div>
-          <p class="download-note">Zdarma · Bez reklam · iOS &amp; Android · Spuštění brzy</p>
+          <p class="dl-note">Zdarma &middot; Bez reklam &middot; iOS &amp; Android &middot; Spuštění brzy</p>
         </div>
       </div>
     </div>
@@ -441,9 +434,42 @@
             <label class="form-label" for="reg-name">Jméno</label>
             <input class="form-input" type="text" id="reg-name" placeholder="Tvoje jméno" autocomplete="name" required />
           </div>
+          <div class="form-group" id="reg-birth-group">
+            <label class="form-label" for="reg-birth">Datum narození</label>
+            <input class="form-input" type="date" id="reg-birth" autocomplete="bday" />
+          </div>
+          <div class="form-group" id="reg-gender-group">
+            <label class="form-label" for="reg-gender">Pohlaví</label>
+            <select class="form-input" id="reg-gender">
+              <option value="">Vyber…</option>
+              <option value="zena">Žena</option>
+              <option value="muz">Muž</option>
+              <option value="jine">Jiné / neuvádím</option>
+            </select>
+          </div>
           <div class="form-group" id="reg-company-group" style="display:none">
             <label class="form-label" for="reg-company">Název firmy</label>
             <input class="form-input" type="text" id="reg-company" placeholder="Název tvé firmy" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-kraj" id="reg-kraj-label">Kraj</label>
+            <select class="form-input" id="reg-kraj">
+              <option value="">Vyber kraj…</option>
+              <option value="praha">Praha</option>
+              <option value="stredocesky">Středočeský</option>
+              <option value="jihocesky">Jihočeský</option>
+              <option value="plzensky">Plzeňský</option>
+              <option value="karlovarsky">Karlovarský</option>
+              <option value="ustecky">Ústecký</option>
+              <option value="liberecky">Liberecký</option>
+              <option value="kralovehradecky">Královéhradecký</option>
+              <option value="pardubicky">Pardubický</option>
+              <option value="vysocina">Vysočina</option>
+              <option value="jihomoravsky">Jihomoravský</option>
+              <option value="olomoucky">Olomoucký</option>
+              <option value="zlinsky">Zlínský</option>
+              <option value="moravskoslezsky">Moravskoslezský</option>
+            </select>
           </div>
           <div class="form-group">
             <label class="form-label" for="reg-email">Email</label>

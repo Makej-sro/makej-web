@@ -19,4 +19,10 @@ Object.assign(T, {
   super:      '#F5A623',
   border:     'rgba(0,32,246,0.12)',  // modré rámečky
   navBg:      '#ffffff',           // světlý topbar
+  // aliasy pro komponenty přenesené z Yasina (card-* tokeny)
+  cardText:      '#0f1222',
+  cardMuted:     '#6b7280',
+  cardMutedSoft: '#9ca3af',
+  cardLight:     '#374151',
+  cardBorder:    'rgba(0,32,246,0.12)',
 });

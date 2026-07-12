@@ -8,10 +8,16 @@ const STATUS_META = {
   scheduled: { label: 'Naplánováno', color: '#5B6BFF' },
 };
 
-function EJobs({ onTab, onEdit }) {
+function EJobs({ onTab, onEdit, onDuplicate }) {
   const [filter, setFilter] = useStateE('all');
   const [q, setQ] = useStateE('');
   const [refresh, setRefresh] = useStateE(0);
+
+  // Živý odpočet boostu — přerenderuj každou minutu, ať čísla klesají sama
+  useEffectE(() => {
+    const id = setInterval(() => setRefresh(x => x + 1), 60000);
+    return () => clearInterval(id);
+  }, []);
 
   async function handleBoost(j) {
     if (typeof can === 'function' && !can('topJob')) {
@@ -19,9 +25,9 @@ function EJobs({ onTab, onEdit }) {
       window.empGoTab && window.empGoTab('pricing');
       return;
     }
-    const ok = await boostJobE(j.id, 7);
+    const ok = await boostJobE(j.id, 48);
     if (ok) {
-      window.empToast && window.empToast('Inzerát boostnutý 🚀', j.title + ' se teď 7 dní zobrazuje nahoře ve feedu brigádníků.', '🚀', 'success');
+      window.empToast && window.empToast('Inzerát boostnutý 🚀', j.title + ' se teď 48 hodin zobrazuje nahoře ve feedu brigádníků, pak se boost sám vypne.', '🚀', 'success');
       setRefresh(x => x + 1);
     } else {
       window.empToast && window.empToast('Chyba', 'Boost se nepodařilo zapnout.', '⚠️', 'error');
@@ -90,6 +96,8 @@ function EJobs({ onTab, onEdit }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {filtered.map(j => {
           const status = STATUS_META[j.status];
+          const boostActive = j.boostedUntil && new Date(j.boostedUntil).getTime() > Date.now();
+          const boostLeftH  = boostActive ? Math.max(1, Math.ceil((new Date(j.boostedUntil).getTime() - Date.now()) / 3600000)) : 0;
           const matchRate = ((j.matches / j.swipes) * 100).toFixed(1);
           const hireRate = ((j.hired / j.matches) * 100).toFixed(1);
           return (
@@ -109,7 +117,7 @@ function EJobs({ onTab, onEdit }) {
                       {status.dot ? <span style={{ width: 6, height: 6, borderRadius: 999, background: status.color, animation: status.pulse ? 'mkBubbleIn 1s infinite alternate' : 'none' }} /> : null}
                       {status.label}
                     </span>
-                    {j.boosted && (
+                    {boostActive && (
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 6, background: 'rgba(245,166,35,0.16)', color: '#F5A623', fontSize: 10, fontWeight: 800, fontFamily: T.fontUI, letterSpacing: 0.5, textTransform: 'uppercase' }}>
                         <Icon name="bolt-bold" size={11} color="#F5A623" /> Top
                       </span>
@@ -170,14 +178,14 @@ function EJobs({ onTab, onEdit }) {
                     fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700,
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   }}><Icon name="users-group-rounded-bold" size={14} color="#fff"/>Kandidáti ({j.matches})</button>
-                  <button onClick={() => handleBoost(j)} disabled={j.boosted} style={{
+                  <button onClick={() => handleBoost(j)} disabled={boostActive} style={{
                     padding: '8px 12px', borderRadius: 9,
-                    background: j.boosted ? 'rgba(245,166,35,0.12)' : 'rgba(0,32,246,0.05)',
-                    border: '1px solid ' + (j.boosted ? 'rgba(245,166,35,0.35)' : T.border),
-                    color: j.boosted ? '#F5A623' : T.light, cursor: j.boosted ? 'default' : 'pointer',
+                    background: boostActive ? 'rgba(245,166,35,0.12)' : 'rgba(0,32,246,0.05)',
+                    border: '1px solid ' + (boostActive ? 'rgba(245,166,35,0.35)' : T.border),
+                    color: boostActive ? '#F5A623' : T.light, cursor: boostActive ? 'default' : 'pointer',
                     fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600,
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  }}><Icon name={j.boosted ? 'bolt-bold' : 'rocket-2-bold'} size={12} color={j.boosted ? '#F5A623' : T.super}/>{j.boosted ? 'Boostnuto' : 'Boostnout'}</button>
+                  }}><Icon name={boostActive ? 'bolt-bold' : 'rocket-2-bold'} size={12} color={boostActive ? '#F5A623' : T.super}/>{boostActive ? ('Boostnuto · ' + boostLeftH + ' h') : 'Boostnout'}</button>
                   <button onClick={() => onEdit && onEdit(j)} style={{
                     padding: '8px 12px', borderRadius: 9,
                     background: 'transparent', border: '1px solid ' + T.border,
@@ -185,6 +193,13 @@ function EJobs({ onTab, onEdit }) {
                     fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600,
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   }}><Icon name="pen-2-linear" size={12} color={T.muted}/>Upravit</button>
+                  <button onClick={() => onDuplicate && onDuplicate(j)} style={{
+                    padding: '8px 12px', borderRadius: 9,
+                    background: 'transparent', border: '1px solid ' + T.border,
+                    color: T.muted, cursor: 'pointer',
+                    fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600,
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  }}><Icon name="copy-bold" size={12} color={T.muted}/>Duplikovat</button>
                 </div>
               </div>
             </ECard>
@@ -630,6 +645,11 @@ function CandidateListCard({ c, jobTags, active, onClick }) {
               Zkušenost
             </span>
           )}
+          {(typeof E_NOTES !== 'undefined' && (E_NOTES[c.worker_id] || '').trim()) && (
+            <span title="Máš u tohoto kandidáta poznámku" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 7px', borderRadius: 6, background: 'rgba(245,166,35,0.14)', color: '#C99A00', fontFamily: T.fontUI, fontSize: 10, fontWeight: 700 }}>
+              <Icon name="notes-bold" size={10} color="#C99A00" /> Poznámka
+            </span>
+          )}
         </div>
 
         <div style={{ color: T.muted, fontSize: 12, fontFamily: T.fontUI, marginBottom: 8 }}>
@@ -690,6 +710,16 @@ function MiniMetric({ icon, v, c }) {
 function CandidateDrawer({ c, jobTags, onClose, onAccepted }) {
   const [accepting, setAccepting] = useStateE(false);
   const [rejecting, setRejecting] = useStateE(false);
+  const [note, setNote]           = useStateE(() => (typeof E_NOTES !== 'undefined' ? (E_NOTES[c.worker_id] || '') : ''));
+  const [noteSaving, setNoteSaving] = useStateE(false);
+  const [noteSaved,  setNoteSaved]  = useStateE(false);
+
+  async function saveNote() {
+    setNoteSaving(true); setNoteSaved(false);
+    const ok = await saveNoteE(c.worker_id, note);
+    setNoteSaving(false);
+    if (ok) { setNoteSaved(true); setTimeout(() => setNoteSaved(false), 2000); }
+  }
   const accepted  = c.status === 'accepted' || c.status === 'confirmed';
   const rejected  = c.status === 'rejected';
   const isPending = c.relStatus === 'pending' || c.status === 'pending';
@@ -762,6 +792,31 @@ function CandidateDrawer({ c, jobTags, onClose, onAccepted }) {
               <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 10, marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.5 }}>{s.l}</div>
             </div>
           ))}
+        </div>
+
+        {/* ── Soukromá poznámka (vidí jen ty) ── */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: T.ink, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700 }}>
+              <Icon name="notes-bold" size={14} color={T.primary} /> Soukromá poznámka
+            </div>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 10.5 }}>
+              <Icon name="lock-keyhole-minimalistic-bold" size={11} color={T.mutedSoft} /> jen ty
+            </span>
+          </div>
+          <textarea
+            value={note}
+            onChange={e => setNote(e.target.value)}
+            onBlur={saveNote}
+            placeholder="Např. Volal jsem, ozve se ve čtvrtek. Zkušený, ale chce vyšší mzdu…"
+            style={{ width: '100%', minHeight: 84, resize: 'vertical', padding: '11px 13px', borderRadius: 11, background: 'rgba(245,166,35,0.06)', border: '1px solid rgba(245,166,35,0.28)', color: T.ink, fontFamily: T.fontUI, fontSize: 13, lineHeight: 1.5, outline: 'none', boxSizing: 'border-box' }}
+          />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6, minHeight: 16 }}>
+            <span style={{ color: noteSaved ? '#16a34a' : T.mutedSoft, fontFamily: T.fontUI, fontSize: 11 }}>
+              {noteSaving ? 'Ukládám…' : noteSaved ? '✓ Uloženo' : 'Uloží se automaticky po kliknutí mimo pole'}
+            </span>
+            <button onClick={saveNote} disabled={noteSaving} style={{ padding: '5px 12px', borderRadius: 8, background: 'rgba(0,32,246,0.06)', border: '1px solid ' + T.border, color: T.primary, fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700, cursor: noteSaving ? 'default' : 'pointer' }}>Uložit</button>
+          </div>
         </div>
 
         {/* ── Proč je to dobrý match ── */}

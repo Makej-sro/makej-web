@@ -117,103 +117,229 @@ function ProGate({ feature, children }) {
 function EAnalytics() {
   return (
     <ProGate feature="Analytika">
-      {(() => {
-        const jobs = (typeof E_JOBS !== 'undefined' ? E_JOBS : []) || [];
-
-        if (jobs.length === 0) {
-          return (
-            <div style={{ flex: 1, display: 'grid', placeItems: 'center', padding: 40 }}>
-              <div style={{ textAlign: 'center', maxWidth: 420 }}>
-                <div style={{ width: 72, height: 72, borderRadius: 20, background: 'rgba(0,32,246,0.08)', border: '1px solid rgba(0,32,246,0.18)', display: 'grid', placeItems: 'center', margin: '0 auto 20px' }}>
-                  <Icon name="chart-2-bold" size={34} color={T.primary} />
-                </div>
-                <div style={{ fontFamily: T.fontHead, fontSize: 20, fontWeight: 800, color: T.ink, marginBottom: 8 }}>Zatím žádná data</div>
-                <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13.5, lineHeight: 1.7 }}>
-                  Jakmile vytvoříš inzeráty a brigádníci je začnou vidět a swajpovat, uvidíš tu reálná čísla o zhlédnutích, konverzi a náboru.
-                </div>
-              </div>
-            </div>
-          );
-        }
-
-        const totalViews   = jobs.reduce((a, j) => a + (j.views || 0), 0);
-        const totalMatches = jobs.reduce((a, j) => a + (j.matches || 0), 0);
-        const totalHired   = jobs.reduce((a, j) => a + (j.hired || 0), 0);
-        const avgCtr       = totalViews > 0 ? (totalMatches / totalViews) * 100 : 0;
-        const fmt = n => n.toLocaleString('cs-CZ').replace(/,/g, ' ');
-
-        const kpis = [
-          { label: 'Celkem zhlédnutí', value: fmt(totalViews),        sub: 'brigádníků vidělo inzeráty', icon: 'eye-bold',          color: '#5B6BFF' },
-          { label: 'Konverze',         value: avgCtr.toFixed(1) + '%', sub: 'zhlédnuto → match',           icon: 'chart-2-bold',      color: '#0020F6' },
-          { label: 'Celkem matchů',    value: fmt(totalMatches),       sub: 'swajpů doprava',             icon: 'heart-bold',        color: '#5BD68A' },
-          { label: 'Najato',           value: fmt(totalHired),         sub: 'potvrzených brigádníků',      icon: 'check-circle-bold', color: '#5BD68A' },
-        ];
-
-        const ranked = jobs.slice().sort((a, b) => (b.views || 0) - (a.views || 0));
-
-        return (
-          <div style={{ padding: '24px 28px 40px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto' }}>
-            {/* KPI grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
-              {kpis.map((k, i) => (
-                <ECard key={i} padding={18}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: 8, background: k.color + '1f', border: '1px solid ' + k.color + '33', display: 'grid', placeItems: 'center' }}>
-                      <Icon name={k.icon} size={14} color={k.color} />
-                    </div>
-                    <span style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase' }}>{k.label}</span>
-                  </div>
-                  <div style={{ fontFamily: T.fontMono, fontSize: 26, fontWeight: 700, color: T.ink, letterSpacing: -0.8 }}>{k.value}</div>
-                  <div style={{ color: T.mutedSoft, fontSize: 10.5, fontFamily: T.fontUI, marginTop: 3 }}>{k.sub}</div>
-                </ECard>
-              ))}
-            </div>
-
-            {/* Per-job performance */}
-            <ECard>
-              <SectionHeader title="Výkon inzerátů" subtitle="Zhlédnutí, matche a konverze podle jednotlivých inzerátů" />
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: T.fontUI }}>
-                  <thead>
-                    <tr>
-                      {['Inzerát', 'Zhlédnutí', 'Matche', 'Konverze', 'Najato'].map((h, i) => (
-                        <th key={i} style={{ textAlign: i === 0 ? 'left' : 'right', padding: '10px 12px', color: T.mutedSoft, fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, borderBottom: '1px solid ' + T.border }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ranked.map((j, i) => {
-                      const conv = (j.views || 0) > 0 ? ((j.matches || 0) / j.views * 100) : 0;
-                      return (
-                        <tr key={j.id || i}>
-                          <td style={{ padding: '11px 12px', borderBottom: '1px solid ' + T.border }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <span style={{ width: 8, height: 8, borderRadius: 3, background: j.accent || T.primary, flexShrink: 0 }} />
-                              <span style={{ color: T.ink, fontSize: 13, fontWeight: 600 }}>{j.title}</span>
-                            </div>
-                          </td>
-                          <td style={{ padding: '11px 12px', textAlign: 'right', color: T.ink, fontFamily: T.fontMono, fontSize: 13, borderBottom: '1px solid ' + T.border }}>{fmt(j.views || 0)}</td>
-                          <td style={{ padding: '11px 12px', textAlign: 'right', color: T.ink, fontFamily: T.fontMono, fontSize: 13, borderBottom: '1px solid ' + T.border }}>{j.matches || 0}</td>
-                          <td style={{ padding: '11px 12px', textAlign: 'right', color: conv > 0 ? '#16a34a' : T.mutedSoft, fontFamily: T.fontMono, fontSize: 13, fontWeight: 700, borderBottom: '1px solid ' + T.border }}>{conv.toFixed(1)}%</td>
-                          <td style={{ padding: '11px 12px', textAlign: 'right', color: T.ink, fontFamily: T.fontMono, fontSize: 13, borderBottom: '1px solid ' + T.border }}>{j.hired || 0}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              {totalViews === 0 && (
-                <div style={{ marginTop: 14, padding: '12px 14px', borderRadius: 10, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.muted, fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.6 }}>
-                  Zhlédnutí se začala počítat od zapojení trackování — čísla porostou, jak brigádníci uvidí tvoje inzeráty ve swipu.
-                </div>
-              )}
-            </ECard>
-          </div>
-        );
-      })()}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto' }}>
+        <KrajeMap />
+        <div style={{ padding: '0 28px 40px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <AnalyticsOverview />
+          <AnalyticsDemo />
+        </div>
+      </div>
     </ProGate>
   );
 }
+
+// ── Přehled ──────────────────────────────────────────────────
+function AnalyticsOverview() {
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 14 }}>
+        <ECard>
+          <SectionHeader title="Cohort: konverze podle týdne nástupu" subtitle="% kandidátů, kteří po N týdnech stále chodí na směny" />
+          <CohortTable />
+        </ECard>
+        <ECard>
+          <SectionHeader title="Srovnání kanálů" subtitle="Kde se vám daří nejlépe" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
+            {[
+              { l: 'Swajp feed', views: 8420, hires: 28, color: '#0020F6' },
+              { l: 'Search', views: 2140, hires: 9, color: '#5B6BFF' },
+              { l: 'Doporučení', views: 1280, hires: 11, color: '#5BD68A' },
+              { l: 'Boost (placený)', views: 1007, hires: 14, color: '#FFD166' },
+            ].map((c, i) => {
+              const conv = ((c.hires / c.views) * 100).toFixed(2);
+              return (
+                <div key={i}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 7, color: T.cardText, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600 }}>
+                      <span style={{ width: 8, height: 8, borderRadius: 2, background: c.color }} />
+                      {c.l}
+                    </span>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'baseline' }}>
+                      <span style={{ color: T.cardMutedSoft, fontFamily: T.fontMono, fontSize: 10.5 }}>{c.views.toLocaleString('cs-CZ').replace(/,/g,' ')} views</span>
+                      <span style={{ color: '#1a9e4d', fontFamily: T.fontMono, fontSize: 11.5, fontWeight: 700 }}>{c.hires} najato</span>
+                      <span style={{ color: T.cardText, fontFamily: T.fontMono, fontSize: 11.5, fontWeight: 700, minWidth: 44, textAlign: 'right' }}>{conv}%</span>
+                    </div>
+                  </div>
+                  <div style={{ height: 6, borderRadius: 3, background: T.cardSoft, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: (parseFloat(conv) * 60) + '%', background: c.color }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </ECard>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <ECard>
+          <SectionHeader title="Doba odpovědi" subtitle="Jak rychle odpovídáš kandidátům v chatu" />
+          {(() => {
+            const resp = (typeof window !== 'undefined' && window.E_RESPONSE) || { data: [], avg: null, count: 0 };
+            if (!resp.count) return <div style={{ color: T.cardMutedSoft, fontFamily: T.fontUI, fontSize: 12, fontStyle: 'italic', padding: '24px 0' }}>Zatím žádná data o odezvě — spočítá se z tvých chatů s kandidáty.</div>;
+            const fmt = m => m == null ? '–' : (m < 60 ? m + ' min' : (m / 60).toFixed(1).replace('.', ',') + ' h');
+            return (
+              <>
+                <BarChart width={460} height={200} data={resp.data} />
+                <div style={{ marginTop: 8, color: T.cardMutedSoft, fontFamily: T.fontUI, fontSize: 11 }}>
+                  Tvůj průměr: <span style={{ color: T.cardText, fontFamily: T.fontMono, fontWeight: 700 }}>{fmt(resp.avg)}</span> · z {resp.count} konverzací
+                </div>
+              </>
+            );
+          })()}
+        </ECard>
+        <ECard>
+          <SectionHeader title="Distribuce hodinovky" subtitle="Rozložení mezd napříč tvými inzeráty (Kč/h)" />
+          {(() => {
+            const wage = (typeof window !== 'undefined' && window.E_WAGE_DISTRO) || [];
+            if (!wage.some(b => b.v > 0)) return <div style={{ color: T.cardMutedSoft, fontFamily: T.fontUI, fontSize: 12, fontStyle: 'italic', padding: '24px 0' }}>Zatím žádné inzeráty s hodinovou mzdou.</div>;
+            return <BarChart width={460} height={200} data={wage} color="#0020F6" />;
+          })()}
+        </ECard>
+      </div>
+    </>
+  );
+}
+
+function CohortTable() {
+  const cohorts = [
+    { week: '6.4. – 12.4.', size: 12, vals: [100, 92, 83, 75, 75, 67] },
+    { week: '13.4. – 19.4.', size: 18, vals: [100, 89, 78, 72, 67] },
+    { week: '20.4. – 26.4.', size: 14, vals: [100, 86, 79, 71] },
+    { week: '27.4. – 3.5.', size: 22, vals: [100, 91, 82] },
+    { week: '4.5. – 10.5.', size: 16, vals: [100, 88] },
+    { week: 'Tento týden', size: 9, vals: [100] },
+  ];
+  return (
+    <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 3, fontFamily: T.fontUI, fontSize: 11.5 }}>
+      <thead>
+        <tr style={{ color: T.cardMutedSoft, fontSize: 10, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase' }}>
+          <th style={{ textAlign: 'left', padding: '4px 8px' }}>Týden nástupu</th>
+          <th style={{ textAlign: 'right', padding: '4px 8px' }}>Vel.</th>
+          {['T0','T+1','T+2','T+3','T+4','T+5'].map(h => <th key={h} style={{ padding: '4px 6px', textAlign: 'center' }}>{h}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {cohorts.map((c, i) => (
+          <tr key={i}>
+            <td style={{ color: T.cardLight, padding: '6px 8px', fontWeight: 600 }}>{c.week}</td>
+            <td style={{ color: T.cardMuted, fontFamily: T.fontMono, padding: '6px 8px', textAlign: 'right' }}>{c.size}</td>
+            {[0,1,2,3,4,5].map(j => {
+              const v = c.vals[j];
+              if (v == null) return <td key={j} style={{ padding: 0 }}><div style={{ height: 26, borderRadius: 5, background: T.cardSoft }}/></td>;
+              const op = 0.2 + (v / 100) * 0.7;
+              return (
+                <td key={j} style={{ padding: 0 }}>
+                  <div style={{ height: 26, borderRadius: 5, background: `rgba(0, 32, 246, ${op})`, color: '#fff', display: 'grid', placeItems: 'center', fontFamily: T.fontMono, fontSize: 10.5, fontWeight: 700 }}>{v}%</div>
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function DistroChart() {
+  const buckets = [
+    { l: '120', v: 8 },
+    { l: '140', v: 24 },
+    { l: '160', v: 41 },
+    { l: '180', v: 35 }, // YOU
+    { l: '200', v: 18 },
+    { l: '220', v: 7 },
+    { l: '240+', v: 3 },
+  ];
+  const max = Math.max(...buckets.map(b => b.v));
+  const W = 460, H = 180, padL = 28, padB = 28, padT = 8;
+  const innerW = W - padL - 8, innerH = H - padT - padB;
+  const bw = (innerW / buckets.length) * 0.7;
+  const gap = (innerW / buckets.length) * 0.3;
+  return (
+    <div>
+      <svg width={W} height={H} style={{ display: 'block' }}>
+        {buckets.map((b, i) => {
+          const h = (b.v / max) * innerH;
+          const x = padL + i * (bw + gap) + gap / 2;
+          const y = padT + innerH - h;
+          const isYou = b.l === '180';
+          return (
+            <g key={i}>
+              <rect x={x} y={y} width={bw} height={h} rx="4" fill={isYou ? '#FFD166' : '#5B6BFF'} opacity={isYou ? 1 : 0.6} />
+              {isYou && <text x={x + bw/2} y={y - 8} textAnchor="middle" fill="#c99400" fontFamily={T.fontUI} fontSize="9.5" fontWeight="800">VY</text>}
+              <text x={x + bw/2} y={H - 12} textAnchor="middle" fill={T.cardMutedSoft} fontFamily={T.fontMono} fontSize="9.5">{b.l}</text>
+            </g>
+          );
+        })}
+        <text x={padL} y={H - 2} fill={T.cardMutedSoft} fontFamily={T.fontUI} fontSize="9">Kč/h</text>
+      </svg>
+      <div style={{ display: 'flex', gap: 20, marginTop: 6, fontFamily: T.fontMono, fontSize: 11 }}>
+        <div><span style={{ color: T.cardMuted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Medián segmentu</span><div style={{ color: T.cardText, fontWeight: 700, fontSize: 14 }}>162 Kč</div></div>
+        <div><span style={{ color: T.cardMuted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Vy</span><div style={{ color: '#c99400', fontWeight: 700, fontSize: 14 }}>180 Kč</div></div>
+        <div><span style={{ color: T.cardMuted, fontFamily: T.fontUI, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>Top 10 %</span><div style={{ color: T.cardText, fontWeight: 700, fontSize: 14 }}>220+ Kč</div></div>
+      </div>
+    </div>
+  );
+}
+
+// ── Demografie ────────────────────────────────────────────────
+function AnalyticsDemo() {
+  const cands = (typeof E_CANDIDATES !== 'undefined') ? [ ...(E_CANDIDATES.new || []), ...(E_CANDIDATES.hired || []) ] : [];
+  const withAge = cands.filter(c => c.age != null);
+  const ageData = [
+    { l: '15-17', v: withAge.filter(c => c.age >= 15 && c.age <= 17).length },
+    { l: '18-21', v: withAge.filter(c => c.age >= 18 && c.age <= 21).length },
+    { l: '22-25', v: withAge.filter(c => c.age >= 22 && c.age <= 25).length },
+    { l: '26-30', v: withAge.filter(c => c.age >= 26 && c.age <= 30).length },
+    { l: '30+',   v: withAge.filter(c => c.age > 30).length },
+  ];
+  const GEN = { zena: { l: 'Žena', c: '#5B6BFF' }, muz: { l: 'Muž', c: '#FFD166' }, jine: { l: 'Jiné', c: '#E0B0FF' } };
+  const withGen = cands.filter(c => c.gender && GEN[c.gender]);
+  const genderData = ['zena', 'muz', 'jine']
+    .map(k => ({ key: k, l: GEN[k].l, c: GEN[k].c, n: withGen.filter(c => c.gender === k).length }))
+    .filter(g => g.n > 0);
+  const genTotal = withGen.length;
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <ECard>
+          <SectionHeader title="Věk" subtitle={withAge.length ? withAge.length + ' kandidátů s věkem' : undefined} />
+          {withAge.length ? (
+            <BarChart width={300} height={200} data={ageData} color="#0020F6" />
+          ) : (
+            <div style={{ color: T.cardMutedSoft, fontFamily: T.fontUI, fontSize: 12, fontStyle: 'italic', padding: '24px 0' }}>Věk se sbírá od registrace — čísla naskočí, jak se přihlásí noví brigádníci s datem narození.</div>
+          )}
+        </ECard>
+        <ECard>
+          <SectionHeader title="Pohlaví" subtitle={genTotal ? genTotal + ' kandidátů' : undefined} />
+          {genTotal ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <Donut size={130} thickness={20} data={genderData.map(g => ({ v: g.n, color: g.c }))} />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, fontFamily: T.fontUI, fontSize: 12 }}>
+                {genderData.map((x, i) => (
+                  <div key={i}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ width: 8, height: 8, borderRadius: 2, background: x.c }} />
+                      <span style={{ color: T.cardLight, flex: 1 }}>{x.l}</span>
+                      <span style={{ color: T.cardText, fontFamily: T.fontMono, fontWeight: 700 }}>{Math.round(x.n / genTotal * 100)} %</span>
+                    </div>
+                    <div style={{ color: T.cardMutedSoft, fontFamily: T.fontMono, fontSize: 10, marginLeft: 14 }}>{x.n} kandidátů</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div style={{ color: T.cardMutedSoft, fontFamily: T.fontUI, fontSize: 12, fontStyle: 'italic', padding: '24px 0' }}>Pohlaví se sbírá od registrace — naskočí, jak se přihlásí noví brigádníci.</div>
+          )}
+        </ECard>
+      </div>
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// PLÁN SMĚN — reálný kalendář z Supabase dat (E_JOBS)
+// ─────────────────────────────────────────────────────────────
 
 
 // ─────────────────────────────────────────────────────────────

@@ -47,7 +47,7 @@ function EMessages() {
   // Grab current user id once
   useEffectE(() => {
     sb.auth.getSession().then(({ data: { session } }) => {
-      userId.current = session?.user?.id || null;
+      userId.current = window._makejActingId || session?.user?.id || null;
     });
   }, []);
 
@@ -549,7 +549,6 @@ function ESettings() {
       <aside style={{ width: 220, padding: 22, borderRight: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', gap: 4 }}>
         {[
           { k: 'profile', l: 'Firemní profil', i: 'buildings-3-bold' },
-          { k: 'team', l: 'Tým', i: 'users-group-two-rounded-bold' },
           { k: 'notif', l: 'Notifikace', i: 'bell-bold' },
           { k: 'priv', l: 'Soukromí + GDPR', i: 'shield-keyhole-bold' },
           { k: 'danger', l: 'Nebezpečná zóna', i: 'shield-warning-bold' },
@@ -567,8 +566,20 @@ function ESettings() {
             {s.l}
           </button>
         ))}
-        {/* Odhlásit se */}
+        {/* Přepnout účet + Odhlásit se */}
         <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid ' + T.border }}>
+          <button onClick={() => window.location.reload()} style={{
+            display: 'flex', alignItems: 'center', gap: 9,
+            padding: '9px 12px', borderRadius: 9, width: '100%', marginBottom: 4,
+            background: 'transparent', border: '1px solid transparent',
+            color: T.muted, cursor: 'pointer', textAlign: 'left',
+            fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 600,
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,32,246,0.08)'; e.currentTarget.style.color = T.primary; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = T.muted; }}>
+            <Icon name="refresh-square-bold" size={14} color="currentColor"/>
+            Přepnout účet / firmu
+          </button>
           <button onClick={async () => {
             await sb.auth.signOut();
             window.location.href = '/';
@@ -589,7 +600,6 @@ function ESettings() {
       </aside>
       <div style={{ flex: 1, padding: '24px 28px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 760 }}>
         {seg === 'profile' && <SettingsProfile />}
-        {seg === 'team' && <SettingsTeam />}
         {seg === 'notif' && <SettingsNotif />}
         {seg === 'priv' && <SettingsPrivacy />}
         {seg === 'danger' && <SettingsDanger />}
@@ -600,19 +610,29 @@ function ESettings() {
 
 const TEAM_ROLES = { admin: 'Admin', recruiter: 'Náborář', accountant: 'Účetní', viewer: 'Jen ke čtení' };
 
+function ETeamTab() {
+  return (
+    <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px 40px' }}>
+      <div style={{ maxWidth: 760 }}>
+        <SettingsTeam />
+      </div>
+    </div>
+  );
+}
+
 function SettingsTeam() {
   const entitled = (typeof can !== 'function') || can('teamRoles');
   const [members, setMembers] = useStateE(() => (typeof E_TEAM !== 'undefined' ? [...E_TEAM] : []));
   const [email, setEmail] = useStateE('');
-  const [role,  setRole]  = useStateE('recruiter');
   const [busy,  setBusy]  = useStateE(false);
   const [err,   setErr]   = useStateE('');
+  const [newLink, setNewLink] = useStateE('');
+  const [copied,  setCopied]  = useStateE('');
 
   useEffectE(() => {
     if (!entitled) return;
-    sb.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) { await fetchTeamE(session.user.id); setMembers([...E_TEAM]); }
-    });
+    const id = window._makejActingId;
+    if (id) fetchTeamE(id).then(() => setMembers([...E_TEAM]));
   }, []);
 
   if (!entitled) {
@@ -622,58 +642,72 @@ function SettingsTeam() {
           <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(0,32,246,0.08)', border: '1px solid rgba(0,32,246,0.18)', display: 'grid', placeItems: 'center', margin: '0 auto 16px' }}>
             <Icon name="users-group-two-rounded-bold" size={28} color={T.primary} />
           </div>
-          <div style={{ fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, color: T.ink, marginBottom: 8 }}>Týmové role jsou v tarifu Business</div>
-          <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13, lineHeight: 1.6, marginBottom: 18 }}>Přizvi kolegy (náboráře, účetní), rozděl role a spravujte nábor společně.</div>
+          <div style={{ fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, color: T.ink, marginBottom: 8 }}>Tým je v tarifu Business</div>
+          <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13, lineHeight: 1.6, marginBottom: 18 }}>Přizvi kolegy pozvacím odkazem a spravujte nábor společně z jednoho účtu.</div>
           <button onClick={() => window.empGoTab && window.empGoTab('pricing')} style={{ padding: '11px 22px', borderRadius: 11, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 13.5, fontWeight: 800, cursor: 'pointer' }}>Zobrazit tarify</button>
         </div>
       </div>
     );
   }
 
-  async function invite() {
-    setBusy(true); setErr('');
-    const r = await inviteTeamMemberE(email, role);
+  async function createLink() {
+    setBusy(true); setErr(''); setNewLink('');
+    const r = await createTeamInviteE(email);
     setBusy(false);
     if (!r.ok) { setErr(r.msg); return; }
-    setEmail(''); setMembers([...E_TEAM]);
-    window.empToast && window.empToast('Pozvánka vytvořena', email + ' se přidá do týmu, jakmile se přihlásí.', '✉️', 'success');
+    setEmail(''); setMembers([...E_TEAM]); setNewLink(r.link || '');
   }
-  async function remove(id) {
-    const ok = await removeTeamMemberE(id);
-    if (ok) setMembers([...E_TEAM]);
-  }
+  async function remove(id) { const ok = await removeTeamMemberE(id); if (ok) setMembers([...E_TEAM]); }
+  function copy(text, key) { try { navigator.clipboard.writeText(text); setCopied(key); setTimeout(() => setCopied(''), 1800); } catch (e) {} }
+  function linkFor(m) { return (typeof _teamInviteLink === 'function') ? _teamInviteLink(m.invite_token) : ''; }
+
+  const copyBtn = (text, key, label) => (
+    <button onClick={() => copy(text, key)} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(0,32,246,0.06)', border: '1px solid ' + T.border, color: T.primary, cursor: 'pointer', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap' }}>{copied === key ? '✓ Zkopírováno' : (label || 'Kopírovat odkaz')}</button>
+  );
 
   return (
     <div>
-      <div style={{ fontFamily: T.fontHead, fontSize: 17, fontWeight: 800, color: T.ink, marginBottom: 4 }}>Tým</div>
-      <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12.5, marginBottom: 18 }}>Pozvi kolegy e-mailem a přiřaď jim roli. Přístup získají, jakmile se přihlásí stejným e-mailem.</div>
+      <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12.5, marginBottom: 18, lineHeight: 1.6 }}>
+        Vytvoř pozvací odkaz a pošli ho kolegovi. Kolega si založí (nebo má) vlastní účet, klikne na odkaz — a účty se spárují. Po přihlášení si pak vybere, jestli jde na svůj účet, nebo do téhle firmy.
+      </div>
 
-      {/* Invite */}
+      {/* Vytvořit odkaz */}
       <div style={{ display: 'flex', gap: 8, alignItems: 'stretch', marginBottom: 8, flexWrap: 'wrap' }}>
-        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="kolega@firma.cz" type="email"
-          style={{ flex: 1, minWidth: 200, padding: '10px 12px', borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontFamily: T.fontUI, fontSize: 13, outline: 'none' }} />
-        <select value={role} onChange={e => setRole(e.target.value)}
-          style={{ padding: '10px 12px', borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontFamily: T.fontUI, fontSize: 13, outline: 'none', appearance: 'auto' }}>
-          {Object.keys(TEAM_ROLES).map(k => <option key={k} value={k}>{TEAM_ROLES[k]}</option>)}
-        </select>
-        <button onClick={invite} disabled={busy || !email.trim()} style={{ padding: '10px 18px', borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, cursor: (busy || !email.trim()) ? 'default' : 'pointer', opacity: (busy || !email.trim()) ? 0.6 : 1 }}>{busy ? 'Zvu…' : 'Pozvat'}</button>
+        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="kolega@firma.cz (nepovinné — jen pro tvůj přehled)" type="email"
+          style={{ flex: 1, minWidth: 220, padding: '10px 12px', borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontFamily: T.fontUI, fontSize: 13, outline: 'none' }} />
+        <button onClick={createLink} disabled={busy} style={{ padding: '10px 18px', borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="link-round-bold" size={14} color="#fff"/>{busy ? 'Vytvářím…' : 'Vytvořit pozvací odkaz'}</button>
       </div>
       {err && <div style={{ color: '#f43f5e', fontFamily: T.fontUI, fontSize: 12, marginBottom: 8 }}>{err}</div>}
 
-      {/* Members */}
+      {/* Nově vytvořený odkaz */}
+      {newLink && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '10px 12px', borderRadius: 10, background: 'rgba(34,160,107,0.07)', border: '1px solid rgba(34,160,107,0.3)', marginBottom: 12 }}>
+          <Icon name="link-round-bold" size={15} color="#16a34a" />
+          <div style={{ flex: 1, minWidth: 0, color: T.ink, fontFamily: T.fontMono, fontSize: 11.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{newLink}</div>
+          {copyBtn(newLink, 'new', 'Kopírovat')}
+        </div>
+      )}
+
+      {/* Členové + čekající pozvánky */}
       <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {members.length === 0 ? (
-          <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12.5, fontStyle: 'italic', padding: '10px 0' }}>Zatím jsi nikoho nepozval.</div>
-        ) : members.map(m => (
-          <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 12, background: '#fff', border: '1px solid ' + T.border }}>
-            <div style={{ width: 36, height: 36, borderRadius: 999, background: _strColorSafe(m.email), display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{(m.email[0] || '?').toUpperCase()}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.email}</div>
-              <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11, marginTop: 1 }}>{TEAM_ROLES[m.role] || m.role} · {m.status === 'active' ? 'aktivní' : 'čeká na přihlášení'}</div>
+          <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12.5, fontStyle: 'italic', padding: '10px 0' }}>Zatím žádný člen ani pozvánka.</div>
+        ) : members.map(m => {
+          const active = !!m.member_id;
+          const name = (m.member && (m.member.name || m.member.company_name)) || m.email || 'Čekající pozvánka';
+          const initial = (name[0] || '?').toUpperCase();
+          return (
+            <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 12, background: '#fff', border: '1px solid ' + T.border }}>
+              <div style={{ width: 36, height: 36, borderRadius: 999, background: active ? _strColorSafe(name) : 'rgba(15,18,40,0.10)', display: 'grid', placeItems: 'center', color: active ? '#fff' : T.mutedSoft, fontFamily: T.fontHead, fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{active ? initial : '⏳'}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
+                <div style={{ color: active ? '#16a34a' : T.muted, fontFamily: T.fontUI, fontSize: 11, marginTop: 1 }}>{active ? 'Člen týmu · aktivní' : 'Čeká na přijetí pozvánky'}</div>
+              </div>
+              {!active && copyBtn(linkFor(m), m.id, 'Kopírovat odkaz')}
+              <button onClick={() => remove(m.id)} style={{ padding: '6px 10px', borderRadius: 8, background: 'transparent', border: '1px solid ' + T.border, color: '#f43f5e', cursor: 'pointer', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700 }}>{active ? 'Odebrat' : 'Zrušit'}</button>
             </div>
-            <button onClick={() => remove(m.id)} style={{ padding: '6px 8px', borderRadius: 8, background: 'transparent', border: '1px solid ' + T.border, color: '#f43f5e', cursor: 'pointer', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700 }}>Odebrat</button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -1075,105 +1109,95 @@ function SettingsDanger() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// CENÍK / TARIFY  (převzato z Yasinova dashboardu, přebarveno na světlý motiv)
+// ─────────────────────────────────────────────────────────────
+// CENÍK / TARIFY  (design převzat z Yasinova dashboardu; handlePay ukládá do DB)
 // ─────────────────────────────────────────────────────────────
 
 const PLANS = [
   {
-    id: 'starter',
-    name: 'Starter',
-    price: 0,
-    period: 'navždy zdarma',
-    color: '#6677cc',
-    icon: 'hand-shake-bold',
-    badge: null,
+    id: 'starter', name: 'Starter', price: 0, free: true, period: 'navždy zdarma',
+    color: '#8AB4FF', icon: 'hand-shake-bold',
     features: [
       { ok: true,  text: '1 aktivní inzerát' },
       { ok: true,  text: '1 full-time inzerce' },
       { ok: true,  text: 'Oslovování brigádníků (1×/měs)' },
       { ok: true,  text: 'Základní statistiky' },
+    ],
+    more: [
       { ok: false, text: 'Topování inzerátu' },
       { ok: false, text: 'Ověřená firma' },
       { ok: false, text: 'SMS Urgent' },
       { ok: false, text: 'Pokročilá analytika' },
+      { ok: false, text: 'Prémiový badge' },
       { ok: false, text: 'Export dat (CSV)' },
     ],
-    cta: 'Začít zdarma',
-    ctaDisabled: false,
-    contact: false,
+    cta: 'Začít zdarma', contact: false,
   },
   {
-    id: 'standard',
-    name: 'Standard',
-    price: 499,
-    annualPrice: 424,
-    period: 'měsíc bez DPH',
-    color: '#8AB4FF',
-    icon: 'bolt-bold',
-    badge: 'Nejoblíbenější',
+    id: 'standard', name: 'Standard', price: 499, annualPrice: 424, period: 'za měsíc bez DPH',
+    color: '#5B6BFF', icon: 'bolt-bold', badge: 'Nejoblíbenější', popular: true,
     features: [
       { ok: true,  text: '2 aktivní inzeráty' },
       { ok: true,  text: 'Topování inzerátu (1×/měs)' },
       { ok: true,  text: 'Ověřená firma + branding' },
       { ok: true,  text: 'Oslovování brigádníků (10×/měs)' },
+    ],
+    more: [
       { ok: true,  text: 'Plné statistiky + CSV export' },
       { ok: true,  text: 'Šablony inzerátů' },
+      { ok: true,  text: 'Video na profilu' },
       { ok: false, text: 'SMS Urgent' },
       { ok: false, text: 'Prémiový badge' },
       { ok: false, text: 'Pokročilá analytika' },
     ],
-    cta: 'Vybrat Standard',
-    ctaDisabled: false,
-    contact: false,
+    cta: 'Vybrat Standard', contact: false,
   },
   {
-    id: 'business',
-    name: 'Business',
-    price: 4999,
-    annualPrice: 4249,
-    period: 'měsíc bez DPH',
-    color: '#F5A623',
-    icon: 'crown-star-bold',
-    badge: null,
+    id: 'business', name: 'Business', price: 4999, annualPrice: 4249, period: 'za měsíc bez DPH',
+    color: '#FFD166', icon: 'crown-star-bold',
     features: [
       { ok: true,  text: '10 aktivních inzerátů' },
       { ok: true,  text: 'Topování inzerátu (5×/měs)' },
       { ok: true,  text: 'SMS Urgent + prémiový badge' },
       { ok: true,  text: 'Oslovování brigádníků (100×/měs)' },
+    ],
+    more: [
       { ok: true,  text: 'Pokročilá analytika' },
       { ok: true,  text: 'Zmínka na FB + IG Makej' },
       { ok: true,  text: 'Role uživatelů' },
       { ok: true,  text: 'Plánování inzerátu' },
       { ok: true,  text: 'Možnost konzultace' },
     ],
-    cta: 'Vybrat Business',
-    ctaDisabled: false,
-    contact: false,
+    cta: 'Vybrat Business', contact: false,
   },
   {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 9999,
-    pricePrefix: 'od ',
-    period: 'kalkulace na míru',
-    color: '#9B59D0',
-    icon: 'buildings-2-bold',
-    badge: null,
+    id: 'enterprise', name: 'Enterprise', price: 9999, pricePrefix: 'od ', period: 'kalkulace na míru',
+    color: '#E0B0FF', icon: 'buildings-2-bold',
     features: [
       { ok: true,  text: 'Vše z Business' },
       { ok: true,  text: 'Custom integrace (HR systémy)' },
       { ok: true,  text: 'Co-marketing s Makej' },
       { ok: true,  text: 'Vlastní reporting na míru' },
+    ],
+    more: [
       { ok: true,  text: 'Neomezení uživatelé v týmu' },
       { ok: true,  text: 'Onboarding a školení týmu' },
       { ok: true,  text: 'SLA 99,99 % + prioritní podpora' },
       { ok: true,  text: 'Dedikovaný account manager' },
     ],
-    cta: 'Nezávazná poptávka',
-    ctaDisabled: false,
-    contact: true,
+    cta: 'Nezávazná poptávka', contact: true,
   },
 ];
+
+// Řádek jedné vlastnosti tarifu (styl z webového ceníku)
+function PlanFeat({ f }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, textAlign: 'left' }}>
+      <Icon name={f.ok ? 'check-circle-bold' : 'close-circle-bold'} size={15} color={f.ok ? '#5B6BFF' : '#D1D5DB'} />
+      <span style={{ color: f.ok ? '#374151' : '#9CA3AF', fontSize: 12.5, fontWeight: 600, fontFamily: T.fontUI, lineHeight: 1.35 }}>{f.text}</span>
+    </div>
+  );
+}
 
 function animatePrice(el, from, to) {
   if (!el) return;
@@ -1192,6 +1216,7 @@ function EPricing({ onTab, onPlanChange }) {
   const [success, setSuccess]   = useStateE(false);
   const [hovered, setHovered]   = useStateE(null);
   const [annual, setAnnual]     = useStateE(false);
+  const [expanded, setExpanded] = useStateE({});
   const priceRefs               = useRefE({});
 
   useEffectE(() => {
@@ -1222,10 +1247,9 @@ function EPricing({ onTab, onPlanChange }) {
     if (plan) {
       ECOMPANY.plan = plan.name;
       if (typeof EPROFILE !== 'undefined') EPROFILE.plan = plan.id;
-      // Ulož tarif do DB (profiles.plan)
       try {
         const { data: { session } } = await sb.auth.getSession();
-        if (session) await sb.from('profiles').update({ plan: plan.id }).eq('id', session.user.id);
+        if (session) await sb.from('profiles').update({ plan: plan.id }).eq('id', window._makejActingId || session.user.id);
       } catch (e) { console.error('Uložení tarifu selhalo:', e); }
       if (onPlanChange) onPlanChange(plan.name);
     }
@@ -1234,153 +1258,156 @@ function EPricing({ onTab, onPlanChange }) {
   }
 
   return (
-    <div style={{ padding: '28px 32px 48px', overflowY: 'auto' }}>
+    <div style={{ padding: '28px 32px 48px', overflowY: 'auto', background: '#fff', flex: 1, minHeight: 0 }}>
       {/* Header */}
       <div style={{ marginBottom: 32, textAlign: 'center' }}>
-        <div style={{ fontFamily: T.fontHead, fontSize: 28, fontWeight: 900, color: T.ink, marginBottom: 8 }}>Vyber si svůj plán</div>
-        <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 14, marginBottom: 20 }}>Bez závazků. Zrušení kdykoliv.</div>
+        <div style={{ fontFamily: T.fontHead, fontSize: 28, fontWeight: 900, color: '#111827', marginBottom: 8 }}>Vyber si svůj plán</div>
+        <div style={{ color: '#6B7280', fontFamily: T.fontUI, fontSize: 14, marginBottom: 20 }}>Bez závazků. Zrušení kdykoliv.</div>
         {/* Billing toggle */}
         <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: T.surfaceAlt, border: '1px solid ' + T.border, borderRadius: 99, padding: '6px 16px' }}>
-            <span style={{ color: annual ? T.muted : T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, transition: 'color .2s' }}>Měsíčně</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, background: '#F3F4F6', border: '1px solid #E5E7EB', borderRadius: 99, padding: '6px 16px' }}>
+            <span style={{ color: annual ? '#9CA3AF' : '#111827', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, transition: 'color .2s' }}>Měsíčně</span>
             <div
               onClick={() => setAnnual(a => !a)}
-              style={{ width: 44, height: 24, borderRadius: 999, background: annual ? '#22a06b' : 'rgba(15,18,40,0.15)', cursor: 'pointer', position: 'relative', transition: 'background .2s', flexShrink: 0 }}
+              style={{ width: 44, height: 24, borderRadius: 999, background: annual ? '#5BD68A' : '#D1D5DB', cursor: 'pointer', position: 'relative', transition: 'background .2s', flexShrink: 0 }}
             >
               <div style={{ position: 'absolute', top: 3, left: annual ? 23 : 3, width: 18, height: 18, borderRadius: 999, background: '#fff', transition: 'left .2s', boxShadow: '0 1px 4px rgba(0,0,0,0.25)' }} />
             </div>
-            <span style={{ color: annual ? T.ink : T.muted, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, transition: 'color .2s' }}>Ročně</span>
+            <span style={{ color: annual ? '#111827' : '#9CA3AF', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, transition: 'color .2s' }}>Ročně</span>
           </div>
           <div style={{ height: 26, display: 'flex', alignItems: 'center' }}>
-            <span style={{ background: 'rgba(34,160,107,0.12)', border: '1px solid rgba(34,160,107,0.3)', color: '#22a06b', fontFamily: T.fontUI, fontSize: 11, fontWeight: 800, borderRadius: 10, padding: '4px 12px', opacity: annual ? 1 : 0, transition: 'opacity .2s' }}>chci šetřit</span>
+            <span style={{ background: 'rgba(0,246,10,0.12)', border: '1px solid rgba(0,246,10,0.3)', color: '#00f60a', fontFamily: T.fontUI, fontSize: 11, fontWeight: 800, borderRadius: 10, padding: '4px 12px', opacity: annual ? 1 : 0, transition: 'opacity .2s' }}>chci šetřit</span>
           </div>
         </div>
       </div>
 
-      {/* Plans grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, maxWidth: 1100, margin: '0 auto 40px' }}>
-        {PLANS.map(plan => {
-          const isActive = plan.id === currentPlanId;
-          const isPop    = plan.badge != null;
-          const isSel    = selected === plan.id;
-          const isHov    = hovered === plan.id;
-          return (
-            <div key={plan.id} onClick={() => handleSelect(plan.id)}
-              onMouseEnter={() => setHovered(plan.id)}
-              onMouseLeave={() => setHovered(null)}
-              style={{
-              borderRadius: 18,
-              border: '2.5px solid ' + (isActive ? plan.color : isSel ? plan.color : isHov ? 'rgba(15,18,40,0.28)' : T.border),
-              background: isPop
-                ? 'linear-gradient(160deg, rgba(245,166,35,0.10), rgba(0,32,246,0.06)), #ffffff'
-                : '#ffffff',
-              boxShadow: '0 6px 20px rgba(15,18,40,0.06)',
-              padding: '28px 24px 24px',
-              cursor: isActive ? 'default' : 'pointer',
-              position: 'relative',
-              transition: 'border-color 0.15s, transform 0.15s',
-              transform: isSel ? 'translateY(-4px)' : 'none',
-            }}>
-              {plan.badge && (
-                <div style={{
-                  position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)',
-                  background: 'linear-gradient(90deg, #F5A623, #FF9F43)',
-                  color: '#1a1000', fontFamily: T.fontUI, fontSize: 10.5, fontWeight: 800,
-                  borderRadius: 99, padding: '4px 14px', whiteSpace: 'nowrap',
-                }}>{plan.badge}</div>
-              )}
-              {isActive && (
-                <div style={{
-                  position: 'absolute', top: 12, right: 12,
-                  background: plan.color + '22', border: '1px solid ' + plan.color + '66',
-                  color: plan.color, fontSize: 9.5, fontWeight: 800, fontFamily: T.fontUI,
-                  borderRadius: 99, padding: '3px 9px', letterSpacing: 0.5,
-                }}>AKTUÁLNÍ</div>
-              )}
-              <div style={{ marginBottom: 16 }}>
-                <Icon name={plan.icon} size={24} color={plan.color} />
-              </div>
-              <div style={{ fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, color: T.ink, marginBottom: 4 }}>{plan.name}</div>
-              <div style={{ marginBottom: 20 }}>
-                {plan.price === 0 ? (
-                  <span style={{ fontFamily: T.fontMono, fontSize: 28, fontWeight: 700, color: plan.color }}>Zdarma</span>
-                ) : (
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexWrap: 'wrap' }}>
-                      {plan.pricePrefix && <span style={{ color: T.muted, fontSize: 13, fontFamily: T.fontUI }}>{plan.pricePrefix}</span>}
-                      <span
-                        ref={el => { if (el) priceRefs.current[plan.id] = el; }}
-                        style={{ fontFamily: T.fontMono, fontSize: 28, fontWeight: 700, color: plan.color }}
-                      >{plan.price.toLocaleString('cs-CZ')}</span>
-                      <span style={{ color: T.muted, fontSize: 12, fontFamily: T.fontUI }}>
-                        Kč / {annual && plan.annualPrice ? 'měs bez DPH' : plan.period}
-                      </span>
-                    </div>
-                    {plan.annualPrice ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 5, opacity: annual ? 1 : 0, transition: 'opacity .2s' }}>
-                        <span style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 11 }}>placeno ročně</span>
-                        <span style={{ background: 'rgba(34,160,107,0.12)', border: '1px solid rgba(34,160,107,0.3)', color: '#22a06b', fontFamily: T.fontUI, fontSize: 10.5, fontWeight: 800, borderRadius: 8, padding: '2px 8px' }}>
-                          ušetříš {((plan.price - plan.annualPrice) * 12).toLocaleString('cs-CZ')} Kč/rok
-                        </span>
-                      </div>
-                    ) : <div style={{ marginTop: 5, height: 22 }} />}
-                  </>
+      {/* Plans grid — vizuál & efekty z webového ceníku */}
+      <div style={{ maxWidth: 1180, margin: '0 auto 30px', paddingBottom: 6 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 16, alignItems: 'stretch', padding: '20px 4px 8px' }}>
+          {PLANS.map((plan, i) => {
+            const isActive = plan.id === currentPlanId;
+            const isPop    = !!plan.popular;
+            const isSel    = selected === plan.id;
+            const isHov    = hovered === plan.id;
+            const isExp    = !!expanded[plan.id];
+            const lift     = isSel || isHov;
+            return (
+              <div key={plan.id}
+                onClick={() => !plan.contact && handleSelect(plan.id)}
+                onMouseEnter={() => setHovered(plan.id)}
+                onMouseLeave={() => setHovered(null)}
+                style={{
+                  position: 'relative', display: 'flex', flexDirection: 'column', textAlign: 'center',
+                  borderRadius: 20,
+                  border: isPop ? '2px solid #0020F6' : ('1.5px solid ' + (isActive ? plan.color : lift ? plan.color + 'aa' : plan.color + '40')),
+                  background: isPop
+                    ? 'linear-gradient(165deg, rgba(0,32,246,0.10), rgba(91,107,255,0.035))'
+                    : plan.color + '12',
+                  boxShadow: isPop
+                    ? '0 20px 48px rgba(0,32,246,0.20)'
+                    : (lift ? '0 16px 36px ' + plan.color + '3a' : '0 1px 2px rgba(0,0,0,0.04)'),
+                  padding: '26px 20px 22px', marginTop: isPop ? 0 : 8,
+                  cursor: plan.contact ? 'default' : (isActive ? 'default' : 'pointer'),
+                  transform: lift ? 'translateY(-6px)' : 'none',
+                  transition: 'transform .25s cubic-bezier(.34,1.3,.5,1), box-shadow .25s, border-color .2s',
+                  animation: 'empPop .4s ease both', animationDelay: (i * 0.07) + 's',
+                }}>
+                {plan.badge && (
+                  <div style={{
+                    position: 'absolute', top: 0, right: 0, display: 'inline-flex', alignItems: 'center', gap: 5,
+                    background: 'linear-gradient(135deg, #0020F6, #5B6BFF)', color: '#fff',
+                    fontFamily: T.fontUI, fontSize: 10.5, fontWeight: 800, padding: '6px 12px',
+                    borderRadius: '0 20px 0 14px', whiteSpace: 'nowrap',
+                  }}><Icon name="star-bold" size={12} color="#fff" />{plan.badge}</div>
                 )}
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 24 }}>
-                {plan.features.map((f, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Icon
-                      name={f.ok ? 'check-circle-bold' : 'close-circle-bold'}
-                      size={15}
-                      color={f.ok ? '#22a06b' : 'rgba(15,18,40,0.2)'}
-                    />
-                    <span style={{ color: f.ok ? T.ink : T.mutedSoft, fontSize: 13.5, fontWeight: 600, fontFamily: T.fontUI }}>
-                      {f.text}
+                {isActive && (
+                  <div style={{
+                    position: 'absolute', top: 10, left: 10,
+                    background: plan.color + '22', border: '1px solid ' + plan.color + '66',
+                    color: plan.color, fontSize: 9, fontWeight: 800, fontFamily: T.fontUI,
+                    borderRadius: 99, padding: '3px 8px', letterSpacing: 0.5,
+                  }}>AKTUÁLNÍ</div>
+                )}
+                <div style={{ marginTop: plan.badge ? 16 : 6 }}>
+                  <Icon name={plan.icon} size={22} color={plan.color} />
+                </div>
+                <div style={{ fontFamily: T.fontUI, fontSize: 11, fontWeight: 800, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1.4, marginTop: 8, marginBottom: 12 }}>{plan.name}</div>
+
+                <div style={{ minHeight: 44, display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 4, flexWrap: 'wrap' }}>
+                  {plan.free ? (
+                    <span style={{ fontFamily: T.fontHead, fontSize: 32, fontWeight: 800, color: '#111827', lineHeight: 1 }}>Zdarma</span>
+                  ) : (
+                    <>
+                      {plan.pricePrefix && <span style={{ color: '#9CA3AF', fontSize: 13, fontWeight: 600, fontFamily: T.fontUI }}>{plan.pricePrefix}</span>}
+                      <span ref={el => { if (el) priceRefs.current[plan.id] = el; }}
+                        style={{ fontFamily: T.fontHead, fontSize: 38, fontWeight: 800, color: '#111827', lineHeight: 1 }}>
+                        {(annual && plan.annualPrice ? plan.annualPrice : plan.price).toLocaleString('cs-CZ')}
+                      </span>
+                      <span style={{ color: '#6B7280', fontSize: 15, fontWeight: 600, fontFamily: T.fontUI }}>Kč</span>
+                    </>
+                  )}
+                </div>
+                <div style={{ color: '#9CA3AF', fontSize: 11.5, fontFamily: T.fontUI, marginTop: 4 }}>
+                  {plan.free ? plan.period : (annual && plan.annualPrice ? 'za měsíc · placeno ročně' : plan.period)}
+                </div>
+                <div style={{ minHeight: 24, marginTop: 6, marginBottom: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  {plan.annualPrice ? (
+                    <span style={{ opacity: annual ? 1 : 0, transition: 'opacity .2s', background: 'rgba(0,246,10,0.12)', border: '1px solid rgba(0,246,10,0.3)', color: '#00f60a', fontFamily: T.fontUI, fontSize: 10.5, fontWeight: 800, borderRadius: 8, padding: '3px 9px' }}>
+                      ušetříš {((plan.price - plan.annualPrice) * 12).toLocaleString('cs-CZ')} Kč/rok
                     </span>
-                  </div>
-                ))}
+                  ) : null}
+                </div>
+
+                <div style={{ borderTop: '1px solid rgba(0,0,0,0.08)', margin: '10px 0 16px' }} />
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
+                  {plan.features.map((f, fi) => <PlanFeat key={fi} f={f} />)}
+                  {isExp && plan.more.map((f, fi) => <PlanFeat key={'m' + fi} f={f} />)}
+                </div>
+
+                {plan.more && plan.more.length > 0 && (
+                  <button onClick={e => { e.stopPropagation(); setExpanded(x => ({ ...x, [plan.id]: !x[plan.id] })); }}
+                    style={{ width: '100%', padding: 8, borderRadius: 10, border: '1px solid #E5E7EB', background: 'rgba(255,255,255,0.65)', color: '#6B7280', fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginBottom: 16 }}>
+                    {isExp ? 'Zobrazit méně' : 'Zobrazit více'}
+                    <span style={{ display: 'inline-flex', transition: 'transform .25s', transform: isExp ? 'rotate(180deg)' : 'none' }}>
+                      <Icon name="alt-arrow-down-bold" size={13} color="#6B7280" />
+                    </span>
+                  </button>
+                )}
+
+                <div style={{ marginTop: 'auto' }}>
+                  {plan.contact ? (
+                    <a href="mailto:hello@makej.eu" onClick={e => e.stopPropagation()} style={{
+                      display: 'block', width: '100%', padding: '11px 0', borderRadius: 12, textAlign: 'center',
+                      background: '#fff', border: '1px solid ' + plan.color + '77',
+                      color: '#374151', fontFamily: T.fontUI, fontSize: 13, fontWeight: 800,
+                      textDecoration: 'none', boxSizing: 'border-box',
+                    }}>{plan.cta}</a>
+                  ) : (
+                    <button onClick={e => { e.stopPropagation(); if (!isActive) handleSelect(plan.id); }}
+                      style={{
+                        width: '100%', padding: '11px 0', borderRadius: 12,
+                        background: isActive ? '#F3F4F6' : isPop ? 'linear-gradient(135deg, #0020F6, #3a3a99)' : '#fff',
+                        border: isActive ? '1px solid #E5E7EB' : isPop ? 'none' : '1.5px solid ' + plan.color,
+                        color: isActive ? '#9CA3AF' : isPop ? '#fff' : '#111827',
+                        fontFamily: T.fontUI, fontSize: 13, fontWeight: 800, cursor: isActive ? 'default' : 'pointer',
+                      }}>
+                      {isActive ? 'Aktuální tarif' : plan.cta}
+                    </button>
+                  )}
+                </div>
               </div>
-              {plan.contact ? (
-                <a href="mailto:hello@makej.eu" style={{
-                  display: 'block', width: '100%', padding: '10px 0', borderRadius: 10, textAlign: 'center',
-                  background: 'rgba(155,89,208,0.10)', border: '1px solid rgba(155,89,208,0.35)',
-                  color: '#9B59D0', fontFamily: T.fontUI, fontSize: 13, fontWeight: 800,
-                  textDecoration: 'none', boxSizing: 'border-box',
-                }}>{plan.cta}</a>
-              ) : (
-                <button
-                  onClick={e => { e.stopPropagation(); if (!isActive) handleSelect(plan.id); }}
-                  style={{
-                    width: '100%', padding: '10px 0', borderRadius: 10,
-                    background: isActive
-                      ? T.surfaceAlt
-                      : isPop
-                      ? 'linear-gradient(90deg, #F5A623, #FF9F43)'
-                      : plan.id === 'business'
-                      ? 'rgba(245,166,35,0.12)'
-                      : 'rgba(0,32,246,0.08)',
-                    border: isActive ? '1px solid ' + T.border : 'none',
-                    color: isActive ? T.muted : isPop ? '#1a1000' : plan.color,
-                    fontFamily: T.fontUI, fontSize: 13, fontWeight: 800,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {isActive ? 'Aktuální tarif' : plan.cta}
-                </button>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Checkout strip */}
       {selected && !success && !PLANS.find(x => x.id === selected)?.contact && (
         <div style={{
           maxWidth: 900, margin: '0 auto',
-          background: '#ffffff',
-          border: '1px solid ' + T.border,
-          boxShadow: '0 6px 20px rgba(15,18,40,0.06)',
+          background: '#F9FAFB',
+          border: '1px solid #E5E7EB',
           borderRadius: 16, padding: '20px 28px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20,
           flexWrap: 'wrap',
@@ -1390,22 +1417,22 @@ function EPricing({ onTab, onPlanChange }) {
             return (
               <>
                 <div>
-                  <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 16, fontWeight: 800 }}>
-                    {p.name} — {p.price.toLocaleString('cs-CZ')} Kč / měsíc
+                  <div style={{ color: '#111827', fontFamily: T.fontHead, fontSize: 16, fontWeight: 800 }}>
+                    {p.name} — {(annual && p.annualPrice ? p.annualPrice : p.price).toLocaleString('cs-CZ')} Kč / měsíc
                   </div>
-                  <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginTop: 3 }}>
-                    Fakturováno měsíčně · zrušení kdykoliv
+                  <div style={{ color: '#6B7280', fontFamily: T.fontUI, fontSize: 12, marginTop: 3 }}>
+                    {annual && p.annualPrice ? 'Placeno ročně · zrušení kdykoliv' : 'Fakturováno měsíčně · zrušení kdykoliv'}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
                   <button onClick={() => setSelected(null)} style={{
                     padding: '10px 18px', borderRadius: 9,
-                    background: 'transparent', border: '1px solid ' + T.border,
-                    color: T.muted, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                    background: '#fff', border: '1px solid #E5E7EB',
+                    color: '#6B7280', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, cursor: 'pointer',
                   }}>Zrušit</button>
                   <button onClick={handlePay} style={{
                     padding: '10px 22px', borderRadius: 9,
-                    background: 'linear-gradient(90deg, #F5A623, #FF9F43)',
+                    background: 'linear-gradient(90deg, #FFD166, #FF9F43)',
                     border: 'none', color: '#1a1000',
                     fontFamily: T.fontUI, fontSize: 13, fontWeight: 800, cursor: 'pointer',
                   }}>
@@ -1422,35 +1449,54 @@ function EPricing({ onTab, onPlanChange }) {
       {success && (
         <div style={{
           maxWidth: 900, margin: '0 auto',
-          background: 'rgba(34,160,107,0.08)', border: '1px solid rgba(34,160,107,0.3)',
+          background: '#F0FDF4', border: '1px solid #BBF7D0',
           borderRadius: 16, padding: '20px 28px', textAlign: 'center',
         }}>
-          <Icon name="check-circle-bold" size={32} color="#22a06b" />
-          <div style={{ color: '#22a06b', fontFamily: T.fontHead, fontSize: 17, fontWeight: 800, marginTop: 10 }}>
+          <Icon name="check-circle-bold" size={32} color="#059669" />
+          <div style={{ color: '#059669', fontFamily: T.fontHead, fontSize: 17, fontWeight: 800, marginTop: 10 }}>
             Platba úspěšná! Tarif byl aktivován.
           </div>
         </div>
       )}
 
-      {/* FAQ */}
-      <div style={{ maxWidth: 900, margin: '36px auto 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+      {/* Slevy (z webového ceníku) */}
+      <div style={{ maxWidth: 980, margin: '8px auto 26px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
         {[
-          { q: 'Mohu kdykoliv zrušit?', a: 'Ano, zrušení je možné kdykoliv bez poplatku. Tarif zůstane aktivní do konce fakturačního období.' },
-          { q: 'Jak se tarif fakturuje?', a: 'Fakturujeme měsíčně přes kartu. Fakturu dostanete e-mailem.' },
-          { q: 'Mohu změnit tarif v průběhu?', a: 'Ano, upgrade je okamžitý. Downgrade proběhne na konci aktuálního období.' },
-          { q: 'Co je ASAP inzerát?', a: 'ASAP inzeráty mají prioritní zobrazení a jsou označeny červeným štítkem — ideální pro urgentní obsazení.' },
-        ].map((item, i) => (
-          <div key={i} style={{
-            background: '#ffffff', border: '1px solid ' + T.border,
-            borderRadius: 12, padding: '16px 18px',
-          }}>
-            <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{item.q}</div>
-            <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.6 }}>{item.a}</div>
+          { pct: '5%',  title: 'Čtvrtletní platba', text: 'Zaplať 3 měsíce předem a ušetři 5 % z ceny tarifu.' },
+          { pct: '15%', title: 'Roční platba',       text: 'Zaplať rok předem a ušetři 15 %. Nejlepší hodnota pro stabilní nábor.' },
+          { emoji: '⚡', title: 'Upgrade kdykoliv',    text: 'Upgrade tarifu platí okamžitě. Downgrade k dalšímu fakturačnímu období.' },
+        ].map((d, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 14, background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 14, padding: '16px 18px' }}>
+            {d.pct
+              ? <div style={{ fontFamily: T.fontHead, fontSize: 26, fontWeight: 900, color: '#00f60a', flexShrink: 0, lineHeight: 1 }}>{d.pct}</div>
+              : <div style={{ fontSize: 26, flexShrink: 0, lineHeight: 1 }}>{d.emoji}</div>}
+            <div>
+              <div style={{ color: '#111827', fontFamily: T.fontUI, fontSize: 13.5, fontWeight: 800, marginBottom: 3 }}>{d.title}</div>
+              <div style={{ color: '#6B7280', fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.5 }}>{d.text}</div>
+            </div>
           </div>
         ))}
+      </div>
+
+      {/* Poznámky a pravidla (z webového ceníku) */}
+      <div style={{ maxWidth: 860, margin: '0 auto', background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 14, padding: '20px 24px' }}>
+        <div style={{ color: '#111827', fontFamily: T.fontHead, fontSize: 14, fontWeight: 800, marginBottom: 12 }}>Poznámky a pravidla</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {[
+            'Aktivní inzeráty = počet zveřejněných (viditelných brigádníkům) zároveň. Po vyřešení inzerátu firma uvolní slot pro další.',
+            'Drafty a neaktivní inzeráty si lze vytvořit libovolně — limit tarifu se vztahuje jen na zveřejněné.',
+            'Každý inzerát má cyklus 30 dní. 5 dní před koncem chodí upozornění. Potvrzením relevance běží další cyklus bez omezení.',
+            'Enterprise tarif se kalkuluje individuálně. Sleva 5 % do 25 000 Kč/měs, sleva 10 % nad 25 001 Kč/měs.',
+            'Všechny ceny jsou bez DPH. Makačky (virtuální měna brigádníků) se firemních tarifů netýkají.',
+          ].map((n, i) => (
+            <div key={i} style={{ display: 'flex', gap: 9, alignItems: 'flex-start' }}>
+              <span style={{ color: '#5B6BFF', flexShrink: 0, lineHeight: 1.55 }}>•</span>
+              <span style={{ color: '#6B7280', fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.55 }}>{n}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-
 Object.assign(window, { EMessages, ESettings, EPricing });
