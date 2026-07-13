@@ -482,7 +482,335 @@
           <p>Získejte přehled o inzerátech, kandidátech a výkonu — a spravujte celý nábor na jednom místě.</p>
         </div>
         <div class="dctrl-shot">
-          <img src="/dashboard-preview.png" alt="Náhled dashboardu zaměstnavatele" width="900" height="576" loading="lazy" />
+          <style>
+          .dashmock-frame{position:relative;width:100%;max-width:1180px;margin:0 auto;aspect-ratio:1440/904;border-radius:22px;overflow:hidden;border:1px solid rgba(16,24,64,.08);box-shadow:0 50px 110px -45px rgba(16,24,64,.55);background:#eef1f9;}
+          .dashmock{position:absolute;top:0;left:0;width:1440px;height:904px;transform-origin:top left;display:flex;font-family:'Inter',system-ui,sans-serif;color:#14162b;text-align:left;}
+          .dashmock *{box-sizing:border-box;}
+          .dm-side{width:252px;flex:0 0 auto;background:#fff;border-right:1px solid #e7ebf5;display:flex;flex-direction:column;padding:26px 18px 18px;}
+          .dm-logo{font:800 26px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.5px;padding:0 8px;}
+          .dm-logo span{color:#1a34e8;}
+          .dm-brandsub{font:700 10px 'Inter';letter-spacing:2.5px;color:#9aa0b8;margin:5px 0 24px 8px;}
+          .dm-seclabel{font:700 10.5px 'Inter';letter-spacing:1.4px;color:#a6abc4;padding:0 10px 9px;margin-top:20px;}
+          .dm-side .dm-seclabel:first-of-type{margin-top:0;}
+          .dm-nav{display:flex;align-items:center;gap:12px;padding:10px 11px;border-radius:12px;color:#5b607a;font:600 14.5px 'Inter';text-decoration:none;margin-bottom:2px;}
+          .dm-nav.on{background:#eaeeff;color:#1a34e8;font-weight:700;}
+          .dm-nav>svg{width:19px;height:19px;flex:0 0 auto;}
+          .dm-nav span{flex:1;}
+          .dm-pro{font:700 10px 'Inter';letter-spacing:.5px;color:#1a34e8;background:#eaeeff;padding:3px 7px;border-radius:6px;font-style:normal;}
+          .dm-count{min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#eef0f6;color:#6b7089;font:700 11.5px 'Inter';display:flex;align-items:center;justify-content:center;font-style:normal;}
+          .dm-spacer{flex:1;}
+          .dm-premium{background:linear-gradient(160deg,#f2f5ff,#e9edff);border:1px solid #dfe4ff;border-radius:16px;padding:16px 15px;margin-bottom:14px;}
+          .dm-premium-h{display:flex;align-items:center;gap:8px;font:700 11px 'Inter';letter-spacing:1px;color:#1a34e8;margin-bottom:11px;}
+          .dm-premium-h svg{width:16px;height:16px;}
+          .dm-premium-t{font:600 13px 'Inter';color:#4a4f6b;margin-bottom:13px;}
+          .dm-premium-btn{background:#1a34e8;color:#fff;border-radius:11px;padding:11px;text-align:center;font:700 13.5px 'Inter';}
+          .dm-user{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:13px;background:#f7f8fc;}
+          .dm-ava{width:38px;height:38px;border-radius:11px;background:linear-gradient(150deg,#8b9bff,#4a5ff2);color:#fff;font:700 14px 'Bricolage Grotesque';display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+          .dm-user b{font:700 13.5px 'Inter';display:block;}
+          .dm-user small{font:500 11.5px 'Inter';color:#8a8fa6;}
+          .dm-main{flex:1;display:flex;flex-direction:column;min-width:0;}
+          .dm-top{flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:22px 26px;border-bottom:1px solid #e7ebf5;background:#fff;}
+          .dm-th{flex:1;display:flex;align-items:center;gap:10px;}
+          .dm-h1{font:800 24px/1 'Bricolage Grotesque';letter-spacing:-.4px;}
+          .dm-dot{width:5px;height:5px;border-radius:50%;background:#1a34e8;}
+          .dm-sub{font:500 15px 'Inter';color:#8a8fa6;}
+          .dm-seg{display:flex;gap:3px;background:#f4f6fb;border:1px solid #eaedf5;border-radius:13px;padding:4px;}
+          .dm-seg span{padding:8px 15px;border-radius:9px;font:600 13px 'Inter';color:#6b7089;}
+          .dm-seg .on{background:#fff;color:#1a34e8;font-weight:700;box-shadow:0 4px 10px -6px rgba(16,24,64,.3);}
+          .dm-ic{width:44px;height:44px;border-radius:13px;border:1px solid #e7ebf5;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;}
+          .dm-ic svg{width:20px;height:20px;}
+          .dm-bdot{position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:#f04438;border:2px solid #fff;}
+          .dm-primary{display:flex;align-items:center;gap:9px;background:#1a34e8;color:#fff;border:none;border-radius:14px;padding:0 20px;height:44px;font:700 14.5px 'Inter';box-shadow:0 12px 26px -12px rgba(26,52,232,.7);}
+          .dm-primary svg{width:18px;height:18px;}
+          .dm-body{flex:1;padding:24px 26px;display:flex;gap:22px;min-height:0;}
+          .dm-left{flex:1;display:flex;flex-direction:column;gap:22px;min-width:0;}
+          .dm-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+          .dm-kpi{background:#fff;border:1px solid #eef0f6;border-radius:20px;padding:18px;box-shadow:0 14px 34px -26px rgba(16,24,64,.5);}
+          .dm-kpi-r{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+          .dm-kpi-ic{width:40px;height:40px;border-radius:12px;background:#eaeeff;display:flex;align-items:center;justify-content:center;}
+          .dm-kpi-ic.gold{background:#fff5e2;}
+          .dm-kpi-ic svg{width:20px;height:20px;}
+          .dm-chip{display:flex;align-items:center;font:700 11.5px 'Inter';padding:4px 8px;border-radius:8px;}
+          .dm-chip.up{color:#1f9d5c;background:#e9f7ef;}
+          .dm-chip.flat{color:#8a8fa6;background:#f4f6fb;}
+          .dm-kpi-label{font:500 13px 'Inter';color:#8a8fa6;margin-bottom:6px;}
+          .dm-kpi-val{font:800 30px/1 'Bricolage Grotesque';}
+          .dm-kpi-val small{font-size:16px;color:#b3b8cc;font-weight:700;}
+          .dm-bar{height:6px;border-radius:4px;background:#eef0f6;margin-top:12px;overflow:hidden;}
+          .dm-bar i{display:block;height:100%;background:#1a34e8;border-radius:4px;}
+          .dm-spark{width:100%;height:26px;margin-top:10px;display:block;}
+          .dm-stars{display:flex;gap:3px;margin-top:12px;}
+          .dm-stars svg{width:15px;height:15px;}
+          .dm-chart-card{flex:1;background:#fff;border:1px solid #eef0f6;border-radius:22px;padding:24px 26px 18px;box-shadow:0 20px 44px -30px rgba(16,24,64,.5);display:flex;flex-direction:column;min-height:0;}
+          .dm-chart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+          .dm-chart-t{font:800 19px 'Bricolage Grotesque';letter-spacing:-.3px;}
+          .dm-chart-s{font:500 13.5px 'Inter';color:#8a8fa6;margin-top:3px;}
+          .dm-legend{display:flex;gap:16px;padding-top:3px;}
+          .dm-legend span{display:flex;align-items:center;gap:7px;font:600 12.5px 'Inter';color:#4a4f6b;}
+          .dm-legend i{width:9px;height:9px;border-radius:3px;}
+          .dm-chart-wrap{flex:1;display:flex;gap:14px;min-height:0;}
+          .dm-yax{display:flex;flex-direction:column;justify-content:space-between;font:600 11.5px 'Inter';color:#b3b8cc;padding:2px 0 20px;text-align:right;width:22px;}
+          .dm-plot{flex:1;position:relative;min-width:0;}
+          .dm-grid{position:absolute;inset:0 0 20px;display:flex;flex-direction:column;justify-content:space-between;}
+          .dm-grid div{border-top:1px solid #f0f2f8;}
+          .dm-area{position:absolute;inset:0 0 20px;width:100%;height:calc(100% - 20px);}
+          .dm-xax{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;font:600 11.5px 'Inter';color:#b3b8cc;}
+          .dm-feed{width:326px;flex:0 0 auto;background:#fff;border:1px solid #eef0f6;border-radius:22px;padding:24px 22px;box-shadow:0 20px 44px -30px rgba(16,24,64,.5);display:flex;flex-direction:column;min-height:0;}
+          .dm-feed-h{display:flex;align-items:center;gap:9px;font:800 18px 'Bricolage Grotesque';letter-spacing:-.3px;}
+          .dm-live{width:8px;height:8px;border-radius:50%;background:#1f9d5c;box-shadow:0 0 0 4px #e9f7ef;}
+          .dm-feed-sub{font:500 13px 'Inter';color:#8a8fa6;margin:3px 0 18px 17px;}
+          .dm-tl{position:relative;padding-left:34px;display:flex;flex-direction:column;gap:16px;}
+          .dm-tl-line{position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:#eef0f6;}
+          .dm-tl-i{position:relative;}
+          .dm-tl-ic{position:absolute;left:-34px;top:0;width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+          .dm-tl-ic svg{width:15px;height:15px;}
+          .dm-tl-ic.green{background:#e9f7ef;}
+          .dm-tl-ic.blue{background:#eaeeff;}
+          .dm-tl-x{font:600 14px 'Inter';color:#14162b;}
+          .dm-tl-x b{font-weight:800;}
+          .dm-tl-x em{color:#1a34e8;font-weight:700;font-style:normal;}
+          .dm-tl-x small{display:block;font:500 12px 'Inter';color:#a6abc4;margin-top:2px;}
+          .dm-feed-all{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:13px;background:#f4f6fb;color:#1a34e8;font:700 13.5px 'Inter';text-decoration:none;}
+          .dm-feed-all svg{width:16px;height:16px;}
+          @media (max-width:640px){ .dashmock-frame{border-radius:14px;} }
+          /* Before/After posuvník */
+          .cmp{position:absolute;inset:0;--pos:55%;cursor:ew-resize;-webkit-user-select:none;user-select:none;touch-action:none;}
+          .cmp-lay{position:absolute;inset:0;overflow:hidden;}
+          .cmp-a{clip-path:inset(0 calc(100% - var(--pos)) 0 0);}
+          .cmp-handle{position:absolute;top:0;bottom:0;left:var(--pos);width:3px;margin-left:-1.5px;background:#5b6bff;box-shadow:0 0 0 1px rgba(91,107,255,.35),0 0 18px rgba(91,107,255,.5);z-index:6;pointer-events:none;}
+          .cmp-grip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:#5b6bff;box-shadow:0 8px 22px rgba(91,107,255,.45);display:flex;align-items:center;justify-content:center;}
+          .cmp-grip svg{width:22px;height:22px;}
+          .cmp-tag{position:absolute;top:14px;z-index:6;pointer-events:none;font:700 11.5px 'Inter';letter-spacing:.3px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:#14162b;box-shadow:0 4px 14px rgba(16,24,64,.14);}
+          .cmp-tag-l{left:14px;} .cmp-tag-r{right:14px;color:#1a34e8;}
+          .dm-halfs{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+          .dm-card{background:#fff;border:1px solid #eef0f6;border-radius:20px;padding:20px 22px;box-shadow:0 14px 34px -26px rgba(16,24,64,.5);}
+          .dm-card-t{font:800 16px 'Bricolage Grotesque';letter-spacing:-.2px;}
+          .dm-card-s{font:500 12.5px 'Inter';color:#8a8fa6;margin:3px 0 16px;}
+          .dm-bars{display:flex;align-items:flex-end;gap:14px;height:150px;}
+          .dm-barcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;height:100%;}
+          .dm-barcol i{width:100%;max-width:32px;border-radius:6px 6px 0 0;background:#1a34e8;opacity:.9;}
+          .dm-barcol small{font:600 11px 'Inter';color:#8a8fa6;}
+          .dm-donutwrap{display:flex;align-items:center;gap:22px;}
+          .dm-donut{width:132px;height:132px;border-radius:50%;position:relative;flex:0 0 auto;background:conic-gradient(#1a34e8 0 42%,#5b6bff 42% 68%,#8ab4ff 68% 86%,#5bd68a 86% 100%);}
+          .dm-donut::after{content:'';position:absolute;inset:23px;background:#fff;border-radius:50%;}
+          .dm-dleg{display:flex;flex-direction:column;gap:10px;}
+          .dm-dleg span{display:flex;align-items:center;gap:9px;font:600 12.5px 'Inter';color:#4a4f6b;}
+          .dm-dleg i{width:11px;height:11px;border-radius:3px;flex:0 0 auto;}
+          </style>
+          <div class="dashmock-frame" role="img" aria-label="Náhled dashboardu a analytiky zaměstnavatele">
+           <div class="cmp" id="cmpDash" style="--pos:55%">
+
+            <!-- Vrstva B: Analytika (vespod, celá) -->
+            <div class="cmp-lay cmp-b">
+             <div class="dashmock">
+              <aside class="dm-side">
+                <div class="dm-logo">Makej<span>.</span></div>
+                <div class="dm-brandsub">PRO FIRMY</div>
+                <div class="dm-seclabel">PŘEHLED</div>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></a>
+                <a class="dm-nav on"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2.1"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Analytika</span><i class="dm-pro">PRO</i></a>
+                <div class="dm-seclabel">NÁBOR</div>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg><span>Inzeráty</span><i class="dm-count">7</i></a>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.4-.9-4.2-2.3-5.3"/></svg><span>Kandidáti</span><i class="dm-count">3</i></a>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1 1 21 11.5Z"/></svg><span>Zprávy</span><i class="dm-count">10</i></a>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span>Plán směn</span></a>
+                <div class="dm-seclabel">FIRMA</div>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 6.6 19l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H2a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 5 6.6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 19 5l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Nastavení</span></a>
+                <div class="dm-spacer"></div>
+                <div class="dm-premium">
+                  <div class="dm-premium-h"><svg viewBox="0 0 24 24" fill="#1a34e8" width="16"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>PREMIUM TARIF</div>
+                  <div class="dm-premium-t">Tarif Business · aktivní</div>
+                  <div class="dm-premium-btn">Spravovat tarif</div>
+                </div>
+                <div class="dm-user"><span class="dm-ava">S</span><div><b>Samuel</b><small>Česká republika</small></div></div>
+              </aside>
+              <div class="dm-main">
+                <div class="dm-top">
+                  <div class="dm-th"><span class="dm-h1">Analytika</span><span class="dm-dot"></span><span class="dm-sub">Pokročilé reporty a segmentace</span></div>
+                  <div class="dm-seg"><span>7d</span><span class="on">30d</span><span>90d</span><span>rok</span></div>
+                  <button class="dm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#4a4f6b" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><i class="dm-bdot"></i></button>
+                  <button class="dm-primary"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Nový inzerát</button>
+                </div>
+                <div class="dm-body">
+                  <div class="dm-left" style="flex:1">
+                    <div class="dm-kpis">
+                      <div class="dm-kpi"><div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="dm-chip up">+18%</span></div><div class="dm-kpi-label">Zhlédnutí</div><div class="dm-kpi-val">8 420</div></div>
+                      <div class="dm-kpi"><div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg></span><span class="dm-chip up">+4%</span></div><div class="dm-kpi-label">Konverze</div><div class="dm-kpi-val">3,1<small> %</small></div></div>
+                      <div class="dm-kpi"><div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="#1a34e8"><path d="M12 21s-7-4.6-9.5-8.6C.9 9.7 2.3 6.4 5.4 6c1.9-.2 3.5.8 4.6 2.3C11.1 6.8 12.7 5.8 14.6 6c3.1.4 4.5 3.7 2.9 6.4C19 16.4 12 21 12 21Z"/></svg></span><span class="dm-chip up">+12%</span></div><div class="dm-kpi-label">Matche</div><div class="dm-kpi-val">142</div></div>
+                      <div class="dm-kpi"><div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></span><span class="dm-chip up">+9%</span></div><div class="dm-kpi-label">Najato</div><div class="dm-kpi-val">28</div></div>
+                    </div>
+                    <div class="dm-chart-card" style="flex:0 0 auto;height:288px">
+                      <div class="dm-chart-head">
+                        <div><div class="dm-chart-t">Vývoj náboru za 30 dní</div><div class="dm-chart-s">Matche a potvrzení podle dne</div></div>
+                        <div class="dm-legend"><span><i style="background:#1a34e8"></i>Matche</span><span><i style="background:#5bd68a"></i>Najato</span></div>
+                      </div>
+                      <div class="dm-chart-wrap">
+                        <div class="dm-yax"><span>40</span><span>30</span><span>20</span><span>10</span><span>0</span></div>
+                        <div class="dm-plot">
+                          <div class="dm-grid"><div></div><div></div><div></div><div></div><div></div></div>
+                          <svg class="dm-area" viewBox="0 0 1000 300" preserveAspectRatio="none">
+                            <defs><linearGradient id="dmgv2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a34e8" stop-opacity=".22"/><stop offset="1" stop-color="#1a34e8" stop-opacity="0"/></linearGradient></defs>
+                            <path d="M0 300 L0 250 L140 210 L280 235 L420 120 L560 160 L700 70 L840 110 L1000 60 L1000 300 Z" fill="url(#dmgv2)"/>
+                            <path d="M0 250 L140 210 L280 235 L420 120 L560 160 L700 70 L840 110 L1000 60" fill="none" stroke="#1a34e8" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+                            <path d="M0 292 L140 286 L280 288 L420 258 L560 270 L700 240 L840 250 L1000 232" fill="none" stroke="#5bd68a" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+                          </svg>
+                          <div class="dm-xax"><span>8. 6.</span><span>13. 6.</span><span>18. 6.</span><span>23. 6.</span><span>28. 6.</span><span>3. 7.</span></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="dm-halfs">
+                      <div class="dm-card">
+                        <div class="dm-card-t">Kandidáti podle krajů</div>
+                        <div class="dm-card-s">Odkud se ti hlásí nejvíc lidí</div>
+                        <div class="dm-bars">
+                          <div class="dm-barcol"><i style="height:88%"></i><small>Praha</small></div>
+                          <div class="dm-barcol"><i style="height:64%"></i><small>Brno</small></div>
+                          <div class="dm-barcol"><i style="height:47%"></i><small>Ostrava</small></div>
+                          <div class="dm-barcol"><i style="height:35%"></i><small>Plzeň</small></div>
+                          <div class="dm-barcol"><i style="height:26%"></i><small>Liberec</small></div>
+                          <div class="dm-barcol"><i style="height:18%"></i><small>Olomouc</small></div>
+                        </div>
+                      </div>
+                      <div class="dm-card">
+                        <div class="dm-card-t">Úroveň kandidátů</div>
+                        <div class="dm-card-s">Rozložení podle Makej Levelu</div>
+                        <div class="dm-donutwrap">
+                          <div class="dm-donut"></div>
+                          <div class="dm-dleg">
+                            <span><i style="background:#1a34e8"></i>Level 1 · 42 %</span>
+                            <span><i style="background:#5b6bff"></i>Level 2 · 26 %</span>
+                            <span><i style="background:#8ab4ff"></i>Level 3 · 18 %</span>
+                            <span><i style="background:#5bd68a"></i>Level 4+ · 14 %</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+             </div>
+            </div>
+
+            <!-- Vrstva A: Dashboard (nahoře, oříznuté zleva) -->
+            <div class="cmp-lay cmp-a">
+             <div class="dashmock">
+
+              <!-- Sidebar -->
+              <aside class="dm-side">
+                <div class="dm-logo">Makej<span>.</span></div>
+                <div class="dm-brandsub">PRO FIRMY</div>
+                <div class="dm-seclabel">PŘEHLED</div>
+                <a class="dm-nav on"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2.1"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></a>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Analytika</span><i class="dm-pro">PRO</i></a>
+                <div class="dm-seclabel">NÁBOR</div>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg><span>Inzeráty</span><i class="dm-count">7</i></a>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.4-.9-4.2-2.3-5.3"/></svg><span>Kandidáti</span><i class="dm-count">3</i></a>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1 1 21 11.5Z"/></svg><span>Zprávy</span><i class="dm-count">10</i></a>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span>Plán směn</span></a>
+                <div class="dm-seclabel">FIRMA</div>
+                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 6.6 19l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H2a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 5 6.6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 19 5l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Nastavení</span></a>
+                <div class="dm-spacer"></div>
+                <div class="dm-premium">
+                  <div class="dm-premium-h"><svg viewBox="0 0 24 24" fill="#1a34e8" width="16"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>PREMIUM TARIF</div>
+                  <div class="dm-premium-t">Tarif Business · aktivní</div>
+                  <div class="dm-premium-btn">Spravovat tarif</div>
+                </div>
+                <div class="dm-user"><span class="dm-ava">S</span><div><b>Samuel</b><small>Česká republika</small></div></div>
+              </aside>
+
+              <!-- Main -->
+              <div class="dm-main">
+                <div class="dm-top">
+                  <div class="dm-th"><span class="dm-h1">Dashboard</span><span class="dm-dot"></span><span class="dm-sub">Přehled výkonu náboru za 30 dní</span></div>
+                  <div class="dm-seg"><span>7d</span><span class="on">30d</span><span>90d</span><span>rok</span></div>
+                  <button class="dm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#4a4f6b" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><i class="dm-bdot"></i></button>
+                  <button class="dm-primary"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Nový inzerát</button>
+                </div>
+
+                <div class="dm-body">
+                  <div class="dm-left">
+                    <div class="dm-kpis">
+                      <div class="dm-kpi">
+                        <div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="dm-chip flat">0.0%</span></div>
+                        <div class="dm-kpi-label">Aktivní inzeráty</div>
+                        <div class="dm-kpi-val">2<small> / 10</small></div>
+                        <div class="dm-bar"><i style="width:20%"></i></div>
+                      </div>
+                      <div class="dm-kpi">
+                        <div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="#1a34e8"><path d="M12 21s-7-4.6-9.5-8.6C.9 9.7 2.3 6.4 5.4 6c1.9-.2 3.5.8 4.6 2.3C11.1 6.8 12.7 5.8 14.6 6c3.1.4 4.5 3.7 2.9 6.4C19 16.4 12 21 12 21Z"/></svg></span><span class="dm-chip up">50.0%</span></div>
+                        <div class="dm-kpi-label">Nové matche</div>
+                        <div class="dm-kpi-val">3</div>
+                        <svg class="dm-spark" viewBox="0 0 120 30" preserveAspectRatio="none"><path d="M0 26 L30 24 L48 8 L60 22 L78 14 L96 26 L120 24" fill="none" stroke="#1f9d5c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </div>
+                      <div class="dm-kpi">
+                        <div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></span><span class="dm-chip up">100%</span></div>
+                        <div class="dm-kpi-label">Najato</div>
+                        <div class="dm-kpi-val">2</div>
+                        <svg class="dm-spark" viewBox="0 0 120 30" preserveAspectRatio="none"><path d="M0 26 L26 24 L40 6 L54 24 L74 8 L92 24 L120 22" fill="none" stroke="#1f9d5c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </div>
+                      <div class="dm-kpi">
+                        <div class="dm-kpi-r"><span class="dm-kpi-ic gold"><svg viewBox="0 0 24 24" fill="#f5b23c"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg></span><span class="dm-chip flat">0.0%</span></div>
+                        <div class="dm-kpi-label">Hodnocení firmy</div>
+                        <div class="dm-kpi-val">4.7<small> / 5</small></div>
+                        <div class="dm-stars">
+                          <svg viewBox="0 0 24 24" fill="#f5b23c"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>
+                          <svg viewBox="0 0 24 24" fill="#f5b23c"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>
+                          <svg viewBox="0 0 24 24" fill="#f5b23c"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>
+                          <svg viewBox="0 0 24 24" fill="#f5b23c"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>
+                          <svg viewBox="0 0 24 24" fill="#e2e5ee"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="dm-chart-card">
+                      <div class="dm-chart-head">
+                        <div><div class="dm-chart-t">Aktivita kandidátů</div><div class="dm-chart-s">Zhlédnutí, swajp-right a matche za 30 dní</div></div>
+                        <div class="dm-legend">
+                          <span><i style="background:#1a34e8"></i>Zhlédnutí</span>
+                          <span><i style="background:#f5b23c"></i>Swajp right</span>
+                          <span><i style="background:#1f9d5c"></i>Matche</span>
+                        </div>
+                      </div>
+                      <div class="dm-chart-wrap">
+                        <div class="dm-yax"><span>28</span><span>21</span><span>14</span><span>7</span><span>0</span></div>
+                        <div class="dm-plot">
+                          <div class="dm-grid"><div></div><div></div><div></div><div></div><div></div></div>
+                          <svg class="dm-area" viewBox="0 0 1000 300" preserveAspectRatio="none">
+                            <defs><linearGradient id="dmgv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a34e8" stop-opacity=".22"/><stop offset="1" stop-color="#1a34e8" stop-opacity="0"/></linearGradient></defs>
+                            <path d="M0 300 L0 292 L360 288 L420 40 L470 292 L740 300 L800 96 L860 292 L1000 296 L1000 300 Z" fill="url(#dmgv)"/>
+                            <path d="M0 292 L360 288 L420 40 L470 292 L740 300 L800 96 L860 292 L1000 296" fill="none" stroke="#1a34e8" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+                            <path d="M0 298 L360 296 L420 244 L470 296 L740 300 L800 258 L860 296 L1000 298" fill="none" stroke="#f5b23c" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+                            <path d="M0 300 L1000 300" fill="none" stroke="#1f9d5c" stroke-width="2.6" stroke-linecap="round"/>
+                            <circle cx="1000" cy="300" r="6" fill="#1f9d5c" opacity=".25"/><circle cx="1000" cy="300" r="3.5" fill="#1f9d5c"/>
+                          </svg>
+                          <div class="dm-xax"><span>8. 6.</span><span>13. 6.</span><span>18. 6.</span><span>23. 6.</span><span>28. 6.</span><span>3. 7.</span></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="dm-feed">
+                    <div class="dm-feed-h"><span class="dm-live"></span><b>Aktivita v reálném čase</b></div>
+                    <div class="dm-feed-sub">Posledních 24 hodin</div>
+                    <div class="dm-tl">
+                      <span class="dm-tl-line"></span>
+                      <div class="dm-tl-i"><span class="dm-tl-ic green"><svg viewBox="0 0 24 24" fill="none" stroke="#1f9d5c" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><div class="dm-tl-x"><b>Samuel Pšeja</b> poslal zprávu<small>před 22 h</small></div></div>
+                      <div class="dm-tl-i"><span class="dm-tl-ic green"><svg viewBox="0 0 24 24" fill="none" stroke="#1f9d5c" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><div class="dm-tl-x"><b>Samuel Pšeja</b> poslal zprávu<small>včera</small></div></div>
+                      <div class="dm-tl-i"><span class="dm-tl-ic blue"><svg viewBox="0 0 24 24" fill="#1a34e8"><path d="M12 21s-7-4.6-9.5-8.6C.9 9.7 2.3 6.4 5.4 6c1.9-.2 3.5.8 4.6 2.3C11.1 6.8 12.7 5.8 14.6 6c3.1.4 4.5 3.7 2.9 6.4C19 16.4 12 21 12 21Z"/></svg></span><div class="dm-tl-x"><b>Samuel Pšeja</b> matchoval na: <em>Pomoc ve skladu</em><small>4. 7.</small></div></div>
+                      <div class="dm-tl-i"><span class="dm-tl-ic blue"><svg viewBox="0 0 24 24" fill="#1a34e8"><path d="M12 21s-7-4.6-9.5-8.6C.9 9.7 2.3 6.4 5.4 6c1.9-.2 3.5.8 4.6 2.3C11.1 6.8 12.7 5.8 14.6 6c3.1.4 4.5 3.7 2.9 6.4C19 16.4 12 21 12 21Z"/></svg></span><div class="dm-tl-x"><b>Šimon Vitásek</b> matchoval na: <em>Makej App developer</em><small>21. 6.</small></div></div>
+                    </div>
+                    <a class="dm-feed-all">Zobrazit vše<svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2.3"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                  </div>
+                </div>
+              </div>
+
+             </div>
+            </div>
+            <div class="cmp-handle"><span class="cmp-grip"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></svg></span></div>
+            <span class="cmp-tag cmp-tag-l">Dashboard</span>
+            <span class="cmp-tag cmp-tag-r">Analytika</span>
+           </div>
+          </div>
         </div>
       </div>
 
@@ -518,144 +846,178 @@
   </main>
 
   <!-- ═══════════ PRICING ═══════════ -->
-  <section id="pricing" class="nav-light" style="padding:60px 0 120px;">
-    <div class="container">
-
-      <div class="section-header reveal">
-      
-        <h2>Ceny, které <span class="gradient-text">dávají smysl</span></h2>
-        <p>Začněte zdarma a rozšiřte plán, až budete potřebovat víc inzerátů, oslovování nebo pokročilou analytiku.</p>
-      </div>
-
-      <!-- Annual toggle -->
-      <div class="cn-billing" id="billing-wrap">
-        <span>Měsíční platba</span>
-        <button class="cn-billing-toggle" id="billing-toggle" onclick="toggleBilling()" title="Přepnout na roční platbu"></button>
-        <span>Roční platba</span>
-        <span class="cn-billing-badge" id="billing-badge">ušetři 15 %</span>
-      </div>
-
-      <div class="cn-plans-wrap">
-        <div class="cn-plans">
-
-          <!-- STARTER -->
-          <div class="cn-plan">
-            <div class="cn-plan-name">Starter</div>
-            <div class="cn-plan-price free"><span class="num">Zdarma</span></div>
-            <div class="cn-plan-period">navždy zdarma</div>
-            <hr class="cn-plan-divider" />
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>1 aktivní inzerát</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>1 full-time inzerce</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (1×/měs)</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Základní statistiky</span></div>
-            <div class="cn-feat-details">
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Topování inzerátu</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Ověřená firma</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>SMS Urgent</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Prémiový badge</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Export dat (CSV)</span></div>
-            </div>
-            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
-            <div class="cn-plan-cta"><a href="javascript:void(0)" class="ghost employer-cta-register">Začít zdarma</a></div>
+  <section id="pricing" class="nav-light" style="background:#fff; padding:72px 0 100px;">
+    <style>
+      #pricing .yp-wrap{max-width:1320px;margin:0 auto;padding:0 24px;}
+      #pricing .yp-head{text-align:center;}
+      #pricing .yp-h2{font-family:var(--font-heading);font-size:clamp(1.9rem,4vw,2.4rem);font-weight:800;color:#111827;margin:0 0 10px;}
+      #pricing .yp-sub{color:#6b7280;font-size:1.05rem;margin:0 0 24px;}
+      #pricing .yp-toggle{display:inline-flex;flex-direction:column;align-items:center;gap:10px;}
+      #pricing .yp-trow{display:inline-flex;align-items:center;gap:14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:99px;padding:8px 20px;}
+      #pricing .yp-trow span{font-weight:700;font-size:15px;color:#9ca3af;transition:color .2s;}
+      #pricing .yp-trow span.on{color:#111827;}
+      #pricing .yp-sw{width:48px;height:26px;border-radius:999px;background:#d1d5db;position:relative;cursor:pointer;transition:background .2s;flex:0 0 auto;}
+      #pricing .yp-sw.on{background:#00c637;}
+      #pricing .yp-sw i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:999px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:left .2s;}
+      #pricing .yp-sw.on i{left:25px;}
+      #pricing .yp-save{background:rgba(0,198,55,.12);border:1px solid rgba(0,198,55,.3);color:#00a82f;font-size:14px;font-weight:800;border-radius:12px;padding:7px 18px;opacity:0;transform:scale(.9);transition:opacity .2s,transform .2s;}
+      #pricing .yp-save.on{opacity:1;transform:scale(1);}
+      #pricing .yp-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;align-items:stretch;margin-top:32px;}
+      #pricing .yp-card{position:relative;display:flex;flex-direction:column;text-align:center;border-radius:22px;padding:34px 22px 28px;transition:transform .25s cubic-bezier(.34,1.3,.5,1),box-shadow .25s;}
+      #pricing .yp-card:hover{transform:translateY(-6px);box-shadow:0 16px 36px rgba(16,24,64,.14);}
+      #pricing .yp-badge{position:absolute;top:0;right:0;display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#0020F6,#5B6BFF);color:#fff;font-size:10.5px;font-weight:800;padding:6px 12px;border-radius:0 20px 0 14px;}
+      #pricing .yp-name{font-size:12px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:1.4px;margin:10px 0 16px;}
+      #pricing .yp-price{min-height:52px;display:flex;align-items:baseline;justify-content:center;gap:4px;flex-wrap:wrap;}
+      #pricing .yp-price .free{font-family:var(--font-heading);font-size:40px;font-weight:800;color:#111827;line-height:1;}
+      #pricing .yp-price .yp-num{font-family:var(--font-heading);font-size:48px;font-weight:800;color:#111827;line-height:1;}
+      #pricing .yp-price .pre{color:#9ca3af;font-size:15px;font-weight:600;}
+      #pricing .yp-price .kc{color:#6b7280;font-size:17px;font-weight:600;}
+      #pricing .yp-period{color:#9ca3af;font-size:12.5px;margin-top:5px;}
+      #pricing .yp-savew{min-height:24px;margin:6px 0 4px;display:flex;justify-content:center;align-items:center;}
+      #pricing .yp-savew span{opacity:0;transition:opacity .2s;background:rgba(0,198,55,.12);border:1px solid rgba(0,198,55,.3);color:#00a82f;font-size:10.5px;font-weight:800;border-radius:8px;padding:3px 9px;}
+      #pricing .yp-savew.on span{opacity:1;}
+      #pricing .yp-hr{border-top:1px solid rgba(0,0,0,.07);margin:4px 0 14px;}
+      #pricing .yp-feats{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;text-align:left;}
+      #pricing .yp-feat{display:flex;align-items:flex-start;gap:9px;font-size:13px;font-weight:600;line-height:1.35;}
+      #pricing .yp-feat iconify-icon{flex:0 0 auto;margin-top:1px;}
+      #pricing .yp-cta{margin-top:auto;padding-top:10px;}
+      #pricing .yp-btn{display:block;width:100%;padding:13px 0;border-radius:13px;font-size:14px;font-weight:800;text-align:center;text-decoration:none;cursor:pointer;box-sizing:border-box;background:#fff;transition:filter .15s;}
+      #pricing .yp-btn:hover{filter:brightness(.97);}
+      #pricing .yp-btn.pop{background:linear-gradient(135deg,#0020F6,#3a3a99);color:#fff;border:none;}
+      #pricing .yp-comparebtn{display:block;margin:14px auto 0;background:none;border:none;color:#0020f6;font-weight:700;font-size:14px;cursor:pointer;padding:12px;font-family:inherit;}
+      #pricing .yp-table-wrap{max-width:1320px;margin:14px auto 0;overflow-x:auto;display:none;}
+      #pricing .yp-table-wrap.on{display:block;}
+      #pricing .yp-table{width:100%;border-collapse:collapse;min-width:840px;}
+      #pricing .yp-table th,#pricing .yp-table td{padding:12px 14px;text-align:center;font-size:12.5px;border-bottom:1px solid #eef0f6;}
+      #pricing .yp-table th:first-child,#pricing .yp-table td:first-child{text-align:left;color:#374151;font-weight:600;}
+      #pricing .yp-table thead th{font-family:var(--font-heading);font-weight:800;color:#111827;font-size:14px;border-bottom:2px solid #e5e7eb;}
+      #pricing .yp-sec td{background:#f7f8fc;font-weight:800;color:#111827;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;}
+      #pricing .yp-cell-no{color:#d1d5db;font-weight:700;}
+      #pricing .yp-cell-txt{font-family:'JetBrains Mono',monospace;font-weight:700;color:#111827;font-size:12px;}
+      #pricing .yp-cell-tbd{display:inline-block;padding:2px 9px;border-radius:6px;background:#f3f4f6;color:#9ca3af;font-size:10.5px;font-weight:700;}
+      @media (max-width:900px){#pricing .yp-cards{grid-template-columns:repeat(2,1fr);}}
+      @media (max-width:560px){#pricing .yp-cards{grid-template-columns:1fr;}}
+    </style>
+    <div class="yp-wrap">
+      <div class="yp-head reveal">
+        <h2 class="yp-h2">Vyber si svůj plán</h2>
+        <p class="yp-sub">Bez závazků. Zrušení kdykoliv.</p>
+        <div class="yp-toggle">
+          <div class="yp-trow">
+            <span id="yp-lbl-m" class="on">Měsíčně</span>
+            <div class="yp-sw" id="yp-sw"><i></i></div>
+            <span id="yp-lbl-a">Ročně</span>
           </div>
-
-          <!-- STANDARD -->
-          <div class="cn-plan popular">
-            <div class="cn-popular-badge"><iconify-icon icon="solar:star-bold" width="13"></iconify-icon>Nejoblíbenější</div>
-            <div class="cn-plan-name">Standard</div>
-            <div class="cn-plan-price"><span class="num" id="std-price">499</span><span class="kc"> Kč</span></div>
-            <div class="cn-plan-period">za měsíc bez DPH</div>
-            <hr class="cn-plan-divider" />
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>2 aktivní inzeráty</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (1×/měs)</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Ověřená firma + branding</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (10×/měs)</span></div>
-            <div class="cn-feat-details">
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Plné statistiky + CSV export</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Šablony inzerátů</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Video na profilu</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>SMS Urgent</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Prémiový badge</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
-            </div>
-            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
-            <div class="cn-plan-cta"><a href="javascript:void(0)" class="primary employer-cta-register">Vybrat Standard</a></div>
-          </div>
-
-          <!-- BUSINESS -->
-          <div class="cn-plan">
-            <div class="cn-plan-name">Business</div>
-            <div class="cn-plan-price"><span class="num" id="biz-price">4 999</span><span class="kc"> Kč</span></div>
-            <div class="cn-plan-period">za měsíc bez DPH</div>
-            <hr class="cn-plan-divider" />
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>10 aktivních inzerátů</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (5×/měs)</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>SMS Urgent + prémiový badge</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (100×/měs)</span></div>
-            <div class="cn-feat-details">
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Zmínka na FB + IG Makej</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Role uživatelů</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Plánování inzerátu</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Možnost konzultace</span></div>
-            </div>
-            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
-            <div class="cn-plan-cta"><a href="javascript:void(0)" class="ghost employer-cta-register">Vybrat Business</a></div>
-          </div>
-
-          <!-- AGENCY -->
-          <div class="cn-plan">
-            <div class="cn-plan-name">Agency</div>
-            <div class="cn-plan-price"><span class="od">od </span><span class="num">4 999</span><span class="kc"> Kč</span></div>
-            <div class="cn-plan-period">za měsíc bez DPH</div>
-            <hr class="cn-plan-divider" />
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Neomezené inzeráty</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Inzerce jménem klienta</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (20×/měs)</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování brigádníků (100×/měs)</span></div>
-            <div class="cn-feat-details">
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Prémiový badge + SMS Urgent</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika + CSV</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Role uživatelů</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Zmínka na FB + IG Makej</span></div>
-            </div>
-            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
-            <div class="cn-plan-cta"><a href="mailto:hello@makej.eu" class="ghost">Kontaktovat nás</a></div>
-          </div>
-
-          <!-- ENTERPRISE -->
-          <div class="cn-plan">
-            <div class="cn-plan-name">Enterprise</div>
-            <div class="cn-plan-price"><span class="od">od </span><span class="num">9 999</span><span class="kc"> Kč</span></div>
-            <div class="cn-plan-period">kalkulace na míru</div>
-            <hr class="cn-plan-divider" />
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Vše z Business</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Custom integrace (HR systémy)</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Co-marketing s Makej</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Vlastní reporting na míru</span></div>
-            <div class="cn-feat-details">
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Neomezení uživatelé v týmu</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Onboarding a školení týmu</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>SLA 99,99 % + prioritní podpora</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Dedikovaný account manager</span></div>
-            </div>
-            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
-            <div class="cn-plan-cta"><a href="mailto:hello@makej.eu" class="ghost">Nezávazná poptávka</a></div>
-          </div>
-
+          <div class="yp-save" id="yp-save">chci šetřit</div>
         </div>
       </div>
-
+      <div class="yp-cards">
+          <div class="yp-card" style="background:rgba(138,180,255,.07);border:1.5px solid rgba(138,180,255,.30)">
+            
+            <div class="yp-name">Základní</div>
+            <div class="yp-price"><span class="free">Zdarma</span></div>
+            <div class="yp-period">navždy zdarma</div>
+            <div class="yp-savew"></div>
+            <div class="yp-hr"></div>
+            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">1 aktivní inzerát</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Oslovování brigádníků 1×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:close-circle-bold" width="15" style="color:#d1d5db"></iconify-icon><span style="color:#9ca3af">Topování inzerátu</span></div><div class="yp-feat"><iconify-icon icon="solar:close-circle-bold" width="15" style="color:#d1d5db"></iconify-icon><span style="color:#9ca3af">Ověřená firma</span></div></div>
+            <div class="yp-cta"><a class="yp-btn employer-cta-register" href="javascript:void(0)" style="border:1.5px solid #8AB4FF;color:#111827">Začít zdarma</a></div>
+          </div>
+          <div class="yp-card" style="background:rgba(91,107,255,.07);border:1.5px solid rgba(91,107,255,.30)">
+            <div class="yp-badge"><iconify-icon icon="solar:star-bold" width="12"></iconify-icon>Nejoblíbenější</div>
+            <div class="yp-name">Výhodný</div>
+            <div class="yp-price"><span class="yp-num" data-a="1" data-plan="vyhodny">499</span><span class="kc"> Kč</span></div>
+            <div class="yp-period">za měsíc bez DPH</div>
+            <div class="yp-savew"><span>ušetříš 900 Kč/rok</span></div>
+            <div class="yp-hr"></div>
+            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">2 aktivní inzeráty</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Topování inzerátu 1×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Ověřená firma + branding</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Oslovování brigádníků 10×/měs</span></div></div>
+            <div class="yp-cta"><a class="yp-btn pop employer-cta-register" href="javascript:void(0)">Vybrat Výhodný</a></div>
+          </div>
+          <div class="yp-card" style="background:rgba(91,214,138,.07);border:1.5px solid rgba(91,214,138,.30)">
+            
+            <div class="yp-name">Dynamický</div>
+            <div class="yp-price"><span class="yp-num">2 000</span><span class="kc"> Kč</span></div>
+            <div class="yp-period">za měsíc bez DPH</div>
+            <div class="yp-savew"></div>
+            <div class="yp-hr"></div>
+            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:clock-circle-bold" width="15" style="color:#9ca3af"></iconify-icon><span style="color:#9ca3af">Funkce doplníme společně</span></div></div>
+            <div class="yp-cta"><a class="yp-btn employer-cta-register" href="javascript:void(0)" style="border:1.5px solid #5BD68A;color:#111827">Vybrat Dynamický</a></div>
+          </div>
+          <div class="yp-card" style="background:rgba(255,209,102,.07);border:1.5px solid rgba(255,209,102,.30)">
+            
+            <div class="yp-name">Maximální</div>
+            <div class="yp-price"><span class="yp-num" data-a="1" data-plan="maximalni">4 999</span><span class="kc"> Kč</span></div>
+            <div class="yp-period">za měsíc bez DPH</div>
+            <div class="yp-savew"><span>ušetříš 9 000 Kč/rok</span></div>
+            <div class="yp-hr"></div>
+            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">10 aktivních inzerátů</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Topování inzerátu 5×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">SMS Urgent + prémiový badge</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Pokročilá analytika</span></div></div>
+            <div class="yp-cta"><a class="yp-btn employer-cta-register" href="javascript:void(0)" style="border:1.5px solid #FFD166;color:#111827">Vybrat Maximální</a></div>
+          </div>
+          <div class="yp-card" style="background:rgba(224,176,255,.07);border:1.5px solid rgba(224,176,255,.30)">
+            
+            <div class="yp-name">Vlastní</div>
+            <div class="yp-price"><span class="pre">od </span><span class="yp-num">9 999</span><span class="kc"> Kč</span></div>
+            <div class="yp-period">kalkulace na míru</div>
+            <div class="yp-savew"></div>
+            <div class="yp-hr"></div>
+            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Vše z Maximální</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Custom integrace (HR)</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Dedikovaný account manager</span></div></div>
+            <div class="yp-cta"><a class="yp-btn" style="border:1px solid rgba(224,176,255,.47);color:#374151" href="mailto:admin@makej.eu">Nezávazná poptávka</a></div>
+          </div>
+      </div>
+      <button class="yp-comparebtn" id="yp-comparebtn">Zobrazit srovnání funkcí</button>
+      <div class="yp-table-wrap" id="yp-table-wrap">
+        <table class="yp-table">
+          <thead><tr><th></th><th>Základní</th><th>Výhodný</th><th>Dynamický</th><th>Maximální</th><th>Vlastní</th></tr></thead>
+          <tbody>
+                        <tr class="yp-sec"><td colspan="6">Inzeráty</td></tr>
+            <tr><td>Aktivní inzeráty</td><td><span class="yp-cell-txt">1</span></td><td><span class="yp-cell-txt">2</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-txt">10</span></td><td><span class="yp-cell-txt">10</span></td></tr>
+            <tr><td>Full-time inzerce</td><td><span class="yp-cell-txt">1</span></td><td><span class="yp-cell-txt">1</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-txt">1</span></td><td><span class="yp-cell-txt">1</span></td></tr>
+            <tr><td>Topování inzerátu</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-txt">1×/měs</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-txt">5×/měs</span></td><td><span class="yp-cell-txt">5×/měs</span></td></tr>
+            <tr><td>Plánování inzerátu předem</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Šablony inzerátů</td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr class="yp-sec"><td colspan="6">Nábor a viditelnost</td></tr>
+            <tr><td>Oslovování brigádníků</td><td><span class="yp-cell-txt">1×/měs</span></td><td><span class="yp-cell-txt">10×/měs</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-txt">100×/měs</span></td><td><span class="yp-cell-txt">100×/měs</span></td></tr>
+            <tr><td>Ověřená firma + branding</td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Video na profilu</td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Prémiový badge</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>SMS Urgent</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Zmínka na FB + IG Makej</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr class="yp-sec"><td colspan="6">Data a reporting</td></tr>
+            <tr><td>Základní statistiky</td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Plné statistiky + CSV export</td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Pokročilá analytika</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Custom integrace (HR systémy)</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Vlastní reporting na míru</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Co-marketing s Makej</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr class="yp-sec"><td colspan="6">Tým a podpora</td></tr>
+            <tr><td>Možnost konzultace</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Role uživatelů</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Neomezení uživatelé v týmu</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Onboarding a školení týmu</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>SLA 99,99 % + prioritní podpora</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+            <tr><td>Dedikovaný account manager</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
-
-  <!-- ═══════════ FAQ ═══════════ -->
-  <section id="faq" style="padding:40px 0 110px;">
+  <section id="faq" style="padding:40px 0 110px; background:#fff;">
+    <style>
+      #faq .section-header h2{color:#0f1222;}
+      #faq .section-header h2 .gradient-text{-webkit-text-fill-color:#0020f6;color:#0020f6;background:none;}
+      #faq .section-header p{color:#5b6478;}
+      #faq .section-header p a{color:#0020f6 !important;}
+      #faq .emp-faq-list,#faq .emp-faq-item{border-color:rgba(15,18,40,.1);}
+      #faq .emp-faq-q{color:#0f1222;}
+      #faq .emp-faq-q:hover{color:#0020f6;}
+      #faq .emp-faq-icon{color:#8a93a8;}
+      #faq .emp-faq-item.open .emp-faq-icon{color:#0020f6;}
+      #faq .emp-faq-a{color:#5b6478;}
+      #faq .emp-faq-a a{color:#0020f6;}
+    </style>
     <div class="container">
       <div class="section-header reveal">
         <h2>Časté <span class="gradient-text">otázky</span></h2>
-        <p>Nenašli jste odpověď? Napište nám na <a href="mailto:hello@makej.eu" style="color:#a0b4ff;text-decoration:none;">hello@makej.eu</a></p>
+        <p>Nenašli jste odpověď? Napište nám na <a href="mailto:admin@makej.eu" style="color:#a0b4ff;text-decoration:none;">admin@makej.eu</a></p>
       </div>
       <div class="emp-faq">
         <div class="emp-faq-list">
@@ -752,7 +1114,7 @@
         <div class="footer-col">
           <h4>Firma</h4>
           <a href="/podpora.html">Podpora</a>
-          <a href="mailto:hello@makej.eu">Kontakt</a>
+          <a href="mailto:admin@makej.eu">Kontakt</a>
           <a href="/o-nas.html">O nás</a>
         </div>
         <div class="footer-col">
@@ -961,22 +1323,61 @@
       });
     }
 
-    // Pricing: annual billing toggle
-    var annualOn = false;
-    var prices = {
-      std: { monthly: 499,  annual: Math.round(499  * 12 * 0.85 / 12) },
-      biz: { monthly: 4999, annual: Math.round(4999 * 12 * 0.85 / 12) },
-    };
-    function toggleBilling() {
-      annualOn = !annualOn;
-      var toggle = document.getElementById('billing-toggle');
-      var badge  = document.getElementById('billing-badge');
-      toggle.classList.toggle('on', annualOn);
-      badge.textContent = annualOn ? 'aktivní — 15 % sleva' : 'ušetři 15 %';
-      cnAnimateNumber(document.getElementById('std-price'), annualOn ? prices.std.annual : prices.std.monthly);
-      cnAnimateNumber(document.getElementById('biz-price'), annualOn ? prices.biz.annual : prices.biz.monthly);
-      if (annualOn) cnConfetti(toggle);
-    }
+    // Ceník: přepínač měsíčně/ročně + srovnání
+    (function () {
+      var annual = false;
+      var data = { vyhodny: { m: 499, a: 424 }, maximalni: { m: 4999, a: 4249 } };
+      function cz(n){ return n.toLocaleString('cs-CZ'); }
+      function apply() {
+        document.querySelectorAll('#pricing .yp-num[data-plan]').forEach(function (el) {
+          var d = data[el.getAttribute('data-plan')]; if (d) el.textContent = cz(annual ? d.a : d.m);
+        });
+        document.querySelectorAll('#pricing .yp-savew').forEach(function (w) { w.classList.toggle('on', annual); });
+        var sw = document.getElementById('yp-sw'); if (sw) sw.classList.toggle('on', annual);
+        var lm = document.getElementById('yp-lbl-m'); if (lm) lm.classList.toggle('on', !annual);
+        var la = document.getElementById('yp-lbl-a'); if (la) la.classList.toggle('on', annual);
+        var sv = document.getElementById('yp-save'); if (sv) sv.classList.toggle('on', annual);
+      }
+      var sw = document.getElementById('yp-sw');
+      if (sw) sw.addEventListener('click', function () { annual = !annual; apply(); });
+      var cb = document.getElementById('yp-comparebtn');
+      if (cb) cb.addEventListener('click', function () {
+        var on = document.getElementById('yp-table-wrap').classList.toggle('on');
+        cb.textContent = on ? 'Skrýt srovnání funkcí' : 'Zobrazit srovnání funkcí';
+      });
+      apply();
+    })();
+  </script>
+  <script>
+    // Škálování mockupů (fixní 1440px → šířka rámečku) + before/after posuvník
+    (function () {
+      function scaleDashmock() {
+        document.querySelectorAll('.dashmock-frame').forEach(function (f) {
+          f.querySelectorAll('.dashmock').forEach(function (m) {
+            m.style.transform = 'scale(' + (f.clientWidth / 1440) + ')';
+          });
+        });
+      }
+      window.addEventListener('resize', scaleDashmock);
+      window.addEventListener('load', scaleDashmock);
+      scaleDashmock();
+
+      document.querySelectorAll('.cmp').forEach(function (cmp) {
+        var dragging = false;
+        function setPos(clientX) {
+          var r = cmp.getBoundingClientRect();
+          var p = ((clientX - r.left) / r.width) * 100;
+          p = Math.max(3, Math.min(97, p));
+          cmp.style.setProperty('--pos', p + '%');
+        }
+        cmp.addEventListener('pointerdown', function (e) {
+          dragging = true; cmp.setPointerCapture(e.pointerId); setPos(e.clientX); e.preventDefault();
+        });
+        cmp.addEventListener('pointermove', function (e) { if (dragging) setPos(e.clientX); });
+        cmp.addEventListener('pointerup', function () { dragging = false; });
+        cmp.addEventListener('pointercancel', function () { dragging = false; });
+      });
+    })();
   </script>
 </body>
 </html>
