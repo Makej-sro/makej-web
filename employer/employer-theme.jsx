@@ -26,3 +26,22 @@ Object.assign(T, {
   cardLight:     '#374151',
   cardBorder:    'rgba(0,32,246,0.12)',
 });
+
+// ─────────────────────────────────────────────────────────────
+// Responsivní hook — dashboard je jinak fixní desktop layout.
+// MOBILE_BP = breakpoint pro přepnutí na mobilní (drawer) režim.
+// ─────────────────────────────────────────────────────────────
+const MOBILE_BP = 820;
+function useIsMobile(bp = MOBILE_BP) {
+  const [m, setM] = React.useState(
+    typeof window !== 'undefined' ? window.innerWidth <= bp : false
+  );
+  React.useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${bp}px)`);
+    const on = () => setM(mq.matches);
+    on();
+    mq.addEventListener ? mq.addEventListener('change', on) : mq.addListener(on);
+    return () => { mq.removeEventListener ? mq.removeEventListener('change', on) : mq.removeListener(on); };
+  }, [bp]);
+  return m;
+}

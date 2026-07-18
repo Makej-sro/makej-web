@@ -27,6 +27,9 @@ const E_THREADS = [
 ];
 
 function EMessages() {
+  const isMobile = useIsMobile();
+  // Na mobilu: přepínání mezi seznamem a vláknem
+  const [mobileView, setMobileView] = useStateE('list'); // 'list' | 'thread'
   // Local thread state — initialized from (possibly mutated) global E_THREADS
   const [threads, setThreads]   = useStateE(() => [...E_THREADS]);
   const [active,  setActive]    = useStateE(() => {
@@ -248,7 +251,12 @@ function EMessages() {
   return (
     <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
       {/* List */}
-      <aside style={{ width: 320, flexShrink: 0, borderRight: '1px solid ' + T.border, display: 'flex', flexDirection: 'column', background: '#ffffff' }}>
+      <aside style={{
+        width: (isMobile ? '100%' : 320), flexShrink: 0,
+        borderRight: isMobile ? 'none' : '1px solid ' + T.border,
+        display: (isMobile && mobileView !== 'list') ? 'none' : 'flex',
+        flexDirection: 'column', background: '#ffffff',
+      }}>
         <div style={{ padding: 16, borderBottom: '1px solid ' + T.border }}>
           <div style={{ position: 'relative' }}>
             <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}><Icon name="magnifer-linear" size={14} color={T.mutedSoft}/></span>
@@ -270,7 +278,7 @@ function EMessages() {
           {filtered.map((t, _i) => {
             const isActive = t.id === active;
             return (
-              <button key={t.id} onClick={() => setActive(t.id)} style={{
+              <button key={t.id} onClick={() => { setActive(t.id); if (isMobile) setMobileView('thread'); }} style={{
                 width: '100%', display: 'flex', alignItems: 'flex-start', gap: 10,
                 padding: '12px 16px', textAlign: 'left',
                 background: isActive ? 'rgba(0,32,246,0.09)' : 'transparent',
@@ -300,18 +308,23 @@ function EMessages() {
       </aside>
 
       {/* Thread */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <div style={{ padding: '14px 22px', borderBottom: '1px solid ' + T.border, display: 'flex', alignItems: 'center', gap: 12, background: '#ffffff' }}>
-          <div style={{ width: 38, height: 38, borderRadius: 999, background: thread.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13 }}>{thread.avatar}</div>
+      <main style={{ flex: 1, display: (isMobile && mobileView !== 'thread') ? 'none' : 'flex', flexDirection: 'column', minWidth: 0 }}>
+        <div style={{ padding: isMobile ? '12px 14px' : '14px 22px', borderBottom: '1px solid ' + T.border, display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 12, background: '#ffffff' }}>
+          {isMobile && (
+            <button onClick={() => setMobileView('list')} aria-label="Zpět" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+              <Icon name="alt-arrow-left-linear" size={20} color={T.ink} />
+            </button>
+          )}
+          <div style={{ width: 38, height: 38, borderRadius: 999, background: thread.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{thread.avatar}</div>
           <div style={{ flex: 1 }}>
             <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 14, fontWeight: 700 }}>{thread.name}</div>
             <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI }}>{thread.role} · {thread.online ? <span style={{ color: '#5BD68A' }}>online</span> : 'offline'}</div>
           </div>
-          <button onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl })} style={{ padding: '8px 12px', borderRadius: 8, background: T.primary, border: '1px solid ' + T.primary, color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <Icon name="user-id-bold" size={13} color="#fff"/>Profil
+          <button title="Profil" onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl })} style={{ padding: isMobile ? 0 : '8px 12px', width: isMobile ? 36 : 'auto', height: isMobile ? 36 : 'auto', flexShrink: 0, borderRadius: 8, background: T.primary, border: '1px solid ' + T.primary, color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <Icon name="user-id-bold" size={13} color="#fff"/>{!isMobile && 'Profil'}
           </button>
-          <button onClick={() => setShowShiftModal(true)} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <Icon name="calendar-bold" size={13} color={T.light}/>Nabídnout směnu
+          <button title="Nabídnout směnu" onClick={() => setShowShiftModal(true)} style={{ padding: isMobile ? 0 : '8px 12px', width: isMobile ? 36 : 'auto', height: isMobile ? 36 : 'auto', flexShrink: 0, borderRadius: 8, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <Icon name="calendar-bold" size={13} color={T.light}/>{!isMobile && 'Nabídnout směnu'}
           </button>
         </div>
 
@@ -406,8 +419,8 @@ function EMessages() {
         </div>
       </main>
 
-      {/* Right: candidate context */}
-      <aside style={{ width: 280, flexShrink: 0, borderLeft: '1px solid ' + T.border, padding: 20, overflowY: 'auto', background: '#ffffff', display: 'flex', flexDirection: 'column' }}>
+      {/* Right: candidate context — na mobilu skryto (profil dostupný přes tlačítko) */}
+      <aside style={{ width: 280, flexShrink: 0, borderLeft: '1px solid ' + T.border, padding: 20, overflowY: 'auto', background: '#ffffff', display: isMobile ? 'none' : 'flex', flexDirection: 'column' }}>
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
           <div style={{ width: 84, height: 84, borderRadius: 24, margin: '0 auto', background: 'linear-gradient(160deg, rgba(255,255,255,0.30), rgba(255,255,255,0)), ' + thread.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 28, boxShadow: '0 10px 24px rgba(20,22,40,0.14)' }}>{thread.avatar}</div>
           <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, marginTop: 12 }}>{thread.name}</div>
@@ -465,7 +478,7 @@ function EMessages() {
       {/* Shift offer modal */}
       {showShiftModal && (
         <div onClick={e => { if (e.target === e.currentTarget) setShowShiftModal(false); }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', display: 'grid', placeItems: 'center', zIndex: 200 }}>
-          <div style={{ background: '#ffffff', border: '1px solid ' + T.border, borderRadius: 18, padding: 28, width: 380, position: 'relative' }}>
+          <div style={{ background: '#ffffff', border: '1px solid ' + T.border, borderRadius: 18, padding: 28, width: 380, maxWidth: "calc(100vw - 32px)", position: 'relative' }}>
             <button onClick={() => setShowShiftModal(false)} style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(208,208,255,.08)', border: 'none', borderRadius: 8, padding: 6, color: T.muted, cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>✕</button>
             <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Nabídnout směnu</div>
             <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginBottom: 20 }}>Nabídka bude odeslána jako zpráva — brigádník ji může přijmout nebo odmítnout.</div>
@@ -500,7 +513,7 @@ function EMessages() {
       {/* Interview offer modal */}
       {showInterviewModal && (
         <div onClick={e => { if (e.target === e.currentTarget) setShowInterviewModal(false); }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', display: 'grid', placeItems: 'center', zIndex: 200 }}>
-          <div style={{ background: '#ffffff', border: '1px solid ' + T.border, borderRadius: 18, padding: 28, width: 380, position: 'relative' }}>
+          <div style={{ background: '#ffffff', border: '1px solid ' + T.border, borderRadius: 18, padding: 28, width: 380, maxWidth: "calc(100vw - 32px)", position: 'relative' }}>
             <button onClick={() => setShowInterviewModal(false)} style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(208,208,255,.08)', border: 'none', borderRadius: 8, padding: 6, color: T.muted, cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>✕</button>
             <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Pozvat na pohovor</div>
             <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginBottom: 20 }}>Pozvánka se odešle jako zpráva. Je to jen pohovor — inzerát zůstává aktivní.</div>

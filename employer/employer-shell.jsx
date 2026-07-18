@@ -24,7 +24,9 @@ function ELogo() {
 // ─────────────────────────────────────────────────────────────
 // SIDEBAR
 // ─────────────────────────────────────────────────────────────
-function ESidebar({ tab, onTab }) {
+function ESidebar({ tab, onTab, mobile = false, open = false, onClose }) {
+  // Na mobilu navigace zavře drawer
+  const go = (k) => { onTab(k); if (mobile && onClose) onClose(); };
   // Dynamické počty z reálných dat (0 → bez badge)
   const jobCount  = (typeof E_JOBS !== 'undefined') ? E_JOBS.length : 0;
   const candCount = (typeof E_CANDIDATES !== 'undefined' && E_CANDIDATES.new) ? E_CANDIDATES.new.length : 0;
@@ -55,18 +57,39 @@ function ESidebar({ tab, onTab }) {
     },
   ];
 
+  const asideBase = {
+    width: 256, flexShrink: 0,
+    display: 'flex', flexDirection: 'column',
+    padding: '20px 14px',
+    borderRight: '1px solid ' + T.border,
+    background: '#ffffff',
+    overflowY: 'auto',
+    position: 'relative', zIndex: 1,
+  };
+  const asideMobile = {
+    ...asideBase,
+    position: 'fixed', top: 0, left: 0, bottom: 0, width: 272, maxWidth: '84vw',
+    zIndex: 260, boxShadow: '0 0 60px rgba(15,18,40,0.28)',
+    transform: open ? 'translateX(0)' : 'translateX(-100%)',
+    transition: 'transform .28s cubic-bezier(.4,0,.2,1)',
+  };
+
   return (
-    <aside style={{
-      width: 256, flexShrink: 0,
-      display: 'flex', flexDirection: 'column',
-      padding: '20px 14px',
-      borderRight: '1px solid ' + T.border,
-      background: '#ffffff',
-      overflowY: 'auto',
-      position: 'relative', zIndex: 1,
-    }}>
-      <div style={{ padding: '4px 8px 18px' }}>
+    <>
+      {mobile && (
+        <div onClick={onClose} style={{
+          position: 'fixed', inset: 0, zIndex: 250,
+          background: 'rgba(15,18,40,0.5)', backdropFilter: 'blur(2px)',
+          opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none',
+          transition: 'opacity .28s ease',
+        }} />
+      )}
+    <aside style={mobile ? asideMobile : asideBase}>
+      <div style={{ padding: '4px 8px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <ELogo />
+        {mobile && (
+          <button onClick={onClose} aria-label="Zavřít menu" style={{ background: 'none', border: 'none', color: T.muted, cursor: 'pointer', fontSize: 20, lineHeight: 1, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+        )}
       </div>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: 18, flex: 1 }}>
@@ -81,7 +104,7 @@ function ESidebar({ tab, onTab }) {
               {sec.items.map(it => {
                 const active = tab === it.k;
                 return (
-                  <button key={it.k} onClick={() => !it.disabled && onTab(it.k)} style={{
+                  <button key={it.k} onClick={() => !it.disabled && go(it.k)} style={{
                     display: 'flex', alignItems: 'center', gap: 11,
                     padding: '9px 12px', borderRadius: 10,
                     background: active ? 'rgba(0,32,246,0.08)' : 'transparent',
@@ -195,35 +218,45 @@ function ESidebar({ tab, onTab }) {
         </div>
       </div>
     </aside>
+    </>
   );
 }
 
 // ─────────────────────────────────────────────────────────────
 // TOPBAR
 // ─────────────────────────────────────────────────────────────
-function ETopbar({ title, subtitle, onNew, onSignOut, period = '30d', onPeriod, showPeriod = false }) {
+function ETopbar({ title, subtitle, onNew, onSignOut, period = '30d', onPeriod, showPeriod = false, mobile = false, onMenu }) {
   const [bellOpen, setBellOpen] = useStateE(false);
   const periodLabel = { '7d': 'za 7 dní', '30d': 'za 30 dní', '90d': 'za 90 dní', 'rok': 'za rok' }[period];
   const acts = (typeof E_ACTIVITY !== 'undefined') ? E_ACTIVITY : [];
   return (
     <header style={{
-      display: 'flex', alignItems: 'center', gap: 16,
-      padding: '14px 28px',
+      display: 'flex', alignItems: 'center', gap: mobile ? 10 : 16,
+      padding: mobile ? '11px 14px' : '14px 28px',
       borderBottom: '1px solid ' + T.border,
       background: 'rgba(255,255,255,0.9)',
       backdropFilter: 'blur(16px)',
       flexShrink: 0,
     }}>
-      <div style={{ flex: 1 }}>
+      {mobile && (
+        <button onClick={onMenu} aria-label="Menu" style={{
+          width: 38, height: 38, borderRadius: 10, flexShrink: 0,
+          background: '#fff', border: '1px solid ' + T.border,
+          display: 'grid', placeItems: 'center', cursor: 'pointer',
+        }}>
+          <Icon name="hamburger-menu-bold" size={20} color={T.ink} />
+        </button>
+      )}
+      <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <h1 style={{ margin: 0, fontFamily: T.fontHead, fontSize: 20, fontWeight: 800, color: T.ink, letterSpacing: -0.4 }}>{title}</h1>
-          <span style={{ width: 4, height: 4, borderRadius: 999, background: T.mutedSoft }} />
-          <span style={{ fontFamily: T.fontUI, fontSize: 13, color: T.muted, fontWeight: 500 }}>{(subtitle || '').replace(/za \d+ dní|za rok/, periodLabel)}</span>
+          <h1 style={{ margin: 0, fontFamily: T.fontHead, fontSize: mobile ? 16 : 20, fontWeight: 800, color: T.ink, letterSpacing: -0.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</h1>
+          {!mobile && <span style={{ width: 4, height: 4, borderRadius: 999, background: T.mutedSoft }} />}
+          {!mobile && <span style={{ fontFamily: T.fontUI, fontSize: 13, color: T.muted, fontWeight: 500 }}>{(subtitle || '').replace(/za \d+ dní|za rok/, periodLabel)}</span>}
         </div>
       </div>
 
-      {/* Period selector — jen na dashboardu */}
-      {showPeriod && (
+      {/* Period selector — jen na dashboardu, na mobilu skryto */}
+      {showPeriod && !mobile && (
         <div style={{
           display: 'flex', gap: 2, padding: 3, borderRadius: 10,
           background: T.surfaceAlt, border: '1px solid ' + T.border,
@@ -303,16 +336,17 @@ function ETopbar({ title, subtitle, onNew, onSignOut, period = '30d', onPeriod, 
         <Icon name="logout-2-bold" size={18} color="#f87171" />
       </button>
 
-      <button onClick={onNew} style={{
-        padding: '10px 16px', borderRadius: 10,
+      <button onClick={onNew} title="Nový inzerát" style={{
+        padding: mobile ? 0 : '10px 16px', borderRadius: 10,
+        width: mobile ? 38 : 'auto', height: mobile ? 38 : 'auto', flexShrink: 0,
         background: 'linear-gradient(135deg, #0020F6, #2D2CA7)',
         border: 'none', color: '#fff', cursor: 'pointer',
         fontFamily: T.fontUI, fontSize: 13, fontWeight: 700,
-        display: 'inline-flex', alignItems: 'center', gap: 7,
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
         boxShadow: '0 6px 16px rgba(0,32,246,0.4)',
       }}>
         <Icon name="add-circle-bold" size={16} color="#fff" />
-        Nový inzerát
+        {!mobile && 'Nový inzerát'}
       </button>
     </header>
   );

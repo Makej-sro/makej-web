@@ -134,10 +134,33 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
   const isShortTerm = isOneshot || isBrigada;
 
   async function handleSubmit() {
+    // Všechna pole, která zaměstnavatel u daného typu inzerátu vidí, jsou povinná
     if (!form.title.trim())    { setErr('Vyplň název pozice.'); return; }
     if (!form.pay)             { setErr('Vyplň mzdu.'); return; }
     if (!form.location.trim()) { setErr('Vyplň místo.'); return; }
-    if (!form.kraj) { setErr('Vyber kraj.'); return; }
+    if (!form.kraj)            { setErr('Vyber kraj.'); return; }
+    if (isShortTerm) {
+      if (!form.date)          { setErr('Vyber datum.'); return; }
+      if (!form.time_start)    { setErr('Vyplň začátek směny.'); return; }
+      if (!form.time_end)      { setErr('Vyplň konec směny.'); return; }
+      if (!form.positions || parseInt(form.positions) < 1) { setErr('Zadej počet volných míst.'); return; }
+    }
+    if (isPartTime) {
+      if (!form.hours_per_week)            { setErr('Vyplň počet hodin týdně.'); return; }
+      if (!form.start_date)               { setErr('Vyber datum nástupu.'); return; }
+      if (!form.contract_duration.trim()) { setErr('Vyplň délku spolupráce.'); return; }
+    }
+    if (isFullTime) {
+      if (!form.contract_type)            { setErr('Vyber typ úvazku.'); return; }
+      if (!form.start_date)               { setErr('Vyber datum nástupu.'); return; }
+      if (!form.contract_duration.trim()) { setErr('Vyplň délku spolupráce.'); return; }
+    }
+    if (!form.description.trim())  { setErr('Vyplň popis.'); return; }
+    if (!form.benefits.trim())     { setErr('Vyplň, co nabízíš (co nabízíme).'); return; }
+    if (!form.dress_code.trim())   { setErr('Vyplň dress code.'); return; }
+    if (!form.contact_note.trim()) { setErr('Vyplň, kam dorazit / kontakt.'); return; }
+    if (!form.tags.trim())         { setErr('Přidej alespoň jeden tag.'); return; }
+    if (!isOneshot && !form.requirements.trim()) { setErr('Vyplň požadavky.'); return; }
     setSaving(true); setErr('');
     const { data: { session } } = await sb.auth.getSession();
     const tags = form.tags.split(',').map(t => t.trim()).filter(Boolean);
@@ -271,15 +294,15 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
         {isShortTerm && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
             <div>
-              <label style={labelStyle}>Datum</label>
+              <label style={labelStyle}>Datum *</label>
               <input style={inputStyle} type="date" value={form.date} onChange={e => setF('date', e.target.value)} />
             </div>
             <div>
-              <label style={labelStyle}>Začátek</label>
+              <label style={labelStyle}>Začátek *</label>
               <input style={inputStyle} type="time" value={form.time_start} onChange={e => setF('time_start', e.target.value)} />
             </div>
             <div>
-              <label style={labelStyle}>Konec</label>
+              <label style={labelStyle}>Konec *</label>
               <input style={inputStyle} type="time" value={form.time_end} onChange={e => setF('time_end', e.target.value)} />
             </div>
           </div>
@@ -289,18 +312,18 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
         {isPartTime && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
             <div>
-              <label style={labelStyle}>Hodin týdně</label>
+              <label style={labelStyle}>Hodin týdně *</label>
               <input style={inputStyle} type="number" placeholder="20" value={form.hours_per_week} onChange={e => setF('hours_per_week', e.target.value)} />
             </div>
             <div>
-              <label style={labelStyle}>Nástup od</label>
+              <label style={labelStyle}>Nástup od *</label>
               <input style={inputStyle} type="date" value={form.start_date} onChange={e => setF('start_date', e.target.value)} />
             </div>
           </div>
         )}
         {isPartTime && (
           <div style={rowStyle}>
-            <label style={labelStyle}>Délka spolupráce</label>
+            <label style={labelStyle}>Délka spolupráce *</label>
             <input style={inputStyle} placeholder="např. 3 měsíce, neurčito…" value={form.contract_duration} onChange={e => setF('contract_duration', e.target.value)} />
           </div>
         )}
@@ -309,34 +332,34 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
         {isFullTime && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
             <div>
-              <label style={labelStyle}>Typ úvazku</label>
+              <label style={labelStyle}>Typ úvazku *</label>
               <select style={{ ...inputStyle, appearance: 'none' }} value={form.contract_type} onChange={e => setF('contract_type', e.target.value)}>
                 {CONTRACT_TYPES.map(ct => <option key={ct}>{ct}</option>)}
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Nástup od</label>
+              <label style={labelStyle}>Nástup od *</label>
               <input style={inputStyle} type="date" value={form.start_date} onChange={e => setF('start_date', e.target.value)} />
             </div>
           </div>
         )}
         {isFullTime && (
           <div style={rowStyle}>
-            <label style={labelStyle}>Délka spolupráce</label>
+            <label style={labelStyle}>Délka spolupráce *</label>
             <input style={inputStyle} placeholder="např. neurčito, 1 rok, zkušební 3 měs.…" value={form.contract_duration} onChange={e => setF('contract_duration', e.target.value)} />
           </div>
         )}
 
         {/* Popis — vždy, ale placeholder se mění */}
         <div style={rowStyle}>
-          <label style={labelStyle}>{isFullTime ? 'Popis pozice' : isPartTime ? 'Popis práce' : 'Popis'}</label>
+          <label style={labelStyle}>{isFullTime ? 'Popis pozice *' : isPartTime ? 'Popis práce *' : 'Popis *'}</label>
           <textarea
             style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
             rows={isFullTime ? 4 : 3}
             placeholder={
               isFullTime  ? 'Náplň práce, co hledáme, pracovní podmínky a prostředí…' :
               isPartTime  ? 'Co bude zaměstnanec dělat, prostředí, co nabízíte…' :
-              isOneshot   ? 'Stručný popis práce (nepovinné)' :
+              isOneshot   ? 'Stručný popis práce…' :
                             'Popis práce, čeká se na brigádníka…'
             }
             value={form.description}
@@ -346,7 +369,7 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
 
         {/* Co nabízíme (benefity) — vždy */}
         <div style={rowStyle}>
-          <label style={labelStyle}>Co nabízíme <span style={{ textTransform: 'none', fontWeight: 500, color: T.mutedSoft }}>· oddělené čárkou</span></label>
+          <label style={labelStyle}>Co nabízíme * <span style={{ textTransform: 'none', fontWeight: 500, color: T.mutedSoft }}>· oddělené čárkou</span></label>
           <textarea
             style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
             rows={2}
@@ -363,19 +386,19 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
         <div style={{ ...rowStyle, display: 'grid', gridTemplateColumns: isShortTerm ? '1fr 1.5fr' : '1fr', gap: 10 }}>
           {isShortTerm && (
             <div>
-              <label style={labelStyle}>Volných míst</label>
+              <label style={labelStyle}>Volných míst *</label>
               <input style={inputStyle} type="number" min="1" placeholder="1" value={form.positions} onChange={e => setF('positions', e.target.value)} />
             </div>
           )}
           <div>
-            <label style={labelStyle}>Dress code <span style={{ textTransform: 'none', fontWeight: 500, color: T.mutedSoft }}>· nepovinné</span></label>
+            <label style={labelStyle}>Dress code *</label>
             <input style={inputStyle} placeholder="např. Černé tričko a kalhoty, uzavřená obuv" value={form.dress_code} onChange={e => setF('dress_code', e.target.value)} />
           </div>
         </div>
 
         {/* Kam dorazit / kontakt */}
         <div style={rowStyle}>
-          <label style={labelStyle}>Kam dorazit / kontakt <span style={{ textTransform: 'none', fontWeight: 500, color: T.mutedSoft }}>· nepovinné</span></label>
+          <label style={labelStyle}>Kam dorazit / kontakt *</label>
           <textarea
             style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
             rows={2}
@@ -387,7 +410,7 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
 
         {/* Tagy — vždy */}
         <div style={rowStyle}>
-          <label style={labelStyle}>Tagy (oddělené čárkou)</label>
+          <label style={labelStyle}>Tagy (oddělené čárkou) *</label>
           <input
             style={inputStyle}
             placeholder={
@@ -403,7 +426,7 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
         {/* Požadavky — skryté u jednorázové */}
         {!isOneshot && (
           <div style={rowStyle}>
-            <label style={labelStyle}>{isFullTime ? 'Požadavky' : 'Výhody / požadavky'} (oddělené čárkou)</label>
+            <label style={labelStyle}>{isFullTime ? 'Požadavky *' : 'Výhody / požadavky *'} (oddělené čárkou)</label>
             <input
               style={inputStyle}
               placeholder={
@@ -517,11 +540,17 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
   const [p, setP]       = useStateE(fallback || null);
   const [reviews, setR] = useStateE(null);   // null = načítá se
   const [loading, setL] = useStateE(true);
+  const [replies, setReplies]     = useStateE({});   // { review_id: [reply] }
+  const [drafts, setDrafts]       = useStateE({});
+  const [sendingId, setSendingId] = useStateE(null);
+  const [myId, setMyId]           = useStateE(null);
 
   useEffectE(() => {
     if (!workerId) return;
     let alive = true;
     (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (alive) setMyId(session?.user?.id || null);
       const [profRes, revRes] = await Promise.all([
         sb.from('profiles').select('*').eq('id', workerId).single(),
         sb.from('reviews')
@@ -531,16 +560,58 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
       ]);
       if (!alive) return;
       if (profRes.data) setP(profRes.data);
-      setR(revRes.data || []);
+      const revs = revRes.data || [];
+      setR(revs);
       setL(false);
+      const ids = revs.map(r => r.id);
+      if (ids.length) {
+        const { data: reps } = await sb.from('review_replies').select('*').in('review_id', ids).order('created_at', { ascending: true });
+        if (!alive) return;
+        const map = {};
+        (reps || []).forEach(x => { (map[x.review_id] = map[x.review_id] || []).push(x); });
+        setReplies(map);
+      }
     })();
     return () => { alive = false; };
   }, [workerId]);
+
+  // Realtime odpovědi (brigádník odpoví → objeví se hned)
+  useEffectE(() => {
+    const chan = sb.channel('e-rev-replies-' + (workerId || 'x'))
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'review_replies' }, (payload) => {
+        const rep = payload.new;
+        setReplies(prev => {
+          const list = prev[rep.review_id] || [];
+          if (list.some(x => x.id === rep.id)) return prev;
+          return { ...prev, [rep.review_id]: [...list, rep] };
+        });
+      })
+      .subscribe();
+    return () => { try { sb.removeChannel(chan); } catch (e) {} };
+  }, [workerId]);
+
+  async function sendReply(reviewId) {
+    const text = (drafts[reviewId] || '').trim();
+    if (!text || sendingId) return;
+    setSendingId(reviewId);
+    const tempId = 'tmp-' + Date.now();
+    setReplies(prev => ({ ...prev, [reviewId]: [...(prev[reviewId] || []), { id: tempId, review_id: reviewId, author_id: myId, text, created_at: new Date().toISOString() }] }));
+    setDrafts(prev => ({ ...prev, [reviewId]: '' }));
+    const { data, error } = await sb.from('review_replies').insert({ review_id: reviewId, author_id: myId, text }).select().single();
+    setSendingId(null);
+    setReplies(prev => {
+      const list = prev[reviewId] || [];
+      return { ...prev, [reviewId]: (data && !error) ? list.map(x => x.id === tempId ? data : x) : list.filter(x => x.id !== tempId) };
+    });
+  }
 
   const name    = p?.name || 'Kandidát';
   const initials = name.split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase() || '??';
   const skills  = Array.isArray(p?.skills) ? p.skills : [];
   const rating  = Number(p?.rating || 0);
+  const age     = p?.birth_date ? Math.floor((Date.now() - new Date(p.birth_date).getTime()) / 31557600000) : null;
+  const krajName = p?.kraj ? ((KRAJE.find(k => k.id === p.kraj) || {}).name || '') : '';
+  const genderTxt = p?.gender === 'male' ? 'Muž' : p?.gender === 'female' ? 'Žena' : '';
   const card    = { background: '#ffffff', border: '1px solid ' + T.border, borderRadius: 12, padding: 14 };
   const secTitle = { color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 };
 
@@ -571,7 +642,7 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
               {p?.verified && <Icon name="verified-check-bold" size={18} color="#5B6BFF" />}
             </div>
             <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12.5, marginTop: 3 }}>
-              {[p?.address, p?.level ? 'Makač L' + p.level : null].filter(Boolean).join(' · ') || 'Brigádník'}
+              {[age ? age + ' let' : null, genderTxt, krajName, p?.address, p?.level ? 'Makač L' + p.level : null].filter(Boolean).join(' · ') || 'Brigádník'}
             </div>
             {loading && <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 11, marginTop: 4 }}>Načítám profil…</div>}
           </div>
@@ -647,16 +718,49 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {reviews.map((r, i) => (
-                  <div key={i} style={{ padding: '14px 16px', borderRadius: 12, background: T.surfaceAlt, border: '1px solid ' + T.border }}>
+                {reviews.map((r, i) => {
+                  const thread = replies[r.id] || [];
+                  const canReply = r.reviewer_id === myId;
+                  return (
+                  <div key={r.id || i} style={{ padding: '14px 16px', borderRadius: 12, background: T.surfaceAlt, border: '1px solid ' + T.border }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{r.reviewer?.company_name || r.reviewer?.name || 'Firma'}</span>
+                      <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700 }}>{r.reviewer?.company_name || r.reviewer?.name || 'Firma'}{canReply ? ' · vy' : ''}</span>
                       <span style={{ color: '#D97706', fontSize: 14, letterSpacing: 1 }}>{stars(Number(r.rating) || 0)}</span>
                     </div>
                     {r.text && <div style={{ color: T.light, fontSize: 12.5, fontFamily: T.fontUI, lineHeight: 1.6 }}>{r.text}</div>}
                     <div style={{ color: T.mutedSoft, fontSize: 11, fontFamily: T.fontUI, marginTop: 6 }}>{_relTime(r.created_at)}</div>
+
+                    {thread.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
+                        {thread.map(rep => {
+                          const mine = rep.author_id === myId;
+                          return (
+                            <div key={rep.id} style={{ alignSelf: mine ? 'flex-end' : 'flex-start', maxWidth: '88%' }}>
+                              <div style={{ color: T.mutedSoft, fontSize: 10, fontWeight: 700, fontFamily: T.fontUI, marginBottom: 2, textAlign: mine ? 'right' : 'left' }}>{mine ? 'Vy' : name}</div>
+                              <div style={{ padding: '8px 12px', borderRadius: 12, background: mine ? '#0020F6' : '#fff', color: mine ? '#fff' : T.ink, border: mine ? 'none' : '1px solid ' + T.border, fontFamily: T.fontUI, fontSize: 12.5, lineHeight: 1.45, borderBottomRightRadius: mine ? 4 : 12, borderBottomLeftRadius: mine ? 12 : 4 }}>{rep.text}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {canReply && (
+                      <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+                        <input
+                          value={drafts[r.id] || ''}
+                          onChange={e => setDrafts(prev => ({ ...prev, [r.id]: e.target.value }))}
+                          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); sendReply(r.id); } }}
+                          placeholder="Odpovědět brigádníkovi…"
+                          style={{ flex: 1, minWidth: 0, padding: '9px 13px', borderRadius: 999, background: '#fff', border: '1px solid ' + T.border, color: T.ink, fontFamily: T.fontUI, fontSize: 12.5, outline: 'none' }}
+                        />
+                        <button onClick={() => sendReply(r.id)} disabled={sendingId === r.id || !(drafts[r.id] || '').trim()} style={{ width: 38, height: 38, borderRadius: 999, flexShrink: 0, border: 'none', cursor: 'pointer', background: '#0020F6', display: 'grid', placeItems: 'center', opacity: (sendingId === r.id || !(drafts[r.id] || '').trim()) ? 0.5 : 1 }}>
+                          <Icon name="plain-bold" size={15} color="#fff" />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -770,6 +874,8 @@ function EmployerApp() {
   const [cancelTarget, setCancelTarget] = useStateE(null);
   const [toasts,    setToasts]    = useStateE([]);
   const empId                     = useRefE(null);
+  const isMobile                  = useIsMobile();
+  const [drawerOpen, setDrawerOpen] = useStateE(false);
 
   function addToast(title, text, icon = '🔔', type = 'info') {
     const id = Date.now() + Math.random();
@@ -897,10 +1003,10 @@ function EmployerApp() {
         filter: 'blur(80px)', pointerEvents: 'none',
       }} />
 
-      {loaded && <ESidebar tab={tab} onTab={setTab} />}
+      {loaded && <ESidebar tab={tab} onTab={setTab} mobile={isMobile} open={drawerOpen} onClose={() => setDrawerOpen(false)} />}
 
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, position: 'relative' }}>
-        {loaded && <ETopbar title={meta.title} subtitle={meta.subtitle} onNew={() => {
+        {loaded && <ETopbar mobile={isMobile} onMenu={() => setDrawerOpen(true)} title={meta.title} subtitle={meta.subtitle} onNew={() => {
           const lim = (typeof planLimit === 'function') ? planLimit('maxActiveJobs') : Infinity;
           const activeCount = (E_JOBS || []).filter(j => j.status === 'active' || j.status === 'urgent').length;
           if (activeCount >= lim) {

@@ -745,7 +745,7 @@ function CandidateDrawer({ c, jobTags, onClose, onAccepted }) {
 
   return (
     <div style={{
-      position: 'fixed', top: 0, right: 0, bottom: 0, width: 440,
+      position: 'fixed', top: 0, right: 0, bottom: 0, width: 440, maxWidth: '100vw',
       background: '#fff',
       borderLeft: '1px solid ' + T.border,
       boxShadow: '-16px 0 50px rgba(20,22,40,0.14)',
