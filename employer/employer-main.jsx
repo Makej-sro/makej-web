@@ -52,7 +52,7 @@ function EEmptyState() {
 
 const EMPTY_JOB_FORM = {
   title: '', description: '', pay: '', pay_unit: 'Kč/h',
-  location: '', kraj: '', date: '', time_start: '', time_end: '',
+  location: '', kraj: '', city: '', _lat: null, _lng: null, photos: [], date: '', time_start: '', time_end: '',
   tags: '', requirements: '', job_type: 'brigada',
   hours_per_week: '', start_date: '', contract_duration: '',
   contract_type: 'HPP', benefits: '',
@@ -88,6 +88,33 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
   const [deleting,   setDeleting]   = useStateE(false);
   const [publishLater, setPublishLater] = useStateE(false);
   const [publishAt,    setPublishAt]    = useStateE('');
+  const [cities,       setCities]       = useStateE([]);
+  const [uploadingPhoto, setUploadingPhoto] = useStateE(false);
+  const photoInputRef = useRefE(null);
+
+  async function handlePhotoPick(e) {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!files.length) return;
+    const { data: { session } } = await sb.auth.getSession();
+    const uid = session && session.user ? session.user.id : null;
+    if (!uid) return;
+    setUploadingPhoto(true);
+    for (const file of files.slice(0, 8)) {
+      const url = typeof uploadImageE === 'function' ? await uploadImageE(uid, 'job', file, 1600) : null;
+      if (url) setForm(f => ({ ...f, photos: [...(f.photos || []), url].slice(0, 8) }));
+    }
+    setUploadingPhoto(false);
+  }
+
+  // Seznam měst pro výběr polohy brigády (souřadnice → radius u brigádníků)
+  useEffectE(() => { sb.from('cities').select('*').order('name').then(({ data }) => setCities(data || [])); }, []);
+  // Při editaci předvyplň město podle uložených souřadnic jobu
+  useEffectE(() => {
+    if (!cities.length || form.city || form._lat == null) return;
+    const m = cities.find(c => Math.abs(c.lat - form._lat) < 1e-4 && Math.abs(c.lng - form._lng) < 1e-4);
+    if (m) setForm(f => ({ ...f, city: m.id, kraj: m.kraj }));
+  }, [cities, form._lat]);
 
   async function handleDelete() {
     if (!editJob) return;
@@ -112,6 +139,8 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
         title: data.title || '', description: data.description || '',
         pay: data.pay != null ? String(data.pay) : '', pay_unit: data.pay_unit || 'Kč/h',
         location: data.location || '', kraj: data.kraj || '',
+        city: '', _lat: data.lat != null ? data.lat : null, _lng: data.lng != null ? data.lng : null,
+        photos: Array.isArray(data.photos) ? data.photos : [],
         date: isDup ? '' : (data.date || ''),
         time_start: isDup ? '' : (data.time_start || ''),
         time_end: isDup ? '' : (data.time_end || ''),
@@ -137,8 +166,7 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
     // Všechna pole, která zaměstnavatel u daného typu inzerátu vidí, jsou povinná
     if (!form.title.trim())    { setErr('Vyplň název pozice.'); return; }
     if (!form.pay)             { setErr('Vyplň mzdu.'); return; }
-    if (!form.location.trim()) { setErr('Vyplň místo.'); return; }
-    if (!form.kraj)            { setErr('Vyber kraj.'); return; }
+    if (!form.city)            { setErr('Vyber město brigády.'); return; }
     if (isShortTerm) {
       if (!form.date)          { setErr('Vyber datum.'); return; }
       if (!form.time_start)    { setErr('Vyplň začátek směny.'); return; }
@@ -167,7 +195,13 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
     const reqs = form.requirements.split(',').map(r => r.trim()).filter(Boolean);
     const benefits = form.benefits.split(/[,\n]/).map(b => b.trim()).filter(Boolean);
     const publishIso = (!isEdit && publishLater && publishAt) ? new Date(publishAt).toISOString() : null;
-    const extra = { tags, requirements: reqs, benefits, positions: parseInt(form.positions) || 1, publish_at: publishIso };
+    const cityObj = cities.find(c => c.id === form.city);
+    const extra = {
+      tags, requirements: reqs, benefits, positions: parseInt(form.positions) || 1, publish_at: publishIso,
+      location: form.location.trim() || (cityObj ? cityObj.name : ''),   // fallback na název města
+      lat: cityObj ? cityObj.lat : (form._lat != null ? form._lat : null),
+      lng: cityObj ? cityObj.lng : (form._lng != null ? form._lng : null),
+    };
     const result = isEdit
       ? await updateJobE(editJob.id, { ...form, ...extra })
       : await createJobE(window._makejActingId || session.user.id, { ...form, ...extra });
@@ -275,19 +309,48 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
           </div>
         </div>
 
-        {/* Místo — vždy */}
+        {/* Místo — bližší popis (nepovinné) */}
         <div style={rowStyle}>
-          <label style={labelStyle}>Místo *</label>
-          <input style={inputStyle} placeholder="např. Brno — Veveří" value={form.location} onChange={e => setF('location', e.target.value)} />
+          <label style={labelStyle}>Bližší místo / adresa</label>
+          <input style={inputStyle} placeholder="např. Brno — Veveří, U nádraží" value={form.location} onChange={e => setF('location', e.target.value)} />
         </div>
 
-        {/* Kraj — vždy (povinné, kvůli filtru brigádníků) */}
+        {/* Město / část — povinné (určuje polohu pro radius u brigádníků) */}
         <div style={rowStyle}>
-          <label style={labelStyle}>Kraj *</label>
-          <select style={{ ...inputStyle, appearance: 'auto' }} value={form.kraj} onChange={e => setF('kraj', e.target.value)}>
-            <option value="">Vyber kraj…</option>
-            {KRAJE.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
+          <label style={labelStyle}>Město / část *</label>
+          <select style={{ ...inputStyle, appearance: 'auto' }} value={form.city} onChange={e => {
+            const c = cities.find(x => x.id === e.target.value);
+            setForm(f => ({ ...f, city: e.target.value, kraj: c ? c.kraj : f.kraj, _lat: c ? c.lat : f._lat, _lng: c ? c.lng : f._lng }));
+          }}>
+            <option value="">Vyber město…</option>
+            {KRAJE.map(k => {
+              const inKraj = cities.filter(c => c.kraj === k.id);
+              return inKraj.length ? (
+                <optgroup key={k.id} label={k.name}>
+                  {inKraj.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </optgroup>
+              ) : null;
+            })}
           </select>
+        </div>
+
+        {/* Fotky brigády — galerie (nepovinné) */}
+        <div style={rowStyle}>
+          <label style={labelStyle}>Fotky brigády <span style={{ textTransform: 'none', fontWeight: 500, color: T.mutedSoft }}>· nepovinné, ukážou se na kartě</span></label>
+          <input ref={photoInputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handlePhotoPick} />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {(form.photos || []).map((url, i) => (
+              <div key={i} style={{ position: 'relative', width: 76, height: 76, borderRadius: 10, overflow: 'hidden', border: '1px solid ' + T.border }}>
+                <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <button type="button" onClick={() => setForm(f => ({ ...f, photos: f.photos.filter((_, k) => k !== i) }))} style={{ position: 'absolute', top: 3, right: 3, width: 20, height: 20, borderRadius: 999, background: 'rgba(0,0,0,0.55)', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 11, lineHeight: 1, display: 'grid', placeItems: 'center' }}>✕</button>
+              </div>
+            ))}
+            {(form.photos || []).length < 8 && (
+              <button type="button" onClick={() => photoInputRef.current && photoInputRef.current.click()} disabled={uploadingPhoto} style={{ width: 76, height: 76, borderRadius: 10, border: '1.5px dashed ' + T.border, background: 'rgba(0,32,246,0.04)', color: T.primary, cursor: uploadingPhoto ? 'default' : 'pointer', display: 'grid', placeItems: 'center', fontSize: 24, fontWeight: 300 }}>
+                {uploadingPhoto ? <span style={{ width: 18, height: 18, borderRadius: 999, border: '2.5px solid rgba(0,32,246,0.25)', borderTopColor: T.primary, display: 'inline-block', animation: 'empSpin .7s linear infinite' }} /> : '+'}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Krátkodobé: datum + čas (jednorázová / brigáda) */}
@@ -505,6 +568,12 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
   );
 }
 
+const E_TOAST_STYLE = {
+  success: { accent: '#16a34a', soft: 'rgba(22,163,74,0.09)' },
+  info:    { accent: '#0020F6', soft: 'rgba(0,32,246,0.07)' },
+  warn:    { accent: '#F5A623', soft: 'rgba(245,166,35,0.11)' },
+  review:  { accent: '#F5A623', soft: 'rgba(245,166,35,0.11)' },
+};
 function EToast({ toasts, onRemove }) {
   if (!toasts.length) return null;
   return (
@@ -513,24 +582,36 @@ function EToast({ toasts, onRemove }) {
       display: 'flex', flexDirection: 'column', gap: 10,
       width: 'min(360px, calc(100vw - 48px))', pointerEvents: 'none',
     }}>
-      {toasts.map(t => (
-        <div key={t.id} style={{
-          background: 'rgba(16,16,42,0.97)',
-          border: '1px solid ' + (t.type === 'success' ? 'rgba(91,214,138,0.45)' : 'rgba(91,107,255,0.45)'),
-          borderRadius: 14, padding: '13px 16px',
-          display: 'flex', alignItems: 'flex-start', gap: 10,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-          animation: 'empPop .3s cubic-bezier(.2,.8,.2,1)',
-          pointerEvents: 'auto',
-        }}>
-          <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0 }}>{t.icon}</span>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {t.title && <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, marginBottom: 2 }}>{t.title}</div>}
-            <div style={{ color: T.light, fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.4 }}>{t.text}</div>
+      {toasts.map(t => {
+        const st = E_TOAST_STYLE[t.type] || E_TOAST_STYLE.info;
+        return (
+          <div key={t.id} style={{
+            position: 'relative', overflow: 'hidden', pointerEvents: 'auto',
+            background: 'linear-gradient(180deg, ' + st.soft + ' 0%, #fff 46%)',
+            border: '1px solid ' + T.border, borderRadius: 16, padding: '13px 15px 14px',
+            boxShadow: '0 1px 0 rgba(255,255,255,0.7) inset, 0 14px 34px -14px rgba(15,18,40,0.32), 0 4px 10px rgba(15,18,40,0.05)',
+            animation: 'empPop .32s cubic-bezier(.2,.8,.2,1)',
+          }}>
+            <button onClick={() => onRemove(t.id)} aria-label="Zavřít" style={{
+              position: 'absolute', top: 9, right: 9, width: 22, height: 22, borderRadius: 999,
+              display: 'grid', placeItems: 'center', background: 'rgba(15,18,40,0.05)', border: 'none',
+              color: T.muted, cursor: 'pointer', fontSize: 11, lineHeight: 1, transition: 'background .15s, color .15s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(15,18,40,0.1)'; e.currentTarget.style.color = T.ink; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(15,18,40,0.05)'; e.currentTarget.style.color = T.muted; }}
+            >✕</button>
+            <div style={{ display: 'flex', gap: 11, alignItems: 'flex-start' }}>
+              <div style={{ width: 38, height: 38, borderRadius: 11, background: st.accent + '14', display: 'grid', placeItems: 'center', flexShrink: 0, fontSize: 19, boxShadow: 'inset 0 0 0 1px ' + st.accent + '22' }}>{t.icon}</div>
+              <div style={{ flex: 1, minWidth: 0, paddingRight: 16 }}>
+                {t.title && <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 13.5, fontWeight: 800, letterSpacing: '-0.01em' }}>{t.title}</div>}
+                {t.text && <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginTop: 2, lineHeight: 1.45 }}>{t.text}</div>}
+              </div>
+            </div>
+            {/* odpočet do zmizení */}
+            <div style={{ position: 'absolute', left: 0, bottom: 0, height: 2.5, width: '100%', background: st.accent, opacity: 0.85, transformOrigin: 'left', animation: 'empToastBar 6s linear forwards' }} />
           </div>
-          <button onClick={() => onRemove(t.id)} style={{ background: 'none', border: 'none', color: T.mutedSoft, cursor: 'pointer', padding: 2, lineHeight: 1, flexShrink: 0 }}>✕</button>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -611,7 +692,7 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
   const rating  = Number(p?.rating || 0);
   const age     = p?.birth_date ? Math.floor((Date.now() - new Date(p.birth_date).getTime()) / 31557600000) : null;
   const krajName = p?.kraj ? ((KRAJE.find(k => k.id === p.kraj) || {}).name || '') : '';
-  const genderTxt = p?.gender === 'male' ? 'Muž' : p?.gender === 'female' ? 'Žena' : '';
+  const genderTxt = { muz: 'Muž', male: 'Muž', zena: 'Žena', female: 'Žena', jine: 'Jiné' }[p?.gender] || '';
   const card    = { background: '#ffffff', border: '1px solid ' + T.border, borderRadius: 12, padding: 14 };
   const secTitle = { color: T.muted, fontSize: 10.5, fontWeight: 700, fontFamily: T.fontUI, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 };
 
@@ -823,7 +904,7 @@ function EReviewModal({ target, onClose, onDone }) {
         padding: 28, width: '100%', maxWidth: 400, textAlign: 'center',
         animation: 'empPop .3s cubic-bezier(.2,.8,.2,1)',
       }}>
-        <div style={{ width: 54, height: 54, borderRadius: 14, background: target.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 19, margin: '0 auto 12px' }}>{target.avatar}</div>
+        <div style={{ width: 54, height: 54, borderRadius: 14, overflow: 'hidden', background: target.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 19, margin: '0 auto 12px' }}>{target.avatarUrl ? <img src={target.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : target.avatar}</div>
         <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 18, fontWeight: 800 }}>Ohodnoť brigádníka</div>
         <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13, marginTop: 4 }}>{target.workerName} · {target.jobTitle}</div>
 
@@ -904,7 +985,7 @@ function EmployerApp() {
           }, 1000);
         } else if (E_REVIEW_QUEUE.length > 0) {
           setTimeout(() => {
-            addToast('Ohodnoť brigádníky', `Máš ${E_REVIEW_QUEUE.length} ${E_REVIEW_QUEUE.length === 1 ? 'dokončenou brigádu' : 'dokončených brigád'} k ohodnocení.`, '⭐', 'info');
+            addToast('Ohodnoť brigádníky', `Máš ${E_REVIEW_QUEUE.length} ${E_REVIEW_QUEUE.length === 1 ? 'dokončenou brigádu' : 'dokončených brigád'} k ohodnocení.`, '⭐', 'review');
             setReviewTarget(E_REVIEW_QUEUE[0]);
           }, 1000);
         }
@@ -927,22 +1008,32 @@ function EmployerApp() {
     const id = empId.current;
 
     const channel = sb.channel('emp-rt-' + id)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'matches' }, async (payload) => {
-        await fetchEmployerData(id);
+      // SPOLEHLIVÝ signál: notifications mají triviální RLS (user_id=auth.uid()),
+      // takže realtime k firmě vždy dorazí (na rozdíl od matches přes RLS s can_act_as).
+      // Server trigger vytvoří firmě upozornění při novém kandidátu / potvrzení / zrušení.
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + id }, async (payload) => {
+        const n = payload.new;
+        if (!n) return;
+        if (n.type === 'message') return;     // zprávy řeší chat (vlastní realtime)
+        await fetchEmployerData(id);          // obnov kandidáty, směny, KPI…
         setTick(t => t + 1);
-        const jobId = payload.new?.job_id;
-        const job = E_JOBS.find(j => j.id === jobId);
-        addToast('Nový zájem o brigádu', job?.title || 'Někdo projevil zájem', '👤', 'info');
-      })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches' }, async (payload) => {
-        const justCancelled = payload.new?.status === 'cancelled' && payload.old?.status !== 'cancelled';
-        await fetchEmployerData(id);
-        setTick(t => t + 1);
-        if (justCancelled) {
-          const c = E_CANCELLED.find(x => x.match_id === payload.new.id);
-          addToast('Zrušená směna', `${c?.workerName || 'Brigádník'} zrušil/a potvrzenou směnu.`, '⚠️', 'info');
+        if (n.type === 'match')      addToast(n.title || 'Nový zájem o brigádu', n.body || '', '👤', 'info');
+        else if (n.type === 'shift') addToast(n.title || 'Změna u směny', n.body || '', '📅', 'success');
+        else if (n.type === 'info')  addToast(n.title || 'Upozornění', n.body || '', '⚠️', 'warn');
+        // u zrušené směny ještě otevři potvrzovací modal (data už jsou načtená)
+        if (n.type === 'info' && /zru/i.test(n.title || '')) {
+          const c = E_CANCELLED.find(x => x.match_id === n.match_id);
           if (c) setCancelTarget(c);
         }
+      })
+      // Záložní refresh z matches (kdyby realtime na matches přece jen dorazil).
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'matches' }, async () => {
+        await fetchEmployerData(id);
+        setTick(t => t + 1);
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches' }, async () => {
+        await fetchEmployerData(id);
+        setTick(t => t + 1);
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'jobs' }, async () => {
         await fetchEmployerData(id);

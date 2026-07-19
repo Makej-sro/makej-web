@@ -149,6 +149,38 @@ function _buildWageDistro(jobs) {
   window.E_WAGE_DISTRO = buckets.map(b => ({ l: b.l, v: rates.filter(r => r >= b.lo && r < b.hi).length }));
 }
 
+// ── Nahrávání obrázků (Supabase Storage bucket 'uploads') ──────
+function _eResizeImage(file, maxDim, quality) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let w = img.width, h = img.height;
+      if (Math.max(w, h) > maxDim) { const s = maxDim / Math.max(w, h); w = Math.round(w * s); h = Math.round(h * s); }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob')), 'image/jpeg', quality || 0.85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('load')); };
+    img.src = url;
+  });
+}
+// Nahraje obrázek do 'uploads/{userId}/{prefix}-{rand}.jpg' → vrátí veřejnou URL.
+// userId = přihlášený auth uživatel (kvůli storage RLS na vlastní složku).
+async function uploadImageE(userId, prefix, file, maxDim) {
+  if (!userId || !file) return null;
+  try {
+    const blob = await _eResizeImage(file, maxDim || 1400, 0.85);
+    const path = `${userId}/${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.jpg`;
+    const { error } = await sb.storage.from('uploads').upload(path, blob, { contentType: 'image/jpeg', upsert: true });
+    if (error) { console.error('uploadImageE:', error); return null; }
+    const { data } = sb.storage.from('uploads').getPublicUrl(path);
+    return data && data.publicUrl ? data.publicUrl : null;
+  } catch (e) { console.error('uploadImageE:', e); return null; }
+}
+
 async function fetchEmployerData(employerId) {
   try {
     const [profileRes, jobsRes] = await Promise.all([
@@ -315,6 +347,7 @@ async function fetchEmployerData(employerId) {
         return {
           match_id: m.id, worker_id: m.worker_id, workerName: nm,
           avatar: nm.split(/\s+/).map(x => x[0] || '').join('').slice(0, 2).toUpperCase() || '??',
+          avatarUrl: w.avatar_url || '',
           color: _strColor(m.worker_id || m.id),
           jobTitle: m.job?.title || 'Brigáda',
           dateText: m.job?.date || '',
@@ -332,6 +365,7 @@ async function fetchEmployerData(employerId) {
         return {
           match_id: m.id, job_id: m.job_id, workerName: nm,
           avatar: nm.split(/\s+/).map(x => x[0] || '').join('').slice(0, 2).toUpperCase() || '??',
+          avatarUrl: w.avatar_url || '',
           color: _strColor(m.worker_id || m.id),
           jobTitle: m.job?.title || 'Brigáda',
           dateText: m.job?.date || '',
@@ -342,20 +376,28 @@ async function fetchEmployerData(employerId) {
     cancelledQueue.forEach(c => E_CANCELLED.push(c));
 
     // ── E_ACTIVITY ───────────────────────────────────────────────────────────
-    const acts = [
-      ...matches.slice(0, 5).map(m => ({
-        type: 'match', who: m.worker?.name || 'Kandidát',
-        what: `matchoval/a na: ${m.job?.title || ''}`,
-        when: _relTime(m.created_at), icon: 'heart-bold', color: '#0020F6', _ts: m.created_at,
-      })),
-      ...messages.slice(0, 4).map(msg => {
+    // Do aktivity jen PŘÍCHOZÍ zprávy (ne moje vlastní) a max 1 na konverzaci
+    // (messages jsou seřazené created_at desc → první výskyt match_id = nejnovější).
+    const _seenMsgMatch = new Set();
+    const msgActs = messages
+      .filter(msg => msg.sender_id !== employerId)
+      .filter(msg => { if (_seenMsgMatch.has(msg.match_id)) return false; _seenMsgMatch.add(msg.match_id); return true; })
+      .slice(0, 4)
+      .map(msg => {
         const match = matches.find(m => m.id === msg.match_id);
         return {
           type: 'msg', who: match?.worker?.name || 'Kandidát',
           what: 'poslal/a zprávu',
           when: _relTime(msg.created_at), icon: 'chat-round-line-bold', color: '#5BD68A', _ts: msg.created_at,
         };
-      }),
+      });
+    const acts = [
+      ...matches.slice(0, 5).map(m => ({
+        type: 'match', who: m.worker?.name || 'Kandidát',
+        what: `matchoval/a na: ${m.job?.title || ''}`,
+        when: _relTime(m.created_at), icon: 'heart-bold', color: '#0020F6', _ts: m.created_at,
+      })),
+      ...msgActs,
     ].sort((a, b) => new Date(b._ts) - new Date(a._ts)).slice(0, 6);
     E_ACTIVITY.length = 0;
     acts.forEach(a => E_ACTIVITY.push(a));
@@ -386,6 +428,7 @@ async function fetchEmployerData(employerId) {
         id: match.id, match_id: match.id, worker_id: match.worker_id,
         name: wName,
         avatar: wName.split(' ').map(p => p[0] || '').join('').slice(0,2).toUpperCase() || '??',
+        avatarUrl: w.avatar_url || '',
         color: _strColor(match.worker_id || match.id),
         role: match.job?.title || '',
         city: w.address || '', rating: Number(w.rating || 0).toFixed(1),
@@ -504,6 +547,9 @@ async function createJobE(employerId, fields) {
     status:      'active',
     publish_at:  fields.publish_at || null,
     kraj:        fields.kraj || null,
+    lat:         fields.lat != null ? fields.lat : null,
+    lng:         fields.lng != null ? fields.lng : null,
+    photos:      Array.isArray(fields.photos) ? fields.photos : [],
   };
   const { data, error } = await sb.from('jobs').insert(payload).select().single();
   if (error) { console.error('createJobE error:', error); return null; }
@@ -540,6 +586,9 @@ async function updateJobE(jobId, fields) {
     contact_note: fields.contact_note || null,
     job_type:    fields.job_type || 'brigada',
     kraj:        fields.kraj || null,
+    lat:         fields.lat != null ? fields.lat : null,
+    lng:         fields.lng != null ? fields.lng : null,
+    photos:      Array.isArray(fields.photos) ? fields.photos : [],
   };
   const { data, error } = await sb.from('jobs').update(payload).eq('id', jobId).select().single();
   if (error) { console.error('updateJobE error:', error); return null; }
@@ -673,4 +722,4 @@ async function dismissCancelE(matchId) {
   return true;
 }
 
-Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, deleteJobE, boostJobE, fetchTeamE, createTeamInviteE, removeTeamMemberE, E_TEAM, _teamInviteLink, fetchNotesE, saveNoteE, E_NOTES, submitReviewE, reopenJobE, dismissCancelE, E_REVIEW_QUEUE, E_CANCELLED, _strColor, _relTime, _fmtTime });
+Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, deleteJobE, boostJobE, fetchTeamE, createTeamInviteE, removeTeamMemberE, E_TEAM, _teamInviteLink, fetchNotesE, saveNoteE, E_NOTES, submitReviewE, reopenJobE, dismissCancelE, E_REVIEW_QUEUE, E_CANCELLED, _strColor, _relTime, _fmtTime, uploadImageE });

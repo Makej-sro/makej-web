@@ -615,10 +615,10 @@ function CandidateListCard({ c, jobTags, active, onClick }) {
     }}>
       {/* Avatar */}
       <div style={{
-        width: 50, height: 50, borderRadius: 999, flexShrink: 0,
+        width: 50, height: 50, borderRadius: 999, flexShrink: 0, overflow: 'hidden',
         background: c.color, display: 'grid', placeItems: 'center',
         color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 17,
-      }}>{c.avatar}</div>
+      }}>{c.avatarUrl ? <img src={c.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : c.avatar}</div>
 
       {/* Střed: jméno + meta + metriky */}
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -764,8 +764,8 @@ function CandidateDrawer({ c, jobTags, onClose, onAccepted }) {
 
         {/* ── Hero ── */}
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: 999, background: c.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 26, flexShrink: 0 }}>
-            {c.avatar}
+          <div style={{ width: 72, height: 72, borderRadius: 999, overflow: 'hidden', background: c.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 26, flexShrink: 0 }}>
+            {c.avatarUrl ? <img src={c.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : c.avatar}
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 20, fontWeight: 800, lineHeight: 1.2 }}>{c.name}</div>

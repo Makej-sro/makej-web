@@ -759,7 +759,18 @@ const SOCIAL_FIELDS = [
   { k: 'tiktok',    icon: 'tiktok',    ph: 'tiktok.com/@firma' },
 ];
 
-function ImageField({ label, sub, value, onChange, fallback, color }) {
+function ImageField({ label, sub, value, onChange, onUpload, fallback, color }) {
+  const inputRef = React.useRef(null);
+  const [up, setUp] = React.useState(false);
+  async function pick(e) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file || !onUpload) return;
+    setUp(true);
+    const url = await onUpload(file);
+    setUp(false);
+    if (url) onChange({ target: { value: url } });
+  }
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 0', borderBottom: '1px solid ' + T.border }}>
       <div style={{ width: 64, height: 64, borderRadius: 14, flexShrink: 0, overflow: 'hidden', background: (color || T.primary) + '22', border: '1px solid ' + (color || T.primary) + '55', display: 'grid', placeItems: 'center', color: color || T.light, fontFamily: T.fontHead, fontWeight: 800, fontSize: 20 }}>
@@ -767,8 +778,15 @@ function ImageField({ label, sub, value, onChange, fallback, color }) {
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 14.5, fontWeight: 800 }}>{label}</div>
-        <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, margin: '2px 0 7px' }}>{sub}</div>
-        <input style={{ ...inputStyle, fontSize: 12 }} value={value} onChange={onChange} placeholder="Vlož odkaz na obrázek (URL)" />
+        <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI, margin: '2px 0 8px' }}>{sub}</div>
+        <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={pick} />
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <button type="button" onClick={() => inputRef.current && inputRef.current.click()} disabled={up} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 14px', borderRadius: 9, background: 'rgba(0,32,246,0.06)', border: '1px solid ' + T.border, color: T.primary, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700, cursor: up ? 'default' : 'pointer' }}>
+            <Icon name="camera-bold" size={14} color={T.primary} />
+            {up ? 'Nahrávám…' : (value ? 'Změnit' : 'Nahrát obrázek')}
+          </button>
+          {value && <button type="button" onClick={() => onChange({ target: { value: '' } })} style={{ background: 'none', border: 'none', color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12, cursor: 'pointer' }}>Odebrat</button>}
+        </div>
       </div>
     </div>
   );
@@ -806,6 +824,26 @@ function SettingsProfile() {
   const setPhoto  = (i, v) => setForm(f => { const p = f.photos.slice(); p[i] = v; return { ...f, photos: p }; });
   const addPhoto  = () => setForm(f => ({ ...f, photos: [...f.photos, ''] }));
   const rmPhoto   = i => setForm(f => ({ ...f, photos: f.photos.filter((_, j) => j !== i) }));
+  const [uploadingCompanyPhoto, setUploadingCompanyPhoto] = useStateE(false);
+  const companyPhotoRef = useRefE(null);
+
+  async function _uploadImg(prefix, file, maxDim) {
+    const { data: { session } } = await sb.auth.getSession();
+    const uid = session && session.user ? session.user.id : null;
+    if (!uid || typeof uploadImageE !== 'function') return null;
+    return uploadImageE(uid, prefix, file, maxDim);
+  }
+  async function handleCompanyPhotos(e) {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!files.length) return;
+    setUploadingCompanyPhoto(true);
+    for (const file of files.slice(0, 8)) {
+      const url = await _uploadImg('company', file, 1600);
+      if (url) setForm(f => ({ ...f, photos: [...f.photos.filter(Boolean), url].slice(0, 8) }));
+    }
+    setUploadingCompanyPhoto(false);
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -856,8 +894,8 @@ function SettingsProfile() {
         </div>
 
         {/* Logo + profilovka */}
-        <ImageField label="Logo firmy" sub="PNG / SVG, čtvercové, ideálně 256×256" value={form.logo_url} onChange={set('logo_url')} fallback={ECOMPANY.logo} color={form.branding.color} />
-        <ImageField label="Profilová fotka" sub="Hlavní fotka profilu (např. provozovna)" value={form.avatar_url} onChange={set('avatar_url')} fallback={<Icon name="camera-bold" size={22} color={T.muted} />} color={form.branding.color} />
+        <ImageField label="Logo firmy" sub="Čtvercové, ideálně 256×256" value={form.logo_url} onChange={set('logo_url')} onUpload={f => _uploadImg('logo', f, 512)} fallback={ECOMPANY.logo} color={form.branding.color} />
+        <ImageField label="Profilová fotka" sub="Hlavní fotka profilu (např. provozovna)" value={form.avatar_url} onChange={set('avatar_url')} onUpload={f => _uploadImg('avatar', f, 1200)} fallback={<Icon name="camera-bold" size={22} color={T.muted} />} color={form.branding.color} />
 
         {/* Základní info */}
         <FormRow label="Název firmy">
@@ -912,25 +950,20 @@ function SettingsProfile() {
         </FormRow>
 
         {/* Bonusové fotky */}
-        <FormRow label="Bonusové fotky" sub="Galerie na profilu firmy">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {form.photos.length === 0 && (
-              <div style={{ color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12 }}>Zatím žádné fotky.</div>
-            )}
-            {form.photos.map((url, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: 8, overflow: 'hidden', background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, display: 'grid', placeItems: 'center' }}>
-                  {url ? <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; }} /> : <Icon name="gallery-bold" size={15} color={T.mutedSoft} />}
-                </div>
-                <input style={{ ...inputStyle, fontSize: 12 }} value={url} onChange={e => setPhoto(i, e.target.value)} placeholder="URL fotky" />
-                <button onClick={() => rmPhoto(i)} style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.25)', color: '#f43f5e', cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
-                  <Icon name="trash-bin-trash-bold" size={14} color="#f43f5e" />
-                </button>
+        <FormRow label="Bonusové fotky" sub="Galerie na profilu firmy — nahraj fotky provozovny, týmu…">
+          <input ref={companyPhotoRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handleCompanyPhotos} />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {form.photos.filter(Boolean).map((url, i) => (
+              <div key={i} style={{ position: 'relative', width: 84, height: 84, borderRadius: 10, overflow: 'hidden', border: '1px solid ' + T.border }}>
+                <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; }} />
+                <button type="button" onClick={() => rmPhoto(i)} style={{ position: 'absolute', top: 3, right: 3, width: 20, height: 20, borderRadius: 999, background: 'rgba(0,0,0,0.55)', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 11, lineHeight: 1, display: 'grid', placeItems: 'center' }}>✕</button>
               </div>
             ))}
-            <button onClick={addPhoto} style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, background: 'rgba(0,32,246,0.05)', border: '1px dashed ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-              <Icon name="add-circle-bold" size={14} color={T.light} /> Přidat fotku
-            </button>
+            {form.photos.filter(Boolean).length < 8 && (
+              <button type="button" onClick={() => companyPhotoRef.current && companyPhotoRef.current.click()} disabled={uploadingCompanyPhoto} style={{ width: 84, height: 84, borderRadius: 10, border: '1.5px dashed ' + T.border, background: 'rgba(0,32,246,0.04)', color: T.primary, cursor: uploadingCompanyPhoto ? 'default' : 'pointer', display: 'grid', placeItems: 'center', fontSize: 24, fontWeight: 300 }}>
+                {uploadingCompanyPhoto ? <span style={{ width: 18, height: 18, borderRadius: 999, border: '2.5px solid rgba(0,32,246,0.25)', borderTopColor: T.primary, display: 'inline-block', animation: 'empSpin .7s linear infinite' }} /> : '+'}
+              </button>
+            )}
           </div>
         </FormRow>
 
