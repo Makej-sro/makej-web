@@ -287,7 +287,7 @@ function EMessages() {
                 fontFamily: 'inherit',
               }}>
                 <div style={{ position: 'relative', flexShrink: 0 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 999, background: t.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13 }}>{t.avatar}</div>
+                  <div style={{ width: 38, height: 38, borderRadius: 999, overflow: 'hidden', background: t.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13 }}>{t.avatarUrl ? <img src={t.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : t.avatar}</div>
                   {t.online ? <span style={{ position: 'absolute', bottom: 0, right: 0, width: 10, height: 10, borderRadius: 999, background: '#5BD68A', border: '2px solid #fff' }} /> : null}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -315,12 +315,12 @@ function EMessages() {
               <Icon name="alt-arrow-left-linear" size={20} color={T.ink} />
             </button>
           )}
-          <div style={{ width: 38, height: 38, borderRadius: 999, background: thread.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{thread.avatar}</div>
+          <div style={{ width: 38, height: 38, borderRadius: 999, overflow: 'hidden', background: thread.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{thread.avatarUrl ? <img src={thread.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : thread.avatar}</div>
           <div style={{ flex: 1 }}>
             <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 14, fontWeight: 700 }}>{thread.name}</div>
             <div style={{ color: T.muted, fontSize: 11, fontFamily: T.fontUI }}>{thread.role} · {thread.online ? <span style={{ color: '#5BD68A' }}>online</span> : 'offline'}</div>
           </div>
-          <button title="Profil" onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl })} style={{ padding: isMobile ? 0 : '8px 12px', width: isMobile ? 36 : 'auto', height: isMobile ? 36 : 'auto', flexShrink: 0, borderRadius: 8, background: T.primary, border: '1px solid ' + T.primary, color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <button title="Profil" onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl, avatar_url: thread.avatarUrl })} style={{ padding: isMobile ? 0 : '8px 12px', width: isMobile ? 36 : 'auto', height: isMobile ? 36 : 'auto', flexShrink: 0, borderRadius: 8, background: T.primary, border: '1px solid ' + T.primary, color: '#fff', fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <Icon name="user-id-bold" size={13} color="#fff"/>{!isMobile && 'Profil'}
           </button>
           <button title="Nabídnout směnu" onClick={() => setShowShiftModal(true)} style={{ padding: isMobile ? 0 : '8px 12px', width: isMobile ? 36 : 'auto', height: isMobile ? 36 : 'auto', flexShrink: 0, borderRadius: 8, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.light, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
@@ -422,7 +422,7 @@ function EMessages() {
       {/* Right: candidate context — na mobilu skryto (profil dostupný přes tlačítko) */}
       <aside style={{ width: 280, flexShrink: 0, borderLeft: '1px solid ' + T.border, padding: 20, overflowY: 'auto', background: '#ffffff', display: isMobile ? 'none' : 'flex', flexDirection: 'column' }}>
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
-          <div style={{ width: 84, height: 84, borderRadius: 24, margin: '0 auto', background: 'linear-gradient(160deg, rgba(255,255,255,0.30), rgba(255,255,255,0)), ' + thread.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 28, boxShadow: '0 10px 24px rgba(20,22,40,0.14)' }}>{thread.avatar}</div>
+          <div style={{ width: 84, height: 84, borderRadius: 24, margin: '0 auto', overflow: 'hidden', background: 'linear-gradient(160deg, rgba(255,255,255,0.30), rgba(255,255,255,0)), ' + thread.color, display: 'grid', placeItems: 'center', color: '#fff', fontFamily: T.fontHead, fontWeight: 800, fontSize: 28, boxShadow: '0 10px 24px rgba(20,22,40,0.14)' }}>{thread.avatarUrl ? <img src={thread.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : thread.avatar}</div>
           <div style={{ color: T.ink, fontFamily: T.fontHead, fontSize: 18, fontWeight: 800, marginTop: 12 }}>{thread.name}</div>
           <div style={{ color: T.muted, fontSize: 12.5, fontFamily: T.fontUI, marginTop: 3 }}>{[thread.city, thread.role].filter(Boolean).join(' · ') || 'Brigádník'}</div>
           <div style={{ display: 'inline-flex', gap: 6, marginTop: 10 }}>
@@ -472,7 +472,7 @@ function EMessages() {
           </div>
         )}
 
-        <button onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl })} style={{ width: '100%', marginTop: 'auto', padding: '13px 12px', borderRadius: 12, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Otevřít plný profil + recenze →</button>
+        <button onClick={() => window.empOpenProfile && window.empOpenProfile(thread.worker_id, { name: thread.name, address: thread.city, level: thread.level, jobs_done: thread.jobsDone, rating: thread.rating, verified: thread.verified, cv_url: thread.cvUrl, avatar_url: thread.avatarUrl })} style={{ width: '100%', marginTop: 'auto', padding: '13px 12px', borderRadius: 12, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Otevřít plný profil + recenze →</button>
       </aside>
 
       {/* Shift offer modal */}
