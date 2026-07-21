@@ -98,17 +98,17 @@ img { max-width: 100%; display: block; }
 }
 .nav-inner {
   max-width: 1200px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
 }
 .nav-logo {
+  flex-shrink: 0;
   font-family: var(--font-heading); font-size: 1.8rem; font-weight: 900;
   background: none; -webkit-background-clip: unset; background-clip: unset;
   -webkit-text-fill-color: #ffffff; color: #ffffff;
 }
 .nav-links {
   display: flex; gap: 32px; align-items: center;
-  position: absolute; left: 0; right: 0; justify-content: center;
-  pointer-events: none;
+  flex: 1; justify-content: center; min-width: 0;
 }
 .nav-links a {
   color: #ffffff; font-weight: 500; font-size: .9rem;
@@ -122,9 +122,11 @@ img { max-width: 100%; display: block; }
   color: #fff; font-weight: 700;
   border-bottom-color: #ffffff;
 }
-.nav-actions { display: flex; gap: 12px; align-items: center; opacity: 0; pointer-events: none; transition: opacity .3s; }
+.nav-actions { display: flex; gap: 12px; align-items: center; flex-shrink: 0; opacity: 0; pointer-events: none; transition: opacity .3s; }
 .nav-actions.nav-actions-visible { opacity: 1; pointer-events: all; }
 .nav-actions .btn-ghost, .nav-actions .btn-primary { padding: 10px 20px; font-size: .85rem; }
+/* Na užších desktopech (768–1050) skryj pozdrav, ať se Dashboard nepřekrývá s odkazy */
+@media (max-width: 1050px) { .nav-user-greeting { display: none; } }
 .mobile-menu-btn { display: none; background: none; border: none; color: #fff; cursor: pointer; }
 .mobile-menu {
   display: none; flex-direction: column; gap: 16px;
