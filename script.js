@@ -298,7 +298,6 @@ function initAuth() {
            </a>`;
       navActions.innerHTML = `
         ${dashBtn}
-        <span class="nav-user-greeting">Ahoj, ${name}!</span>
         <button class="btn-ghost" id="logout-btn">Odhlásit se</button>
       `;
       mobileActions.innerHTML = `
