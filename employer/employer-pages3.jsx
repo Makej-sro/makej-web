@@ -26,6 +26,9 @@ const E_THREADS = [
     msgs: [{ from: 'them', text: 'Mám zájem.', t: 'pondělí' }] },
 ];
 
+function _eFmtDur(s) { s = Math.max(0, Math.round(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function _eFmtSize(b) { b = b || 0; if (b < 1024) return b + ' B'; if (b < 1048576) return Math.round(b / 1024) + ' kB'; return (b / 1048576).toFixed(1) + ' MB'; }
+
 function EMessages() {
   const isMobile = useIsMobile();
   // Na mobilu: přepínání mezi seznamem a vláknem
@@ -46,6 +49,18 @@ function EMessages() {
   const [interviewForm, setInterviewForm] = useStateE({ date: '', time: '', location: '', note: '' });
   const userId                  = useRefE(null);
   const scrollRef               = useRefE(null);
+  const [uploadingFile, setUploadingFile] = useStateE(false);
+  const [recording, setRecording] = useStateE(false);
+  const [recSecs,   setRecSecs]   = useStateE(0);
+  const [signedUrls, setSignedUrls] = useStateE({});
+  const attachInputRef = useRefE(null);
+  const recRef      = useRefE(null);
+  const recTimerRef = useRefE(null);
+
+  function _ensureSigned(path) {
+    if (!path || signedUrls[path] || typeof chatSignedUrlE !== 'function') return;
+    chatSignedUrlE(path).then(url => { if (url) setSignedUrls(prev => ({ ...prev, [path]: url })); });
+  }
 
   // Grab current user id once
   useEffectE(() => {
@@ -79,6 +94,63 @@ function EMessages() {
     }
   }, [active, threads]);
 
+  // Předpřiprav podepsané URL pro přílohy v otevřené konverzaci
+  useEffectE(() => {
+    const t = threads.find(x => x.id === active);
+    if (!t) return;
+    t.msgs.forEach(m => { if (m.kind === 'file' && m.fileUrl) _ensureSigned(m.fileUrl); });
+  }, [active, threads]);
+
+  // Odeslání přílohy (fotka / soubor / hlasovka)
+  async function sendFileMessage(fileObj, fileType, duration) {
+    if (!active || !userId.current || uploadingFile || typeof uploadChatFileE !== 'function') return;
+    setUploadingFile(true);
+    const up = await uploadChatFileE(active, fileObj, fileType);
+    if (up) {
+      const payload = { match_id: active, sender_id: userId.current, file_url: up.path, file_type: fileType, file_name: up.name, file_size: up.size };
+      if (duration != null) payload.duration = duration;
+      const { data } = await sb.from('messages').insert(payload).select().single();
+      if (data) {
+        _ensureSigned(up.path);
+        setThreads(prev => prev.map(t => t.id !== active ? t : {
+          ...t,
+          last: fileType === 'image' ? '📷 Fotka' : fileType === 'audio' ? '🎤 Hlasová zpráva' : '📎 Příloha',
+          msgs: t.msgs.some(m => m.id === data.id) ? t.msgs : [...t.msgs, { from: 'me', kind: 'file', fileUrl: up.path, fileType, fileName: up.name, fileSize: up.size, duration, text: '', t: _fmtTime(data.created_at), id: data.id }],
+        }));
+      }
+    }
+    setUploadingFile(false);
+  }
+  function onPickAttach(e) { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) sendFileMessage(f, (f.type || '').startsWith('image/') ? 'image' : 'file'); }
+
+  async function startRecording() {
+    if (recording || !active) return;
+    if (!navigator.mediaDevices || !window.MediaRecorder) { alert('Nahrávání hlasovek prohlížeč nepodporuje.'); return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mr = new MediaRecorder(stream);
+      const chunks = [];
+      mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      mr.onstop = () => {
+        try { stream.getTracks().forEach(t => t.stop()); } catch (_) {}
+        clearInterval(recTimerRef.current);
+        const secs = Math.max(1, Math.round((Date.now() - recRef.current.startedAt) / 1000));
+        const blob = new Blob(chunks, { type: mr.mimeType || 'audio/webm' });
+        setRecording(false); setRecSecs(0); recRef.current = null;
+        if (blob.size > 0) sendFileMessage(blob, 'audio', secs);
+      };
+      recRef.current = { mr, stream, startedAt: Date.now() };
+      mr.start(); setRecording(true); setRecSecs(0);
+      recTimerRef.current = setInterval(() => setRecSecs(s => s + 1), 1000);
+    } catch (e) { console.error('mic:', e); alert('Nepodařilo se spustit mikrofon. Povol přístup k mikrofonu.'); }
+  }
+  function stopRecording(cancel) {
+    const r = recRef.current;
+    if (!r) return;
+    if (cancel) { r.mr.onstop = () => { try { r.stream.getTracks().forEach(t => t.stop()); } catch (_) {} clearInterval(recTimerRef.current); setRecording(false); setRecSecs(0); recRef.current = null; }; }
+    try { r.mr.stop(); } catch (_) {}
+  }
+
   // Realtime: subscribe to new messages for the active thread
   useEffectE(() => {
     if (!active) return;
@@ -100,10 +172,13 @@ function EMessages() {
             ? { from, kind: 'shift', shift: { role: msg.metadata.role, date: msg.metadata.date, time: msg.metadata.time, pay: msg.metadata.pay }, t: _fmtTime(msg.created_at), id: msg.id }
             : isInterview
             ? { from, kind: 'interview', interview: { date: msg.metadata.date, time: msg.metadata.time, location: msg.metadata.location, note: msg.metadata.note }, t: _fmtTime(msg.created_at), id: msg.id }
+            : msg.file_url
+            ? { from, kind: 'file', fileUrl: msg.file_url, fileType: msg.file_type, fileName: msg.file_name, fileSize: msg.file_size, duration: msg.duration, text: msg.text || '', t: _fmtTime(msg.created_at), id: msg.id }
             : { from, text: msg.text, t: _fmtTime(msg.created_at), id: msg.id };
+          if (newMsg.kind === 'file') _ensureSigned(newMsg.fileUrl);
           return {
             ...t,
-            last: isShift ? '📅 Nabídka směny' : isInterview ? '🗓️ Pozvánka na pohovor' : msg.text,
+            last: isShift ? '📅 Nabídka směny' : isInterview ? '🗓️ Pozvánka na pohovor' : msg.file_url ? (msg.file_type === 'image' ? '📷 Fotka' : msg.file_type === 'audio' ? '🎤 Hlasová zpráva' : '📎 Příloha') : msg.text,
             msgs: [...t.msgs, newMsg],
           };
         }));
@@ -362,6 +437,34 @@ function EMessages() {
                 </div>
               );
             }
+            const mine = m.from === 'me';
+            if (m.kind === 'file') {
+              const url = signedUrls[m.fileUrl];
+              const bubbleBg = mine ? 'linear-gradient(135deg, #0020F6, #2D2CA7)' : '#fff';
+              return (
+                <div key={i} style={{ alignSelf: mine ? 'flex-end' : 'flex-start', maxWidth: '70%' }}>
+                  {m.fileType === 'image' ? (
+                    <a href={url || undefined} target="_blank" rel="noopener noreferrer" onClick={e => { if (!url) e.preventDefault(); }} style={{ display: 'block', borderRadius: 14, overflow: 'hidden', border: '1px solid ' + T.border, background: 'rgba(0,32,246,0.05)' }}>
+                      {url ? <img src={url} alt="" style={{ display: 'block', maxWidth: 220, width: '100%', maxHeight: 280, objectFit: 'cover' }} /> : <div style={{ width: 170, height: 110, display: 'grid', placeItems: 'center', color: T.mutedSoft, fontFamily: T.fontUI, fontSize: 12 }}>Načítám…</div>}
+                    </a>
+                  ) : m.fileType === 'audio' ? (
+                    <div style={{ padding: '9px 11px', borderRadius: 14, background: bubbleBg, border: mine ? 'none' : '1px solid ' + T.border, display: 'flex', alignItems: 'center', gap: 8, minWidth: 200 }}>
+                      {url ? <audio controls src={url} style={{ height: 32, maxWidth: 190, flex: 1 }} /> : <span style={{ color: mine ? '#fff' : T.muted, fontFamily: T.fontUI, fontSize: 12, flex: 1 }}>Načítám…</span>}
+                      <span style={{ color: mine ? 'rgba(255,255,255,0.85)' : T.mutedSoft, fontFamily: T.fontMono, fontSize: 10, flexShrink: 0 }}>{_eFmtDur(m.duration)}</span>
+                    </div>
+                  ) : (
+                    <a href={url || undefined} target="_blank" rel="noopener noreferrer" download={m.fileName} onClick={e => { if (!url) e.preventDefault(); }} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 13px', borderRadius: 14, background: bubbleBg, border: mine ? 'none' : '1px solid ' + T.border, textDecoration: 'none', minWidth: 170, maxWidth: 240 }}>
+                      <span style={{ width: 34, height: 34, borderRadius: 9, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 16, background: mine ? 'rgba(255,255,255,0.18)' : 'rgba(0,32,246,0.08)' }}>📎</span>
+                      <span style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ color: mine ? '#fff' : T.ink, fontFamily: T.fontHead, fontSize: 12.5, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.fileName || 'Soubor'}</div>
+                        <div style={{ color: mine ? 'rgba(255,255,255,0.8)' : T.mutedSoft, fontFamily: T.fontUI, fontSize: 11, marginTop: 1 }}>{_eFmtSize(m.fileSize)}{url ? '' : ' · načítám…'}</div>
+                      </span>
+                    </a>
+                  )}
+                  <div style={{ color: T.mutedSoft, fontFamily: T.fontMono, fontSize: 10, marginTop: 4, textAlign: mine ? 'right' : 'left' }}>{m.t}</div>
+                </div>
+              );
+            }
             return (
               <div key={i} style={{ alignSelf: m.from === 'me' ? 'flex-end' : 'flex-start', maxWidth: '65%' }}>
                 <div style={{
@@ -378,19 +481,37 @@ function EMessages() {
         </div>
 
         <div style={{ padding: 16, borderTop: '1px solid ' + T.border, display: 'flex', gap: 8, alignItems: 'center', background: '#ffffff' }}>
-          <input
-            placeholder="Napište zprávu…"
-            value={msgInput}
-            onChange={e => setMsgInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-            style={{ flex: 1, padding: '11px 14px', borderRadius: 10, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontSize: 13, outline: 'none', fontFamily: T.fontUI }}
-          />
-          <button
-            onClick={handleSend}
-            disabled={sending || !msgInput.trim()}
-            style={{ width: 40, height: 38, borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', cursor: 'pointer', display: 'grid', placeItems: 'center', opacity: (sending || !msgInput.trim()) ? 0.5 : 1 }}>
-            <Icon name="plain-bold" size={16} color="#fff"/>
-          </button>
+          <input ref={attachInputRef} type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt,.zip" style={{ display: 'none' }} onChange={onPickAttach} />
+          {recording ? (<>
+            <button onClick={() => stopRecording(true)} title="Zrušit" style={{ width: 38, height: 38, borderRadius: 9, background: 'rgba(244,63,94,0.1)', border: 'none', color: '#f43f5e', cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+              <Icon name="trash-bin-trash-bold" size={16} color="#f43f5e" />
+            </button>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', height: 38, borderRadius: 10, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border }}>
+              <span style={{ width: 9, height: 9, borderRadius: 999, background: '#f43f5e', animation: 'empRecPulse 1s ease-in-out infinite', flexShrink: 0 }} />
+              <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 600 }}>Nahrávám… {_eFmtDur(recSecs)}</span>
+            </div>
+            <button onClick={() => stopRecording(false)} title="Odeslat" style={{ width: 40, height: 38, borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+              <Icon name="plain-bold" size={16} color="#fff" />
+            </button>
+          </>) : (<>
+            <button onClick={() => attachInputRef.current && attachInputRef.current.click()} disabled={uploadingFile} title="Příloha" style={{ width: 38, height: 38, borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, cursor: uploadingFile ? 'default' : 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0, fontSize: 17 }}>
+              {uploadingFile ? <span style={{ width: 16, height: 16, borderRadius: 999, border: '2.5px solid rgba(0,32,246,0.25)', borderTopColor: T.primary, display: 'inline-block', animation: 'empSpin .7s linear infinite' }} /> : '📎'}
+            </button>
+            <input
+              placeholder="Napište zprávu…"
+              value={msgInput}
+              onChange={e => setMsgInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+              style={{ flex: 1, minWidth: 0, padding: '11px 14px', borderRadius: 10, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontSize: 13, outline: 'none', fontFamily: T.fontUI }}
+            />
+            {msgInput.trim() ? (
+              <button onClick={handleSend} disabled={sending} style={{ width: 40, height: 38, borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0, opacity: sending ? 0.5 : 1 }}>
+                <Icon name="plain-bold" size={16} color="#fff"/>
+              </button>
+            ) : (
+              <button onClick={startRecording} title="Nahrát hlasovku" style={{ width: 40, height: 38, borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0, fontSize: 17 }}>🎤</button>
+            )}
+          </>)}
         </div>
 
         {/* Quick replies */}

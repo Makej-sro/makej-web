@@ -181,6 +181,26 @@ async function uploadImageE(userId, prefix, file, maxDim) {
   } catch (e) { console.error('uploadImageE:', e); return null; }
 }
 
+// ── Chat přílohy (private bucket 'chat-prilohy', cesta {matchId}/...) ──
+async function uploadChatFileE(matchId, file, fileType) {
+  if (!matchId || !file) return null;
+  try {
+    let blob = file, ext = 'bin', contentType = file.type || 'application/octet-stream';
+    if (fileType === 'image') { blob = await _eResizeImage(file, 1600, 0.85); ext = 'jpg'; contentType = 'image/jpeg'; }
+    else { const m = (file.name || '').match(/\.([a-z0-9]+)$/i); ext = m ? m[1].toLowerCase() : (fileType === 'audio' ? 'webm' : 'bin'); }
+    const path = `${matchId}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+    const { error } = await sb.storage.from('chat-prilohy').upload(path, blob, { contentType, upsert: false });
+    if (error) { console.error('uploadChatFileE:', error); return null; }
+    return { path, name: file.name || (fileType === 'audio' ? 'Hlasová zpráva' : 'soubor'), size: (blob.size || file.size || 0) };
+  } catch (e) { console.error('uploadChatFileE:', e); return null; }
+}
+async function chatSignedUrlE(path) {
+  if (!path) return null;
+  const { data, error } = await sb.storage.from('chat-prilohy').createSignedUrl(path, 3600);
+  if (error) { console.error('chatSignedUrlE:', error); return null; }
+  return data && data.signedUrl ? data.signedUrl : null;
+}
+
 async function fetchEmployerData(employerId) {
   try {
     const [profileRes, jobsRes] = await Promise.all([
@@ -419,6 +439,7 @@ async function fetchEmployerData(employerId) {
             interview: { date: msg.metadata.date, time: msg.metadata.time, location: msg.metadata.location, note: msg.metadata.note },
             t: _fmtTime(msg.created_at), id: msg.id,
           };
+          if (msg.file_url) return { from, kind: 'file', fileUrl: msg.file_url, fileType: msg.file_type, fileName: msg.file_name, fileSize: msg.file_size, duration: msg.duration, text: msg.text || '', t: _fmtTime(msg.created_at), id: msg.id };
           return { from, text: msg.text, t: _fmtTime(msg.created_at), id: msg.id };
         });
       const lastMsg = threadMsgs[threadMsgs.length - 1];
@@ -722,4 +743,4 @@ async function dismissCancelE(matchId) {
   return true;
 }
 
-Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, deleteJobE, boostJobE, fetchTeamE, createTeamInviteE, removeTeamMemberE, E_TEAM, _teamInviteLink, fetchNotesE, saveNoteE, E_NOTES, submitReviewE, reopenJobE, dismissCancelE, E_REVIEW_QUEUE, E_CANCELLED, _strColor, _relTime, _fmtTime, uploadImageE });
+Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, updateJobE, deleteJobE, boostJobE, fetchTeamE, createTeamInviteE, removeTeamMemberE, E_TEAM, _teamInviteLink, fetchNotesE, saveNoteE, E_NOTES, submitReviewE, reopenJobE, dismissCancelE, E_REVIEW_QUEUE, E_CANCELLED, _strColor, _relTime, _fmtTime, uploadImageE, uploadChatFileE, chatSignedUrlE });
