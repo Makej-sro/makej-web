@@ -482,36 +482,19 @@ function EMessages() {
 
         <div style={{ padding: 16, borderTop: '1px solid ' + T.border, display: 'flex', gap: 8, alignItems: 'center', background: '#ffffff' }}>
           <input ref={attachInputRef} type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt,.zip" style={{ display: 'none' }} onChange={onPickAttach} />
-          {recording ? (<>
-            <button onClick={() => stopRecording(true)} title="Zrušit" style={{ width: 38, height: 38, borderRadius: 9, background: 'rgba(244,63,94,0.1)', border: 'none', color: '#f43f5e', cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
-              <Icon name="trash-bin-trash-bold" size={16} color="#f43f5e" />
-            </button>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', height: 38, borderRadius: 10, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border }}>
-              <span style={{ width: 9, height: 9, borderRadius: 999, background: '#f43f5e', animation: 'empRecPulse 1s ease-in-out infinite', flexShrink: 0 }} />
-              <span style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 600 }}>Nahrávám… {_eFmtDur(recSecs)}</span>
-            </div>
-            <button onClick={() => stopRecording(false)} title="Odeslat" style={{ width: 40, height: 38, borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
-              <Icon name="plain-bold" size={16} color="#fff" />
-            </button>
-          </>) : (<>
-            <button onClick={() => attachInputRef.current && attachInputRef.current.click()} disabled={uploadingFile} title="Příloha" style={{ width: 38, height: 38, borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, cursor: uploadingFile ? 'default' : 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0, fontSize: 17 }}>
-              {uploadingFile ? <span style={{ width: 16, height: 16, borderRadius: 999, border: '2.5px solid rgba(0,32,246,0.25)', borderTopColor: T.primary, display: 'inline-block', animation: 'empSpin .7s linear infinite' }} /> : '📎'}
-            </button>
-            <input
-              placeholder="Napište zprávu…"
-              value={msgInput}
-              onChange={e => setMsgInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-              style={{ flex: 1, minWidth: 0, padding: '11px 14px', borderRadius: 10, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontSize: 13, outline: 'none', fontFamily: T.fontUI }}
-            />
-            {msgInput.trim() ? (
-              <button onClick={handleSend} disabled={sending} style={{ width: 40, height: 38, borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0, opacity: sending ? 0.5 : 1 }}>
-                <Icon name="plain-bold" size={16} color="#fff"/>
-              </button>
-            ) : (
-              <button onClick={startRecording} title="Nahrát hlasovku" style={{ width: 40, height: 38, borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0, fontSize: 17 }}>🎤</button>
-            )}
-          </>)}
+          <button onClick={() => attachInputRef.current && attachInputRef.current.click()} disabled={uploadingFile} title="Příloha" style={{ width: 38, height: 38, borderRadius: 9, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, cursor: uploadingFile ? 'default' : 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0, fontSize: 17 }}>
+            {uploadingFile ? <span style={{ width: 16, height: 16, borderRadius: 999, border: '2.5px solid rgba(0,32,246,0.25)', borderTopColor: T.primary, display: 'inline-block', animation: 'empSpin .7s linear infinite' }} /> : '📎'}
+          </button>
+          <input
+            placeholder="Napište zprávu…"
+            value={msgInput}
+            onChange={e => setMsgInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+            style={{ flex: 1, minWidth: 0, padding: '11px 14px', borderRadius: 10, background: 'rgba(0,32,246,0.05)', border: '1px solid ' + T.border, color: T.ink, fontSize: 13, outline: 'none', fontFamily: T.fontUI }}
+          />
+          <button onClick={handleSend} disabled={sending || !msgInput.trim()} title="Odeslat" style={{ width: 40, height: 38, borderRadius: 9, background: 'linear-gradient(135deg, #0020F6, #2D2CA7)', border: 'none', color: '#fff', cursor: (sending || !msgInput.trim()) ? 'default' : 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0, opacity: (sending || !msgInput.trim()) ? 0.5 : 1 }}>
+            <Icon name="plain-bold" size={16} color="#fff"/>
+          </button>
         </div>
 
         {/* Quick replies */}
