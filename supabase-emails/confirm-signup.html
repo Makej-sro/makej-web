@@ -1,11 +1,11 @@
 <!--
-  Makej! — Potvrzení registrace (Confirm signup)
+  Makej — Potvrzení registrace (Confirm signup)
   Vloz do: Supabase → Authentication → Emails → Templates → "Confirm signup"
 
   SUBJECT (worker i employer, jednoduse):
-    Potvrď svůj email — Makej!
+    Potvrď svůj email — Makej
   NEBO podminene (Supabase podporuje Go sablonu i v Subjectu):
-    {{ if eq .Data.role "employer" }}Vítejte v Makej! pro firmy — potvrďte email{{ else }}Vítej v Makej! — potvrď svůj email{{ end }}
+    {{ if eq .Data.role "employer" }}Vítejte v Makej pro firmy — potvrďte email{{ else }}Vítej v Makej — potvrď svůj email{{ end }}
 -->
 <!DOCTYPE html>
 <html lang="cs" xmlns="http://www.w3.org/1999/xhtml">
@@ -23,7 +23,7 @@
 <body style="margin:0; padding:0; background-color:#e8ecfb; -webkit-font-smoothing:antialiased;">
   <!-- preheader (skryty nahled v inboxu) -->
   <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#e8ecfb;">
-    Klikni na tlačítko a aktivuj svůj účet na Makej!
+    Klikni na tlačítko a aktivuj svůj účet na Makej
   </div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#e8ecfb;">
@@ -35,7 +35,7 @@
           <!-- Header / logo -->
           <tr>
             <td align="center" style="background:linear-gradient(135deg,#0020F6,#2D2CA7); padding:34px 24px;">
-              <div style="font-family:'Inter',Arial,sans-serif; font-size:30px; font-weight:900; color:#ffffff; letter-spacing:-0.5px;">Makej!</div>
+              <div style="font-family:'Inter',Arial,sans-serif; font-size:30px; font-weight:900; color:#ffffff; letter-spacing:-0.5px;">Makej</div>
               <div style="font-family:Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; color:#c9d0ff; text-transform:uppercase; margin-top:4px;">
                 {{ if eq .Data.role "employer" }}pro firmy{{ else }}práce na pár swipů{{ end }}
               </div>
@@ -50,9 +50,9 @@
               </h1>
               <p style="margin:0 0 8px 0; font-size:15px; line-height:1.6; color:#4a4a66;">
                 {{ if eq .Data.role "employer" }}
-                  Díky za registraci do <strong>Makej! pro firmy</strong>. Ještě jeden krok — potvrď svůj email a můžeš začít nabírat brigádníky.
+                  Díky za registraci do <strong>Makej pro firmy</strong>. Ještě jeden krok — potvrď svůj email a můžeš začít nabírat brigádníky.
                 {{ else }}
-                  Díky, že ses přidal/a k <strong>Makej!</strong>. Ještě jeden krok — potvrď svůj email a můžeš začít swipovat nabídky práce.
+                  Díky, že ses přidal/a k <strong>Makej</strong>. Ještě jeden krok — potvrď svůj email a můžeš začít swipovat nabídky práce.
                 {{ end }}
               </p>
             </td>
@@ -99,9 +99,9 @@
           <!-- Footer -->
           <tr>
             <td align="center" style="padding:28px 40px 34px 40px; font-family:'Segoe UI',Arial,sans-serif;">
-              <div style="font-size:13px; font-weight:800; color:#0020F6;">Makej!</div>
+              <div style="font-size:13px; font-weight:800; color:#0020F6;">Makej</div>
               <p style="margin:6px 0 0 0; font-size:11px; color:#9ca3af;">
-                © 2026 Makej! · <a href="{{ .SiteURL }}" style="color:#9ca3af; text-decoration:underline;">makej.eu</a>
+                © 2026 Makej · <a href="{{ .SiteURL }}" style="color:#9ca3af; text-decoration:underline;">makej.eu</a>
               </p>
             </td>
           </tr>

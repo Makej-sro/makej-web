@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const RESEND_API_KEY    = Deno.env.get('RESEND_API_KEY')!;
 const SUPABASE_URL      = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const FROM_EMAIL        = 'Makej! <notifikace@makej.eu>';
+const FROM_EMAIL        = 'Makej <notifikace@makej.eu>';
 const BASE_URL          = 'https://www.makej.eu';
 
 const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE, {
@@ -117,7 +117,7 @@ function emailTemplate({ heading, body, cta, accent }: {
         </td></tr>
         <!-- Footer -->
         <tr><td style="padding:20px 32px;border-top:1px solid rgba(208,208,255,0.1);text-align:center;">
-          <div style="font-size:12px;color:#6e6ea8;">Makej! · <a href="${BASE_URL}" style="color:#8080ff;text-decoration:none;">makej.eu</a></div>
+          <div style="font-size:12px;color:#6e6ea8;">Makej · <a href="${BASE_URL}" style="color:#8080ff;text-decoration:none;">makej.eu</a></div>
         </td></tr>
       </table>
     </td></tr>

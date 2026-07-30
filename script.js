@@ -757,3 +757,70 @@ function showToast(msg) {
   startTimer();
 })();
 
+
+/* ═══════════ REFERENCE — kroužkový sešit s listováním (z Yasin/recenze) ═══════════ */
+(function () {
+  var reviews = [
+    { text: 'Za tři dny jsem měl první brigádu. Večer jsem swipnul pár nabídek a ráno mi napsala kavárna.', name: 'Tomáš H.', role: 'Barista', date: '14. 6. 2025', photo: '' },
+    { text: 'Konečně appka, kde ke každé nabídce nemusím psát životopis. Pár tapů a je to.', name: 'Klára M.', role: 'Servírka', date: '2. 7. 2025', photo: '' },
+    { text: 'Bral jsem to jako přivýdělek při škole, teď tam chodím pravidelně. Firmy odpovídají fakt rychle.', name: 'Petr V.', role: 'Skladník', date: '21. 6. 2025', photo: '' },
+    { text: 'Líbí se mi, že vidím hodinovku hned — žádné „mzda dle dohody".', name: 'Aneta L.', role: 'Výpomoc na eventech', date: '9. 7. 2025', photo: '' },
+    { text: 'Jsem tu skoro od začátku a je vidět, že se to pořád zlepšuje. Super práce!', name: 'Pavel K.', role: 'Rozvoz', date: '18. 7. 2025', photo: '' },
+  ];
+
+  var stack = document.getElementById('ref-stack');
+  if (!stack) return;
+
+  function fill(cardEl, r) {
+    cardEl.querySelector('.ref-name').textContent = r.name;
+    cardEl.querySelector('.ref-meta').textContent = r.role + ' · ' + r.date;
+    cardEl.querySelector('.ref-text').textContent = r.text;
+  }
+
+  var VISIBLE = Math.min(3, reviews.length);
+  var nodes = [];
+  for (var k = 0; k < VISIBLE; k++) {
+    var c = document.createElement('div');
+    c.className = 'rs-card';
+    c.dataset.slot = k;
+    c.innerHTML = '<div class="ref-name"></div><div class="ref-meta"></div><p class="ref-text"></p>';
+    fill(c, reviews[k]);
+    nodes.push(c);
+    stack.appendChild(c);
+  }
+
+  var nextRev = VISIBLE % reviews.length;
+  var busy = false, timer;
+
+  function nodeAtSlot(s) {
+    for (var n = 0; n < nodes.length; n++) if (+nodes[n].dataset.slot === s) return nodes[n];
+    return null;
+  }
+
+  function advance() {
+    if (busy || reviews.length <= 1) return;
+    busy = true;
+    clearInterval(timer);
+
+    var leaving = nodeAtSlot(0);
+    for (var s = 1; s < VISIBLE; s++) {
+      var nd = nodeAtSlot(s);
+      if (nd) nd.dataset.slot = s - 1;
+    }
+    leaving.classList.add('leaving');
+
+    setTimeout(function () {
+      fill(leaving, reviews[nextRev]);
+      nextRev = (nextRev + 1) % reviews.length;
+      leaving.dataset.slot = VISIBLE - 1;
+      leaving.classList.remove('leaving');
+      setTimeout(function () { busy = false; startTimer(); }, 720);
+    }, 540);
+  }
+
+  function startTimer() { clearInterval(timer); timer = setInterval(advance, 6000); }
+
+  stack.addEventListener('click', function () { if (!busy) { advance(); startTimer(); } });
+
+  startTimer();
+})();

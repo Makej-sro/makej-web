@@ -118,7 +118,7 @@ function WSwipe({ tick }) {
       {/* Header */}
       <div style={{ padding: '12px 20px 12px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
-          <div style={{ color: '#0020F6', fontFamily: T.fontHead, fontSize: 28, fontWeight: 900, letterSpacing: -0.8, lineHeight: 1 }}>Makej!</div>
+          <div style={{ color: '#0020F6', fontFamily: T.fontHead, fontSize: 28, fontWeight: 900, letterSpacing: -0.8, lineHeight: 1 }}>Makej</div>
           <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13.5, marginTop: 4 }}>{remaining} {_wPlural(remaining, 'nabídka', 'nabídky', 'nabídek')} v okolí</div>
         </div>
         <div title={`Level ${lvl.level} · ${lvl.title}`} style={{

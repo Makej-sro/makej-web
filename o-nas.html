@@ -11,22 +11,22 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>O nás — Makej!</title>
-  <meta name="description" content="Příběh, hodnoty a tým za Makej! — pracovní platformou nové generace. Swajpuj, matchuj a pracuj." />
+  <title>O nás — Makej</title>
+  <meta name="description" content="Příběh, hodnoty a tým za Makej — pracovní platformou nové generace. Swajpuj, matchuj a pracuj." />
   <meta name="theme-color" content="#0020f6" />
   <link rel="canonical" href="https://makej.eu/o-nas.html" />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://makej.eu/o-nas.html" />
-  <meta property="og:title" content="O nás — Makej!" />
-  <meta property="og:description" content="Příběh, hodnoty a tým za Makej! — pracovní platformou nové generace. Swajpuj, matchuj a pracuj." />
+  <meta property="og:title" content="O nás — Makej" />
+  <meta property="og:description" content="Příběh, hodnoty a tým za Makej — pracovní platformou nové generace. Swajpuj, matchuj a pracuj." />
   <meta property="og:image" content="https://makej.eu/og-image.png" />
   <meta property="og:locale" content="cs_CZ" />
-  <meta property="og:site_name" content="Makej!" />
+  <meta property="og:site_name" content="Makej" />
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="O nás — Makej!" />
-  <meta name="twitter:description" content="Příběh, hodnoty a tým za Makej! — pracovní platformou nové generace." />
+  <meta name="twitter:title" content="O nás — Makej" />
+  <meta name="twitter:description" content="Příběh, hodnoty a tým za Makej — pracovní platformou nové generace." />
   <meta name="twitter:image" content="https://makej.eu/og-image.png" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,251 +34,91 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="stylesheet" href="/style.css?v=23" />
+  <link rel="stylesheet" href="/style.css?v=27" />
   <style>
-    /* ═══════════ O NÁS / ABOUT ═══════════ */
-    #about { padding: 132px 0 60px; }
+    /* ═══════════ O NÁS — světlá stránka ═══════════ */
+    body { background: #ffffff; }
+    body::before { display: none; }
 
-    .about-page-head { text-align: center; max-width: 640px; margin: 0 auto 56px; padding: 92px 24px 0; }
-    .about-page-head h1 {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: clamp(2.6rem, 6vw, 4.2rem); font-weight: 800;
-      line-height: 1.05; letter-spacing: -0.03em; margin: 16px 0 0;
-    }
+    .ab-wrap { max-width: 860px; margin: 0 auto; padding: 150px 24px 40px; }
 
-    /* Manifesto block */
-    .about-manifesto {
-      padding: 72px 80px; border-radius: 24px;
-      background: linear-gradient(135deg, rgba(41,41,120,.7), rgba(22,22,59,.9));
-      border: 1px solid rgba(208,208,255,.12);
-      position: relative; overflow: hidden;
-      margin-bottom: 100px;
+    .ab-title {
+      font-family: var(--font-heading);
+      font-weight: 800; font-size: clamp(2.2rem, 5.2vw, 3.5rem);
+      line-height: 1.08; letter-spacing: -0.02em; color: #16163c; margin: 0 0 26px;
+      text-wrap: balance;
     }
-    .about-manifesto::before {
-      content: ''; position: absolute; inset: 0;
-      background-image: radial-gradient(circle, rgba(208,208,255,.05) 1px, transparent 1.2px);
-      background-size: 44px 44px;
-      mask-image: radial-gradient(ellipse 80% 70% at 80% 50%, #000 20%, transparent 70%);
-      -webkit-mask-image: radial-gradient(ellipse 80% 70% at 80% 50%, #000 20%, transparent 70%);
-      pointer-events: none;
-    }
-    .about-lead {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: clamp(30px, 4.6vw, 68px);
-      line-height: 1.05; letter-spacing: -0.025em; font-weight: 500;
-      margin: 0 0 56px; position: relative;
-    }
-    .about-lead em {
-      font-style: normal;
-      background: linear-gradient(135deg, #7c7cff, #d0d0ff);
-      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .about-principles {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
-      border-top: 1px solid rgba(208,208,255,.1); padding-top: 40px; position: relative;
-    }
-    .about-pill {
-      display: inline-block; padding: 4px 12px;
-      border: 1px solid rgba(208,208,255,.2); border-radius: 100px;
-      font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em;
-      color: var(--muted-fg); margin-bottom: 12px;
-    }
-    .about-principle p { color: rgba(208,208,255,.7); font-size: 14px; line-height: 1.65; margin: 0; }
+    .ab-accent { color: #0020f6; }
 
-    /* Shared block structure */
-    .about-block { margin-bottom: 100px; }
-    .about-block-head {
-      display: grid; grid-template-columns: 380px 1fr; gap: 80px;
-      align-items: end; margin-bottom: 52px;
-    }
-    .about-h2 {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: clamp(34px, 4.5vw, 76px);
-      line-height: 0.95; letter-spacing: -0.03em; font-weight: 600;
-      margin: 12px 0 0;
-    }
-    .about-desc { color: var(--muted-fg); font-size: 15px; line-height: 1.7; align-self: end; max-width: 48ch; }
+    .ab-lead { font-size: 17px; line-height: 1.6; color: #5a5c7a; max-width: 46ch; margin: 0 0 64px; }
 
-    /* Timeline */
-    .about-timeline { display: grid; grid-template-columns: repeat(4, 1fr); }
-    .about-timeline-item {
-      border-top: 1px solid rgba(208,208,255,.12);
-      padding-top: 24px; padding-right: 28px; position: relative;
-    }
-    .about-timeline-item::before {
-      content: ''; position: absolute; top: -5px; left: 0;
-      width: 9px; height: 9px; border-radius: 50%; background: var(--secondary);
-    }
-    .about-yr {
-      font-family: 'JetBrains Mono', monospace; font-size: 12px;
-      letter-spacing: 0.06em; color: var(--secondary); font-weight: 500;
-      display: block; margin-bottom: 12px;
-    }
-    .about-timeline-item h3 {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 20px; font-weight: 600; margin: 0 0 10px; letter-spacing: -0.01em;
-    }
-    .about-timeline-item p { margin: 0; color: var(--muted-fg); font-size: 14px; line-height: 1.6; }
-
-    /* Values grid */
-    .about-values {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 1px; background: rgba(208,208,255,.07);
-      border: 1px solid rgba(208,208,255,.07); border-radius: 20px; overflow: hidden;
-    }
-    .about-value {
-      background: rgba(16,16,42,.7); padding: 44px 36px 52px;
-      display: flex; flex-direction: column; min-height: 340px; position: relative;
-    }
-    .about-value-num {
-      font-family: 'JetBrains Mono', monospace; font-size: 11px;
-      color: var(--muted-fg); letter-spacing: 0.1em;
-    }
-    .about-value h3 {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 24px; font-weight: 600; letter-spacing: -0.02em;
-      margin: auto 0 12px; line-height: 1.15;
-    }
-    .about-value p { margin: 0; color: var(--muted-fg); font-size: 14px; line-height: 1.65; }
-    .about-value-glyph {
-      position: absolute; top: 36px; right: 28px;
-      width: 30px; height: 30px; border-radius: 50%;
-      border: 1.5px solid rgba(208,208,255,.2); display: grid; place-items: center;
-    }
-    .about-value-glyph::after {
-      content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--secondary);
-    }
-    .about-value-highlight { background: rgba(41,41,120,.5); }
-    .about-value-highlight .about-value-glyph { border-color: var(--secondary); }
-
-    /* Numbers */
-    .about-numbers {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      border: 1px solid rgba(208,208,255,.08); border-radius: 20px; overflow: hidden;
-    }
-    .about-num-cell {
-      padding: 44px 32px; border-right: 1px solid rgba(208,208,255,.08);
-      background: rgba(22,22,59,.4);
-    }
-    .about-num-cell:last-child { border-right: none; }
-    .about-big {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: clamp(40px, 4.5vw, 76px);
-      line-height: 1; letter-spacing: -0.04em; font-weight: 600;
-      background: linear-gradient(135deg, #7c7cff, #d0d0ff);
-      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .about-num-lbl { margin-top: 14px; font-size: 13px; color: var(--muted-fg); line-height: 1.5; max-width: 22ch; }
-    .about-delta {
-      display: inline-flex; align-items: center;
-      font-family: 'JetBrains Mono', monospace; font-size: 11px;
-      color: var(--secondary); margin-top: 12px; letter-spacing: 0.04em;
-      padding: 3px 8px; background: rgba(208,208,255,.07);
-      border-radius: 4px; border: 1px solid rgba(208,208,255,.1);
+    .ab-label {
+      display: block; font-family: var(--font-heading); font-weight: 800;
+      font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #0020f6; margin-bottom: 14px;
     }
 
-    /* Team */
-    .about-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-    .about-person { text-align: center; align-items: center; }
-    .about-person { display: flex; flex-direction: column; gap: 12px; }
-    .about-photo {
-      aspect-ratio: 4/5; background: rgba(22,22,59,.6);
-      border: 1px solid rgba(208,208,255,.08); border-radius: 16px;
-      display: grid; place-items: center; position: relative; overflow: hidden;
-    }
-    .about-photo::before {
-      content: ''; position: absolute; inset: 0;
-      background: repeating-linear-gradient(135deg, rgba(208,208,255,.04) 0 1px, transparent 1px 20px);
-    }
-    .about-photo::after {
-      content: 'FOTO'; font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; letter-spacing: 0.12em; color: var(--muted-fg); opacity: 0.4;
-      position: relative; z-index: 1;
-    }
-    .about-photo-badge {
-      position: absolute; top: 10px; left: 10px;
-      background: rgba(15,15,45,.85); backdrop-filter: blur(6px);
-      padding: 3px 10px; border-radius: 100px;
-      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
-      color: var(--secondary); border: 1px solid rgba(208,208,255,.14); z-index: 2;
-    }
-    .about-person h4 {
-      margin: 0; font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
-    }
-    .about-role { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted-fg); letter-spacing: 0.04em; }
+    .ab-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-bottom: 76px; }
+    .ab-cols p { margin: 0; font-size: 15px; line-height: 1.7; color: #5a5c7a; }
 
-    /* Quote */
-    .about-quote {
-      display: grid; grid-template-columns: 72px 1fr; gap: 40px; align-items: start;
-      padding: 80px 0; border-top: 1px solid rgba(208,208,255,.07);
-      border-bottom: 1px solid rgba(208,208,255,.07); margin-bottom: 80px;
+    /* Tým */
+    .ab-team-block { margin-bottom: 40px; }
+    .ab-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 24px; }
+    .ab-person { display: flex; flex-direction: column; gap: 14px; }
+    .ab-photo {
+      border-radius: 16px; background: #eef0f7; border: 1px solid rgba(22,22,60,.06);
+      display: grid; place-items: center; overflow: hidden;
     }
-    .about-quote-mark {
-      font-family: 'Bricolage Grotesque', sans-serif; font-size: 88px;
-      line-height: 0.6; font-weight: 400;
-      background: linear-gradient(135deg, #7c7cff, #d0d0ff);
-      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    .ab-person .ab-photo { aspect-ratio: 4/3; }
+    .ab-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ab-photo-inner { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #9aa0bf; }
+    .ab-photo-inner iconify-icon { font-size: 30px; opacity: .55; }
+    .ab-photo-inner span { font-size: 12.5px; color: #8a90b0; }
+    .ab-name { font-family: var(--font-heading); font-weight: 700; font-size: 16px; color: #16163c; }
+    .ab-photo-wide { aspect-ratio: 16/6; }
+
+    .ab-divider { height: 1px; background: rgba(22,22,60,.1); margin: 64px 0 60px; }
+
+    /* Citát */
+    .ab-quote { text-align: center; max-width: 640px; margin: 0 auto 40px; }
+    .ab-quote p {
+      font-family: var(--font-heading); font-weight: 700;
+      font-size: clamp(20px, 2.6vw, 28px); line-height: 1.35; letter-spacing: -0.01em;
+      color: #16163c; margin: 0 0 18px; text-wrap: balance;
     }
-    .about-quote blockquote {
-      margin: 0; font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: clamp(22px, 3vw, 42px); line-height: 1.2;
-      letter-spacing: -0.02em; font-weight: 400;
+    .ab-quote cite { font-style: normal; font-size: 13.5px; color: #8a90b0; }
+
+    /* CTA */
+    .ab-cta { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; padding-bottom: 40px; }
+    .ab-btn-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 100px;
+      background: #fff; color: #16163c; border: 1px solid rgba(22,22,60,.16);
+      font-weight: 700; font-size: .95rem;
+      transition: border-color .2s ease, transform .2s ease;
     }
-    .about-quote cite {
-      display: block; margin-top: 24px; font-style: normal;
-      font-family: 'JetBrains Mono', monospace; font-size: 12px;
-      color: var(--muted-fg); letter-spacing: 0.04em;
+    @media (hover: hover) and (pointer: fine) {
+      .ab-btn-outline:hover { border-color: rgba(22,22,60,.4); transform: translateY(-2px); }
     }
 
-    /* Career CTA */
-    .about-career {
-      display: grid; grid-template-columns: 1.4fr 1fr; gap: 80px; align-items: end;
-      padding: 72px 80px; border-radius: 24px;
-      background: linear-gradient(135deg, rgba(41,41,120,.5), rgba(22,22,59,.8));
-      border: 1px solid rgba(208,208,255,.1);
-      position: relative; overflow: hidden;
-    }
-    .about-career::before {
-      content: ''; position: absolute; right: -10%; top: -50%;
-      width: 60%; aspect-ratio: 1/1; border-radius: 50%;
-      background: radial-gradient(circle, rgba(58,58,153,.5) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .about-career h2 {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: clamp(32px, 4vw, 72px); line-height: 0.95;
-      letter-spacing: -0.03em; font-weight: 600; margin: 0; position: relative;
-    }
-    .about-career-right { position: relative; display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
-    .about-career-right p { color: var(--muted-fg); font-size: 15px; line-height: 1.65; margin: 0; max-width: 34ch; }
+    /* Updatlej modrý footer (jako na indexu) */
+    #footer { background: #0020f6; border-top: none; }
+    #footer .footer-logo { background: none !important; -webkit-text-fill-color: #fff !important; color: #fff !important; }
+    #footer .footer-brand > p,
+    #footer .footer-col h4,
+    #footer .footer-col a,
+    #footer .footer-bottom span { color: rgba(255,255,255,.85) !important; }
+    #footer .footer-col a:hover { color: #fff !important; }
+    #footer .footer-bottom { border-top-color: rgba(255,255,255,.18); }
+    #footer .footer-social a { background: rgba(255,255,255,.12); color: #fff; }
+    #footer .footer-social a:hover { background: rgba(255,255,255,.22); }
 
-    /* About responsive */
-    @media (max-width: 1024px) {
-      .about-block-head { grid-template-columns: 1fr; gap: 24px; }
-      .about-numbers { grid-template-columns: 1fr 1fr; }
-      .about-num-cell:nth-child(2) { border-right: none; }
-      .about-num-cell:nth-child(3) { border-top: 1px solid rgba(208,208,255,.08); border-right: 1px solid rgba(208,208,255,.08); }
-      .about-num-cell:nth-child(4) { border-top: 1px solid rgba(208,208,255,.08); }
-      .about-career { grid-template-columns: 1fr; gap: 40px; padding: 56px 48px; }
-    }
-    @media (max-width: 768px) {
-      #about { padding: 100px 0 40px; }
-      .about-manifesto { padding: 36px 28px; margin-bottom: 64px; }
-      .about-principles { grid-template-columns: 1fr; gap: 24px; }
-      .about-timeline { grid-template-columns: 1fr 1fr; gap: 32px; }
-      .about-timeline-item { padding-right: 12px; }
-      .about-values { grid-template-columns: 1fr; }
-      .about-value { min-height: auto; padding: 32px 28px 40px; }
-      .about-numbers { grid-template-columns: 1fr 1fr; }
-      .about-num-cell { border-right: none; border-bottom: 1px solid rgba(208,208,255,.08); padding: 32px 24px; }
-      .about-num-cell:last-child { border-bottom: none; }
-      .about-team { grid-template-columns: 1fr 1fr; }
-      .about-quote { grid-template-columns: 1fr; gap: 16px; padding: 56px 0; }
-      .about-quote-mark { font-size: 56px; }
-      .about-career { padding: 40px 28px; gap: 32px; }
-      .about-block { margin-bottom: 64px; }
-      .about-block-head { margin-bottom: 36px; }
+    @media (max-width: 760px) {
+      .ab-wrap { padding: 120px 20px 32px; }
+      .ab-cols { grid-template-columns: 1fr; gap: 32px; margin-bottom: 56px; }
+      .ab-team { grid-template-columns: 1fr; gap: 18px; }
+      .ab-person .ab-photo { aspect-ratio: 16/9; }
+      .ab-photo-wide { aspect-ratio: 16/9; }
     }
   </style>
 </head>
@@ -287,7 +127,7 @@
   <!-- ═══════════ NAV ═══════════ -->
   <nav id="navbar">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">Makej!</a>
+      <a href="/" class="nav-logo">Makej</a>
       <div class="nav-links">
         <a href="/hledam-si-praci.html">Hledám si práci</a>
         <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
@@ -316,91 +156,53 @@
 
   <!-- ═══════════ MAIN ═══════════ -->
   <main>
-    <div class="about-page-head">
-      <h1>Příběh za <span class="gradient-text">Makej!</span></h1>
-    </div>
+    <div class="ab-wrap nav-light">
+      <h1 class="ab-title">Vznikli jsme ze <span class="ab-accent">školního projektu.</span><br>Zůstali jsme, protože to má smysl.</h1>
+      <p class="ab-lead">Makej se zrodil na vysoké škole, když jsme řešili zadaný projekt na reálnou firmu — a skončili u problému, se kterým jsme se sami trápili.</p>
 
-    <section id="about">
-      <div class="container">
-
-        <!-- Manifesto -->
-        <div class="about-manifesto">
-          <p class="about-lead">Hledání brigády <em>nemá být</em> druhá brigáda.</p>
-          <div class="about-principles">
-            <div class="about-principle">
-              <span class="about-pill">01 — Princip</span>
-              <p>Stavíme nejjednodušší most mezi člověkem, co má pár volných hodin, a firmou, co potřebuje ruce. Tečka.</p>
-            </div>
-            <div class="about-principle">
-              <span class="about-pill">02 — Princip</span>
-              <p>Žádné poplatky za to, že chcete pracovat. Žádné skryté podmínky. Žádné agenturní marže.</p>
-            </div>
-            <div class="about-principle">
-              <span class="about-pill">03 — Princip</span>
-              <p>Hodnocení jdou oběma směry. Spravedlivý vztah začíná tím, že mluvíme jako sobě rovní.</p>
-            </div>
-          </div>
+      <div class="ab-cols">
+        <div class="ab-col">
+          <span class="ab-label">Co nás štvalo</span>
+          <p>Hledání brigády bylo samo o sobě druhá práce — zmatené weby, staré formuláře, žádná zpětná vazba. Chtěli jsme prostředí, které je moderní, zábavné a jednoduché.</p>
         </div>
-
-        <!-- Příběh -->
-        <div class="about-block">
-          <div class="about-block-head">
-            <div>
-              <h2 class="about-h2">Začalo to ve společné hodině na VŠ</h2>
-            </div>
-            <p class="about-desc">Nápad na Makej! se zrodil v jedné z hodin na vysoké škole. Jakožto spolužáci jsme měli zadaný projekt na vytvoření reálné firmy — myšlenka moderní aplikace propojující lidi, co práci zadávají, i ty, kdo o ni mají zájem, nás naprosto uchvátila. Primárně jsme se chtěli soustředit na jednorázové přivýdělky, každopádně časem jsme usoudili, že se chceme soustředit na trh práce komplexně.</p>
-          </div>
+        <div class="ab-col">
+          <span class="ab-label">Co jsme chtěli postavit</span>
+          <p>Most mezi lidmi, kteří potřebují jednorázově pomoct, a kýmkoliv ochotným přiložit ruku k dílu — od babičky, co potřebuje pomoct na zahradě, po kohokoliv s pár volnými hodinami.</p>
         </div>
-
-        <!-- Tým -->
-        <div class="about-block">
-          <div class="about-block-head">
-            <div>
-              <h2 class="about-h2">Tým Makej!</h2>
-            </div>
-            <p class="about-desc">Malý, sehraný tým. Spolužáci z VŠ s velkými ambicemi.</p>
-          </div>
-          <div class="about-team">
-            <div class="about-person">
-              <div class="about-photo"></div>
-              <h4>Samuel Pšeja</h4>
-            </div>
-            <div class="about-person">
-              <div class="about-photo"></div>
-              <h4>Jan Weber</h4>
-            </div>
-            <div class="about-person">
-              <div class="about-photo"></div>
-              <h4>Yasin Benmerzouk</h4>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quote -->
-        <div class="about-quote">
-          <div class="about-quote-mark">„</div>
-          <div>
-            <blockquote>Postavili jsme Makej, abychom mohli říct, že najít si práci může být jednoduché a zábavné...</blockquote>
-            <cite>— Tým Makej! 2026</cite>
-          </div>
-        </div>
-
-        <!-- Kariéra CTA -->
-        <div class="about-career" id="kariera">
-          <div class="about-career-left">
-            <h2>Stavíš s námi <span class="gradient-text">další kapitolu?</span></h2>
-          </div>
-          <div class="about-career-right">
-            <p>Chceš pracovat v Makej? Jsme malý tým s velkými ambicemi — hledáme lidi, kteří chtějí budovat něco reálného.</p>
-            <a href="mailto:samuel.pseja@makej.eu?subject=Kariéra v Makej!" class="btn-primary btn-lg">
-              <iconify-icon icon="solar:arrow-right-bold" width="18"></iconify-icon>
-              Otevřené pozice
-            </a>
-          </div>
-        </div>
-
       </div>
-    </section>
+
+      <div class="ab-team-block">
+        <span class="ab-label">Tým</span>
+        <div class="ab-team">
+          <div class="ab-person">
+            <div class="ab-photo"><div class="ab-photo-inner"><iconify-icon icon="solar:gallery-bold"></iconify-icon><span>Fotka — Samuel</span></div></div>
+            <div class="ab-name">Samuel Pšeja</div>
+          </div>
+          <div class="ab-person">
+            <div class="ab-photo"><div class="ab-photo-inner"><iconify-icon icon="solar:gallery-bold"></iconify-icon><span>Fotka — Jan</span></div></div>
+            <div class="ab-name">Jan Weber</div>
+          </div>
+          <div class="ab-person">
+            <div class="ab-photo"><div class="ab-photo-inner"><iconify-icon icon="solar:gallery-bold"></iconify-icon><span>Fotka — Yasin</span></div></div>
+            <div class="ab-name">Yasin Benmerzouk</div>
+          </div>
+        </div>
+        <div class="ab-photo ab-photo-wide"><div class="ab-photo-inner"><iconify-icon icon="solar:gallery-bold"></iconify-icon><span>Společná fotka týmu</span></div></div>
+      </div>
+
+      <div class="ab-divider"></div>
+
+      <div class="ab-quote">
+        <p>„Postavili jsme Makej, abychom mohli říct, že najít si práci — nebo pomocnou ruku — může být jednoduché a zábavné."</p>
+        <cite>— Tým Makej, 2026</cite>
+      </div>
+
+      <div class="ab-cta">
+        <a href="/#download" class="btn-primary btn-lg">Stáhnout aplikaci</a>
+        <a href="https://instagram.com/makej.eu" class="ab-btn-outline" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://tiktok.com/@makej.eu" class="ab-btn-outline" target="_blank" rel="noopener">TikTok</a>
+      </div>
+    </div>
   </main>
 
   <!-- ═══════════ FOOTER ═══════════ -->
@@ -408,18 +210,19 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a href="/" class="footer-logo">Makej!</a>
+          <a href="/" class="footer-logo">Makej</a>
           <p>Pracovní platforma nové generace. Propojujeme lidi s příležitostmi.</p>
           <div class="footer-social">
-            <a href="#" aria-label="Instagram"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a>
-            <a href="#" aria-label="TikTok"><iconify-icon icon="ic:baseline-tiktok" width="22"></iconify-icon></a>
-            <a href="#" aria-label="LinkedIn"><iconify-icon icon="mdi:linkedin" width="22"></iconify-icon></a>
+            <a href="https://www.instagram.com/makej.eu" aria-label="Instagram" target="_blank" rel="noopener"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a>
+            <a href="https://www.tiktok.com/@makejaplikace" aria-label="TikTok" target="_blank" rel="noopener"><iconify-icon icon="ic:baseline-tiktok" width="22"></iconify-icon></a>
+            <a href="https://www.linkedin.com/company/makej-s-r-o/" aria-label="LinkedIn" target="_blank" rel="noopener"><iconify-icon icon="mdi:linkedin" width="22"></iconify-icon></a>
           </div>
         </div>
         <div class="footer-col">
           <h4>Produkt</h4>
           <a href="/hledam-si-praci.html">Hledám si práci</a>
           <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+          <a href="/pro-zamestnavatele.html#pricing">Ceník</a>
           <a href="/#download">Stáhnout</a>
         </div>
         <div class="footer-col">
@@ -436,51 +239,155 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <span>© 2026 Makej! Všechna práva vyhrazena.</span>
+        <span>© 2026 Makej Všechna práva vyhrazena.</span>
       </div>
     </div>
   </footer>
 
-  <!-- Modals -->
+    <!-- Modals -->
   <div class="modal-overlay" id="modal-overlay">
-    <div class="modal" id="login-modal">
+
+    <!-- LOGIN MODAL -->
+    <div class="modal" id="login-modal" style="overflow:visible;">
+      <!-- Makač peeker -->
+      <div id="main-peeker" style="
+        position:absolute; top:-70px; left:50%; transform:translateX(-50%);
+        pointer-events:none; z-index:3;
+        filter: drop-shadow(0 14px 36px rgba(0,0,60,0.65));
+        transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+        animation: peekerIn 0.45s cubic-bezier(.2,.8,.2,1) both;
+      ">
+        <div style="width:88px;height:76px;background:linear-gradient(160deg,#4848c4 0%,#1c1c7a 100%);border-radius:50% 50% 44% 44%;position:relative;box-shadow:0 14px 36px rgba(0,0,60,0.65),inset 0 1px 0 rgba(255,255,255,0.18);border:2px solid rgba(140,140,255,0.3);">
+          <div id="main-browL" style="position:absolute;left:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-browR" style="position:absolute;right:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-eyeL" style="position:absolute;left:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilL" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidL" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div id="main-eyeR" style="position:absolute;right:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilR" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidR" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div style="position:absolute;bottom:11px;left:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+          <div style="position:absolute;bottom:11px;right:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+        </div>
+      </div>
       <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
-      <div class="modal-logo">Makej!</div>
+      <div class="modal-logo">Makej</div>
       <h2 class="modal-title">Přihlásit se</h2>
-      <p class="modal-subtitle">Vítej zpět!</p>
+      <p class="modal-subtitle">Vítej zpět! Přihlaš se ke svému účtu.</p>
       <div class="modal-error" id="login-error"></div>
       <form id="login-form" novalidate>
-        <div class="form-group"><label class="form-label" for="login-email">Email</label><input class="form-input" type="email" id="login-email" placeholder="tvuj@email.cz" autocomplete="email" required /></div>
-        <div class="form-group"><label class="form-label" for="login-password">Heslo</label><input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required /></div>
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email</label>
+          <input class="form-input" type="email" id="login-email" placeholder="tvuj@email.cz" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Heslo</label>
+          <input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
         <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
       </form>
       <div class="modal-divider"><span>nebo</span></div>
-      <button class="btn-google" id="login-google"><iconify-icon icon="flat-color-icons:google" width="18"></iconify-icon> Pokračovat přes Google</button>
-      <p class="modal-switch">Nemáš účet? <a href="javascript:void(0)" id="switch-to-register">Zaregistruj se</a></p>
+      <button class="btn-google" id="login-google">
+        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.6 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.3C29.4 35.5 26.8 36.5 24 36.5c-5.2 0-9.6-3.4-11.2-8l-6.6 5C9.7 39.7 16.3 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.2 5.3C37.5 39.7 44 35.4 44 24c0-1.3-.1-2.6-.4-3.9z"/>
+        </svg>
+        Pokračovat s Google
+      </button>
+      <p class="modal-switch">Nemáš účet? <a href="#" id="switch-to-register">Zaregistruj se</a></p>
     </div>
-    <div class="modal" id="register-modal" style="display:none;">
+
+    <!-- REGISTER MODAL -->
+    <div class="modal" id="register-modal">
       <button class="modal-close" id="register-close" aria-label="Zavřít">✕</button>
-      <div class="modal-logo">Makej!</div>
-      <h2 class="modal-title">Vytvořit účet</h2>
-      <p class="modal-subtitle">Začni swipovat práci ještě dnes.</p>
-      <div class="modal-error" id="register-error"></div>
-      <div id="register-step-1">
-        <div style="display:flex;gap:10px;margin-bottom:20px;">
-          <button type="button" class="role-btn" id="role-worker" onclick="selectRole('worker')"><iconify-icon icon="solar:user-bold" width="20"></iconify-icon><span>Hledám práci</span></button>
-          <button type="button" class="role-btn" id="role-employer" onclick="selectRole('employer')"><iconify-icon icon="solar:buildings-bold" width="20"></iconify-icon><span>Hledám lidi</span></button>
+      <div class="modal-logo">Makej</div>
+
+      <!-- Krok 1: výběr role -->
+      <div id="reg-step-1">
+        <h2 class="modal-title">Vytvořit účet</h2>
+        <p class="modal-subtitle">Kdo jsi?</p>
+        <div class="role-cards">
+          <button type="button" class="role-card" data-role="worker">
+            <iconify-icon icon="solar:user-bold" width="32"></iconify-icon>
+            <strong>Brigádník</strong>
+            <small>Hledám práci</small>
+          </button>
+          <button type="button" class="role-card" data-role="employer">
+            <iconify-icon icon="solar:buildings-bold" width="32"></iconify-icon>
+            <strong>Zaměstnavatel</strong>
+            <small>Hledám brigádníky</small>
+          </button>
         </div>
-        <button type="button" class="btn-primary btn-full btn-lg" onclick="goToStep2()">Pokračovat</button>
       </div>
-      <div id="register-step-2" style="display:none;">
+
+      <!-- Krok 2: údaje -->
+      <div id="reg-step-2" style="display:none">
+        <button class="modal-back" id="reg-back">
+          <iconify-icon icon="solar:arrow-left-bold" width="16"></iconify-icon>
+          Zpět
+        </button>
+        <h2 class="modal-title">Tvoje údaje</h2>
+        <p class="modal-subtitle" id="reg-role-subtitle">Brigádník</p>
+        <div class="modal-error" id="register-error"></div>
         <form id="register-form" novalidate>
-          <div class="form-group"><label class="form-label" for="reg-name">Jméno</label><input class="form-input" type="text" id="reg-name" placeholder="Jan Novák" required /></div>
-          <div class="form-group" id="reg-company-group" style="display:none;"><label class="form-label" for="reg-company">Název firmy</label><input class="form-input" type="text" id="reg-company" placeholder="Moje firma s.r.o." /></div>
-          <div class="form-group"><label class="form-label" for="reg-email">Email</label><input class="form-input" type="email" id="reg-email" placeholder="tvuj@email.cz" required /></div>
-          <div class="form-group"><label class="form-label" for="reg-password">Heslo</label><input class="form-input" type="password" id="reg-password" placeholder="Alespoň 8 znaků" required /></div>
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Jméno</label>
+            <input class="form-input" type="text" id="reg-name" placeholder="Tvoje jméno" autocomplete="name" required />
+          </div>
+          <div class="form-group" id="reg-company-group" style="display:none">
+            <label class="form-label" for="reg-company">Název firmy</label>
+            <input class="form-input" type="text" id="reg-company" placeholder="Název tvé firmy" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email</label>
+            <input class="form-input" type="email" id="reg-email" placeholder="tvuj@email.cz" autocomplete="email" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Heslo</label>
+            <div class="password-wrap">
+              <input class="form-input" type="password" id="reg-password" placeholder="Min. 6 znaků" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" id="reg-pw-toggle" aria-label="Zobrazit heslo" tabindex="-1">
+                <iconify-icon icon="solar:eye-bold" width="18" id="reg-pw-icon"></iconify-icon>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password2">Heslo znovu</label>
+            <div class="password-wrap">
+              <input class="form-input" type="password" id="reg-password2" placeholder="Zopakuj heslo" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" id="reg-pw2-toggle" aria-label="Zobrazit heslo" tabindex="-1">
+                <iconify-icon icon="solar:eye-bold" width="18" id="reg-pw2-icon"></iconify-icon>
+              </button>
+            </div>
+          </div>
           <button type="submit" class="btn-primary btn-full btn-lg" id="register-submit">Vytvořit účet</button>
+          <p style="font-size:.78rem;color:var(--muted-fg);text-align:center;margin-top:12px;line-height:1.5;">
+            Registrací souhlasíš s našimi <a href="/terms.html" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
+            a <a href="/privacy.html" target="_blank" style="color:var(--secondary)">Zásadami ochrany osobních údajů</a>.
+          </p>
         </form>
       </div>
-      <p class="modal-switch">Máš účet? <a href="javascript:void(0)" id="switch-to-login">Přihlásit se</a></p>
+
+      <p class="modal-switch">Už máš účet? <a href="#" id="switch-to-login">Přihlásit se</a></p>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ COOKIE BANNER ═══════════ -->
+  <div id="cookie-banner" role="dialog" aria-label="Souhlas s cookies" aria-live="polite">
+    <div class="cookie-inner">
+      <p class="cookie-text">
+        🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
+        Žádné reklamní trackery. Více informací v naší <a href="/privacy.html#cookies">Politice ochrany soukromí</a>.
+      </p>
+      <div class="cookie-actions">
+        <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
+        <button class="cookie-btn cookie-btn-accept" id="cookie-accept">Rozumím, souhlasím</button>
+      </div>
     </div>
   </div>
 

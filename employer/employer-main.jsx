@@ -36,14 +36,14 @@ function EEmptyState() {
           Zatím žádné inzeráty
         </div>
         <div style={{ marginTop: 8, fontSize: 13, color: T.muted, fontFamily: T.fontUI, lineHeight: 1.6 }}>
-          Vytvořte první inzerát v mobilní aplikaci Makej! a kandidáti se začnou ozývat.
+          Vytvořte první inzerát v mobilní aplikaci Makej a kandidáti se začnou ozývat.
         </div>
         <div style={{
           marginTop: 20, padding: '12px 20px', borderRadius: 12,
           background: 'rgba(91,107,255,0.12)', border: '1px solid rgba(91,107,255,0.25)',
           color: T.light, fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.5,
         }}>
-          📱 Stáhněte aplikaci Makej! a přidejte první brigádu
+          📱 Stáhněte aplikaci Makej a přidejte první brigádu
         </div>
       </div>
     </div>

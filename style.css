@@ -55,6 +55,12 @@ img { max-width: 100%; display: block; }
 .section-header { text-align: center; margin-bottom: 64px; }
 .section-header h2 { font-family: var(--font-heading); font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 16px; text-wrap: balance; }
 .section-header p { color: var(--muted-fg); font-size: 1.1rem; max-width: 560px; margin: 0 auto; text-wrap: pretty; }
+.section-tag {
+  display: inline-block; padding: 6px 16px; border-radius: 100px;
+  background: rgba(41,41,120,.4); border: 1px solid rgba(208,208,255,.15);
+  color: var(--secondary); font-size: .8rem; font-weight: 600;
+  letter-spacing: .05em; text-transform: uppercase; margin-bottom: 16px;
+}
 
 /* ═══════════ BUTTONS ═══════════ */
 .btn-primary {
@@ -478,92 +484,67 @@ img { max-width: 100%; display: block; }
   .testimonials-grid { grid-template-columns: 1fr; }
 }
 
-/* ═══════════ MAKÁČI SEKCE ═══════════ */
-#makaci { padding: 120px 0 80px; background: #fff; }
-#makaci .section-header h2 { color: #0020f6; }
-#makaci .section-header p { color: #0020f6; }
-
-.makaci-stage {
-  position: relative;
-  height: 620px;
-  max-width: 1200px;
-  margin: 0 auto;
-  overflow-x: clip;   /* karty kolotoče (±340/600 px) nesmí přetahovat stránku do boku */
+/* ═══════════ REFERENCE (štos karet) ═══════════ */
+#makaci { padding: 120px 0; background: #fff; overflow: hidden; }
+.ref-grid {
+  display: grid; grid-template-columns: 1fr 1.05fr; gap: 60px;
+  align-items: center; max-width: 1200px; margin: 0 auto;
 }
-
-.makac-wrap {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  cursor: pointer;
-  transition: transform 0.65s cubic-bezier(.4,0,.2,1), opacity 0.5s ease;
+.ref-title {
+  font-family: var(--font-heading); font-size: clamp(2rem, 3.4vw, 2.9rem);
+  font-weight: 800; line-height: 1.1; letter-spacing: -.02em;
+  color: #0a0d2e; margin: 0 0 20px;
 }
-.makac-wrap.no-transition { transition: none !important; }
+.ref-hint { font-size: .95rem; color: rgba(10,13,46,.5); margin: 0; }
 
-.makac-wrap[data-pos="-5"] { transform: translateX(calc(-50% - 600px)) scale(1); opacity: 0; z-index: 1; pointer-events: none; }
-.makac-wrap[data-pos="-4"] { transform: translateX(calc(-50% - 600px)) scale(1); opacity: 0; z-index: 1; pointer-events: none; }
-.makac-wrap[data-pos="-3"] { transform: translateX(calc(-50% - 600px)) scale(1); opacity: 0; z-index: 1; pointer-events: none; }
-.makac-wrap[data-pos="-2"] { transform: translateX(calc(-50% - 600px)) scale(1); opacity: 0; z-index: 1; pointer-events: none; }
-.makac-wrap[data-pos="-1"] { transform: translateX(calc(-50% - 340px)) scale(1); opacity: 1; z-index: 2; }
-.makac-wrap[data-pos="0"]  { transform: translateX(-50%) scale(1); opacity: 1; z-index: 5; }
-.makac-wrap[data-pos="1"]  { transform: translateX(calc(-50% + 340px)) scale(1); opacity: 1; z-index: 2; }
-.makac-wrap[data-pos="2"]  { transform: translateX(calc(-50% + 600px)) scale(1); opacity: 0; z-index: 1; pointer-events: none; }
-.makac-wrap[data-pos="3"]  { transform: translateX(calc(-50% + 600px)) scale(1); opacity: 0; z-index: 1; pointer-events: none; }
-
-.makac-img {
-  height: 420px;
-  width: auto;
-  display: block;
-  filter: drop-shadow(0 18px 36px rgba(0,20,180,.35));
-  transition: filter 0.3s;
-  user-select: none;
-  pointer-events: none;
-  -webkit-user-drag: none;
+.ref-right { position: relative; display: flex; justify-content: center; align-items: center; min-height: 440px; }
+/* Swipovací balíček — 3 karty ve fanu, barevná paleta v brandové rodině */
+.ref-deck { position: absolute; inset: 0; z-index: 0; }
+.ref-deck-card {
+  position: absolute; top: 50%; left: 50%;
+  width: 84%; aspect-ratio: 1.2 / 1; border-radius: 34px;
+  box-shadow: 0 34px 80px rgba(0,32,246,.24);
 }
-.makac-wrap[data-pos="0"] .makac-img { filter: drop-shadow(0 26px 52px rgba(0,32,246,.5)); }
-
-.makac-review {
-  position: absolute;
-  bottom: calc(100% + 14px);
-  left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  width: 230px;
-  background: #0020f6;
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 20px;
-  padding: 18px 20px;
-  box-shadow: 0 24px 64px rgba(0,0,40,.55);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  z-index: 20;
+.ref-deck-card.c1 {
+  z-index: 3;
+  background:
+    radial-gradient(130% 120% at 18% 12%, rgba(255,255,255,.16), transparent 46%),
+    linear-gradient(150deg, #0020f6 0%, #1a35ff 70%, #3a4bff 100%);
+  transform: translate(-50%, -50%) rotate(-7deg);
 }
-.makac-wrap[data-pos="0"] .makac-review { opacity: 1; transform: translateX(-50%) translateY(0); }
+.ref-deck-card.c2 {
+  z-index: 2;
+  background: linear-gradient(150deg, #4353ff, #6470ff);
+  transform: translate(-50%, -50%) rotate(4deg) translate(5%, 2%);
+}
+.ref-deck-card.c3 {
+  z-index: 1;
+  background: linear-gradient(150deg, #8b97ff, #aab3ff);
+  transform: translate(-50%, -50%) rotate(14deg) translate(9%, 5%);
+}
+.ref-stack { position: relative; width: min(520px, 100%); min-height: 250px; z-index: 1; }
+/* Cyklický balíček bílých karet — přední odjede nahoru a zařadí se dozadu */
+.rs-card {
+  position: absolute; top: 0; left: 0; width: 100%;
+  background: #fff; border-radius: 20px; padding: 40px 42px; cursor: pointer;
+  transition: transform .7s cubic-bezier(.33,0,.2,1), opacity .7s cubic-bezier(.33,0,.2,1);
+  will-change: transform, opacity;
+}
+.rs-card[data-slot="0"] { transform: translate(0, 0) scale(1); z-index: 3; box-shadow: 0 24px 60px rgba(10,20,90,.18); }
+.rs-card[data-slot="1"] { transform: translate(16px, 22px) scale(.965); z-index: 2; box-shadow: 0 20px 46px rgba(10,20,90,.14); }
+.rs-card[data-slot="2"] { transform: translate(32px, 44px) scale(.93); z-index: 1; box-shadow: 0 18px 40px rgba(10,20,90,.10); }
+.rs-card.leaving { transform: translateY(-78px) scale(.9); opacity: 0; z-index: 5; }
+.ref-name { font-family: var(--font-heading); font-weight: 800; font-size: 1.08rem; color: #0a0d2e; }
+.ref-meta { font-size: .9rem; color: rgba(10,13,46,.5); margin-top: 3px; }
+.ref-text { font-size: 1.12rem; line-height: 1.65; color: #2a2f52; margin: 18px 0 0; }
 
-.mkr-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
-.mkr-company { font-weight: 800; font-size: .92rem; color: #fff; }
-.mkr-badge { font-size: .7rem; font-weight: 700; color: #fff; background: rgba(255,255,255,.2); border-radius: 100px; padding: 3px 9px; white-space: nowrap; }
-.mkr-stars { color: #fff; font-size: 1rem; letter-spacing: 1px; margin-bottom: 10px; }
-.mkr-num { color: #fff; font-weight: 800; font-size: .88rem; margin-left: 6px; letter-spacing: 0; }
-.mkr-text { font-size: .82rem; color: rgba(255,255,255,.85); line-height: 1.6; margin: 0 0 10px; font-style: italic; }
-.mkr-role { font-size: .75rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: .06em; }
-
-.makaci-dots { display: flex; justify-content: center; gap: 8px; margin-top: 32px; }
-.makaci-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(0,32,246,.2); transition: background 0.4s, transform 0.4s; cursor: pointer; }
-.makaci-dot.active { background: #0020f6; transform: scale(1.3); }
-
-@media (max-width: 768px) {
-  .makaci-stage { height: 380px; }
-  .makac-img { height: 200px; }
-  .makac-wrap[data-pos="-5"] { transform: translateX(calc(-50% - 260px)) scale(0.55); opacity: 0; }
-  .makac-wrap[data-pos="-4"] { transform: translateX(calc(-50% - 260px)) scale(0.55); opacity: 0; }
-  .makac-wrap[data-pos="-3"] { transform: translateX(calc(-50% - 260px)) scale(0.55); opacity: 0; }
-  .makac-wrap[data-pos="-2"] { transform: translateX(calc(-50% - 260px)) scale(0.55); opacity: 0; }
-  .makac-wrap[data-pos="-1"] { transform: translateX(calc(-50% - 145px)) scale(0.75); }
-  .makac-wrap[data-pos="1"]  { transform: translateX(calc(-50% + 145px)) scale(0.75); }
-  .makac-wrap[data-pos="2"]  { transform: translateX(calc(-50% + 260px)) scale(0.55); opacity: 0; }
-  .makac-wrap[data-pos="3"]  { transform: translateX(calc(-50% + 260px)) scale(0.55); opacity: 0; }
-  .makac-review { width: 180px; padding: 14px 15px; font-size: .78rem; }
+@media (max-width: 860px) {
+  #makaci { padding: 80px 0; }
+  .ref-grid { grid-template-columns: 1fr; gap: 32px; }
+  .ref-right { min-height: 300px; }
+  .rs-card { padding: 30px 26px; }
+  .ref-text { font-size: 1rem; }
+  .rs-card[data-slot="2"] { display: none; }
 }
 
 /* ═══════════ DOWNLOAD ═══════════ */
@@ -702,6 +683,18 @@ img { max-width: 100%; display: block; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .footer-bottom { flex-direction: column; gap: 8px; align-items: center; }
 }
+
+/* Footer navazující na download = modrý konec stránky (Yasin) */
+#download + #footer { background: #0020f6; border-top: none; }
+#download + #footer .footer-logo { background: none !important; -webkit-text-fill-color: #fff !important; color: #fff !important; }
+#download + #footer .footer-brand > p,
+#download + #footer .footer-col h4,
+#download + #footer .footer-col a,
+#download + #footer .footer-bottom span { color: rgba(255,255,255,.85) !important; }
+#download + #footer .footer-col a:hover { color: #fff !important; }
+#download + #footer .footer-bottom { border-top-color: rgba(255,255,255,.18); }
+#download + #footer .footer-social a { background: rgba(255,255,255,.12); color: #fff; }
+#download + #footer .footer-social a:hover { background: rgba(255,255,255,.22); }
 
 /* ═══════════ SCROLL REVEAL ═══════════ */
 .reveal { opacity: 0; transform: translateY(40px); transition: opacity .7s ease-out, transform .7s ease-out; pointer-events: none; will-change: opacity, transform; }
