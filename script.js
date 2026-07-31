@@ -220,11 +220,17 @@ function initAuth() {
     } else {
       registerModal.classList.add('active');
       loginModal.classList.remove('active');
+      const backBtn = document.getElementById('reg-back');
       if (role) {
+        // Role je předvybraná (worker-cta / employer-cta) → přeskoč rozcestník
+        // a skryj „Zpět", aby se na rozcestník nedalo vrátit.
         applyRole(role);
         showRegStep(2);
+        if (backBtn) backBtn.style.display = 'none';
       } else {
+        // Bez role (tlačítko v navbaru) → ukaž rozcestník a nech „Zpět" dostupné.
         showRegStep(1);
+        if (backBtn) backBtn.style.display = '';
       }
     }
     document.body.style.overflow = 'hidden';
@@ -259,16 +265,16 @@ function initAuth() {
 
   function applyRole(role) {
     selectedRole = role;
-    document.getElementById('reg-role-subtitle').textContent =
-      role === 'worker' ? 'Brigádník' : 'Zaměstnavatel';
-    document.getElementById('reg-company-group').style.display =
-      role === 'employer' ? 'block' : 'none';
-    document.getElementById('reg-birth-group').style.display =
-      role === 'worker' ? 'block' : 'none';
-    document.getElementById('reg-gender-group').style.display =
-      role === 'worker' ? 'block' : 'none';
-    document.getElementById('reg-kraj-label').textContent =
-      role === 'worker' ? 'Z jakého jsi kraje?' : 'Kraj firmy';
+    // Null-safe: některé stránky mají zjednodušený registrační modal (bez
+    // birth/gender/kraj polí). Kdyby applyRole spadl na null, nepřeskočil by se
+    // rozcestník rolí u worker-cta / employer-cta tlačítek.
+    const setText  = (id, txt)  => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+    const setDisp  = (id, disp) => { const el = document.getElementById(id); if (el) el.style.display = disp; };
+    setText('reg-role-subtitle', role === 'worker' ? 'Brigádník' : 'Zaměstnavatel');
+    setDisp('reg-company-group', role === 'employer' ? 'block' : 'none');
+    setDisp('reg-birth-group',   role === 'worker' ? 'block' : 'none');
+    setDisp('reg-gender-group',  role === 'worker' ? 'block' : 'none');
+    setText('reg-kraj-label',    role === 'worker' ? 'Z jakého jsi kraje?' : 'Kraj firmy');
   }
 
   // ─── Nav update ───
@@ -366,7 +372,8 @@ function initAuth() {
   document.getElementById('register-close').addEventListener('click', closeModals);
   document.getElementById('switch-to-register').addEventListener('click', e => { e.preventDefault(); openModal('register'); });
   document.getElementById('switch-to-login').addEventListener('click', e => { e.preventDefault(); openModal('login'); });
-  document.getElementById('reg-back').addEventListener('click', () => showRegStep(1));
+  const regBackBtn = document.getElementById('reg-back');
+  if (regBackBtn) regBackBtn.addEventListener('click', () => showRegStep(1));
 
   document.querySelectorAll('.role-card').forEach(card => {
     card.addEventListener('click', () => {
@@ -761,11 +768,11 @@ function showToast(msg) {
 /* ═══════════ REFERENCE — kroužkový sešit s listováním (z Yasin/recenze) ═══════════ */
 (function () {
   var reviews = [
-    { text: 'Za tři dny jsem měl první brigádu. Večer jsem swipnul pár nabídek a ráno mi napsala kavárna.', name: 'Tomáš H.', role: 'Barista', date: '14. 6. 2025', photo: '' },
-    { text: 'Konečně appka, kde ke každé nabídce nemusím psát životopis. Pár tapů a je to.', name: 'Klára M.', role: 'Servírka', date: '2. 7. 2025', photo: '' },
-    { text: 'Bral jsem to jako přivýdělek při škole, teď tam chodím pravidelně. Firmy odpovídají fakt rychle.', name: 'Petr V.', role: 'Skladník', date: '21. 6. 2025', photo: '' },
-    { text: 'Líbí se mi, že vidím hodinovku hned — žádné „mzda dle dohody".', name: 'Aneta L.', role: 'Výpomoc na eventech', date: '9. 7. 2025', photo: '' },
-    { text: 'Jsem tu skoro od začátku a je vidět, že se to pořád zlepšuje. Super práce!', name: 'Pavel K.', role: 'Rozvoz', date: '18. 7. 2025', photo: '' },
+    { text: 'Těším se, až to vyjde!', name: 'Šimon V.', role: '', date: '29. 7. 2026', photo: '' },
+    { text: 'Moc se těším, až si na Makej najdu brigádu.', name: 'David V.', role: '', date: '27. 7. 2026', photo: '' },
+    { text: 'Vypadá to suprově!', name: 'Samuel P.', role: '', date: '24. 7. 2026', photo: '' },
+    { text: 'Posílám nezaměstnaným kamarádům.', name: 'Jan W.', role: '', date: '21. 7. 2026', photo: '' },
+    { text: 'Budu konečně makat ve stylu!', name: 'Yasin B.', role: '', date: '18. 7. 2026', photo: '' },
   ];
 
   var stack = document.getElementById('ref-stack');
@@ -773,7 +780,7 @@ function showToast(msg) {
 
   function fill(cardEl, r) {
     cardEl.querySelector('.ref-name').textContent = r.name;
-    cardEl.querySelector('.ref-meta').textContent = r.role + ' · ' + r.date;
+    cardEl.querySelector('.ref-meta').textContent = r.role ? r.role + ' · ' + r.date : r.date;
     cardEl.querySelector('.ref-text').textContent = r.text;
   }
 
@@ -790,7 +797,7 @@ function showToast(msg) {
   }
 
   var nextRev = VISIBLE % reviews.length;
-  var busy = false, timer;
+  var busy = false, timer, paused = false;
 
   function nodeAtSlot(s) {
     for (var n = 0; n < nodes.length; n++) if (+nodes[n].dataset.slot === s) return nodes[n];
@@ -818,9 +825,51 @@ function showToast(msg) {
     }, 540);
   }
 
-  function startTimer() { clearInterval(timer); timer = setInterval(advance, 6000); }
+  function startTimer() { clearInterval(timer); if (!paused) timer = setInterval(advance, 3500); }
 
-  stack.addEventListener('click', function () { if (!busy) { advance(); startTimer(); } });
+  // Najetí myší (bez kliku) pozastaví listování, odjetí ho zase spustí.
+  stack.addEventListener('mouseenter', function () { paused = true; clearInterval(timer); });
+  stack.addEventListener('mouseleave', function () { paused = false; startTimer(); });
+  // Klik = posun na další + pokračuj dál (i když na kartě zůstane kurzor).
+  stack.addEventListener('click', function () { if (!busy) { paused = false; advance(); } });
 
   startTimer();
+})();
+
+/* ═══════════ Scroll-driven kreslení spojnice „jak to funguje" (bolt-path) ═══════════ */
+/* Čára se postupně prodlužuje podle toho, jak uživatel scrolluje sekcí — jde s ním
+   a dovede ho až k „Vytvořit účet". Funguje na /hledam-si-praci i /pro-zamestnavatele. */
+(function () {
+  var svg = document.querySelector('.bolt-path');
+  if (!svg) return;
+  var path = svg.querySelector('path');
+  var journey = svg.closest('.bolt-journey');
+  if (!path || !journey) return;
+
+  // Plná (nepřerušovaná) čára, která se s posunem odkrývá: jeden dash o délce
+  // celé dráhy + offset. Délku bereme z getTotalLength (kvůli non-scaling-stroke
+  // se čárkování měří v reálné délce dráhy, ne v normalizované).
+  var L = path.getTotalLength();
+  path.style.strokeDasharray = L;
+  path.style.strokeDashoffset = L;
+  path.style.transition = 'stroke-dashoffset .12s linear';
+
+  var ticking = false;
+  function update() {
+    ticking = false;
+    var rect = journey.getBoundingClientRect();
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    // Kreslit začne, když vršek sekce projde ~88 % výšky okna, a dokreslí se,
+    // než spodek sekce vyjede nad ~40 % okna.
+    var start = vh * 0.88;
+    var span = rect.height + vh * 0.48;
+    var p = (start - rect.top) / span;
+    p = p < 0 ? 0 : p > 1 ? 1 : p;
+    path.style.strokeDashoffset = L * (1 - p);
+  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', update);
+  update();
 })();
