@@ -36,7 +36,7 @@
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
   <link rel="preload" as="image" href="/krok-1.png" />
   <link rel="preload" as="image" href="/krok-2.png" />
-  <link rel="stylesheet" href="style.css?v=29" />
+  <link rel="stylesheet" href="style.css?v=30" />
   <style>
     /* Bolt-style střídavé kroky (foto + text) */
     .bolt-head { text-align: center; max-width: 1080px; margin: 0 auto 56px; padding: 0 24px; }
@@ -145,17 +145,23 @@
     .mk-band .mk__track--1 { padding-bottom:18px; animation:mk-marq-l 32s linear infinite; }
     .mk-band .mk__track--2 { animation:mk-marq-r 38s linear infinite; }
     .mk-band .mk__track:hover { animation-play-state:paused; }
-    .mk-band .mk__item { display:flex; align-items:center; gap:44px; cursor:default; }
+    .mk-band .mk__item { display:flex; align-items:center; gap:22px; cursor:default; }
     .mk-band .mk__word { font-family:'Caveat',cursive; font-weight:700; font-size:72px; line-height:1; letter-spacing:0; white-space:nowrap; color:var(--mk-word); transition:color .3s ease; }
     .mk-band .mk__track--2 .mk__word { color:var(--mk-word-2); }
     .mk-band .mk__item:hover .mk__word { color:var(--mk-ink); }
     .mk-band .mk__track--2 .mk__item:hover .mk__word { color:var(--mk-accent); }
+    /* Popis se při najetí rozvine vedle slova; text se zalomí na víc řádků (celý). */
+    .mk-band .mk__exp { max-width:0; opacity:0; overflow:hidden;
+      transition:max-width .55s cubic-bezier(.4,0,.2,1), opacity .3s ease; }
+    .mk-band .mk__exp-in { display:inline-block; width:360px; white-space:normal; vertical-align:middle;
+      font-family:var(--font-sans); font-size:18px; line-height:1.4; color:var(--mk-body); text-wrap:pretty; }
+    .mk-band .mk__item:hover .mk__exp { max-width:360px; opacity:1; }
     @keyframes mk-marq-l { from{transform:translateX(0)} to{transform:translateX(-50%)} }
     @keyframes mk-marq-r { from{transform:translateX(-50%)} to{transform:translateX(0)} }
     @media (prefers-reduced-motion:reduce) { .mk-band .mk__track { animation:none; } }
     .mk-band .mk__foot {
-      max-width:1160px; margin:56px auto 0; padding:56px 24px 0; border-top:1px solid var(--mk-line);
-      display:flex; align-items:flex-end; justify-content:space-between; gap:64px;
+      max-width:1160px; margin:48px auto 0; padding:48px 24px 0; border-top:1px solid var(--mk-line);
+      display:flex; align-items:center; justify-content:center;
     }
     .mk-band .mk__copy { display:flex; flex-direction:column; gap:10px; max-width:560px; min-height:96px; }
     .mk-band .mk__tag { font-family:var(--font-heading); font-weight:900; font-size:11px; line-height:1; letter-spacing:.16em; text-transform:uppercase; color:var(--mk-accent); }
@@ -166,10 +172,17 @@
       border:none; cursor:pointer; transition:transform .2s ease;
     }
     .mk-band .mk__cta:hover { transform:translateY(-2px); }
+    /* Mobilní statický seznam funkcí (na desktopu skrytý) */
+    .mk-band .mk__list { display:none; list-style:none; margin:0; padding:0; }
     @media (max-width:760px) {
-      .mk-band .mk__word { font-size:50px; }
-      .mk-band .mk__foot { flex-direction:column; align-items:flex-start; gap:28px; padding-top:40px; margin-top:40px; }
-      .mk-band .mk__desc { font-size:18px; }
+      .mk-band { margin-top:8px; }
+      .mk-band .mk__track { display:none; }
+      .mk-band .mk__list { display:flex; flex-direction:column; padding:0 24px; }
+      .mk-band .mk__li { display:flex; flex-direction:column; gap:4px; padding:18px 0; border-bottom:1px solid var(--mk-line); }
+      .mk-band .mk__li:last-child { border-bottom:none; }
+      .mk-band .mk__li-word { font-family:'Caveat',cursive; font-weight:700; font-size:40px; line-height:1; color:var(--mk-ink); }
+      .mk-band .mk__li-desc { margin:0; font-family:var(--font-sans); font-size:15px; line-height:1.5; color:var(--mk-body); }
+      .mk-band .mk__foot { padding-top:28px; margin-top:8px; }
     }
 
     /* Demo telefon na bílé sekci */
@@ -404,11 +417,9 @@
         <div class="mk-band">
           <div class="mk__track mk__track--1" data-mk-track></div>
           <div class="mk__track mk__track--2" data-mk-track data-mk-reverse></div>
+          <!-- Mobil: statický seznam (hover nefunguje na dotyku) -->
+          <ul class="mk__list" data-mk-list></ul>
           <div class="mk__foot">
-            <div class="mk__copy">
-              <span class="mk__tag" data-mk-tag>Makej</span>
-              <p class="mk__desc" data-mk-desc>Najeď na kterékoli slovo a napíšeme ti, co znamená.</p>
-            </div>
             <a class="mk__cta worker-cta-register" href="javascript:void(0)">Vytvořit účet</a>
           </div>
         </div>
@@ -425,11 +436,11 @@
           <p class="dl-sub">Stáhni si aplikaci zdarma a prozkoumej pracovní příležitosti ve tvém okolí ještě dnes.</p>
           <div class="dl-btns">
             <a href="#" class="dl-btn" aria-disabled="true">
-              <iconify-icon icon="logos:apple"></iconify-icon>
+              <svg class="dl-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 315" aria-hidden="true"><path d="M213.803 167.03c.442 47.58 41.74 63.413 42.197 63.615c-.35 1.116-6.599 22.563-21.757 44.716c-13.104 19.153-26.705 38.235-48.13 38.63c-21.05.388-27.82-12.483-51.888-12.483c-24.061 0-31.582 12.088-51.51 12.871c-20.68.783-36.428-20.71-49.64-39.793c-27-39.033-47.633-110.3-19.928-158.406c13.763-23.89 38.36-39.017 65.056-39.405c20.307-.387 39.475 13.662 51.889 13.662c12.406 0 35.699-16.895 60.186-14.414c10.25.427 39.026 4.14 57.503 31.186c-1.49.923-34.335 20.044-33.978 59.822M174.24 50.199c10.98-13.29 18.369-31.79 16.353-50.199c-15.826.636-34.962 10.546-46.314 23.828c-10.173 11.763-19.082 30.589-16.678 48.633c17.64 1.365 35.66-8.964 46.64-22.262"/></svg>
               <span><small>Brzy dostupné na</small><strong>App Store</strong></span>
             </a>
             <a href="#" class="dl-btn" aria-disabled="true">
-              <iconify-icon icon="logos:google-play-icon"></iconify-icon>
+              <svg class="dl-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 283" aria-hidden="true"><path fill="#ea4335" d="M119.553 134.916L1.06 259.061a32.14 32.14 0 0 0 47.062 19.071l133.327-75.934z"/><path fill="#fbbc04" d="M239.37 113.814L181.715 80.79l-64.898 56.95l65.162 64.28l57.216-32.67a31.345 31.345 0 0 0 0-55.537z"/><path fill="#4285f4" d="M1.06 23.487A30.6 30.6 0 0 0 0 31.61v219.327a32.3 32.3 0 0 0 1.06 8.124l122.555-120.966z"/><path fill="#34a853" d="m120.436 141.274l61.278-60.483L48.564 4.503A32.85 32.85 0 0 0 32.051 0C17.644-.028 4.978 9.534 1.06 23.399z"/></svg>
               <span><small>Brzy dostupné na</small><strong>Google Play</strong></span>
             </a>
           </div>
@@ -651,22 +662,30 @@
       { t: 'Recenze',        cat: 'Důvěra',     d: 'Buduj si reputaci přes hodnocení od firem. Lepší recenze, lepší nabídky.' },
       { t: 'Blízko tebe',    cat: 'Hledání',    d: 'Filtruj podle lokace a najdi práci pár minut od domova nebo od školy.' }
     ];
-    var tagEl = document.querySelector('[data-mk-tag]');
-    var descEl = document.querySelector('[data-mk-desc]');
     document.querySelectorAll('[data-mk-track]').forEach(function (track) {
       var list = track.hasAttribute('data-mk-reverse') ? FEATURES.slice().reverse() : FEATURES;
       list.concat(list).forEach(function (f) {
         var item = document.createElement('span');
         item.className = 'mk__item';
-        item.innerHTML = '<span class="mk__word"></span>';
+        // Popis se rozvine vodorovně vedle slova (žádný výpis dole).
+        item.innerHTML = '<span class="mk__word"></span><span class="mk__exp"><span class="mk__exp-in"></span></span>';
         item.querySelector('.mk__word').textContent = f.t;
-        item.addEventListener('mouseenter', function () {
-          if (tagEl) tagEl.textContent = f.cat;
-          if (descEl) descEl.textContent = f.d;
-        });
+        item.querySelector('.mk__exp-in').textContent = f.d;
         track.appendChild(item);
       });
     });
+    // Mobilní statický seznam (slovo + popis, vše rovnou viditelné — bez hoveru).
+    var listEl = document.querySelector('[data-mk-list]');
+    if (listEl) {
+      FEATURES.forEach(function (f) {
+        var li = document.createElement('li');
+        li.className = 'mk__li';
+        li.innerHTML = '<span class="mk__li-word"></span><p class="mk__li-desc"></p>';
+        li.querySelector('.mk__li-word').textContent = f.t;
+        li.querySelector('.mk__li-desc').textContent = f.d;
+        listEl.appendChild(li);
+      });
+    }
   })();
 
   /* ═══════════ Makej Scroll Line — kreslená spojnice od „j" v Makej přes kroky k CTA ═══════════ */
