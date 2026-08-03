@@ -1615,3 +1615,396 @@ html { scroll-padding-top: 92px; }
   background: transparent; color: #0a0d2e; border-color: rgba(10,13,46,.22);
 }
 #navbar.nav-over-light #nav-login-btn:hover { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.4); }
+
+/* ═══════════════════════════════════════════════════════════════
+   WAITLIST (čekací list) + vlastní kurzor — přeneseno z Makej-sro/Yasin
+   ═══════════════════════════════════════════════════════════════ */
+.wl-fs {
+  position: fixed; inset: 0; z-index: 4000;
+  background: #0020F6;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none; transition: opacity .3s ease;
+}
+.wl-fs.active { opacity: 1; pointer-events: auto; }
+/* Tečkované pozadí (flow field) — canvas přenesený z Claude designu.
+   Kreslí tečky + modrý „reflektor" u kurzoru. Leží za obsahem (z-index 0).
+   width/height 100% je NUTNÉ — jinak se canvas nezmenší podle Retina (dpr)
+   a kreslí se ve 2× měřítku (tečky řídké, vidět jen výřez). */
+.wl-dotbg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; pointer-events: none; }
+.wl-fs-close {
+  position: fixed; top: 16px; right: 18px; z-index: 6;
+  width: 44px; height: 44px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,.16); color: #fff;
+  font-size: 1.15rem; cursor: url('kurzor-modra.png?v=3') 28 16, pointer; line-height: 1;
+  transition: background .15s;
+}
+.wl-fs-close:hover { background: rgba(255,255,255,.3); }
+.wl-fs-inner { position: relative; z-index: 3; flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+
+.wl-fs-head { text-align: center; padding: 1.4rem 1.5rem .8rem; }
+.wl-badge {
+  display: inline-block; background: rgba(0,32,246,.09); color: var(--primary);
+  font-size: .74rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+  padding: .4rem .8rem; border-radius: 999px; margin-bottom: 1rem;
+}
+.wl-fs-title {
+  font-size: clamp(1.3rem, 3vw, 1.7rem); font-weight: 700;
+  color: #fff; letter-spacing: -.01em; line-height: 1.15; margin: 0;
+  text-shadow: 0 1px 12px rgba(0,0,0,.28);
+}
+.wl-fs-sub {
+  color: rgba(255,255,255,.92); max-width: 580px; margin: .6rem auto 0;
+  font-size: 1rem; line-height: 1.5; font-weight: 700;
+  text-shadow: 0 1px 10px rgba(0,0,0,.28);
+}
+.wl-ig {
+  display: inline-flex; align-items: center; gap: .5rem;
+  margin-top: .7rem; color: #252525; font-weight: 700; font-size: .95rem;
+  text-decoration: none; transition: transform .2s ease;
+  transform-origin: center;
+}
+.wl-ig-icon {
+  width: 30px; height: 30px; display: inline-block; flex-shrink: 0;
+  background-color: var(--primary);
+  -webkit-mask: url("/instagram.png") center / contain no-repeat;
+  mask: url("/instagram.png") center / contain no-repeat;
+}
+.wl-ig:hover, .wl-ig:focus { text-decoration: none; opacity: 1; }
+.wl-ig:hover { transform: scale(1.1); }
+/* Instagram na obrazovce „Jsi na seznamu" — jemný nástup */
+.wl-ig--done { margin: .4rem 0 1.5rem; animation: wlIgIn .5s ease; }
+@keyframes wlIgIn {
+  from { opacity: 0; transform: translateY(8px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Odpočet do spuštění */
+.wl-countdown { display: flex; gap: .45rem; justify-content: center; align-items: center; margin: 1rem 0 .3rem; }
+.wl-cd-unit {
+  display: flex; flex-direction: column; align-items: center; gap: .25rem;
+  background: #f6f3f2; border: 1px solid #eae7e7; border-radius: 14px;
+  padding: .6rem .35rem; min-width: 58px; box-shadow: 0 2px 6px rgba(0,0,0,.04);
+}
+.wl-cd-num { font-size: clamp(1.4rem, 4vw, 1.9rem); font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; line-height: 1; }
+.wl-cd-lbl { font-size: .62rem; text-transform: uppercase; letter-spacing: .07em; color: #6b7280; font-weight: 700; }
+.wl-cd-sep { font-size: 1.2rem; font-weight: 700; color: #cfcfd8; line-height: 1; }
+
+/* Jedna karta + přepínač (segmented switch jako u ceníku) */
+.wl-switch-wrap {
+  width: 100%; max-width: 520px; margin: 0 auto;
+  padding: .4rem clamp(1rem, 4vw, 1.5rem) 1.4rem;
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+}
+.wl-toggle {
+  position: relative; display: grid; grid-template-columns: 1fr 1fr;
+  background: #eaeefb; border-radius: 999px; padding: 5px; width: 100%; max-width: 380px;
+}
+.wl-toggle-pill {
+  position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc(50% - 5px);
+  border-radius: 999px; background: var(--primary);
+  box-shadow: 0 6px 16px -6px rgba(0,32,246,.6);
+  transition: transform .18s cubic-bezier(.2,.8,.2,1);
+}
+.wl-toggle.is-employer .wl-toggle-pill { transform: translateX(100%); }
+.wl-toggle-opt {
+  position: relative; z-index: 1; border: none; background: none; cursor: url('kurzor-modra.png?v=3') 28 16, pointer;
+  padding: .7rem .6rem; font-family: inherit; font-weight: 800; font-size: .92rem;
+  color: var(--primary); border-radius: 999px; transition: color .2s;
+}
+.wl-toggle-opt.is-active { color: #fff; }
+/* Modrý box (.wl-cards) STOJÍ; obsah obou stran (.wl-side) leží přes sebe a
+   při přepnutí plynule „sjede/přijede" do strany (jako v návrhu). */
+.wl-cards {
+  display: grid; width: 100%; overflow: hidden;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,.09) 1px, transparent 0) 0 0 / 22px 22px,
+    var(--primary);
+  color: #fff; border-radius: 20px;
+  padding: 2rem clamp(1.6rem, 2.8vw, 2.3rem) 2rem;
+  /* na modrém pozadí kartu odliší světlý rámeček + hlubší stín */
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 26px 60px -22px rgba(0,0,0,.55);
+}
+.wl-side {
+  grid-area: 1 / 1; display: flex; flex-direction: column;
+  transition: opacity .28s ease, transform .28s ease;
+}
+.wl-side.is-off { opacity: 0; transform: translateX(18px); pointer-events: none; }
+
+/* „live" sociální důkaz — dole uvnitř karty pod CTA, jako součást karty, menší */
+.wl-social {
+  display: flex; align-items: center; justify-content: center; gap: .4rem;
+  margin: 1.1rem 0 0; padding: .9rem 0 0;
+  border-top: 1px solid rgba(255,255,255,.16);
+  font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.82);
+  text-align: center;
+}
+.wl-social b { color: #fff; font-weight: 800; font-variant-numeric: tabular-nums; }
+.wl-social-dot {
+  width: .55rem; height: .55rem; border-radius: 50%; flex-shrink: 0;
+  background: #22c55e; box-shadow: 0 0 0 0 rgba(34,197,94,.5);
+  animation: wlLiveDot 1.9s ease-out infinite;
+}
+@keyframes wlLiveDot {
+  0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.5); }
+  70%  { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+/* ── Obsah karty: pouze primární modrá + bílá, tučné texty ── */
+.wl-side-title { font-size: clamp(1.55rem, 2.8vw, 2.1rem); font-weight: 800; margin: 0 0 .55rem; line-height: 1.1; }
+.wl-side-lead { margin: 0 0 1.6rem; font-size: 1rem; line-height: 1.45; font-weight: 700; color: #fff; }
+
+/* Placka odznaku „Byl jsem u toho" — bílá, minimalistická */
+.wl-badge-chip {
+  display: inline-flex; align-items: center;
+  padding: .42rem .95rem; border-radius: 999px;
+  background: #fff; color: var(--primary);
+  font-weight: 800; font-size: .86rem; white-space: nowrap;
+}
+/* Unikátní fialový odznak „Byl jsem u toho" — světlý fialový vnitřek, fialový text, menší */
+.wl-badge-chip--purple {
+  background: #ece7ff; color: #7c3aed;
+  border: 1px solid rgba(124,58,237,.28); box-shadow: none;
+  font-size: .74rem; padding: .24rem .66rem;
+}
+
+/* Výhody — bílé tečky, tučný bílý text */
+.wl-benefits { list-style: none; padding: 0; margin: 0 0 1.6rem; display: flex; flex-direction: column; gap: .75rem; }
+.wl-benefits li { position: relative; padding-left: 2rem; font-size: .96rem; line-height: 1.4; font-weight: 700; color: #fff; }
+.wl-benefits li::before {
+  content: ''; position: absolute; left: 0; top: .1rem;
+  width: 1.25rem; height: 1.25rem;
+  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='white'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='12'%20cy='12'%20r='9'/%3E%3Cpath%20d='M8.5%2012.5l2.5%202.5%204.5-5'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+/* Odměna je normální odrážka (má tečku) — fialová placka je inline uvnitř */
+.wl-badge-chip { vertical-align: middle; margin: 0 .18rem 0 .5rem; }
+
+/* Scarcity — bílá lišta + bod (0 → TOTAL) */
+.wl-scarcity { margin: auto 0 1.5rem; }
+.wl-scarcity-lbl { display: block; margin-bottom: .65rem; font-size: .94rem; font-weight: 800; color: #fff; }
+.wl-scarcity-lbl strong { font-weight: 900; font-variant-numeric: tabular-nums; }
+.wl-bar { position: relative; height: 6px; border-radius: 999px; background: rgba(255,255,255,.22); }
+.wl-bar span {
+  display: block; height: 100%; width: 20%; border-radius: 999px;
+  background: rgba(255,255,255,.6);
+  transition: width .8s cubic-bezier(.2,.7,.2,1);
+}
+.wl-knob {
+  position: absolute; top: 50%; left: 20%;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: #fff; transform: translate(-50%, -50%);
+  box-shadow: 0 1px 5px rgba(0,0,0,.3);
+  transition: left .8s cubic-bezier(.2,.7,.2,1);
+}
+.wl-ends {
+  display: flex; justify-content: space-between; margin-top: .5rem;
+  font-size: .74rem; font-weight: 800; color: rgba(255,255,255,.6);
+  font-variant-numeric: tabular-nums;
+}
+
+.wl-cta {
+  margin-top: auto; width: 100%; height: 54px; border-radius: 14px;
+  font-family: inherit; font-size: 1rem; font-weight: 700; cursor: url('kurzor-modra.png?v=3') 28 16, pointer; border: none;
+  transition: transform .12s, box-shadow .2s;
+  background: #fff; color: var(--primary); box-shadow: 0 14px 28px -14px rgba(0,0,0,.45);
+}
+.wl-cta:hover { transform: translateY(-2px); }
+.wl-cta:active { transform: scale(.99); }
+
+/* Formulářový panel (překryje split po kliknutí na CTA) */
+.wl-panel {
+  position: fixed; inset: 0; z-index: 4100;
+  background: rgba(10,13,46,.55); backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.wl-panel.active { display: flex; }
+.wl-panel-card {
+  background: #fff; border-radius: 1.5rem; padding: 2.4rem;
+  width: min(430px, 100%); max-height: calc(100vh - 40px); overflow-y: auto;
+  position: relative;
+}
+.wl-panel-back { background: none; border: none; color: var(--primary); font-weight: 600; font-size: .9rem; cursor: url('kurzor-modra.png?v=3') 28 16, pointer; margin-bottom: .9rem; padding: 0; }
+.wl-panel-card .modal-logo { margin-bottom: .8rem; }
+.wl-form-title { font-size: 1.5rem; font-weight: 800; color: #0a0d2e; margin: 0 0 .3rem; }
+.wl-form-sub { color: rgba(10,13,46,.6); margin: 0 0 1.2rem; font-size: .95rem; line-height: 1.5; }
+/* Světlé formulářové prvky uvnitř panelu (globální jsou pro tmavý motiv) */
+.wl-panel-card .form-label { color: #0a0d2e; }
+.wl-panel-card .form-input { background: #f4f6fb; border-color: #e6e8f2; color: #0a0d2e; }
+.wl-panel-card .form-input::placeholder { color: rgba(10,13,46,.4); }
+.wl-panel-card .form-input:focus { background: #fff; border-color: var(--primary); }
+.wl-panel-card .modal-error { background: rgba(244,63,94,.08); border-color: rgba(244,63,94,.25); color: #d92d4b; }
+.wl-fineprint { font-size: .76rem; color: rgba(10,13,46,.5); text-align: center; margin-top: .85rem; line-height: 1.5; }
+#wl-done { text-align: center; }
+.wl-done-ic {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg,#16a34a,#22c55e);
+  display: grid; place-items: center; margin: .4rem auto 1.1rem;
+  box-shadow: 0 12px 26px -10px rgba(34,197,94,.6);
+}
+
+@media (max-width: 760px) {
+  .wl-fs-head { padding: 3.4rem 1.3rem 1rem; }
+  .wl-cards { padding: 1.7rem 1.5rem 1.8rem; }
+}
+/* Pojistka: na nízkých obrazovkách povol scroll, ať se nic neuřízne.
+   Na běžném desktopu je vše na jednu obrazovku bez scrollu. */
+@media (max-height: 700px) {
+  .wl-fs { overflow-y: auto; }
+  .wl-fs-inner { justify-content: flex-start; }
+}
+
+/* ═══════════ WAITLIST v1 — MINIMALISTICKÝ PANEL (override) ═══════════
+   Vše v jednom jemném panelu na modrém tečkovaném pozadí. Bez „AI" prvků:
+   žádné fajfky v kroužcích, žádná fialová, žádné těžké boxy odpočtu. */
+.wl-card {
+  width: 100%; max-width: 420px; margin: auto;
+  display: flex; flex-direction: column; text-align: center;
+  padding: clamp(1.7rem, 4vw, 2.5rem);
+  border-radius: 24px;
+  /* VERZE 2 — plně BÍLÝ panel (max kontrast pro firemní modrou), jemný frosted okraj */
+  background: #fff;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.8);
+  box-shadow: 0 30px 70px -28px rgba(0,20,120,.45), inset 0 1px 0 rgba(255,255,255,.9);
+  color: var(--primary);
+}
+.wl-card .wl-fs-title {
+  font-size: clamp(1.5rem, 4.2vw, 2rem); font-weight: 800;
+  letter-spacing: -.02em; line-height: 1.12; margin: 0; color: var(--primary); text-shadow: none;
+}
+.wl-card .wl-fs-sub {
+  margin: .55rem 0 0; font-size: .92rem; line-height: 1.5;
+  font-weight: 600; color: rgba(0,32,246,.82); text-shadow: none; max-width: none;
+}
+/* odpočet — modrý pás, bílé číslice + plynule ubývající linky (dodaný design) */
+.wl-card .wl-countdown {
+  align-self: center; display: inline-flex; align-items: center; gap: 13px;
+  background: #1B2BFF; border-radius: 999px; padding: 13px 26px 11px;
+  margin: 1.4rem 0 1.6rem; font-family: Figtree, system-ui, sans-serif;
+}
+.wl-card .wl-cd-unit {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  background: none; border: none; box-shadow: none; border-radius: 0; padding: 0; min-width: 0;
+}
+.wl-card .wl-cd-num {
+  font-size: 29px; line-height: .9; font-weight: 800; color: #fff;
+  letter-spacing: -.03em; font-variant-numeric: tabular-nums;
+}
+.wl-card .wl-cd-track { display: block; width: 100%; height: 2.5px; border-radius: 3px; background: rgba(255,255,255,.28); overflow: hidden; }
+.wl-card .wl-cd-track b { display: block; height: 100%; border-radius: 3px; background: #fff; width: 0; }
+.wl-card .wl-cd-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.5); margin-bottom: 7px; flex: none; }
+/* přepínač */
+.wl-card .wl-toggle { background: rgba(0,32,246,.1); max-width: none; padding: 4px; margin: 0 0 1.5rem; }
+.wl-card .wl-toggle-pill { top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); background: var(--primary); box-shadow: none; }
+.wl-card .wl-toggle-opt { padding: .6rem .5rem; font-weight: 700; font-size: .9rem; color: rgba(0,32,246,.7); }
+.wl-card .wl-toggle-opt.is-active { color: #fff; font-weight: 800; }
+/* panely (swap) — bez vlastního boxu, obsah zarovnaný vlevo */
+.wl-card .wl-cards { background: none; border: none; box-shadow: none; border-radius: 0; padding: 0; text-align: left; overflow: visible; }
+.wl-card .wl-side-lead { margin: 0; font-size: .96rem; line-height: 1.5; font-weight: 600; color: var(--primary); }
+/* výhody — odrážky s plnou modrou tečkou, bez čar mezi body */
+.wl-card .wl-benefits { gap: .95rem; margin: 1.1rem 0 1.4rem; }
+.wl-card .wl-benefits li {
+  position: static; padding: 0; font-size: .93rem; font-weight: 600; color: var(--primary);
+  border: none;
+  display: flex; align-items: center; flex-wrap: wrap; gap: .1rem .5rem;
+}
+.wl-card .wl-benefits li::before {
+  content: ''; position: static; display: block; flex-shrink: 0;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--primary);
+}
+/* odznak — modrý obrys + modrý text */
+.wl-card .wl-badge-chip {
+  margin: 0; padding: .16rem .58rem; border-radius: 999px;
+  background: transparent; color: var(--primary); border: 1px solid rgba(0,32,246,.45);
+  font-weight: 700; font-size: .72rem; box-shadow: none;
+}
+/* CTA — modrý oválek, bílý tučný text + běžící světlá „kometa" po obrysu */
+.wl-card .wl-cta {
+  position: relative; overflow: hidden;
+  margin-top: .4rem; height: 52px; border-radius: 999px;
+  background: var(--primary); color: #fff; box-shadow: none; font-weight: 800;
+}
+.wl-card .wl-cta:hover { transform: translateY(-1px); }
+@property --wlBeam { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.wl-card .wl-cta::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 2.5px;
+  background: conic-gradient(from var(--wlBeam),
+    transparent 0deg, transparent 235deg,
+    rgba(255,255,255,.15) 275deg, #fff 320deg, rgba(255,255,255,.5) 348deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  animation: wlBeamSpin 2.4s linear infinite;
+  pointer-events: none;
+}
+@keyframes wlBeamSpin { to { --wlBeam: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .wl-card .wl-cta::before { animation: none; } }
+
+/* CTA — 3D flip pilulka (dodaný design): Chci být u toho ⇄ Registrovat se */
+.wl-card .wl-cta-flip {
+  perspective: 1100px; width: 100%; height: 56px; margin-top: .5rem; cursor: url('kurzor-modra.png?v=3') 28 16, pointer;
+  transition: transform .2s cubic-bezier(.2,.8,.2,1); transform-origin: center;
+}
+.wl-card .wl-cta-flip:hover { transform: scale(1.05); }   /* pop na najetí kurzorem */
+.wl-card .wl-cta-flip:active { transform: scale(1.02); }
+.wl-card .wl-cta-flip:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 999px; }
+.wl-card .wl-cta-flip__inner {
+  position: relative; width: 100%; height: 100%; transform-style: preserve-3d;
+  animation: wlFlipFace 4.2s cubic-bezier(.6,.02,.2,1) infinite;
+}
+.wl-card .wl-cta-flip__face {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  border: 2px solid transparent; border-radius: 999px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  font-family: inherit; font-size: 1rem; font-weight: 800; color: #fff; pointer-events: none;
+  /* stejná modrá #0020F6 + stejný stříbrný okraj na OBOU stranách */
+  background-image: linear-gradient(var(--primary), var(--primary)), linear-gradient(135deg, #EDF0F7, #A9B2C9);
+  background-origin: border-box; background-clip: padding-box, border-box;
+  box-shadow: 0 14px 26px -16px rgba(0,32,246,.7);
+}
+.wl-card .wl-cta-flip__face--back { transform: rotateX(180deg); }
+@keyframes wlFlipFace {
+  0%, 20%  { transform: rotateX(0deg); }
+  45%, 78% { transform: rotateX(-180deg); }
+  100%     { transform: rotateX(-360deg); }
+}
+@media (prefers-reduced-motion: reduce) { .wl-card .wl-cta-flip__inner { animation: none; } }
+/* social — dole, jemné (modrý odstín) */
+.wl-card .wl-social {
+  margin: 1.4rem 0 0; padding: 1.1rem 0 0; border-top: 1px solid rgba(0,32,246,.16);
+  font-size: .76rem; font-weight: 500; color: rgba(0,32,246,.6);
+}
+.wl-card .wl-social b { color: var(--primary); font-weight: 700; }
+
+/* Chatovací bublina (chat-widget.js) — schovat, když je waitlist otevřený */
+.wl-fs.active ~ #makac-widget { display: none !important; }
+
+/* Vlastní firemní kurzor — nahrazuje klasickou šipku na celém webu.
+   Čísla za url = "hrot" (kam se reálně klikne).
+   Trik: klikatelné prvky NEpřepnou na systémovou ručičku, jen se šipka přebarví —
+   MODRÁ na světlém pozadí, BÍLÁ na tmavém. Tvar zůstává pořád stejný. */
+html, body { cursor: url('kurzor.png?v=3') 28 16, auto; }
+
+/* Klikatelné na SVĚTLÉM pozadí => modrý vnitřek (černý obrys) */
+a, button, [role="button"], input[type="submit"], input[type="button"],
+input[type="reset"], label[for], select, summary,
+.wl-card .wl-toggle-opt, .wl-card .wl-cta-flip {
+  cursor: url('kurzor-modra.png?v=3') 28 16, pointer;
+}
+
+/* Klikatelné na TMAVÉM pozadí => bílý vnitřek.
+   Modrý overlay waitlistu + tmavé UI náhledu dashboardu / demo navigace. */
+.wl-fs-close,
+[class^="dp-"], [class*=" dp-"],
+.demo-nav-btn {
+  cursor: url('kurzor-bila.png?v=3') 28 16, pointer;
+}
+
+/* Textová pole => klasický "psací" kurzor, ať se dobře píše */
+input:not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+textarea, [contenteditable="true"] {
+  cursor: text;
+}
