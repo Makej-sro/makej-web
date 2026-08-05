@@ -188,10 +188,114 @@ function setupHeroUnderline() {
   if (heroH1) observer.observe(heroH1);
 }
 
+// ═══════════ DATUMOVÝ „REVOLVER" PICKER (den·měsíc·rok) ═══════════
+// Vanilla verze Yasinova WDatumPicker — nahrazuje nativní <input type="date">
+// hezkým rolovacím výběrem (den · měsíc · rok, roluješ do středu).
+function initDatePicker(input, opts) {
+  if (!input || input.dataset.dp) return;
+  input.dataset.dp = '1';
+  input.type = 'hidden';
+  opts = opts || {};
+  const MES = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
+  const letos = new Date().getFullYear();
+  const yFrom = opts.yearFrom != null ? opts.yearFrom : letos;
+  const yTo   = opts.yearTo   != null ? opts.yearTo   : 1920;
+  const ROKY = [];
+  if (yFrom >= yTo) { for (let r = yFrom; r >= yTo; r--) ROKY.push(r); }
+  else { for (let r = yFrom; r <= yTo; r++) ROKY.push(r); }
+  const placeholder = opts.placeholder || 'Vyber datum';
+  const parse = v => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||''); return m?{y:+m[1],mo:+m[2]-1,d:+m[3]}:{y:(opts.defYear||2005),mo:0,d:1}; };
+  const fmt = v => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||''); return m?(+m[3]+'. '+(+m[2])+'. '+m[1]):''; };
+  const daysIn = (y,mo) => new Date(y, mo+1, 0).getDate();
+
+  let cur = parse(input.value);
+
+  const wrap = document.createElement('div'); wrap.className = 'mdp';
+  wrap.innerHTML =
+    '<button type="button" class="mdp-btn"><iconify-icon icon="solar:calendar-bold"></iconify-icon><span class="mdp-label"></span></button>' +
+    '<div class="mdp-pop"></div>';
+  input.parentNode.insertBefore(wrap, input.nextSibling);
+  const btn = wrap.querySelector('.mdp-btn');
+  const pop = wrap.querySelector('.mdp-pop');
+  const labelEl = wrap.querySelector('.mdp-label');
+
+  function syncLabel() {
+    labelEl.textContent = input.value ? fmt(input.value) : placeholder;
+    wrap.classList.toggle('mdp-empty', !input.value);
+  }
+  function commit() {
+    input.value = cur.y + '-' + String(cur.mo+1).padStart(2,'0') + '-' + String(cur.d).padStart(2,'0');
+    syncLabel();
+    try { input.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+  }
+  function divEl(){ const d=document.createElement('div'); d.className='mdp-div'; return d; }
+
+  function makeWheel(items, index, itemW, onIndex) {
+    const w = document.createElement('div'); w.className = 'mdp-wheel-wrap';
+    const hl = document.createElement('div'); hl.className='mdp-hl'; hl.style.width=(itemW-10)+'px';
+    const fl = document.createElement('div'); fl.className='mdp-fade mdp-fade-l';
+    const fr = document.createElement('div'); fr.className='mdp-fade mdp-fade-r';
+    const track = document.createElement('div'); track.className='w-wheel mdp-track';
+    const pad1 = document.createElement('div'); pad1.style.flex='0 0 calc(50% - '+(itemW/2)+'px)'; track.appendChild(pad1);
+    const btns = items.map((it,i)=>{
+      const b=document.createElement('button'); b.type='button'; b.className='mdp-item'+(i===index?' is-active':'');
+      b.style.flex='0 0 '+itemW+'px'; b.textContent=it;
+      b.addEventListener('click',()=>{
+        track.scrollTo({left:i*itemW,behavior:'smooth'});
+        btns.forEach((bb,bi)=>bb.classList.toggle('is-active',bi===i));
+        onIndex(i);
+      });
+      track.appendChild(b); return b;
+    });
+    const pad2 = document.createElement('div'); pad2.style.flex='0 0 calc(50% - '+(itemW/2)+'px)'; track.appendChild(pad2);
+    w.appendChild(hl); w.appendChild(fl); w.appendChild(fr); w.appendChild(track);
+    requestAnimationFrame(()=>{ track.scrollLeft = index*itemW; });
+    let tim;
+    track.addEventListener('scroll',()=>{
+      clearTimeout(tim);
+      tim=setTimeout(()=>{
+        const i=Math.max(0,Math.min(items.length-1,Math.round(track.scrollLeft/itemW)));
+        btns.forEach((b,bi)=>b.classList.toggle('is-active',bi===i));
+        onIndex(i);
+      },90);
+    },{passive:true});
+    return w;
+  }
+
+  let dayHolder;
+  function buildDayWheel() {
+    const cnt = daysIn(cur.y, cur.mo);
+    if (cur.d > cnt) cur.d = cnt;
+    const DNY=[]; for(let d=1; d<=cnt; d++) DNY.push(d);
+    return makeWheel(DNY, cur.d-1, 62, i=>{ cur.d=i+1; commit(); });
+  }
+  function refreshDay() { const nw = buildDayWheel(); pop.replaceChild(nw, dayHolder); dayHolder = nw; }
+  function renderPop() {
+    pop.innerHTML='';
+    dayHolder = buildDayWheel();
+    pop.appendChild(dayHolder);
+    pop.appendChild(divEl());
+    pop.appendChild(makeWheel(MES, cur.mo, 116, i=>{ cur.mo=i; refreshDay(); commit(); }));
+    pop.appendChild(divEl());
+    pop.appendChild(makeWheel(ROKY, Math.max(0,ROKY.indexOf(cur.y)), 86, i=>{ cur.y=ROKY[i]; refreshDay(); commit(); }));
+  }
+
+  btn.addEventListener('click', e=>{
+    e.preventDefault();
+    const opening = !wrap.classList.contains('is-open');
+    if (opening) { cur = parse(input.value); renderPop(); }
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', e=>{ if(!wrap.contains(e.target)) wrap.classList.remove('is-open'); }, true);
+  syncLabel();
+}
+
 // ═══════════ INIT ═══════════
 document.addEventListener('DOMContentLoaded', () => {
   setupReveal();
   initAuth();
+  // Datum narození v registraci → „revolver" picker (1920 … letos)
+  initDatePicker(document.getElementById('reg-birth'), { placeholder: 'Vyber datum narození', defYear: 2005 });
 });
 
 // ═══════════ AUTH / SUPABASE ═══════════

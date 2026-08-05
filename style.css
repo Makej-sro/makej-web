@@ -2353,3 +2353,38 @@ html { scroll-padding-top: 92px; }
   background-image: url('employer/chevron-blue.png');
   transform: translateX(-2px);
 }
+
+/* ── Datumový „revolver" picker (den·měsíc·rok) — styl z Makej-sro/Yasin ── */
+.w-wheel { scrollbar-width: none; -ms-overflow-style: none; }
+.w-wheel::-webkit-scrollbar { display: none; }
+@keyframes dpPop { 0% { transform: scale(.97) translateY(-6px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+.mdp { position: relative; }
+.mdp-btn {
+  width: 100%; text-align: left; cursor: pointer;
+  display: flex; align-items: center; gap: 9px;
+  padding: 11px 15px; border-radius: .75rem;
+  background: #f4f6fb; border: 1px solid #e6e8f2; color: #0a0d2e;
+  font-family: var(--font-sans); font-size: .95rem;
+}
+.mdp-btn iconify-icon { color: var(--primary); font-size: 17px; flex-shrink: 0; }
+.mdp.mdp-empty .mdp-btn, .mdp.mdp-empty .mdp-btn iconify-icon { color: rgba(10,13,46,.4); }
+.mdp-pop {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 61; margin-top: 10px; padding: 10px 0 12px;
+  background: #fff; border: 1px solid #e6e8f2; border-radius: 18px;
+  box-shadow: 0 18px 40px -14px rgba(20,22,40,.28); overflow: hidden;
+  display: none; animation: dpPop .18s cubic-bezier(.2,.8,.2,1);
+}
+.mdp.is-open .mdp-pop { display: block; }
+.mdp-div { height: 1px; background: #e6e8f2; margin: 8px 14px; }
+.mdp-wheel-wrap { position: relative; }
+.mdp-hl { position: absolute; left: 50%; top: 4px; bottom: 4px; transform: translateX(-50%); border-radius: 12px; background: rgba(0,32,246,.08); pointer-events: none; }
+.mdp-fade { position: absolute; top: 0; bottom: 0; width: 34px; pointer-events: none; z-index: 2; }
+.mdp-fade-l { left: 0; background: linear-gradient(to right, #fff, rgba(255,255,255,0)); }
+.mdp-fade-r { right: 0; background: linear-gradient(to left, #fff, rgba(255,255,255,0)); }
+.mdp-track { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+.mdp-item {
+  scroll-snap-align: center; background: none; border: none; cursor: pointer; padding: 11px 0;
+  font-family: var(--font-heading); font-size: 14.5px; font-weight: 600; color: rgba(10,13,46,.45);
+  transition: color .15s, font-size .15s; white-space: nowrap;
+}
+.mdp-item.is-active { font-size: 16px; font-weight: 800; color: var(--primary); }

@@ -193,6 +193,11 @@
     @media (prefers-reduced-motion: reduce) {
       .tier-badge__pill, .tier-badge__sheen, .tier-badge__aura, .tier-badge__sparks i { animation: none; }
     }
+
+    /* Datumový „revolver" picker (den·měsíc·rok) */
+    .w-wheel { scrollbar-width: none; -ms-overflow-style: none; }
+    .w-wheel::-webkit-scrollbar { display: none; }
+    @keyframes wPop { 0% { transform: scale(0.96) translateY(-6px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
   </style>
 </head>
 <body>
@@ -342,13 +347,13 @@
   <script type="text/babel" src="employer-theme.jsx?v=4"></script>
   <script type="text/babel" src="employer-data.jsx?v=6"></script>
   <script type="text/babel" src="employer-plans.jsx?v=2"></script>
-  <script type="text/babel" src="employer-shell.jsx?v=16"></script>
+  <script type="text/babel" src="employer-shell.jsx?v=17"></script>
   <script type="text/babel" src="employer-dashboard.jsx?v=11"></script>
-  <script type="text/babel" src="employer-pages.jsx?v=22"></script>
+  <script type="text/babel" src="employer-pages.jsx?v=23"></script>
   <script type="text/babel" src="employer-pages3.jsx?v=29"></script>
   <script type="text/babel" src="_premium/kraje-map.jsx?v=2"></script>
   <script type="text/babel" src="_premium/analytics.jsx?v=17"></script>
   <script type="text/babel" src="employer-supabase.jsx?v=28"></script>
-  <script type="text/babel" src="employer-main.jsx?v=31"></script>
+  <script type="text/babel" src="employer-main.jsx?v=32"></script>
 </body>
 </html>

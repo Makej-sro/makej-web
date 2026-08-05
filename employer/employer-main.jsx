@@ -1,5 +1,62 @@
 // Makej Employer — main entry (with live Supabase data)
 
+// ── Datumový „revolver" picker (den·měsíc·rok) — tmavá varianta pro dashboard ──
+const _E_MESICE = ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
+const _E_ROKY = (() => { const l = new Date().getFullYear(); const a = []; for (let r = l; r <= l + 3; r++) a.push(r); return a; })();
+function _eRozloz(v) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); const n = new Date(); return m ? { y: +m[1], mo: +m[2] - 1, d: +m[3] } : { y: n.getFullYear(), mo: n.getMonth(), d: n.getDate() }; }
+function _eFmt(v) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? (+m[3] + '. ' + (+m[2]) + '. ' + m[1]) : ''; }
+
+function EWheel({ items, index, itemW, onIndex }) {
+  const boxRef = useRefE(null);
+  const timRef = useRefE(null);
+  useEffectE(() => { const el = boxRef.current; if (el) el.scrollLeft = index * itemW; return () => clearTimeout(timRef.current); }, []);
+  function onScroll() { clearTimeout(timRef.current); timRef.current = setTimeout(() => { const el = boxRef.current; if (!el) return; const i = Math.max(0, Math.min(items.length - 1, Math.round(el.scrollLeft / itemW))); if (i !== index) onIndex(i); }, 90); }
+  function klepni(i) { const el = boxRef.current; if (el) el.scrollTo({ left: i * itemW, behavior: 'smooth' }); if (i !== index) onIndex(i); }
+  const okraj = 'calc(50% - ' + (itemW / 2) + 'px)';
+  return (
+    <div style={{ position: 'relative' }}>
+      <div style={{ position: 'absolute', left: '50%', top: 4, bottom: 4, width: itemW - 10, transform: 'translateX(-50%)', borderRadius: 12, background: 'rgba(120,130,255,0.20)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 34, pointerEvents: 'none', zIndex: 2, background: 'linear-gradient(to right, ' + T.card + ', rgba(22,22,59,0))' }} />
+      <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 34, pointerEvents: 'none', zIndex: 2, background: 'linear-gradient(to left, ' + T.card + ', rgba(22,22,59,0))' }} />
+      <div ref={boxRef} onScroll={onScroll} className="w-wheel" style={{ display: 'flex', overflowX: 'auto', overflowY: 'hidden', scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ flex: '0 0 ' + okraj }} />
+        {items.map((it, i) => { const a = i === index; return (
+          <button key={i} type="button" onClick={() => klepni(i)} style={{ flex: '0 0 ' + itemW + 'px', scrollSnapAlign: 'center', background: 'none', border: 'none', cursor: 'pointer', padding: '11px 0', fontFamily: T.fontHead, fontSize: a ? 16 : 14.5, fontWeight: a ? 800 : 600, color: a ? '#a0b4ff' : T.mutedSoft, transition: 'color .15s, font-size .15s', whiteSpace: 'nowrap' }}>{it}</button>
+        ); })}
+        <div style={{ flex: '0 0 ' + okraj }} />
+      </div>
+    </div>
+  );
+}
+
+function EDatePicker({ value, onChange, placeholder, style }) {
+  const [open, setOpen] = useStateE(false);
+  const [dmy, setDmy] = useStateE(() => _eRozloz(value));
+  const ref = useRefE(null);
+  useEffectE(() => { setDmy(_eRozloz(value)); }, [value]);
+  useEffectE(() => { if (!open) return; const onClick = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }; document.addEventListener('click', onClick, true); return () => document.removeEventListener('click', onClick, true); }, [open]);
+  const dim = new Date(dmy.y, dmy.mo + 1, 0).getDate();
+  const DNY = []; for (let d = 1; d <= dim; d++) DNY.push(d);
+  function zmen(nv) { const next = { ...dmy, ...nv }; const dm = new Date(next.y, next.mo + 1, 0).getDate(); if (next.d > dm) next.d = dm; setDmy(next); onChange(next.y + '-' + String(next.mo + 1).padStart(2, '0') + '-' + String(next.d).padStart(2, '0')); }
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button type="button" onClick={() => setOpen(o => !o)} style={{ ...(style || {}), width: '100%', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 9, color: value ? T.text : T.mutedSoft }}>
+        <Icon name="calendar-bold" size={16} color={value ? '#a0b4ff' : T.mutedSoft} />
+        <span style={{ flex: 1 }}>{value ? _eFmt(value) : (placeholder || 'Vyber datum')}</span>
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 400, marginTop: 8, padding: '10px 0 12px', background: T.card, border: '1px solid ' + T.border, borderRadius: 16, boxShadow: '0 18px 40px -12px rgba(0,0,0,0.5)', animation: 'wPop .18s cubic-bezier(.2,.8,.2,1)', overflow: 'hidden' }}>
+          <EWheel key={'d-' + dmy.y + '-' + dmy.mo} items={DNY} index={dmy.d - 1} itemW={62} onIndex={i => zmen({ d: i + 1 })} />
+          <div style={{ height: 1, background: T.border, margin: '8px 14px' }} />
+          <EWheel items={_E_MESICE} index={dmy.mo} itemW={116} onIndex={i => zmen({ mo: i })} />
+          <div style={{ height: 1, background: T.border, margin: '8px 14px' }} />
+          <EWheel items={_E_ROKY} index={Math.max(0, _E_ROKY.indexOf(dmy.y))} itemW={86} onIndex={i => zmen({ y: _E_ROKY[i] })} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 const TITLES = {
   dash:       { title: 'Dashboard',   subtitle: 'Přehled výkonu náboru za 30 dní' },
   analytics:  { title: 'Analytika',   subtitle: 'Pokročilé reporty a segmentace' },
@@ -358,7 +415,7 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 14 }}>
             <div>
               <label style={labelStyle}>Datum *</label>
-              <input style={inputStyle} type="date" value={form.date} onChange={e => setF('date', e.target.value)} />
+              <EDatePicker style={inputStyle} value={form.date} onChange={v => setF('date', v)} placeholder="Vyber datum" />
             </div>
             <div>
               <label style={labelStyle}>Začátek *</label>
@@ -380,7 +437,7 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
             </div>
             <div>
               <label style={labelStyle}>Nástup od *</label>
-              <input style={inputStyle} type="date" value={form.start_date} onChange={e => setF('start_date', e.target.value)} />
+              <EDatePicker style={inputStyle} value={form.start_date} onChange={v => setF('start_date', v)} placeholder="Vyber datum" />
             </div>
           </div>
         )}
@@ -402,7 +459,7 @@ function ENewJobModal({ onClose, onCreated, editJob, duplicateJob }) {
             </div>
             <div>
               <label style={labelStyle}>Nástup od *</label>
-              <input style={inputStyle} type="date" value={form.start_date} onChange={e => setF('start_date', e.target.value)} />
+              <EDatePicker style={inputStyle} value={form.start_date} onChange={v => setF('start_date', v)} placeholder="Vyber datum" />
             </div>
           </div>
         )}
