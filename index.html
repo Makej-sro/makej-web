@@ -34,7 +34,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="stylesheet" href="style.css?v=31" />
+  <link rel="stylesheet" href="style.css?v=36" />
   <!-- Structured data -->
   <script type="application/ld+json">
   {
@@ -275,7 +275,12 @@
           <label class="form-label" for="login-password">Heslo</label>
           <input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
         </div>
-        <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
+        <div class="form-group">
+            <label class="form-label" for="login-key">Přístupový klíč</label>
+            <input class="form-input" type="text" id="login-key" placeholder="Zadej klíč" inputmode="numeric" autocomplete="off" />
+            <p class="form-hint">Pouze pro oficiální testovací a vývojářské účty.</p>
+          </div>
+          <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
       </form>
       <div class="modal-divider"><span>nebo</span></div>
       <button class="btn-google" id="login-google">
@@ -386,6 +391,10 @@
               </button>
             </div>
           </div>
+          <label for="reg-marketing" class="reg-consent" style="display:flex;align-items:flex-start;gap:10px;margin:2px 2px 15px;cursor:pointer;font-size:.82rem;line-height:1.45;color:rgba(10,13,46,.62);text-align:left;">
+            <input type="checkbox" id="reg-marketing" style="width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--primary);cursor:pointer;" />
+            <span>Souhlasím se zasíláním novinek, výhodných nabídek a dalších sdělení pro <a href="/privacy.html#marketing" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--primary);font-weight:600;">marketingové účely</a>. <em style="font-style:normal;opacity:.65;">(nepovinné)</em></span>
+          </label>
           <button type="submit" class="btn-primary btn-full btn-lg" id="register-submit">Vytvořit účet</button>
           <p style="font-size:.78rem;color:var(--muted-fg);text-align:center;margin-top:12px;line-height:1.5;">
             Registrací souhlasíš s našimi <a href="/terms.html" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
@@ -430,12 +439,12 @@
         <div class="wl-cards">
           <!-- BRIGÁDNÍCI -->
           <section class="wl-side" data-wl-panel="worker">
-            <p class="wl-side-lead">Buď v první stovce uživatelů.</p>
+            <p class="wl-side-lead">Registrace před startem nese spoustu výhod.</p>
             <ul class="wl-benefits">
-              <li class="wl-bene-reward"><span class="wl-bene-reward-txt">Unikátní odznak na profilu</span><span class="wl-badge-chip">Byl jsem u toho</span></li>
-              <li>Přednostní přístup — jsi uvnitř dřív</li>
+              <li class="wl-bene-reward"><span class="wl-bene-reward-txt">Unikátní odznak na profilu</span><span class="gold-badge">Byl jsem u toho<span class="gold-badge__sheen" aria-hidden="true"></span></span></li>
               <li>Náskok na nejlepší brigády při startu</li>
-              <li>O spuštění víš mezi prvními</li>
+              <li>Prioritní vstup do soutěží</li>
+              <li>Po startu od nás obdržíš 500 Makaček na svůj účet</li>
             </ul>
             <div class="wl-cta-flip" data-wl-role="worker" role="button" tabindex="0" aria-label="Chci být u toho">
               <div class="wl-cta-flip__inner">
@@ -447,10 +456,11 @@
 
           <!-- FIRMY -->
           <section class="wl-side is-off" data-wl-panel="employer">
-            <p class="wl-side-lead">Buď mezi prvními 50 firmami.</p>
+            <p class="wl-side-lead">Buď mezi prvními firmami.</p>
             <ul class="wl-benefits">
-              <li class="wl-bene-reward"><span class="wl-bene-reward-txt">Sleva na první rok</span><span class="wl-badge-chip">30 %</span></li>
-              <li>Odznak „Zakládající partner" = víc důvěry</li>
+              <li class="wl-bene-reward"><span class="wl-bene-reward-txt">Výhodný tarif na 6 měsíců</span><span class="free-star"><span class="free-star__word">Zdarma</span><span class="free-star__field" aria-hidden="true"><i style="left:8%;top:5px;width:7px;height:7px;"></i><i style="left:34%;top:0;width:6px;height:6px;animation-delay:.35s;"></i><i style="left:58%;top:6px;width:5px;height:5px;animation-delay:.7s;"></i><i style="left:82%;top:1px;width:6px;height:6px;animation-delay:1.05s;"></i></span></span></li>
+              <li>Tvoje logo na webu Makej</li>
+              <li class="wl-bene-reward"><span class="wl-bene-reward-txt">Odznak na profilu</span><span class="founder-badge-wrap"><span class="founder-badge"><span class="founder-badge__label">Zakládající partner</span><span class="founder-badge__sheen" aria-hidden="true"></span></span><span class="founder-badge__sparks" aria-hidden="true"><i style="top:0;left:14%;width:7px;height:7px;"></i><i style="top:30%;right:2px;width:5px;height:5px;animation-delay:-0.7s;"></i></span></span></li>
               <li>Přednostní zobrazení inzerátů při startu</li>
               <li>Onboarding a první inzeráty zdarma</li>
             </ul>
@@ -529,7 +539,18 @@
     </div>
   </div>
 
+  <!-- Plovoucí tlačítko „Startujeme" — otevře čekací list -->
+  <!-- Plovoucí tlačítko „Startujeme" — otevře čekací list (i po zavření křížkem) -->
+  <button class="wl-fab" type="button" aria-label="Startujeme – přidat se na waitlist">
+    <span class="wl-fab__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+        <path d="M13.6 2 5.4 13.1c-.4.5 0 1.3.7 1.3h4.2l-1.4 7.4c-.1.8.9 1.2 1.4.6l8.3-11.1c.4-.5 0-1.3-.7-1.3h-4.2l1.4-7.4c.1-.8-.9-1.2-1.5-.6Z" fill="currentColor"/>
+      </svg>
+    </span>
+    <span class="wl-fab__label">Startujeme</span>
+  </button>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=17"></script>
+  <script src="script.js?v=19"></script>
 </body>
 </html>

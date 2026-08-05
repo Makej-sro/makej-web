@@ -34,7 +34,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="stylesheet" href="/style.css?v=31" />
+  <link rel="stylesheet" href="/style.css?v=36" />
   <style>
     /* ═══════════ O NÁS — světlá stránka ═══════════ */
     body { background: #ffffff; }
@@ -286,7 +286,12 @@
           <label class="form-label" for="login-password">Heslo</label>
           <input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
         </div>
-        <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
+        <div class="form-group">
+            <label class="form-label" for="login-key">Přístupový klíč</label>
+            <input class="form-input" type="text" id="login-key" placeholder="Zadej klíč" inputmode="numeric" autocomplete="off" />
+            <p class="form-hint">Pouze pro oficiální testovací a vývojářské účty.</p>
+          </div>
+          <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
       </form>
       <div class="modal-divider"><span>nebo</span></div>
       <button class="btn-google" id="login-google">
@@ -364,6 +369,10 @@
               </button>
             </div>
           </div>
+          <label for="reg-marketing" class="reg-consent" style="display:flex;align-items:flex-start;gap:10px;margin:2px 2px 15px;cursor:pointer;font-size:.82rem;line-height:1.45;color:rgba(10,13,46,.62);text-align:left;">
+            <input type="checkbox" id="reg-marketing" style="width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--primary);cursor:pointer;" />
+            <span>Souhlasím se zasíláním novinek, výhodných nabídek a dalších sdělení pro <a href="/privacy.html#marketing" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--primary);font-weight:600;">marketingové účely</a>. <em style="font-style:normal;opacity:.65;">(nepovinné)</em></span>
+          </label>
           <button type="submit" class="btn-primary btn-full btn-lg" id="register-submit">Vytvořit účet</button>
           <p style="font-size:.78rem;color:var(--muted-fg);text-align:center;margin-top:12px;line-height:1.5;">
             Registrací souhlasíš s našimi <a href="/terms.html" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
@@ -392,6 +401,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=17"></script>
+  <script src="/script.js?v=19"></script>
 </body>
 </html>

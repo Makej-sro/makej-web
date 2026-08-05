@@ -1,5 +1,30 @@
 // Makej Employer — Inzeráty (jobs management) + Kandidáti (kanban)
 
+// Akční tlačítko inzerátu — v klidu černobílé, po najetí myší se zbarví do modra.
+function EActionButton({ icon, label, onClick }) {
+  const [hover, setHover] = useStateE(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        padding: '8px 12px', borderRadius: 9, cursor: 'pointer',
+        fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600,
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        transition: 'background .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease',
+        background: hover ? 'rgba(0,32,246,0.08)' : '#F3F4F6',
+        border: '1px solid ' + (hover ? 'rgba(0,32,246,0.30)' : '#E5E7EB'),
+        color: hover ? '#0020F6' : '#4B5563',
+        boxShadow: hover ? '0 2px 10px rgba(0,32,246,0.14)' : 'none',
+      }}
+    >
+      <Icon name={icon} size={13} color={hover ? '#0020F6' : '#6B7280'} />
+      {label}
+    </button>
+  );
+}
+
 const STATUS_META = {
   active: { label: 'Aktivní', color: '#5BD68A', dot: true },
   urgent: { label: 'ASAP · spěchá', color: '#f43f5e', dot: true, pulse: true },
@@ -186,20 +211,8 @@ function EJobs({ onTab, onEdit, onDuplicate }) {
                     fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600,
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   }}><Icon name={boostActive ? 'bolt-bold' : 'rocket-2-bold'} size={12} color={boostActive ? '#F5A623' : T.super}/>{boostActive ? ('Boostnuto · ' + boostLeftH + ' h') : 'Boostnout'}</button>
-                  <button onClick={() => onEdit && onEdit(j)} style={{
-                    padding: '8px 12px', borderRadius: 9,
-                    background: 'transparent', border: '1px solid ' + T.border,
-                    color: T.muted, cursor: 'pointer',
-                    fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600,
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  }}><Icon name="pen-2-linear" size={12} color={T.muted}/>Upravit</button>
-                  <button onClick={() => onDuplicate && onDuplicate(j)} style={{
-                    padding: '8px 12px', borderRadius: 9,
-                    background: 'transparent', border: '1px solid ' + T.border,
-                    color: T.muted, cursor: 'pointer',
-                    fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600,
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  }}><Icon name="copy-bold" size={12} color={T.muted}/>Duplikovat</button>
+                  <EActionButton icon="pen-2-linear" label="Upravit" onClick={() => onEdit && onEdit(j)} />
+                  <EActionButton icon="copy-bold" label="Duplikovat" onClick={() => onDuplicate && onDuplicate(j)} />
                 </div>
               </div>
             </ECard>

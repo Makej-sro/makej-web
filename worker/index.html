@@ -97,6 +97,8 @@
     <div id="gate-login-form">
       <input class="gate-input" type="email" id="gate-email" placeholder="tvuj@email.cz" autocomplete="email" />
       <input class="gate-input" type="password" id="gate-password" placeholder="Heslo" autocomplete="current-password" />
+      <input class="gate-input" type="text" id="login-key" inputmode="numeric" autocomplete="off" autocapitalize="none" autocorrect="off" placeholder="Přístupový klíč" />
+      <div style="font-size:11px;color:rgba(153,153,204,0.7);margin:-4px 2px 4px;line-height:1.4;">Pouze pro oficiální testovací a vývojářské účty.</div>
       <button class="gate-btn" id="gate-submit">Přihlásit se</button>
     </div>
 
@@ -128,6 +130,20 @@
 
   function showGate() { gate.classList.remove('hidden'); }
   function hideGate() { gate.classList.add('hidden'); }
+
+  // ─── Přístupový klíč (pre-launch) ───────────────────────────────────────────
+  // Dashboard ještě není hotový → do rozhraní se nikdo nedostane bez klíče.
+  // Klíč se sdílí s marketingovým webem přes sessionStorage 'makej-gate-ok', takže
+  // kdo se přihlásí s klíčem na makej.eu a je přesměrován sem, nemusí ho psát znovu.
+  //   ⇒ ZMĚNIT KLÍČ = uprav ACCESS_KEY.   ⇒ NAOSTRO = dej ACCESS_KEY na '' (pustí všechny).
+  const ACCESS_KEY = '8939';
+  function accessKeyOk() {
+    if (!ACCESS_KEY) return true;
+    try { if (sessionStorage.getItem('makej-gate-ok') === ACCESS_KEY) return true; } catch (e) {}
+    const el = document.getElementById('login-key');
+    return !!el && el.value.trim() === ACCESS_KEY;
+  }
+  function markGateOk() { try { sessionStorage.setItem('makej-gate-ok', ACCESS_KEY); } catch (e) {} }
   function showErr(msg) { gateError.textContent = msg; gateError.style.display = 'block'; }
   function clearErr() { gateError.style.display = 'none'; }
 
@@ -153,6 +169,8 @@
     const email = document.getElementById('gate-email').value.trim();
     const password = document.getElementById('gate-password').value;
     if (!email || !password) { showErr('Vyplň email a heslo.'); return; }
+    if (!accessKeyOk()) { showErr('Spouštíme 1. 10. — přihlášení jen s přístupovým klíčem. 🔧'); return; }
+    markGateOk();
     const btn = document.getElementById('gate-submit');
     btn.disabled = true; btn.textContent = 'Přihlašuji...';
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
@@ -180,23 +198,28 @@
     if (password.length < 6) { showErr('Heslo musí mít alespoň 6 znaků.'); return; }
     const btn = document.getElementById('reg-submit');
     btn.disabled = true; btn.textContent = 'Registruji...';
-    const { error } = await sb.auth.signUp({ email, password, options: { data: { name, role: 'worker', cv_url: cvUrl } } });
+    const { data, error } = await sb.auth.signUp({ email, password, options: { data: { name, role: 'worker', cv_url: cvUrl } } });
     if (error) { showErr(translateErr(error.message)); btn.disabled = false; btn.textContent = 'Vytvořit účet brigádníka'; return; }
+    // Když je potvrzování e-mailu vypnuté, signUp rovnou přihlásí → pre-launch to NECHCEME.
+    // Účet se založí, ale do rozhraní až s přístupovým klíčem → odhlásíme.
+    if (data && data.session) { try { await sb.auth.signOut(); } catch (e) {} }
     showErr('');
     gateError.style.display = 'block';
     gateError.style.background = 'rgba(91,214,138,0.12)';
     gateError.style.borderColor = 'rgba(91,214,138,0.3)';
     gateError.style.color = '#5BD68A';
-    gateError.textContent = 'Účet vytvořen! Zkontroluj email pro potvrzení, pak se přihlas.';
+    gateError.textContent = 'Účet založen! 🎉 Spouštíme 1. 10. — přihlaš se přístupovým klíčem.';
     btn.disabled = false; btn.textContent = 'Vytvořit účet brigádníka';
     switchGateTab('login');
   });
 
-  // Check existing session
-  sb.auth.getSession().then(({ data: { session } }) => {
+  // Check existing session — dovnitř jen když je brána ověřená klíčem (sdíleno s webem).
+  // Session bez ověřené brány (nebo firemní) → odhlásit, ať appka za bránou nikdy neběží bez klíče.
+  sb.auth.getSession().then(async ({ data: { session } }) => {
     const role = session?.user?.user_metadata?.role;
-    if (session && role !== 'employer') hideGate();
-    else showGate();
+    if (session && role !== 'employer' && accessKeyOk()) { hideGate(); return; }
+    if (session) await sb.auth.signOut();
+    showGate();
   });
 </script>
 
@@ -205,7 +228,7 @@
 <script type="text/babel" src="worker-supabase.jsx?v=17"></script>
 <script type="text/babel" src="worker-swipe.jsx?v=17"></script>
 <script type="text/babel" src="worker-messages.jsx?v=12"></script>
-<script type="text/babel" src="worker-profile.jsx?v=10"></script>
+<script type="text/babel" src="worker-profile.jsx?v=11"></script>
 <script type="text/babel" src="worker-history.jsx?v=8"></script>
 <script type="text/babel" src="worker-main.jsx?v=10"></script>
 </body>

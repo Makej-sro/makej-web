@@ -1636,7 +1636,7 @@ html { scroll-padding-top: 92px; }
   position: fixed; top: 16px; right: 18px; z-index: 6;
   width: 44px; height: 44px; border-radius: 50%; border: none;
   background: rgba(255,255,255,.16); color: #fff;
-  font-size: 1.15rem; cursor: url('kurzor-modra.png?v=3') 28 16, pointer; line-height: 1;
+  font-size: 1.15rem; cursor: pointer; line-height: 1;
   transition: background .15s;
 }
 .wl-fs-close:hover { background: rgba(255,255,255,.3); }
@@ -1708,7 +1708,7 @@ html { scroll-padding-top: 92px; }
 }
 .wl-toggle.is-employer .wl-toggle-pill { transform: translateX(100%); }
 .wl-toggle-opt {
-  position: relative; z-index: 1; border: none; background: none; cursor: url('kurzor-modra.png?v=3') 28 16, pointer;
+  position: relative; z-index: 1; border: none; background: none; cursor: pointer;
   padding: .7rem .6rem; font-family: inherit; font-weight: 800; font-size: .92rem;
   color: var(--primary); border-radius: 999px; transition: color .2s;
 }
@@ -1805,7 +1805,7 @@ html { scroll-padding-top: 92px; }
 
 .wl-cta {
   margin-top: auto; width: 100%; height: 54px; border-radius: 14px;
-  font-family: inherit; font-size: 1rem; font-weight: 700; cursor: url('kurzor-modra.png?v=3') 28 16, pointer; border: none;
+  font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; border: none;
   transition: transform .12s, box-shadow .2s;
   background: #fff; color: var(--primary); box-shadow: 0 14px 28px -14px rgba(0,0,0,.45);
 }
@@ -1824,7 +1824,7 @@ html { scroll-padding-top: 92px; }
   width: min(430px, 100%); max-height: calc(100vh - 40px); overflow-y: auto;
   position: relative;
 }
-.wl-panel-back { background: none; border: none; color: var(--primary); font-weight: 600; font-size: .9rem; cursor: url('kurzor-modra.png?v=3') 28 16, pointer; margin-bottom: .9rem; padding: 0; }
+.wl-panel-back { background: none; border: none; color: var(--primary); font-weight: 600; font-size: .9rem; cursor: pointer; margin-bottom: .9rem; padding: 0; }
 .wl-panel-card .modal-logo { margin-bottom: .8rem; }
 .wl-form-title { font-size: 1.5rem; font-weight: 800; color: #0a0d2e; margin: 0 0 .3rem; }
 .wl-form-sub { color: rgba(10,13,46,.6); margin: 0 0 1.2rem; font-size: .95rem; line-height: 1.5; }
@@ -1945,7 +1945,7 @@ html { scroll-padding-top: 92px; }
 
 /* CTA — 3D flip pilulka (dodaný design): Chci být u toho ⇄ Registrovat se */
 .wl-card .wl-cta-flip {
-  perspective: 1100px; width: 100%; height: 56px; margin-top: .5rem; cursor: url('kurzor-modra.png?v=3') 28 16, pointer;
+  perspective: 1100px; width: 100%; height: 56px; margin-top: .5rem; cursor: pointer;
   transition: transform .2s cubic-bezier(.2,.8,.2,1); transform-origin: center;
 }
 .wl-card .wl-cta-flip:hover { transform: scale(1.05); }   /* pop na najetí kurzorem */
@@ -1982,29 +1982,374 @@ html { scroll-padding-top: 92px; }
 /* Chatovací bublina (chat-widget.js) — schovat, když je waitlist otevřený */
 .wl-fs.active ~ #makac-widget { display: none !important; }
 
-/* Vlastní firemní kurzor — nahrazuje klasickou šipku na celém webu.
-   Čísla za url = "hrot" (kam se reálně klikne).
-   Trik: klikatelné prvky NEpřepnou na systémovou ručičku, jen se šipka přebarví —
-   MODRÁ na světlém pozadí, BÍLÁ na tmavém. Tvar zůstává pořád stejný. */
-html, body { cursor: url('kurzor.png?v=3') 28 16, auto; }
+/* (Vlastní obrázkový kurzor odstraněn — zpět na systémové kurzory, jako u Yasina.) */
 
-/* Klikatelné na SVĚTLÉM pozadí => modrý vnitřek (černý obrys) */
-a, button, [role="button"], input[type="submit"], input[type="button"],
-input[type="reset"], label[for], select, summary,
-.wl-card .wl-toggle-opt, .wl-card .wl-cta-flip {
-  cursor: url('kurzor-modra.png?v=3') 28 16, pointer;
+/* ── Waitlist odměny + plovoucí tlačítko (přeneseno z Yasin: c9be0ee, 3e6659a) ── */
+.wl-fab {
+  --wl-blue: #1236E8;
+  --wl-size: 50px;        /* průměr kolečka (o 30 % menší) */
+  --wl-cycle: 13s;        /* jak často blesk problikne */
+
+  position: fixed;
+  right: 26px;
+  bottom: 26px;
+  z-index: 9000;
+
+  display: flex;
+  align-items: center;
+  height: var(--wl-size);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--wl-blue);
+  color: #fff;
+  text-decoration: none;              /* i jako <a> na stránkách bez JS */
+  box-shadow: 0 14px 34px rgba(4, 10, 60, .5);
+  cursor: pointer;
+  font: 700 15px/1 Poppins, system-ui, sans-serif;
+  letter-spacing: -.01em;
+  transition: padding-right .34s cubic-bezier(.22, 1, .36, 1);
 }
 
-/* Klikatelné na TMAVÉM pozadí => bílý vnitřek.
-   Modrý overlay waitlistu + tmavé UI náhledu dashboardu / demo navigace. */
-.wl-fs-close,
-[class^="dp-"], [class*=" dp-"],
-.demo-nav-btn {
-  cursor: url('kurzor-bila.png?v=3') 28 16, pointer;
+/* světlý disk za ikonkou – ukotvený k ikoně, ne ke středu pilulky */
+.wl-fab__disc {
+  position: absolute;
+  left: -14px;
+  top: -14px;
+  width: calc(var(--wl-size) + 28px);
+  height: calc(var(--wl-size) + 28px);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .10);
+  transition: opacity .26s ease, transform .3s cubic-bezier(.22, 1, .36, 1);
 }
 
-/* Textová pole => klasický "psací" kurzor, ať se dobře píše */
-input:not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-textarea, [contenteditable="true"] {
-  cursor: text;
+.wl-fab__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--wl-size);
+  height: var(--wl-size);
+  animation: wl-zap var(--wl-cycle) steps(1, end) infinite;   /* problikne */
+}
+.wl-fab__icon > svg {
+  animation: wl-buzz 2.6s ease-in-out infinite;               /* jemné dýchání */
+}
+
+.wl-fab__label {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  padding-left: 2px;
+  transition: max-width .34s cubic-bezier(.22, 1, .36, 1), opacity .22s ease;
+}
+
+/* rozbalení */
+.wl-fab:hover,
+.wl-fab:focus-visible,
+.wl-fab.is-open { padding-right: 30px; }
+
+.wl-fab:hover .wl-fab__label,
+.wl-fab:focus-visible .wl-fab__label,
+.wl-fab.is-open .wl-fab__label { max-width: 260px; opacity: 1; }
+
+/* disk při rozbalení zhasne, ať nevykukuje z pilulky */
+.wl-fab:hover .wl-fab__disc,
+.wl-fab:focus-visible .wl-fab__disc,
+.wl-fab.is-open .wl-fab__disc { opacity: 0; transform: scale(.82); }
+
+@keyframes wl-zap {
+  0%, 72% { opacity: 1 }
+  74% { opacity: .2 }
+  76% { opacity: 1 }
+  78% { opacity: .25 }
+  80% { opacity: 1 }
+  82% { opacity: .35 }
+  84%, 100% { opacity: 1 }
+}
+@keyframes wl-buzz {
+  0%, 100% { transform: scale(1) }
+  50% { transform: scale(1.07) }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wl-fab__icon, .wl-fab__icon > svg { animation: none }
+}
+
+/* mobil: menší a bez hoveru (rozbalení řeší JS / .is-open) */
+@media (max-width: 640px) {
+  .wl-fab { --wl-size: 45px; right: 20px; bottom: 20px; font-size: 13px }
+  .wl-fab:hover { padding-right: 0 }
+  .wl-fab:hover .wl-fab__label { max-width: 0; opacity: 0 }
+  .wl-fab:hover .wl-fab__disc { opacity: 1; transform: none }
+  .wl-fab.is-open { padding-right: 26px }
+  .wl-fab.is-open .wl-fab__label { max-width: 260px; opacity: 1 }
+}
+
+/* Když je čekací list otevřený, tlačítko schovej */
+.wl-fs.active ~ .wl-fab { display: none; }
+
+/* ── Zlatý odznáček „Byl jsem u toho" (odměna na waitlistu, za textem) ── */
+.gold-badge {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-family: Poppins, var(--font-heading), sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  color: #221A05;
+  border: 1px solid #A5780C;
+  background: linear-gradient(105deg,
+    #B8860B 0%, #E8C56A 22%, #FDF3C8 42%,
+    #D9A93C 62%, #A9770A 82%, #E4C069 100%);
+  background-size: 260% 100%;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .65),
+    inset 0 -1px 0 rgba(90, 60, 0, .35),
+    0 2px 6px -2px rgba(140, 96, 10, .5);
+  animation: goldFlow 7s ease-in-out infinite;
+}
+/* přejíždějící odlesk */
+.gold-badge__sheen {
+  position: absolute;
+  top: -40%;
+  left: 0;
+  width: 34px;
+  height: 180%;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, .9) 50%,
+    rgba(255, 255, 255, 0) 100%);
+  animation: goldSheen 4.5s ease-in-out infinite;
+}
+@keyframes goldFlow {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@keyframes goldSheen {
+  0%, 8%     { transform: translateX(-160%) skewX(-22deg); }
+  46%, 100%  { transform: translateX(420%) skewX(-22deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gold-badge, .gold-badge__sheen { animation: none; }
+}
+
+/* ── Onyxový odznak „Zakládající partner" (firemní odměna na waitlistu, za textem) ── */
+.founder-badge-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  font-family: Poppins, var(--font-heading), sans-serif;
+}
+/* kovové tělo odznáčku */
+.founder-badge {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid #2A3E52;
+  background: linear-gradient(105deg,
+    #060A12 0%, #14202E 22%, #2E4759 42%,
+    #101A26 62%, #050810 82%, #24384B 100%);
+  background-size: 260% 100%;
+  box-shadow: 0 5px 14px -3px rgba(6, 32, 40, .7);
+  animation: metalFlow 3.6s ease-in-out infinite;
+}
+/* bílý text, který odlesk obarví na tyrkysovou */
+.founder-badge__label {
+  position: relative;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  white-space: nowrap;
+  background-image: linear-gradient(100deg,
+    #FFFFFF 0%, #FFFFFF 36%, #3FC3D8 50%, #FFFFFF 64%, #FFFFFF 100%);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: textSheen 7.5s cubic-bezier(.5, 0, .3, 1) infinite;
+}
+/* přejíždějící světelný pruh */
+.founder-badge__sheen {
+  position: absolute;
+  top: -40%;
+  left: 0;
+  width: 34px;
+  height: 180%;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(226, 253, 255, .9) 50%,
+    rgba(255, 255, 255, 0) 100%);
+  animation: sheenSweep 7.5s cubic-bezier(.5, 0, .3, 1) infinite;
+}
+/* jiskry okolo */
+.founder-badge__sparks {
+  position: absolute;
+  inset: -10px;
+  pointer-events: none;
+}
+.founder-badge__sparks i {
+  position: absolute;
+  background: radial-gradient(50% 50% at 50% 50%,
+    #EAFDFF 0%, rgba(234, 253, 255, 0) 70%);
+  animation: sparkPop 2.6s ease-in-out infinite;
+}
+@keyframes metalFlow {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@keyframes sheenSweep {
+  0%, 8%    { transform: translateX(-200%) skewX(-22deg); }
+  46%, 100% { transform: translateX(900%) skewX(-22deg); }
+}
+@keyframes textSheen {
+  0%, 8%    { background-position: 100% 50%; }
+  46%, 100% { background-position: 0% 50%; }
+}
+@keyframes sparkPop {
+  0%, 100% { opacity: 0; transform: scale(.4) rotate(0deg); }
+  50%      { opacity: 1; transform: scale(1) rotate(90deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .founder-badge,
+  .founder-badge__label,
+  .founder-badge__sheen,
+  .founder-badge__sparks i { animation: none; }
+  .founder-badge__label { color: #fff; -webkit-text-fill-color: #fff; }
+  .founder-badge__sparks { display: none; }
+}
+
+/* ── „Zdarma" jako navazující text + probleskující zlaté hvězdičky nad slovem ── */
+.free-star {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+/* stejná velikost/tučnost/font jako zbytek řádku → vypadá jako poslední slovo věty */
+.free-star__word {
+  font: inherit;
+  color: inherit;
+}
+/* pás nad slovem, ve kterém hvězdičky probleskují */
+.free-star__field {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -11px;
+  height: 13px;
+  pointer-events: none;
+}
+.free-star__field i {
+  position: absolute;
+  background: linear-gradient(140deg, #FBE7A8 0%, #D9A93C 55%, #B8860B 100%);
+  clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%,
+                     50% 100%, 42% 58%, 0% 50%, 42% 42%);
+  animation: starPop 2.6s ease-in-out infinite;
+}
+/* každá hvězdička se rozsvítí, pootočí a zhasne; pak čeká do konce cyklu */
+@keyframes starPop {
+  0%, 72%, 100% { opacity: 0;  transform: scale(.2)  rotate(0deg); }
+  12%           { opacity: 1;  transform: scale(1.15) rotate(35deg); }
+  34%           { opacity: .9; transform: scale(.85) rotate(70deg); }
+  56%           { opacity: 0;  transform: scale(.3)  rotate(100deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .free-star__field i { animation: none; opacity: 1; transform: none; }
+}
+
+/* Vysvětlivka pod polem (přístupový klíč v přihlášení) — světlé modály */
+.form-hint { margin: .4rem 0 0; font-size: .78rem; line-height: 1.35; color: #8a8f98; }
+
+/* ── Světlé auth modály (login/registrace) — přeneseno z Makej-sro/Yasin ── */
+.modal {
+  background: #fff;
+  border: 1px solid rgba(10,13,46,.08);
+  box-shadow: 0 30px 80px rgba(5,7,26,.45);
+  color: #0a0d2e;
+}
+.modal .modal-title { color: #0a0d2e; }
+.modal .modal-subtitle,
+.modal .modal-switch,
+.modal .modal-divider,
+.modal .modal-back { color: rgba(10,13,46,.55); }
+.modal .modal-divider::before,
+.modal .modal-divider::after { background: rgba(10,13,46,.1); }
+.modal .modal-back:hover,
+.modal .modal-switch a { color: var(--primary); }
+
+.modal .modal-close { background: rgba(10,13,46,.06); color: rgba(10,13,46,.5); }
+.modal .modal-close:hover { background: rgba(10,13,46,.12); color: #0a0d2e; }
+
+.modal .form-label { color: #0a0d2e; }
+.modal .form-input {
+  background: #f5f6fb; border: 1px solid rgba(10,13,46,.12); color: #0a0d2e;
+}
+.modal .form-input::placeholder { color: rgba(10,13,46,.4); }
+.modal .form-input:focus { background: #fff; border-color: var(--primary); }
+.modal .pw-toggle { color: rgba(10,13,46,.45); }
+.modal .pw-toggle:hover { color: var(--primary); }
+
+.modal .modal-error { background: rgba(244,63,94,.08); border-color: rgba(244,63,94,.25); color: #d92d4b; }
+
+.modal .btn-google {
+  background: #fff; border: 1px solid rgba(10,13,46,.14); color: #0a0d2e;
+}
+.modal .btn-google:hover { background: #f5f6fb; border-color: rgba(10,13,46,.28); }
+
+.modal .role-card {
+  background: #f5f6fb; border: 1px solid rgba(10,13,46,.08); color: #0a0d2e;
+}
+@media (hover: hover) and (pointer: fine) {
+  .modal .role-card:hover { background: #eef0f9; border-color: var(--primary); }
+}
+.modal .role-card iconify-icon { color: var(--primary); }
+.modal .role-card small { color: rgba(10,13,46,.55); }
+
+/* Ikony rolí (PNG glyfy obarvené maskou na firemní modrou) */
+.role-ic {
+  width: 34px; height: 34px; display: block;
+  background-repeat: no-repeat; background-position: center; background-size: contain;
+}
+.role-ic--user { background-image: url('employer/user-blue.png'); }
+.role-ic--company { background-image: url('employer/company-blue.png'); }
+
+/* Odkaz „Zapomněl jsem heslo?" v přihlašovacím modálu */
+.modal .login-forgot-row { display: flex; justify-content: flex-end; margin: -6px 0 14px; }
+.modal .login-forgot {
+  font-size: .8rem; font-weight: 600; color: rgba(10,13,46,.55);
+  transition: color .2s ease;
+}
+.modal .login-forgot:hover { color: var(--primary); text-decoration: underline; }
+
+/* Přepínač hesla textem (Zobrazit / Skrýt) */
+.modal .pw-toggle--text {
+  font-family: var(--font-sans); font-size: .78rem; font-weight: 700;
+  color: rgba(10,13,46,.55); letter-spacing: .01em;
+  padding: 4px 2px; transition: color .2s ease;
+  user-select: none; -webkit-user-select: none; touch-action: none;
+}
+.modal .pw-toggle--text:active { color: var(--primary); }
+.modal .pw-toggle--text:hover { color: var(--primary); }
+.modal .password-wrap:has(.pw-toggle--text) .form-input { padding-right: 76px; }
+
+/* Chevron „Zpět" v přihlašovacím modálu — šedý, na hover zmodrá spolu s textem */
+.modal .modal-back .back-ic {
+  width: 13px; height: 13px; flex-shrink: 0;
+  background: url('employer/chevron-gray.png') center/contain no-repeat;
+  transition: transform .2s ease;
+}
+.modal .modal-back:hover .back-ic {
+  background-image: url('employer/chevron-blue.png');
+  transform: translateX(-2px);
 }

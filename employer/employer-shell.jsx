@@ -4,6 +4,41 @@
 const { useState: useStateE, useEffect: useEffectE, useRef: useRefE, useMemo: useMemoE } = React;
 
 // ─────────────────────────────────────────────────────────────
+// ODZNÁČEK TARIFU — efekt roste s cenou (CSS .tier-badge v index.html).
+// Mapuje název plánu (starý „Premium/Standard" i nový „Výhodný…") na tier + název.
+// ─────────────────────────────────────────────────────────────
+function _planToTier(plan) {
+  const p = (plan || '').toLowerCase();
+  if (p.includes('enterprise') || p.includes('vlastní') || p.includes('vlastni'))                 return { tier: 'custom',  label: 'Vlastní' };
+  if (p.includes('business') || p.includes('premium') || p.includes('maximáln') || p.includes('maximalni')) return { tier: 'max', label: 'Maximální' };
+  if (p.includes('dynamick'))                                                                       return { tier: 'dynamic', label: 'Dynamický' };
+  if (p.includes('standard') || p.includes('výhodn') || p.includes('vyhodn'))                       return { tier: 'value',   label: 'Výhodný' };
+  return { tier: 'free', label: 'Zdarma' };
+}
+
+function TierBadge({ plan }) {
+  const { tier, label } = _planToTier(plan);
+  const hasAura   = tier === 'max' || tier === 'custom';
+  const hasSparks = tier === 'custom';
+  return (
+    <span className="tier-badge" data-tier={tier}>
+      {hasAura && <span className="tier-badge__aura" aria-hidden="true" />}
+      <span className="tier-badge__pill">
+        {label}
+        <span className="tier-badge__sheen" aria-hidden="true" />
+      </span>
+      {hasSparks && (
+        <span className="tier-badge__sparks" aria-hidden="true">
+          <i style={{ top: 0, left: '14%', width: 7, height: 7 }} />
+          <i style={{ bottom: 2, right: '20%', width: 6, height: 6, animationDelay: '-1.3s' }} />
+          <i style={{ top: '30%', right: 2, width: 5, height: 5, animationDelay: '-.7s' }} />
+        </span>
+      )}
+    </span>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
 // LOGO + COMPANY BADGE
 // ─────────────────────────────────────────────────────────────
 function ELogo() {
@@ -159,6 +194,8 @@ function ESidebar({ tab, onTab, mobile = false, open = false, onClose }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <Icon name="crown-star-bold" size={16} color={T.primary} />
           <span style={{ color: T.primary, fontSize: 10, fontWeight: 800, fontFamily: T.fontUI, letterSpacing: 1, textTransform: 'uppercase' }}>Premium tarif</span>
+          <span style={{ flex: 1 }} />
+          <TierBadge plan={(typeof planId === 'function' && typeof PLAN_LIMITS !== 'undefined' && PLAN_LIMITS[planId()]) ? PLAN_LIMITS[planId()].label : (ECOMPANY && ECOMPANY.plan) || 'Starter'} />
         </div>
         {(() => {
           const expStr = EPROFILE.premium_until || EPROFILE.plan_expires_at || null;

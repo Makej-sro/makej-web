@@ -16,7 +16,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Playfair+Display:ital,wght@1,600;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Playfair+Display:ital,wght@1,600;1,700&family=Poppins:wght@700&display=swap" rel="stylesheet">
 
   <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -118,6 +118,80 @@
       [style*="repeat(3, 1fr)"],
       [style*="repeat(2, 1fr)"],
       [style*="repeat(2, minmax(0, 1fr)"] { grid-template-columns: 1fr !important; }
+    }
+
+    /* ── Odznáčky tarifů (TierBadge) — efekt roste s cenou ── */
+    .tier-badge { position: relative; display: inline-flex; align-items: center; justify-content: center; perspective: 400px; }
+    /* dashboard má #root * { font: Inter !important } → přebíjíme specifičtějším !important */
+    #root .tier-badge, #root .tier-badge__pill { font-family: 'Poppins', sans-serif !important; }
+    .tier-badge__pill {
+      position: relative; overflow: hidden; display: inline-block;
+      padding: 5px 13px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; letter-spacing: .2px; white-space: nowrap;
+      color: var(--tier-text); border: 1px solid var(--tier-edge);
+      background-image: var(--tier-metal); background-size: 260% 100%;
+      box-shadow: inset 0 1px 0 var(--tier-top-light), inset 0 -1px 0 var(--tier-bottom-dark), var(--tier-drop-shadow);
+      animation: var(--tier-anim, none);
+    }
+    .tier-badge__sheen {
+      position: absolute; top: -40%; left: 0; width: var(--tier-sheen-width); height: 180%; pointer-events: none;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, var(--tier-sheen) 50%, rgba(255,255,255,0) 100%);
+      animation: sheenSweep var(--tier-sheen-dur) var(--tier-sheen-ease) infinite; animation-delay: var(--tier-sheen-delay);
+    }
+    .tier-badge__aura {
+      position: absolute; inset: -7px; border-radius: 999px; pointer-events: none;
+      background: radial-gradient(60% 70% at 50% 50%, var(--tier-aura) 0%, rgba(255,255,255,0) 72%);
+      animation: auraPulse 3.4s ease-in-out infinite; animation-delay: var(--tier-aura-delay, 0s);
+    }
+    .tier-badge__sparks { position: absolute; inset: -10px; pointer-events: none; }
+    .tier-badge__sparks i { position: absolute; background: radial-gradient(50% 50% at 50% 50%, #fff 0%, rgba(255,255,255,0) 70%); animation: sparkPop 2.6s ease-in-out infinite; }
+
+    .tier-badge[data-tier="free"] {
+      --tier-metal: linear-gradient(105deg, #9AA6BF 0%, #CDD6E6 22%, #F4F7FC 42%, #B7C1D6 62%, #8E9AB4 82%, #C9D2E3 100%);
+      --tier-text: #1B2437; --tier-edge: #8B96AE;
+      --tier-top-light: rgba(255,255,255,.8); --tier-bottom-dark: rgba(40,52,75,.3);
+      --tier-sheen: rgba(255,255,255,.95); --tier-drop-shadow: 0 1px 3px -1px rgba(90,105,135,.4);
+      --tier-anim: none; --tier-sheen-dur: 8s; --tier-sheen-ease: ease-in-out; --tier-sheen-delay: 0s; --tier-sheen-width: 22px;
+    }
+    .tier-badge[data-tier="value"] {
+      --tier-metal: linear-gradient(105deg, #0E11B4 0%, #2E33F0 22%, #5A60F0 42%, #1D21DC 62%, #0B0D96 82%, #3438E8 100%);
+      --tier-text: #FFFFFF; --tier-edge: #0B0D96;
+      --tier-top-light: rgba(190,195,255,.6); --tier-bottom-dark: rgba(4,6,60,.5);
+      --tier-sheen: rgba(235,240,255,.9); --tier-drop-shadow: 0 2px 6px -2px rgba(20,23,230,.5);
+      --tier-anim: metalFlow 7s ease-in-out infinite -1.2s; --tier-sheen-dur: 5s; --tier-sheen-ease: ease-in-out; --tier-sheen-delay: -.9s; --tier-sheen-width: 28px;
+    }
+    .tier-badge[data-tier="dynamic"] {
+      --tier-metal: linear-gradient(105deg, #0F7A3D 0%, #229B54 22%, #3EB871 42%, #178F49 62%, #0B6532 82%, #2FA862 100%);
+      --tier-text: #FFFFFF; --tier-edge: #0B6532;
+      --tier-top-light: rgba(198,246,216,.6); --tier-bottom-dark: rgba(4,45,22,.45);
+      --tier-sheen: rgba(240,255,246,.9); --tier-drop-shadow: 0 2px 8px -2px rgba(15,122,61,.5);
+      --tier-anim: metalFlow 5.5s ease-in-out infinite -2.4s; --tier-sheen-dur: 4s; --tier-sheen-ease: cubic-bezier(.5,0,.3,1); --tier-sheen-delay: -1.8s; --tier-sheen-width: 30px;
+    }
+    .tier-badge[data-tier="max"] {
+      --tier-metal: linear-gradient(105deg, #8F3A0C 0%, #BE5518 22%, #DC7434 42%, #B04D14 62%, #7C310A 82%, #C9601F 100%);
+      --tier-text: #FFFFFF; --tier-edge: #7C310A;
+      --tier-top-light: rgba(255,214,180,.55); --tier-bottom-dark: rgba(60,22,4,.5);
+      --tier-sheen: rgba(255,240,225,.9); --tier-drop-shadow: 0 4px 12px -3px rgba(143,58,12,.6);
+      --tier-anim: metalFlow 4.5s ease-in-out infinite -3.6s, badgeTilt 5s ease-in-out infinite;
+      --tier-sheen-dur: 3.4s; --tier-sheen-ease: cubic-bezier(.5,0,.3,1); --tier-sheen-delay: -2.7s; --tier-sheen-width: 34px;
+      --tier-aura: rgba(216,116,52,.75); --tier-aura-delay: -3.6s;
+    }
+    .tier-badge[data-tier="custom"] {
+      --tier-metal: linear-gradient(105deg, #5B2A9E 0%, #7A41C8 22%, #9C6BE0 42%, #7439C4 62%, #4A1F86 82%, #8A54D4 100%);
+      --tier-text: #FFFFFF; --tier-edge: #4A1F86;
+      --tier-top-light: rgba(226,205,252,.6); --tier-bottom-dark: rgba(35,10,70,.5);
+      --tier-sheen: rgba(250,243,255,.9); --tier-drop-shadow: 0 5px 14px -3px rgba(91,42,158,.65);
+      --tier-anim: metalFlow 3.6s ease-in-out infinite -4.8s, badgeTilt 4.2s ease-in-out infinite;
+      --tier-sheen-dur: 2.8s; --tier-sheen-ease: cubic-bezier(.5,0,.3,1); --tier-sheen-delay: -3.6s; --tier-sheen-width: 34px;
+      --tier-aura: rgba(156,107,224,.8); --tier-aura-delay: -4.8s;
+    }
+    @keyframes metalFlow { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    @keyframes sheenSweep { 0%,8% { transform: translateX(-200%) skewX(-22deg); } 46%,100% { transform: translateX(900%) skewX(-22deg); } }
+    @keyframes badgeTilt { 0%,100% { transform: rotateY(-9deg) rotateX(4deg); } 50% { transform: rotateY(9deg) rotateX(-4deg); } }
+    @keyframes auraPulse { 0%,100% { opacity: .22; transform: scale(1); } 50% { opacity: .6; transform: scale(1.16); } }
+    @keyframes sparkPop { 0%,100% { opacity: 0; transform: scale(.4) rotate(0deg); } 50% { opacity: 1; transform: scale(1) rotate(90deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .tier-badge__pill, .tier-badge__sheen, .tier-badge__aura, .tier-badge__sparks i { animation: none; }
     }
   </style>
 </head>
@@ -268,9 +342,9 @@
   <script type="text/babel" src="employer-theme.jsx?v=4"></script>
   <script type="text/babel" src="employer-data.jsx?v=6"></script>
   <script type="text/babel" src="employer-plans.jsx?v=2"></script>
-  <script type="text/babel" src="employer-shell.jsx?v=15"></script>
+  <script type="text/babel" src="employer-shell.jsx?v=16"></script>
   <script type="text/babel" src="employer-dashboard.jsx?v=11"></script>
-  <script type="text/babel" src="employer-pages.jsx?v=21"></script>
+  <script type="text/babel" src="employer-pages.jsx?v=22"></script>
   <script type="text/babel" src="employer-pages3.jsx?v=29"></script>
   <script type="text/babel" src="_premium/kraje-map.jsx?v=2"></script>
   <script type="text/babel" src="_premium/analytics.jsx?v=17"></script>

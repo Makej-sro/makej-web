@@ -210,6 +210,22 @@ function initAuth() {
   // true = registrace otevřena z waitlistu → „Zpět" vede zpět na waitlist,
   // ne na rozcestník. Resetuje se při každém otevření modálu (wlGoRegister ho pak nastaví).
   let regFromWaitlist = false;
+  // true = po signUp NEpřesměrovávat (když je v Supabase vypnuté potvrzování e-mailu,
+  // signUp uživatele rovnou přihlásí — nechceme ho hodit do dashboardu). Viz register-form.
+  let skipAutoRedirect = false;
+
+  // ── PŘÍSTUPOVÝ KLÍČ ──────────────────────────────────────────────────────
+  // Web je před spuštěním: registrace běží pro všechny, ale PŘIHLÁSIT se (a jít
+  // do dashboardu) může jen ten, kdo v přihlašovacím formuláři zadá platný klíč.
+  //   ⇒ ZMĚNIT KLÍČ = uprav ACCESS_KEY.  ⇒ NAOSTRO = dej ACCESS_KEY na '' (pustí všechny).
+  const ACCESS_KEY = '8939';
+  const ACCESS_LOCKED_MSG =
+    'Spouštíme 1. 10. — zrovna na tom makáme. 💪 Jakmile bude hotovo, dáme ti vědět e-mailem.';
+  function accessKeyOk() {
+    if (!ACCESS_KEY) return true;
+    const el = document.getElementById('login-key');
+    return !!el && el.value.trim() === ACCESS_KEY;
+  }
 
   // ─── Modal open/close ───
   function openModal(type, role) {
@@ -393,6 +409,14 @@ function initAuth() {
   document.getElementById('login-form').addEventListener('submit', async e => {
     e.preventDefault();
     clearErrors();
+    // Přístupový klíč — bez něj se dovnitř nedostaneš (viz komentář výš).
+    if (!accessKeyOk()) {
+      showError('login-error', ACCESS_LOCKED_MSG);
+      return;
+    }
+    // Klíč prošel → poznač do session, ať /worker/ po přesměrování ví, že brána byla ověřena.
+    try { sessionStorage.setItem('makej-gate-ok', ACCESS_KEY); } catch (e) {}
+
     const btn = document.getElementById('login-submit');
     const email    = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
@@ -472,13 +496,22 @@ function initAuth() {
       return;
     }
 
+    // Nepovinný marketingový souhlas (opt-in) — uloží se k účtu.
+    const marketing = !!document.getElementById('reg-marketing')?.checked;
+
     btn.disabled = true;
     btn.textContent = 'Registrace...';
 
-    const { error } = await sb.auth.signUp({
+    // Registrace nesmí po signUp přesměrovat: když je v Supabase VYPNUTÉ potvrzování
+    // e-mailu, signUp uživatele rovnou přihlásí → hodilo by ho to do (nedodělaného)
+    // dashboardu. Proto redirect potlačíme a hned se odhlásíme.
+    skipAutoRedirect = true;
+
+    const { data, error } = await sb.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: window.location.origin,
         data: {
           name,
           role: selectedRole,
@@ -486,22 +519,45 @@ function initAuth() {
           birth_date: selectedRole === 'worker' ? birth : null,
           gender: selectedRole === 'worker' ? (gender || null) : null,
           kraj: kraj || null,
+          marketing_consent: marketing,
         }
       }
     });
 
     if (error) {
+      skipAutoRedirect = false;
       showError('register-error', translateAuthError(error.message));
       btn.disabled = false;
       btn.textContent = 'Vytvořit účet';
-    } else {
-      closeModals();
-      showToast('Registrace proběhla! Zkontroluj svůj email pro potvrzení.');
+      return;
     }
+
+    // Účet je v DB. Když je potvrzování e-mailu vypnuté, signUp nás rovnou přihlásil →
+    // hned se odhlásíme, ať nikdo nespadne do nedodělaného dashboardu.
+    let msg;
+    if (data && data.session) {
+      try { await sb.auth.signOut(); } catch (e) {}
+      msg = 'Účet byl úspěšně založen! 🎉 Spouštíme 1. 10. — dáme ti vědět, jakmile bude hotovo.';
+    } else {
+      msg = 'Účet byl úspěšně založen! Zkontroluj e-mail pro potvrzení.';
+    }
+    skipAutoRedirect = false;
+
+    closeModals();
+    showToast(msg);
+    btn.disabled = false;
+    btn.textContent = 'Vytvořit účet';
   });
 
   // ─── Google OAuth — stejný provider jako v makej ───
   document.getElementById('login-google').addEventListener('click', async () => {
+    // Přístupový klíč platí i pro Google login — ať není zadní vrátka.
+    if (!accessKeyOk()) {
+      showError('login-error', ACCESS_LOCKED_MSG);
+      return;
+    }
+    // Klíč prošel → poznač do session i pro Google (redirect na /worker/ ho pak nechce znovu).
+    try { sessionStorage.setItem('makej-gate-ok', ACCESS_KEY); } catch (e) {}
     await sb.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.href }
@@ -515,6 +571,7 @@ function initAuth() {
     // INITIAL_SESSION = obnova existující session při načtení stránky → nepřesměrovávat
     // SIGNED_IN = aktivní přihlášení (formulář / Google OAuth callback) → přesměrovat
     if (event === 'SIGNED_IN' && session?.user) {
+      if (skipAutoRedirect) { skipAutoRedirect = false; return; }   // registrace se odhlásí sama
       const role = session.user.user_metadata?.role;
       window.location.href = role === 'employer' ? '/employer/' : '/worker/';
     }
@@ -564,6 +621,15 @@ function initAuth() {
 
   document.getElementById('wl-close').addEventListener('click', () => closeWaitlist(true));
   document.getElementById('wl-done-close').addEventListener('click', () => closeWaitlist(false));
+  // Plovoucí tlačítko „Startujeme" (.wl-fab) — otevře čekací list i po zavření křížkem
+  const wlFab = document.querySelector('.wl-fab');
+  if (wlFab) {
+    wlFab.addEventListener('click', () => openWaitlist());
+    if (window.matchMedia('(max-width: 640px)').matches) {
+      setTimeout(() => wlFab.classList.add('is-open'), 2000);
+      setTimeout(() => wlFab.classList.remove('is-open'), 6000);
+    }
+  }
   document.getElementById('wl-back').addEventListener('click', () => wlPanel.classList.remove('active'));
   wlPanel.addEventListener('click', e => { if (e.target === wlPanel) wlPanel.classList.remove('active'); });
   document.addEventListener('keydown', e => {
