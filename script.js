@@ -137,10 +137,26 @@ function animateCounters() {
 
 // ═══════════ SCROLL REVEAL ═══════════
 function setupReveal() {
-  const revealElements = document.querySelectorAll(
-    '.step-card, .feature-card, .testimonial-card, .download-card, .section-header, .cn-plan'
-  );
-  revealElements.forEach(el => el.classList.add('reveal'));
+  // Bezpečné obsahové bloky napříč stránkami. POZOR: nezahrnovat prvky s vlastním
+  // transformem (.dl-card rotate) ani kroky u „jak to funguje" (.bolt-row — konflikt
+  // s kreslenou spojnicí), aby se transform nepřebil.
+  const SEL = [
+    '.step-card', '.feature-card', '.testimonial-card', '.download-card',
+    '.section-header', '.cn-plan',
+    '.ref-grid', '.bolt-head', '.bolt-text',
+    '.ab-lead', '.ab-col', '.ab-team-block', '.ab-person', '.ab-quote', '.ab-cta',
+    '.emp-faq-item', '.faq-item',
+  ].join(', ');
+  const revealElements = document.querySelectorAll(SEL);
+
+  revealElements.forEach(el => {
+    el.classList.add('reveal');
+    // Stagger: prvek dostane zpoždění podle pořadí mezi reveal-sourozenci ve stejném
+    // rodiči → skupiny karet naskakují kaskádovitě, samostatné bloky bez zpoždění.
+    let i = 0, s = el.previousElementSibling;
+    while (s) { if (s.classList && s.classList.contains('reveal')) i++; s = s.previousElementSibling; }
+    if (i > 0) el.style.transitionDelay = (Math.min(i, 5) * 0.08).toFixed(2) + 's';
+  });
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -149,7 +165,7 @@ function setupReveal() {
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
   revealElements.forEach(el => observer.observe(el));
 }
@@ -544,13 +560,17 @@ function initAuth() {
   });
 
   // ─── Zobrazit / skrýt heslo ───
+  // Null-safe: některé stránky mají jednodušší modal bez všech pw-toggle tlačítek.
   function setupPwToggle(toggleId, inputId, iconId) {
-    document.getElementById(toggleId).addEventListener('click', () => {
+    const toggle = document.getElementById(toggleId);
+    if (!toggle) return;
+    toggle.addEventListener('click', () => {
       const input = document.getElementById(inputId);
       const icon  = document.getElementById(iconId);
+      if (!input) return;
       const show  = input.type === 'password';
       input.type  = show ? 'text' : 'password';
-      icon.setAttribute('icon', show ? 'solar:eye-closed-bold' : 'solar:eye-bold');
+      if (icon) icon.setAttribute('icon', show ? 'solar:eye-closed-bold' : 'solar:eye-bold');
     });
   }
   setupPwToggle('reg-pw-toggle',  'reg-password',  'reg-pw-icon');
@@ -1373,7 +1393,8 @@ function showToast(msg) {
   var L = path.getTotalLength();
   path.style.strokeDasharray = L;
   path.style.strokeDashoffset = L;
-  path.style.transition = 'stroke-dashoffset .12s linear';
+  // Bez transition: update běží na rAF (frame-synced se scrollem), takže čára sleduje
+  // posun přesně. Dřívější .12s transition dobíhala scroll → u tlačítka dole to poskakovalo.
 
   var ticking = false;
   function update() {
