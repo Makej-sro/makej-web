@@ -195,11 +195,31 @@ img { max-width: 100%; display: block; }
   font-family: var(--font-heading); font-size: clamp(2.8rem, min(11vw, 15vh), 9.5rem);
   font-weight: 900; line-height: 1.02; margin-bottom: 28px;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
-  animation: fadeInUp .6s ease-out both;
 }
-/* ── Hero word lines ── */
+/* ── Hero word lines — postupné vyjetí zpod masky (insieme-styl) ── */
 .hero-line {
   display: block; text-align: left; line-height: 1.1; position: relative;
+  overflow: hidden; padding-bottom: .14em; margin-bottom: -.14em;
+}
+.hero-line-in {
+  display: inline-block; will-change: transform;
+  transform: translateY(120%);
+  animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) both;
+}
+.hero-line:nth-child(1) .hero-line-in { animation-delay: .08s; }
+.hero-line:nth-child(2) .hero-line-in { animation-delay: .22s; }
+.hero-line:nth-child(3) .hero-line-in { animation-delay: .36s; }
+@keyframes heroLineUp { from { transform: translateY(120%); } to { transform: translateY(0); } }
+/* Prostřední slovo „Matchuj" — jemný nekonečný lesk (gradient sweep) */
+#hero .hero-grad {
+  background: linear-gradient(100deg, #7c86ff 0%, #c7ceff 28%, #ffffff 50%, #c7ceff 72%, #7c86ff 100%);
+  background-size: 220% auto; -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) .22s both, heroGradSweep 6s linear 1.3s infinite;
+}
+@keyframes heroGradSweep { to { background-position: 220% center; } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-line-in, #hero .hero-grad { animation: none !important; transform: none !important; }
 }
 
 .hero-subtitle {
