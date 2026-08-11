@@ -28,7 +28,7 @@
   <meta name="twitter:title" content="Hledám si práci — Makej" />
   <meta name="twitter:description" content="Žádné životopisy, žádné pohovory. Swajpni nabídku, matchni se s firmou a začni vydělávat ještě dnes." />
   <meta name="twitter:image" content="https://makej.eu/og-image.png" />
-  <link rel="icon" type="image/png" href="/favicon.png?v=2" />
+  <link rel="icon" type="image/png" href="/favicon.png?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Instrument+Sans:wght@400;500;600&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -265,6 +265,27 @@
       .mkj-visual { height: 470px; margin-top: -70px; }
       .mkj-stage { transform: translateX(-50%) scale(.8); top: 8px; }
     }
+
+    /* ── FAQ (brigádníci) — světlá sekce ── */
+    .emp-faq { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+    .emp-faq-list { border-top: 1px solid rgba(15,18,40,.1); }
+    .emp-faq-item { border-bottom: 1px solid rgba(15,18,40,.1); }
+    .emp-faq-q {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      padding: 22px 4px; cursor: pointer; font-weight: 600; font-size: 1rem; color: #0f1222;
+      user-select: none; transition: color .15s;
+    }
+    .emp-faq-q:hover { color: #0020f6; }
+    .emp-faq-icon { color: #8a93a8; flex-shrink: 0; transition: transform .25s cubic-bezier(.2,.8,.2,1), color .15s; }
+    .emp-faq-item.open .emp-faq-icon { transform: rotate(45deg); color: #0020f6; }
+    .emp-faq-a { display: none; padding: 0 4px 22px; color: #5b6478; font-size: .92rem; line-height: 1.7; }
+    .emp-faq-a a { color: #0020f6; text-decoration: none; }
+    .emp-faq-a a:hover { text-decoration: underline; }
+    .emp-faq-item.open .emp-faq-a { display: block; }
+    #faq .section-header h2 { color: #0f1222; }
+    #faq .section-header h2 .gradient-text { -webkit-text-fill-color: #0020f6; color: #0020f6; background: none; }
+    #faq .section-header p { color: #5b6478; }
+    #faq .section-header p a { color: #0020f6; }
   </style>
 </head>
 <body>
@@ -276,6 +297,7 @@
       <div class="nav-links">
         <a href="/hledam-si-praci.html" class="nav-active">Hledám si práci</a>
         <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+        <a href="/blog.html">Blog</a>
         <a href="#download">Stáhnout</a>
         <a href="/podpora.html">Podpora</a>
       </div>
@@ -291,6 +313,7 @@
     <div class="mobile-menu" id="mobile-menu">
       <a href="/hledam-si-praci.html" class="nav-active">Hledám si práci</a>
       <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+      <a href="/blog.html">Blog</a>
       <a href="#download">Stáhnout</a>
       <a href="/podpora.html">Podpora</a>
       <div class="mobile-menu-actions">
@@ -379,7 +402,7 @@
                   style="transition: opacity .6s cubic-bezier(.33,0,.2,1), stroke-width .6s cubic-bezier(.33,0,.2,1)"></path>
           </svg>
           <div class="bolt-head" style="position:relative; z-index:1;">
-            <h2>Pojď si vydělat s <span class="gradient-text" id="boltMakej" aria-label="Makej">Make<span id="boltJ" aria-hidden="true" style="position:relative;">&#567;<span id="boltDot" style="position:absolute; left:45%; top:0.24em; width:0.175em; height:0.175em; border-radius:50%; background:#0020f6; transform:translate(-50%,-50%); pointer-events:none;"</span></span></span></h2>
+            <h2>Pojď si vydělat s <span class="gradient-text" id="boltMakej" aria-label="Makej">Make<span id="boltJ" aria-hidden="true" style="position:relative;">&#567;<span id="boltDot" style="position:absolute; left:45%; top:0.24em; width:0.175em; height:0.175em; border-radius:50%; background:#0020f6; transform:translate(-50%,-50%); pointer-events:none;"></span></span></span></h2>
           </div>
 
           <div class="bolt-steps">
@@ -439,8 +462,61 @@
           <div class="mk__track mk__track--2" data-mk-track data-mk-reverse></div>
           <!-- Mobil: statický seznam (hover nefunguje na dotyku) -->
           <ul class="mk__list" data-mk-list></ul>
-          <div class="mk__foot">
-            <a class="mk__cta worker-cta-register" href="javascript:void(0)">Vytvořit účet</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ FAQ (brigádníci) ═══════════ -->
+    <section id="faq" class="nav-light" style="padding:40px 0 110px; background:#fff;">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Časté <span class="gradient-text">otázky</span></h2>
+          <p>Nenašel jsi odpověď? Napiš nám na <a href="mailto:admin@makej.eu">admin@makej.eu</a></p>
+        </div>
+        <div class="emp-faq">
+          <div class="emp-faq-list">
+            <div class="emp-faq-item">
+              <div class="emp-faq-q" onclick="toggleFaq(this)">
+                <span>Kolik stojí Makej pro brigádníky?</span>
+                <iconify-icon icon="solar:add-circle-bold" width="20" class="emp-faq-icon"></iconify-icon>
+              </div>
+              <div class="emp-faq-a">Makej je pro brigádníky úplně zdarma. Žádné poplatky ani provize z výdělku — stáhneš, zaregistruješ se a swajpuješ.</div>
+            </div>
+            <div class="emp-faq-item">
+              <div class="emp-faq-q" onclick="toggleFaq(this)">
+                <span>Jak si najdu brigádu?</span>
+                <iconify-icon icon="solar:add-circle-bold" width="20" class="emp-faq-icon"></iconify-icon>
+              </div>
+              <div class="emp-faq-a">Swajpuješ nabídky ve svém okolí jako na Tinderu: doprava „mám zájem", doleva „přeskočit". Když firma projeví zájem taky, vznikne match a otevře se chat.</div>
+            </div>
+            <div class="emp-faq-item">
+              <div class="emp-faq-q" onclick="toggleFaq(this)">
+                <span>Musím psát životopis?</span>
+                <iconify-icon icon="solar:add-circle-bold" width="20" class="emp-faq-icon"></iconify-icon>
+              </div>
+              <div class="emp-faq-a">Ne. Stačí vyplnit profil (jméno, pár údajů, případně zkušenosti) a swajpovat — žádné zdlouhavé životopisy ani motivační dopisy.</div>
+            </div>
+            <div class="emp-faq-item">
+              <div class="emp-faq-q" onclick="toggleFaq(this)">
+                <span>Jsou firmy ověřené?</span>
+                <iconify-icon icon="solar:add-circle-bold" width="20" class="emp-faq-icon"></iconify-icon>
+              </div>
+              <div class="emp-faq-a">Ano. Každý zaměstnavatel projde verifikací IČO i provozovny, takže swajpuješ jen prověřené nabídky.</div>
+            </div>
+            <div class="emp-faq-item">
+              <div class="emp-faq-q" onclick="toggleFaq(this)">
+                <span>Kdy a jak dostanu zaplaceno?</span>
+                <iconify-icon icon="solar:add-circle-bold" width="20" class="emp-faq-icon"></iconify-icon>
+              </div>
+              <div class="emp-faq-a">Formu i termín výplaty (hotově, na účet) si domluvíš přímo s firmou v chatu po matchi. Hodinovku navíc vidíš už u inzerátu — žádné „mzda dle dohody".</div>
+            </div>
+            <div class="emp-faq-item">
+              <div class="emp-faq-q" onclick="toggleFaq(this)">
+                <span>Od kolika let a kde Makej funguje?</span>
+                <iconify-icon icon="solar:add-circle-bold" width="20" class="emp-faq-icon"></iconify-icon>
+              </div>
+              <div class="emp-faq-a">Brigády jsou zpravidla od 15 let (u některých pozic může být podmínka 18 let — vždy je to uvedené u nabídky). Nabídky filtruješ podle lokace, ať máš práci pár minut od domova nebo školy.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -487,6 +563,7 @@
           <h4>Produkt</h4>
           <a href="/hledam-si-praci.html">Hledám si práci</a>
           <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+          <a href="/blog.html">Blog</a>
           <a href="#download">Stáhnout</a>
         </div>
         <div class="footer-col">
@@ -956,9 +1033,27 @@
     window.addEventListener('load', measure);
     if (window.ResizeObserver) { new ResizeObserver(measure).observe(wrap); }
     wrap.querySelectorAll('img').forEach(function (im) { if (!im.complete) im.addEventListener('load', measure); });
+    // Web font (Bricolage/Inter) doskočí až po prvním renderu a POSUNE slovo „Makej“
+    // i tečku nad „j“ → čára pak občas nevychází z tečky. Přeměříme, jakmile jsou
+    // fonty připravené i po doběhnutí konkrétního fontu nadpisu.
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(measure);
+      try {
+        document.fonts.load('800 3rem "Bricolage Grotesque"').then(measure).catch(function () {});
+      } catch (e) {}
+    }
     setTimeout(measure, 600);
     setTimeout(measure, 1600);
   })();
+  </script>
+  <!-- FAQ rozbalování -->
+  <script>
+    function toggleFaq(el) {
+      var item = el.parentElement;
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.emp-faq-item.open').forEach(function (i) { i.classList.remove('open'); });
+      if (!isOpen) item.classList.add('open');
+    }
   </script>
 </body>
 </html>
