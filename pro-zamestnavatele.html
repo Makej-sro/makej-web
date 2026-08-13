@@ -224,6 +224,23 @@
     .bolt-steps { display: flex; flex-direction: column; gap: 88px; }
     .bolt-path { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
     .bolt-cta { display: flex; justify-content: center; margin-top: 60px; position: relative; z-index: 1; }
+    /* CTA morph: tlačítko je bílé a zmodrá teprve až doscrolluje na obrazovku (chytne pozornost) */
+    .bolt-cta a.cta-morph {
+      background: #fff !important; color: #0020f6 !important;
+      box-shadow: inset 0 0 0 2px #0020f6 !important;
+      transition: background .5s cubic-bezier(.2,.8,.2,1), color .5s cubic-bezier(.2,.8,.2,1),
+                  box-shadow .5s cubic-bezier(.2,.8,.2,1), transform .35s cubic-bezier(.2,.8,.2,1);
+    }
+    .bolt-cta a.cta-morph.seen {
+      background: #0020f6 !important; color: #fff !important;
+      box-shadow: 0 16px 38px rgba(0,32,246,.30) !important;
+      animation: ctaMorphPop .6s cubic-bezier(.2,.8,.2,1) .12s both;
+    }
+    @keyframes ctaMorphPop { 0% { transform: scale(1); } 42% { transform: scale(1.07); } 100% { transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) {
+      .bolt-cta a.cta-morph { transition: none; }
+      .bolt-cta a.cta-morph.seen { animation: none; }
+    }
     .bolt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
     .bolt-row:nth-child(even) .bolt-media { order: 2; }
     .bolt-media {
@@ -272,6 +289,30 @@
     .emp-white-zone .bolt-text p { color: rgba(10,13,46,.6); }
     .emp-white-zone .bolt-text-label { color: var(--primary); background: rgba(0,32,246,.07); border-color: rgba(0,32,246,.18); }
     .emp-white-zone .bolt-path path { stroke: rgba(0,32,246,.3); }
+    /* Nadpis nad kroky (paralela k brigádnickému „Pojď si vydělat s Makej") */
+    .emp-white-zone .bolt-head { margin: 4px auto 56px; }
+    .emp-white-zone .bolt-head h2 { color: #0a0d2e; }
+    .emp-white-zone .bolt-head h2 .gradient-text { -webkit-text-fill-color: #0020f6; color: #0020f6; background: none; }
+    /* Kicker nad nadpisem — čistý text, bez podkladu */
+    .emp-white-zone .bolt-kicker {
+      display: block; font-family: var(--font-heading); font-weight: 800;
+      font-size: 13px; letter-spacing: .16em; text-transform: uppercase;
+      color: #0020f6; margin-bottom: 16px;
+    }
+    /* Zvýrazněné slovo + ručně kreslené podtržení, které se nakreslí při reveal */
+    .emp-white-zone .bolt-head h2 .scribble { position: relative; white-space: nowrap; color: #0020f6; }
+    .emp-white-zone .bolt-head h2 .scribble svg {
+      position: absolute; left: -3%; bottom: -.24em; width: 106%; height: .42em; overflow: visible;
+    }
+    .emp-white-zone .bolt-head h2 .scribble svg path {
+      fill: none; stroke: #0020f6; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 1; stroke-dashoffset: 1;
+      transition: stroke-dashoffset .9s cubic-bezier(.6,0,.2,1) .3s;
+    }
+    .emp-white-zone .bolt-head.visible h2 .scribble svg path { stroke-dashoffset: 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .emp-white-zone .bolt-head h2 .scribble svg path { transition: none; stroke-dashoffset: 0; }
+    }
 
     /* ── Ceník na bílé ── */
     #pricing { background: #fff; }
@@ -334,7 +375,6 @@
       <div class="nav-links">
         <a href="/hledam-si-praci.html">Hledám si práci</a>
         <a href="/pro-zamestnavatele.html" class="nav-active">Pro zaměstnavatele</a>
-        <a href="/blog.html">Blog</a>
         <a href="#download">Stáhnout</a>
         <a href="/podpora.html">Podpora</a>
       </div>
@@ -350,7 +390,6 @@
     <div class="mobile-menu" id="mobile-menu">
       <a href="/hledam-si-praci.html">Hledám si práci</a>
       <a href="/pro-zamestnavatele.html" class="nav-active">Pro zaměstnavatele</a>
-      <a href="/blog.html">Blog</a>
       <a href="#download">Stáhnout</a>
       <a href="/podpora.html">Podpora</a>
       <div class="mobile-menu-actions">
@@ -442,6 +481,11 @@
       <!-- ░░░ BÍLÁ ZÓNA: kroky + dashboard + Proč Makej ░░░ -->
       <div class="emp-white-zone nav-light">
 
+      <div class="bolt-head">
+        <span class="bolt-kicker">Jak to funguje</span>
+        <h2>Najděte lidi, co <span class="scribble">makají<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M5 13 C 62 4, 110 6, 152 11 S 246 18, 295 6" /></svg></span></h2>
+      </div>
+
       <!-- KROKY (alternující řady, prázdná místa pro fotky) -->
       <div class="bolt-journey">
         <svg class="bolt-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
@@ -492,7 +536,7 @@
         </div>
         </div>
         <div class="bolt-cta">
-          <a href="#" class="btn-primary btn-lg employer-cta-register">
+          <a href="#" class="btn-primary btn-lg employer-cta-register cta-morph">
             Vytvořit účet <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex-shrink:0"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 12h16m0 0l-6-6m6 6l-6 6"/></svg>
           </a>
         </div>
@@ -1123,6 +1167,7 @@
           <p>Brigádní appka nové generace. Swajpuj, matchuj a pracuj.</p>
           <div class="footer-social">
             <a href="https://www.instagram.com/makej.eu" aria-label="Instagram" target="_blank" rel="noopener"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a>
+            <a href="https://www.facebook.com/share/19Kq5N1R2u/?mibextid=wwXIfr" aria-label="Facebook" target="_blank" rel="noopener"><iconify-icon icon="mdi:facebook" width="22"></iconify-icon></a>
             <a href="https://www.tiktok.com/@makejaplikace" aria-label="TikTok" target="_blank" rel="noopener"><iconify-icon icon="ic:baseline-tiktok" width="22"></iconify-icon></a>
             <a href="https://www.linkedin.com/company/makej-s-r-o/" aria-label="LinkedIn" target="_blank" rel="noopener"><iconify-icon icon="mdi:linkedin" width="22"></iconify-icon></a>
           </div>
@@ -1131,11 +1176,11 @@
           <h4>Produkt</h4>
           <a href="/hledam-si-praci.html">Hledám si práci</a>
           <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-          <a href="/blog.html">Blog</a>
           <a href="#download">Stáhnout</a>
         </div>
         <div class="footer-col">
           <h4>Firma</h4>
+          <a href="/blog.html">Blog</a>
           <a href="/podpora.html">Podpora</a>
           <a href="mailto:admin@makej.eu">Kontakt</a>
           <a href="/o-nas.html">O nás</a>
@@ -1409,6 +1454,24 @@
         cmp.addEventListener('pointerup', function () { dragging = false; });
         cmp.addEventListener('pointercancel', function () { dragging = false; });
       });
+    })();
+  </script>
+  <!-- CTA morph: „Vytvořit účet" zmodrá až doscrolluje na obrazovku -->
+  <script>
+    (function () {
+      var btn = document.querySelector('.bolt-cta a.cta-morph');
+      if (!btn) return;
+      if (!('IntersectionObserver' in window)) { btn.classList.add('seen'); return; }
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          // spustí se, až je tlačítko pořádně vidět (ne jen okrajem)
+          if (e.isIntersecting && e.intersectionRatio >= 0.6) {
+            btn.classList.add('seen');
+            obs.unobserve(btn);
+          }
+        });
+      }, { threshold: [0, 0.6, 1], rootMargin: '0px 0px -8% 0px' });
+      obs.observe(btn);
     })();
   </script>
 </body>
