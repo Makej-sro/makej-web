@@ -70,6 +70,46 @@
       .blog-ig-btn:hover { background: #0020f6; transform: translateY(-2px); }
     }
 
+    /* Přepínač sekcí */
+    .blog-tabs {
+      display: inline-flex; gap: 4px; padding: 5px; flex-wrap: wrap;
+      background: #eef0f7; border-radius: 100px; margin: 6px 0 10px;
+    }
+    .blog-tab {
+      border: none; cursor: pointer; font-family: var(--font-heading);
+      font-weight: 700; font-size: .92rem; color: #5a5c7a;
+      padding: 10px 20px; border-radius: 100px; background: transparent;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+    }
+    .blog-tab iconify-icon { font-size: 17px; }
+    .blog-tab:hover { color: #16163c; }
+    .blog-tab.active { background: #0020f6; color: #fff; box-shadow: 0 6px 18px rgba(0,32,246,.28); }
+    .blog-section[hidden] { display: none; }
+
+    /* Sekce blogu */
+    .blog-section { margin-top: 40px; }
+    .blog-section-head { max-width: 720px; margin: 0 0 30px; }
+    .blog-section-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font-heading); font-weight: 800;
+      font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+      color: #0020f6; margin-bottom: 12px;
+    }
+    .blog-section-eyebrow iconify-icon { font-size: 15px; }
+    .blog-section-head h2 {
+      font-family: var(--font-heading); font-weight: 800;
+      font-size: clamp(1.7rem, 3.4vw, 2.3rem); letter-spacing: -.02em;
+      line-height: 1.12; color: #16163c; margin: 0 0 10px; text-wrap: balance;
+    }
+    .blog-section-head p { font-size: 15.5px; line-height: 1.6; color: #5a5c7a; margin: 0; max-width: 62ch; }
+    .blog-section-head p strong { color: #16163c; font-weight: 700; }
+
+    /* Barevné štítky novinek */
+    .blog-chip.is-new { color: #0a7d3c; background: rgba(16,160,72,.12); }
+    .blog-chip.is-soon { color: #b26a00; background: rgba(230,150,0,.14); }
+    .blog-chip.is-update { color: #0020f6; background: rgba(0,32,246,.08); }
+
     /* Mřížka karet */
     .blog-grid {
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px;
@@ -187,72 +227,211 @@
 
       <!-- Hlavička -->
       <div class="blog-head reveal">
-        <span class="blog-eyebrow"><iconify-icon icon="mdi:instagram"></iconify-icon> Z našeho Instagramu</span>
+        <span class="blog-eyebrow"><iconify-icon icon="solar:notebook-bold"></iconify-icon> Blog &amp; novinky</span>
         <h1 class="blog-title">Blog <span class="blog-accent">Makej</span></h1>
-        <p class="blog-lead">Zajímavosti, tipy a novinky ze světa brigád a práce. Sesbírané příspěvky z našeho Instagramu — přehledně na jednom místě.</p>
+        <p class="blog-lead">Co se u nás děje, co chystáme a zajímavosti ze světa brigád a práce — všechno přehledně na jednom místě.</p>
         <a href="https://www.instagram.com/makej.eu" class="blog-ig-btn" target="_blank" rel="noopener">
           <iconify-icon icon="mdi:instagram"></iconify-icon> Sledovat @makej.eu
         </a>
       </div>
 
-      <!--
-        ════════════════════════════════════════════════════════════════
-        JAK PŘIDAT NOVÝ PŘÍSPĚVEK:
-        1. Zkopíruj jeden celý blok <article class="blog-card"> ... </article>
-        2. Vlož ho nahoru mřížky (nejnovější první).
-        3. Uprav:
-           • href="..."  → odkaz na příspěvek na Instagramu
-           • blog-chip   → kategorie (TIPY / NOVINKA / PŘÍBĚH / GASTRO …)
-           • blog-date   → datum
-           • blog-card-title / blog-card-excerpt → titulek a krátký popis
-           • FOTKA: nahraj obrázek do složky /blog-img/ a nahraď blok
-             <div class="blog-card-media"> ... </div> takto:
-             <div class="blog-card-media">
-               <a class="blog-card-ig" ...><iconify-icon icon="mdi:instagram"></iconify-icon></a>
-               <img src="/blog-img/nazev.jpg" alt="popis fotky" loading="lazy" />
-             </div>
-             (Když fotka není, nech placeholder – zobrazí se ikonka.)
-        ════════════════════════════════════════════════════════════════
-      -->
-      <div class="blog-grid">
-
-        <!-- ▸ PŘÍSPĚVEK -->
-        <article class="blog-card reveal">
-          <a href="https://www.instagram.com/p/DbiO-tBjDQD/" target="_blank" rel="noopener" style="text-decoration:none;display:contents;">
-            <div class="blog-card-media">
-              <span class="blog-card-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span>
-              <img src="/blog-img/post-2.jpg" alt="Posíláš životopisy a pořád ticho?" loading="lazy" />
-            </div>
-            <div class="blog-card-body">
-              <div class="blog-card-meta">
-                <span class="blog-chip">Ze světa práce</span>
-              </div>
-              <h2 class="blog-card-title">Posíláš životopisy a pořád ticho? Není to tvoje vina</h2>
-              <p class="blog-card-excerpt">Novináři poslali životopis do 1000 firem — přes polovina měsíc mlčela. Přesně tohle ticho jsme zažili taky. Proto vzniklo Makej.</p>
-              <span class="blog-card-more">Číst na Instagramu <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
-            </div>
-          </a>
-        </article>
-
-        <!-- ▸ PŘÍSPĚVEK -->
-        <article class="blog-card reveal">
-          <a href="https://www.instagram.com/p/Da-f75SjKc2/" target="_blank" rel="noopener" style="text-decoration:none;display:contents;">
-            <div class="blog-card-media">
-              <span class="blog-card-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span>
-              <img src="/blog-img/post-1.jpg" alt="Co je Makej?" loading="lazy" />
-            </div>
-            <div class="blog-card-body">
-              <div class="blog-card-meta">
-                <span class="blog-chip">O Makej</span>
-              </div>
-              <h2 class="blog-card-title">Co je Makej?</h2>
-              <p class="blog-card-excerpt">Platforma, na které si jednoduše domluvíš jednorázové i pravidelné brigády. Vysvětlujeme, jak to celé funguje.</p>
-              <span class="blog-card-more">Číst na Instagramu <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
-            </div>
-          </a>
-        </article>
-
+      <!-- Přepínač sekcí -->
+      <div class="blog-tabs" role="tablist" aria-label="Sekce blogu">
+        <button class="blog-tab active" type="button" data-tab="social" role="tab" aria-selected="true">
+          <iconify-icon icon="mdi:instagram"></iconify-icon> Sociální sítě
+        </button>
+        <button class="blog-tab" type="button" data-tab="news" role="tab" aria-selected="false">
+          <iconify-icon icon="solar:bell-bold"></iconify-icon> Novinky
+        </button>
+        <button class="blog-tab" type="button" data-tab="articles" role="tab" aria-selected="false">
+          <iconify-icon icon="solar:document-text-bold"></iconify-icon> Články
+        </button>
       </div>
+
+      <!-- ═══════════ SEKCE 1: SOCIÁLNÍ SÍTĚ ═══════════ -->
+      <section class="blog-section" data-panel="social">
+        <div class="blog-section-head reveal">
+          <span class="blog-section-eyebrow"><iconify-icon icon="mdi:instagram"></iconify-icon> Sociální sítě</span>
+          <h2>My na sociálních sítích</h2>
+          <p>Nejnovější příspěvky z našich sítí — sleduj nás na Instagramu, Facebooku, TikToku i LinkedInu.</p>
+        </div>
+
+        <!--
+          PŘIDAT PŘÍSPĚVEK ZE SÍTÍ: zkopíruj jeden <article class="blog-card"> níže a uprav:
+            • href="..."  → odkaz na příspěvek (Instagram, Facebook …)
+            • blog-chip   → kategorie (např. „Ze světa práce")
+            • FOTKA: nahraj obrázek do /blog-img/ a nahraď <img src="…">
+              (bez fotky nech <div class="blog-card-ph">… → zobrazí se ikonka)
+        -->
+        <div class="blog-grid">
+
+          <!-- ▸ PŘÍSPĚVEK -->
+          <article class="blog-card reveal">
+            <a href="https://www.instagram.com/p/DbiO-tBjDQD/" target="_blank" rel="noopener" style="text-decoration:none;display:contents;">
+              <div class="blog-card-media">
+                <span class="blog-card-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span>
+                <img src="/blog-img/post-2.jpg" alt="Posíláš životopisy a pořád ticho?" loading="lazy" />
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class="blog-chip">Ze světa práce</span>
+                </div>
+                <h2 class="blog-card-title">Posíláš životopisy a pořád ticho? Není to tvoje vina</h2>
+                <p class="blog-card-excerpt">Novináři poslali životopis do 1000 firem — přes polovina měsíc mlčela. Přesně tohle ticho jsme zažili taky. Proto vzniklo Makej.</p>
+                <span class="blog-card-more">Číst na Instagramu <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+            </a>
+          </article>
+
+          <!-- ▸ PŘÍSPĚVEK -->
+          <article class="blog-card reveal">
+            <a href="https://www.instagram.com/p/Da-f75SjKc2/" target="_blank" rel="noopener" style="text-decoration:none;display:contents;">
+              <div class="blog-card-media">
+                <span class="blog-card-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span>
+                <img src="/blog-img/post-1.jpg" alt="Co je Makej?" loading="lazy" />
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class="blog-chip">O Makej</span>
+                </div>
+                <h2 class="blog-card-title">Co je Makej?</h2>
+                <p class="blog-card-excerpt">Platforma, na které si jednoduše domluvíš jednorázové i pravidelné brigády. Vysvětlujeme, jak to celé funguje.</p>
+                <span class="blog-card-more">Číst na Instagramu <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+            </a>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ═══════════ SEKCE 2: NOVINKY ═══════════ -->
+      <section class="blog-section" data-panel="news">
+        <div class="blog-section-head reveal">
+          <span class="blog-section-eyebrow"><iconify-icon icon="solar:bell-bold"></iconify-icon> Novinky</span>
+          <h2>Novinky ze světa Makej</h2>
+          <p>Co je nového a co pro vás chystáme. Každou novinku značíme štítkem — <strong>Nové</strong>, <strong>Chystáme</strong> nebo <strong>Update</strong>.</p>
+        </div>
+
+        <!--
+          PŘIDAT NOVINKU: zkopíruj jeden <article class="blog-card"> níže, dej ho nahoru
+          a označ štítkem podle typu:
+            • <span class="blog-chip is-new">Nové</span>       → zelený (už spuštěno)
+            • <span class="blog-chip is-soon">Chystáme</span>  → oranžový (připravujeme)
+            • <span class="blog-chip is-update">Update</span>  → modrý (vylepšení)
+          href veď na detail novinky (nebo nech "#", než bude hotový).
+        -->
+        <div class="blog-grid">
+
+          <!-- ▸ NOVINKA -->
+          <article class="blog-card reveal">
+            <a href="#" style="text-decoration:none;display:contents;">
+              <div class="blog-card-media">
+                <div class="blog-card-ph"><iconify-icon icon="solar:gallery-bold"></iconify-icon><span>Náhledový obrázek</span></div>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class="blog-chip is-soon">Chystáme</span>
+                  <span class="blog-date">Brzy</span>
+                </div>
+                <h2 class="blog-card-title">Hodnocení firem i brigádníků</h2>
+                <p class="blog-card-excerpt">Po každé brigádě si dáte vzájemné hodnocení — ať víte, s kým jdete do toho příště.</p>
+                <span class="blog-card-more">Číst více <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+            </a>
+          </article>
+
+          <!-- ▸ NOVINKA -->
+          <article class="blog-card reveal">
+            <a href="#" style="text-decoration:none;display:contents;">
+              <div class="blog-card-media">
+                <div class="blog-card-ph"><iconify-icon icon="solar:gallery-bold"></iconify-icon><span>Náhledový obrázek</span></div>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class="blog-chip is-new">Nové</span>
+                  <span class="blog-date">Nově v appce</span>
+                </div>
+                <h2 class="blog-card-title">Matchování a chat přímo v aplikaci</h2>
+                <p class="blog-card-excerpt">Swajpni nabídku, matchni se s firmou a domluvte si detaily rovnou v chatu — bez telefonů a e-mailů.</p>
+                <span class="blog-card-more">Číst více <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+            </a>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ═══════════ SEKCE 3: ČLÁNKY ═══════════ -->
+      <section class="blog-section" data-panel="articles">
+        <div class="blog-section-head reveal">
+          <span class="blog-section-eyebrow"><iconify-icon icon="solar:document-text-bold"></iconify-icon> Články</span>
+          <h2>Klasické články</h2>
+          <p>Delší čtení — tipy, návody a příběhy ze světa brigád a práce.</p>
+        </div>
+
+        <!--
+          PŘIDAT ČLÁNEK: zkopíruj jeden <article class="blog-card"> níže, uprav chip
+          (Tipy / Návod / Příběh …), titulek, popis, datum a href na detail článku.
+          FOTKU dej do /blog-img/ a nahraď <div class="blog-card-ph">… za <img …>.
+        -->
+        <div class="blog-grid">
+
+          <!-- ▸ ČLÁNEK -->
+          <article class="blog-card reveal">
+            <a href="#" style="text-decoration:none;display:contents;">
+              <div class="blog-card-media">
+                <div class="blog-card-ph"><iconify-icon icon="solar:gallery-bold"></iconify-icon><span>Náhledový obrázek</span></div>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class="blog-chip">Tipy</span>
+                  <span class="blog-date">Připravujeme</span>
+                </div>
+                <h2 class="blog-card-title">5 tipů, jak si najít první brigádu bez životopisu</h2>
+                <p class="blog-card-excerpt">S Makej nepotřebuješ zdlouhavý životopis. Poradíme, jak vyladit profil, aby ti firmy psaly první.</p>
+                <span class="blog-card-more">Číst více <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+            </a>
+          </article>
+
+          <!-- ▸ ČLÁNEK -->
+          <article class="blog-card reveal">
+            <a href="#" style="text-decoration:none;display:contents;">
+              <div class="blog-card-media">
+                <div class="blog-card-ph"><iconify-icon icon="solar:gallery-bold"></iconify-icon><span>Náhledový obrázek</span></div>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class="blog-chip">Gastro</span>
+                  <span class="blog-date">Připravujeme</span>
+                </div>
+                <h2 class="blog-card-title">Brigáda v gastru: kolik si reálně vyděláš za směnu?</h2>
+                <p class="blog-card-excerpt">Podívali jsme se na hodinovky v kavárnách, na eventech i ve skladech. Kde se dnes vyplatí makat nejvíc?</p>
+                <span class="blog-card-more">Číst více <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+            </a>
+          </article>
+
+          <!-- ▸ ČLÁNEK -->
+          <article class="blog-card reveal">
+            <a href="#" style="text-decoration:none;display:contents;">
+              <div class="blog-card-media">
+                <div class="blog-card-ph"><iconify-icon icon="solar:gallery-bold"></iconify-icon><span>Náhledový obrázek</span></div>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class="blog-chip">Návod</span>
+                  <span class="blog-date">Připravujeme</span>
+                </div>
+                <h2 class="blog-card-title">Jak si vytvořit profil, který zaujme firmy</h2>
+                <p class="blog-card-excerpt">Pár minut práce a máš profil, na který firmy slyší. Ukážeme ti, co tam nesmí chybět.</p>
+                <span class="blog-card-more">Číst více <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+            </a>
+          </article>
+
+        </div>
+      </section>
     </div>
   </main>
 
@@ -453,10 +632,39 @@
     </div>
   </div>
 
+  <!-- Přepínač sekcí blogu -->
+  <script>
+    (function () {
+      var tabs = document.querySelectorAll('.blog-tab');
+      var panels = document.querySelectorAll('.blog-section[data-panel]');
+      if (!tabs.length || !panels.length) return;
+      function reveal(panel) {
+        panel.querySelectorAll('.blog-section-head, .blog-card').forEach(function (el) { el.classList.add('visible'); });
+      }
+      function show(name) {
+        panels.forEach(function (p) {
+          var on = p.getAttribute('data-panel') === name;
+          p.hidden = !on;
+          if (on) reveal(p);
+        });
+        tabs.forEach(function (t) {
+          var on = t.getAttribute('data-tab') === name;
+          t.classList.toggle('active', on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+      }
+      tabs.forEach(function (t) {
+        t.addEventListener('click', function () { show(t.getAttribute('data-tab')); });
+      });
+      var initial = document.querySelector('.blog-tab.active');
+      show(initial ? initial.getAttribute('data-tab') : 'social');
+    })();
+  </script>
+
   <!-- Reveal pro blog (globální setupReveal tyto selektory nesleduje) -->
   <script>
     (function () {
-      var els = document.querySelectorAll('.blog-head, .blog-card');
+      var els = document.querySelectorAll('.blog-head, .blog-section-head, .blog-card');
       if (!els.length) return;
       if (!('IntersectionObserver' in window)) {
         els.forEach(function (el) { el.classList.add('visible'); });
@@ -476,6 +684,6 @@
     })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=24"></script>
+  <script src="/script.js?v=25"></script>
 </body>
 </html>

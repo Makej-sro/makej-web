@@ -478,7 +478,7 @@ function initAuth() {
         ['mobile-register-btn','register'],
       ].forEach(([id, type]) => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('click', e => { e.preventDefault(); openModal(type); });
+        if (el) el.addEventListener('click', e => { e.preventDefault(); type === 'register' ? goWaitlist() : openModal(type); });
       });
 
       // Hero CTA: show auth buttons, hide dashboard/worker
@@ -487,18 +487,30 @@ function initAuth() {
     }
   }
 
+  // „Registrovat se / Vytvořit účet" → nejdřív na čekací list (předregistrace).
+  // Na index.html (kde je overlay) otevře čekací list rovnou; z ostatních stránek
+  // přesměruje na /?wl (index čekací list po načtení sám otevře).
+  function goWaitlist(role) {
+    if (document.getElementById('wl-overlay') && typeof openWaitlist === 'function') {
+      openWaitlist();
+      if (role && window.wlSetTab) window.wlSetTab(role);
+    } else {
+      window.location.href = '/?wl=1' + (role ? '&role=' + role : '');
+    }
+  }
+
   // ─── Statická tlačítka (nejsou nikdy přepisována) — bindujeme jen jednou ───
   document.querySelectorAll('.employer-cta-register').forEach(btn => {
-    btn.addEventListener('click', e => { e.preventDefault(); openModal('register', 'employer'); });
+    btn.addEventListener('click', e => { e.preventDefault(); goWaitlist('employer'); });
   });
   document.querySelectorAll('.worker-cta-register').forEach(btn => {
-    btn.addEventListener('click', e => { e.preventDefault(); openModal('register', 'worker'); });
+    btn.addEventListener('click', e => { e.preventDefault(); goWaitlist('worker'); });
   });
 
   // Hero CTA buttons (Vytvořit účet zdarma / Přihlásit se)
   const heroRegisterBtn = document.getElementById('hero-register-btn');
   const heroLoginBtn    = document.getElementById('hero-login-btn');
-  if (heroRegisterBtn) heroRegisterBtn.addEventListener('click', e => { e.preventDefault(); openModal('register'); });
+  if (heroRegisterBtn) heroRegisterBtn.addEventListener('click', e => { e.preventDefault(); goWaitlist(); });
   if (heroLoginBtn)    heroLoginBtn.addEventListener('click',    e => { e.preventDefault(); openModal('login'); });
 
   // Escape key zavře modál
@@ -953,6 +965,7 @@ function initAuth() {
       if (window.wlSetSocialRole) window.wlSetSocialRole(tab);
     }
     opts.forEach(o => o.addEventListener('click', () => setTab(o.dataset.wlTab)));
+    window.wlSetTab = setTab;   // ať jde předvybrat roli při otevření z registračních tlačítek
   })();
 
   // Odpočet do spuštění (1. 10. 2026) — modrý pás s ubývajícími linkami
@@ -1048,7 +1061,10 @@ function initAuth() {
   const wlSeen   = (() => { try { return localStorage.getItem('wl-joined') || sessionStorage.getItem('wl-dismissed'); } catch (e) { return null; } })();
   const wlLogged = (() => { try { return !!localStorage.getItem('makej-auth'); } catch (e) { return false; } })();
   if (WL_DEV_ALWAYS || wlForce) {
-    setTimeout(openWaitlist, 300);              // dev / ?wl v adrese = vždy ukázat
+    setTimeout(() => {                          // dev / ?wl v adrese = vždy ukázat
+      openWaitlist();
+      try { const r = new URLSearchParams(location.search).get('role'); if (r && window.wlSetTab) window.wlSetTab(r); } catch (e) {}
+    }, 300);
   } else if (!wlSeen && !wlLogged) {
     setTimeout(openWaitlist, 900);
   }

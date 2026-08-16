@@ -85,6 +85,8 @@
     /* Kroky na bílé (jako employer) */
     #how-it-works { background: #fff; }
     #how-it-works .bolt-head h2 { color: #0a0d2e; }
+    /* „Makej" v nadpisu celé v brandové modré (jako tečka nad „j"), ne levandulové */
+    #boltMakej { background: none; -webkit-text-fill-color: #0020f6; color: #0020f6; }
     #how-it-works .bolt-text h3 { color: #0a0d2e; }
     #how-it-works .bolt-text p { color: rgba(10,13,46,.6); }
     #how-it-works .bolt-text-label { color: var(--primary); background: rgba(0,32,246,.07); border-color: rgba(0,32,246,.18); }
@@ -92,10 +94,11 @@
     /* Scroll-kreslená čára (Makej Scroll Line) — na mobilu skrytá (kroky jdou pod sebe) */
     @media (max-width: 768px) { #boltSvg { display: none; } }
 
-    /* Sekce „Proč si zvolíš Makej" jako samostatná bílá stránka */
-    #features { background: #fff; }
-    #features .section-header h2 { color: #0a0d2e; }
-    #features .section-header p { color: rgba(10,13,46,.55); }
+    /* Sekce „Proč si zvolíš Makej" — brandová modrá, na celou výšku obrazovky.
+       Obsah zarovnaný nahoru (žádné vertikální centrování), aby po doskočení
+       fontu nadpis nepřecentrovával celý blok = žádný skok při scrollu. */
+    #features { background: linear-gradient(150deg, #2a45ff 0%, #0020f6 58%, #0018c8 100%); min-height: 100vh; box-sizing: border-box;
+      padding-top: max(96px, calc((100vh - 560px) / 2)); padding-bottom: max(96px, calc((100vh - 560px) / 2)); }
 
     /* ── Video ukázka aplikace (full-bleed přes celou šířku stránky) ── */
     #features .feat-video {
@@ -132,58 +135,31 @@
     #features .feature-card h3 { color: #0a0d2e; }
     #features .feature-card p { color: rgba(10,13,46,.55); }
 
-    /* ── Typografický pás funkcí (marquee) ── */
-    .mk-band {
-      --mk-ink:#0F1D2B; --mk-body:#3C4E60; --mk-muted:#8A97A5;
-      --mk-word:#C4D2DF; --mk-word-2:#E1E8F0; --mk-line:#EDF1F5;
-      --mk-dot:#DCE6F0; --mk-accent:#0020f6;
-      --mk-font:'Instrument Sans','Plus Jakarta Sans',-apple-system,system-ui,sans-serif;
-      position:relative; width:100vw; left:50%; transform:translateX(-50%);
-      margin-top:40px; overflow:hidden; font-family:var(--mk-font); color:var(--mk-ink);
+    /* ── Funkce — text vlevo + mřížka s target ikonami vpravo (brandová modrá) ── */
+    #features .bf2 { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: 64px; align-items: start; }
+    #features .bf2-kicker { display: inline-block; font-family: var(--font-heading); font-weight: 800; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--secondary); margin-bottom: 20px; }
+    #features .bf2-left h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2.6rem, 6vw, 4.4rem); line-height: 1.04; letter-spacing: -.02em; color: #fff; margin: 0 0 24px; text-wrap: balance; }
+    #features .bf2-left h2 .grad { color: var(--secondary); }
+    #features .bf2-left p { color: rgba(255,255,255,.74); font-size: 1.22rem; line-height: 1.6; max-width: 40ch; margin: 0 0 40px; }
+    #features .bf2-cta { display: inline-flex; align-items: center; gap: 10px; padding: 18px 40px; border-radius: 100px; background: #fff; color: #0a0d2e; font-weight: 700; font-size: 1.08rem; transition: transform .2s ease, box-shadow .2s ease; }
+    #features .bf2-cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(0,0,20,.3); }
+
+    #features .bf2-feats { display: grid; grid-template-columns: 1fr 1fr; gap: 56px 40px; }
+    /* Pevná výška ikonového boxu — ať pozdní načtení ikon (async) nehne řadami */
+    #features .bf2-feat-ic { color: #fff; height: 50px; display: flex; align-items: center; margin-bottom: 18px; transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+    #features .bf2-feat-ic iconify-icon { font-size: 46px; }
+    /* Vlastní swipe ikona (SVG) přebarvená na bílo přes mask */
+    #features .bf2-feat-ic .bf2-swipe { display: block; width: 50px; height: 50px; background: #fff;
+      -webkit-mask: url(/swipe-to-right.svg) center / contain no-repeat; mask: url(/swipe-to-right.svg) center / contain no-repeat; }
+    #features .bf2-feat:hover .bf2-feat-ic { transform: translateY(-3px) scale(1.06); }
+    #features .bf2-feat h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1.3rem; color: #fff; margin: 0 0 8px; }
+    #features .bf2-feat p { font-size: 1rem; line-height: 1.55; color: rgba(255,255,255,.72); margin: 0; min-height: 3.1em; }
+
+    @media (max-width: 860px) {
+      #features .bf2 { grid-template-columns: 1fr; gap: 34px; }
     }
-    .mk-band .mk__hintline { text-align:center; font-size:13px; line-height:1.5; color:var(--mk-muted); margin:0 0 44px; }
-    .mk-band .mk__track { display:flex; gap:80px; width:max-content; will-change:transform; }
-    .mk-band .mk__track--1 { padding-bottom:18px; animation:mk-marq-l 32s linear infinite; }
-    .mk-band .mk__track--2 { animation:mk-marq-r 38s linear infinite; }
-    .mk-band .mk__track:hover { animation-play-state:paused; }
-    .mk-band .mk__item { display:flex; align-items:center; gap:22px; cursor:default; }
-    .mk-band .mk__word { font-family:'Caveat',cursive; font-weight:700; font-size:72px; line-height:1; letter-spacing:0; white-space:nowrap; color:var(--mk-word); transition:color .3s ease; }
-    .mk-band .mk__track--2 .mk__word { color:var(--mk-word-2); }
-    .mk-band .mk__item:hover .mk__word { color:var(--mk-ink); }
-    .mk-band .mk__track--2 .mk__item:hover .mk__word { color:var(--mk-accent); }
-    /* Popis se při najetí rozvine vedle slova; text se zalomí na víc řádků (celý). */
-    .mk-band .mk__exp { max-width:0; opacity:0; overflow:hidden;
-      transition:max-width .55s cubic-bezier(.4,0,.2,1), opacity .3s ease; }
-    .mk-band .mk__exp-in { display:inline-block; width:360px; white-space:normal; vertical-align:middle;
-      font-family:var(--font-sans); font-size:18px; line-height:1.4; color:var(--mk-body); text-wrap:pretty; }
-    .mk-band .mk__item:hover .mk__exp { max-width:360px; opacity:1; }
-    @keyframes mk-marq-l { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-    @keyframes mk-marq-r { from{transform:translateX(-50%)} to{transform:translateX(0)} }
-    @media (prefers-reduced-motion:reduce) { .mk-band .mk__track { animation:none; } }
-    .mk-band .mk__foot {
-      max-width:1160px; margin:48px auto 0; padding:48px 24px 0; border-top:1px solid var(--mk-line);
-      display:flex; align-items:center; justify-content:center;
-    }
-    .mk-band .mk__copy { display:flex; flex-direction:column; gap:10px; max-width:560px; min-height:96px; }
-    .mk-band .mk__tag { font-family:var(--font-heading); font-weight:900; font-size:11px; line-height:1; letter-spacing:.16em; text-transform:uppercase; color:var(--mk-accent); }
-    .mk-band .mk__desc { font-family:var(--font-sans); margin:0; font-size:21px; line-height:1.5; color:var(--mk-body); text-wrap:pretty; }
-    .mk-band .mk__cta {
-      padding:16px 32px; border-radius:999px; background:var(--mk-accent); color:#fff; text-decoration:none;
-      font-family:var(--mk-font); font-weight:600; font-size:15px; line-height:1; white-space:nowrap;
-      border:none; cursor:pointer; transition:transform .2s ease;
-    }
-    .mk-band .mk__cta:hover { transform:translateY(-2px); }
-    /* Mobilní statický seznam funkcí (na desktopu skrytý) */
-    .mk-band .mk__list { display:none; list-style:none; margin:0; padding:0; }
-    @media (max-width:760px) {
-      .mk-band { margin-top:8px; }
-      .mk-band .mk__track { display:none; }
-      .mk-band .mk__list { display:flex; flex-direction:column; padding:0 24px; }
-      .mk-band .mk__li { display:flex; flex-direction:column; gap:4px; padding:18px 0; border-bottom:1px solid var(--mk-line); }
-      .mk-band .mk__li:last-child { border-bottom:none; }
-      .mk-band .mk__li-word { font-family:'Caveat',cursive; font-weight:700; font-size:40px; line-height:1; color:var(--mk-ink); }
-      .mk-band .mk__li-desc { margin:0; font-family:var(--font-sans); font-size:15px; line-height:1.5; color:var(--mk-body); }
-      .mk-band .mk__foot { padding-top:28px; margin-top:8px; }
+    @media (max-width: 480px) {
+      #features .bf2-feats { grid-template-columns: 1fr; gap: 28px; }
     }
 
     /* Demo telefon na bílé sekci */
@@ -449,19 +425,48 @@
       </div>
     </section>
 
-    <!-- ═══════════ FEATURES ═══════════ -->
-    <section id="features" class="nav-light">
+    <!-- ═══════════ FEATURES — text vlevo + funkce vpravo ═══════════ -->
+    <section id="features">
       <div class="container">
-        <div class="section-header">
-          <h2>Proč si zvolíš <span class="gradient-text">Makej</span></h2>
-          <p>Všechno, co potřebuješ, na jednom místě.</p>
-        </div>
-        <!-- FUNKCE — typografický pás -->
-        <div class="mk-band">
-          <div class="mk__track mk__track--1" data-mk-track></div>
-          <div class="mk__track mk__track--2" data-mk-track data-mk-reverse></div>
-          <!-- Mobil: statický seznam (hover nefunguje na dotyku) -->
-          <ul class="mk__list" data-mk-list></ul>
+        <div class="bf2">
+          <div class="bf2-left">
+            <span class="bf2-kicker">Funkce</span>
+            <h2>Proč si zvolíš <span class="grad">Makej</span></h2>
+            <p>Všechno, co při hledání brigády potřebuješ, na jednom místě — swajpuj, matchuj a začni makat.</p>
+            <a href="#" class="bf2-cta worker-cta-register">Vytvořit účet <span style="font-size:18px;line-height:1;">→</span></a>
+          </div>
+          <div class="bf2-feats">
+            <div class="bf2-feat">
+              <div class="bf2-feat-ic" aria-hidden="true"><span class="bf2-swipe"></span></div>
+              <h3>Swajp rozhraní</h3>
+              <p>Prohlížej nabídky jako karty.</p>
+            </div>
+            <div class="bf2-feat">
+              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon></div>
+              <h3>Real-time chat</h3>
+              <p>Piš si přímo s firmou po matchi.</p>
+            </div>
+            <div class="bf2-feat">
+              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:verified-check-bold"></iconify-icon></div>
+              <h3>Ověřené firmy</h3>
+              <p>Jen prověřené nabídky (IČO i provozovna).</p>
+            </div>
+            <div class="bf2-feat">
+              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:cup-star-bold"></iconify-icon></div>
+              <h3>Gamifikace</h3>
+              <p>Sbírej XP, leveluj a odemykej odměny.</p>
+            </div>
+            <div class="bf2-feat">
+              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:star-bold"></iconify-icon></div>
+              <h3>Recenze</h3>
+              <p>Buduj si reputaci, získávej lepší nabídky.</p>
+            </div>
+            <div class="bf2-feat">
+              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:map-point-bold"></iconify-icon></div>
+              <h3>Blízko tebe</h3>
+              <p>Práce pár minut od domova nebo školy.</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -743,7 +748,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=24"></script>
+  <script src="script.js?v=25"></script>
   <!-- Lazy-play ukázkového videa: stáhne a přehraje až ve viewportu (šetří data + LCP) -->
   <script>
   (function () {
@@ -757,42 +762,6 @@
       });
     }, { threshold: 0.25 });
     io.observe(v);
-  })();
-
-  /* Typografický pás funkcí */
-  (function () {
-    var FEATURES = [
-      { t: 'Swajp rozhraní', cat: 'Hledání',    d: 'Prohlížej nabídky jako karty. Vlevo přeskočíš, vpravo se přihlásíš.' },
-      { t: 'Real-time chat', cat: 'Komunikace', d: 'Po matchi si píšeš přímo se zaměstnavatelem. Žádné e-maily, žádné čekání.' },
-      { t: 'Ověření firmy',  cat: 'Důvěra',     d: 'Každý zaměstnavatel projde verifikací IČO i provozovny. Pracuj s klidem.' },
-      { t: 'Gamifikace',     cat: 'Odměny',     d: 'Získávej XP, leveluj se a odemykej odměny za každou dokončenou brigádu.' },
-      { t: 'Recenze',        cat: 'Důvěra',     d: 'Buduj si reputaci přes hodnocení od firem. Lepší recenze, lepší nabídky.' },
-      { t: 'Blízko tebe',    cat: 'Hledání',    d: 'Filtruj podle lokace a najdi práci pár minut od domova nebo od školy.' }
-    ];
-    document.querySelectorAll('[data-mk-track]').forEach(function (track) {
-      var list = track.hasAttribute('data-mk-reverse') ? FEATURES.slice().reverse() : FEATURES;
-      list.concat(list).forEach(function (f) {
-        var item = document.createElement('span');
-        item.className = 'mk__item';
-        // Popis se rozvine vodorovně vedle slova (žádný výpis dole).
-        item.innerHTML = '<span class="mk__word"></span><span class="mk__exp"><span class="mk__exp-in"></span></span>';
-        item.querySelector('.mk__word').textContent = f.t;
-        item.querySelector('.mk__exp-in').textContent = f.d;
-        track.appendChild(item);
-      });
-    });
-    // Mobilní statický seznam (slovo + popis, vše rovnou viditelné — bez hoveru).
-    var listEl = document.querySelector('[data-mk-list]');
-    if (listEl) {
-      FEATURES.forEach(function (f) {
-        var li = document.createElement('li');
-        li.className = 'mk__li';
-        li.innerHTML = '<span class="mk__li-word"></span><p class="mk__li-desc"></p>';
-        li.querySelector('.mk__li-word').textContent = f.t;
-        li.querySelector('.mk__li-desc').textContent = f.d;
-        listEl.appendChild(li);
-      });
-    }
   })();
 
   /* ═══════════ Makej Scroll Line — kreslená spojnice od „j" v Makej přes kroky k CTA ═══════════ */
