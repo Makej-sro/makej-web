@@ -1112,11 +1112,13 @@ function showToast(msg) {
 
   document.getElementById('cookie-accept').addEventListener('click', () => {
     localStorage.setItem(COOKIE_KEY, 'accepted');
+    if (window.gtag) gtag('consent', 'update', { analytics_storage: 'granted' });
     banner.classList.remove('visible');
   });
 
   document.getElementById('cookie-reject').addEventListener('click', () => {
     localStorage.setItem(COOKIE_KEY, 'rejected');
+    if (window.gtag) gtag('consent', 'update', { analytics_storage: 'denied' });
     banner.classList.remove('visible');
   });
 })();

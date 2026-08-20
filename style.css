@@ -1,6 +1,25 @@
 /* ═══════════ RESET & BASE ═══════════ */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* Metrikami sladěné fallbacky (Arial) — text zabírá stejné místo jako webfont,
+   takže po dotažení Inter/Plus Jakarta nedochází k přeskládání layoutu (CLS ≈ 0). */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  size-adjust: 110.18%;
+  ascent-override: 87.93%;
+  descent-override: 21.89%;
+  line-gap-override: 0.00%;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans Fallback';
+  src: local('Arial');
+  size-adjust: 106.08%;
+  ascent-override: 97.85%;
+  descent-override: 20.93%;
+  line-gap-override: 0.00%;
+}
+
 :root {
   --bg: #05071a;
   --fg: #ffffff;
@@ -13,8 +32,8 @@
   --destructive: #f43f5e;
   --border: #0d1240;
   --radius: 1rem;
-  --font-sans: 'Plus Jakarta Sans', sans-serif;
-  --font-heading: 'Inter', 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
+  --font-heading: 'Inter', 'Inter Fallback', 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
 }
 
 html { scroll-behavior: smooth; overflow-x: clip; }

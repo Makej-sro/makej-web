@@ -6,6 +6,9 @@
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    // GDPR: výchozí souhlas odepřen (žádné analytické cookies), dokud uživatel nepřijme cookie lištu.
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500 });
+    try { if (localStorage.getItem('makej-cookie-consent') === 'accepted') gtag('consent', 'update', { analytics_storage: 'granted' }); } catch (e) {}
     gtag('js', new Date());
     gtag('config', 'G-25X9CMKGRD');
   </script>
@@ -28,6 +31,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    /* Metrikami sladěné fallbacky (Arial) — bez CLS při dotažení webfontů */
+    @font-face {
+      font-family: 'Plus Jakarta Sans Fallback';
+      src: local('Arial');
+      size-adjust: 106.08%;
+      ascent-override: 97.85%;
+      descent-override: 20.93%;
+      line-gap-override: 0.00%;
+    }
+    @font-face {
+      font-family: 'Bricolage Grotesque Fallback';
+      src: local('Arial');
+      size-adjust: 99.36%;
+      ascent-override: 93.60%;
+      descent-override: 27.17%;
+      line-gap-override: 0.00%;
+    }
     :root {
       --bg: #eef1f9;
       --surface: #ffffff;
@@ -36,8 +56,8 @@
       --primary: #0020f6;
       --primary-soft: rgba(0,32,246,.07);
       --border: rgba(10,13,46,.10);
-      --font-sans: 'Plus Jakarta Sans', sans-serif;
-      --font-heading: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+      --font-sans: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
+      --font-heading: 'Bricolage Grotesque', 'Bricolage Grotesque Fallback', 'Plus Jakarta Sans', sans-serif;
     }
     html { scroll-behavior: smooth; }
     body {

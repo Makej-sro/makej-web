@@ -6,6 +6,9 @@
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    // GDPR: výchozí souhlas odepřen (žádné analytické cookies), dokud uživatel nepřijme cookie lištu.
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500 });
+    try { if (localStorage.getItem('makej-cookie-consent') === 'accepted') gtag('consent', 'update', { analytics_storage: 'granted' }); } catch (e) {}
     gtag('js', new Date());
     gtag('config', 'G-25X9CMKGRD');
   </script>
@@ -36,7 +39,7 @@
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
   <link rel="preload" as="image" href="/emp-krok-1.png" />
   <link rel="preload" as="image" href="/emp-krok-2.png" />
-  <link rel="stylesheet" href="style.css?v=42" />
+  <link rel="stylesheet" href="style.css?v=43" />
   <style>
     /* ═══════════ BENTO DESIGN (pro zaměstnavatele) ═══════════ */
     #employers { padding: 0; }
@@ -1356,7 +1359,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=25"></script>
+  <script src="script.js?v=26"></script>
   <script>
     // FAQ accordion
     function toggleFaq(el) {
