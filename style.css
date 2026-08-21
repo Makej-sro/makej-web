@@ -219,7 +219,7 @@ img { max-width: 100%; display: block; }
 /* ── Hero word lines — postupné vyjetí zpod masky (insieme-styl) ── */
 .hero-line {
   display: block; text-align: left; line-height: 1.1; position: relative;
-  overflow: hidden; padding-bottom: .14em; margin-bottom: -.14em;
+  overflow: hidden; padding-bottom: .3em; margin-bottom: -.3em;
 }
 .hero-line-in {
   display: inline-block; will-change: transform;
