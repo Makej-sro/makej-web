@@ -153,6 +153,8 @@
       background-size: 220% auto !important;
       -webkit-background-clip: text !important; background-clip: text !important;
       -webkit-text-fill-color: transparent !important; color: transparent;
+      /* Safari: -webkit-background-clip:text ořezává dotažení písmen (j/y) — dolní rezerva to vyřeší, záporný margin drží layout */
+      padding-bottom: .2em; margin-bottom: -.2em;
       animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) .26s both, heroGradSweep 6s linear 1.4s infinite;
     }
     .eh-sub { animation: fadeInUp .7s ease-out .5s both; }
