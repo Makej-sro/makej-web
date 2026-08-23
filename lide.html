@@ -325,6 +325,8 @@
     /* ── HERO ── */
     .vx-hero { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; align-items: center; padding: clamp(96px, 13vh, 130px) 24px 0; text-align: center; }
     /* Typografie stejná jako hero na /pro-zamestnavatele a /hledam-si-praci (.eh-head h1) */
+    /* .vx-heroimg-wrap má z-index 1, nadpis a tlačítka měly auto (0) → obrázek je překrýval */
+    .vx-h1, .vx-sub-btns { position: relative; z-index: 2; }
     .vx-h1 { font-family: var(--font-heading); font-weight: 800; letter-spacing: -.025em; line-height: 1.02; font-size: clamp(2.7rem, 7vw, 5.4rem); color: #fff; margin: 0; text-shadow: 0 6px 30px rgba(0,10,80,.25); }
     .vx-h1 .vx-glitch {
       font-family: inherit; font-weight: inherit; letter-spacing: inherit;
@@ -348,7 +350,8 @@
        šířka 422px původním 940px. Bez toho se na mobilu (92vw) postavičky smrskly
        na ~160px a zbytek výšky hera zůstal prázdný. */
     .vx-heroimg-wrap { position: absolute; left: 0; right: 0; bottom: -91px; display: flex; justify-content: center; align-items: flex-end; z-index: 1; pointer-events: none; }
-    .vx-heroimg { width: min(422px, 92vw); height: auto; display: block; filter: drop-shadow(0 40px 50px rgba(0,10,80,.28)); }
+    /* 44vh strop: na nízkém okně (dock, lišta záložek) by fixních 422px vyjelo až do tlačítek */
+    .vx-heroimg { width: min(422px, 92vw, 44vh); height: auto; display: block; filter: drop-shadow(0 40px 50px rgba(0,10,80,.28)); }
 
     /* spodní pás hero: avataři vlevo, preview karta vpravo — překrývá spodek obrázku */
     .vx-avstack { display:flex; }
@@ -523,7 +526,7 @@
       .vx-pv-cols { grid-template-columns:1fr; }
       .vx-fan { transform: scale(.86); margin-top:16px; }
       .vx-heroimg-wrap { bottom: -46px; }
-      .vx-heroimg { width: min(422px, 96vw); }
+      .vx-heroimg { width: min(422px, 96vw, 44vh); }
       .vx-gal-cards { flex-direction:column; align-items:center; gap:34px; }
       .vx-gal-card.c1, .vx-gal-card.c2, .vx-gal-card.c3 { margin-top:0; }
       .vx-gal-card.c2 .vx-gal-ph, .vx-gal-card.c1 .vx-gal-ph, .vx-gal-card.c3 .vx-gal-ph { width: min(300px,80vw); }
