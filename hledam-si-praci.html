@@ -38,9 +38,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Instrument+Sans:wght@400;500;600&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="preload" as="image" href="/krok-1.png?v=2" />
-  <link rel="preload" as="image" href="/krok-2.png" />
-  <link rel="stylesheet" href="style.css?v=57" />
+  <link rel="preload" as="image" href="/krok-1.png?v=3" />
+  <link rel="preload" as="image" href="/krok-2.png?v=2" />
+  <link rel="stylesheet" href="style.css?v=58" />
   <style>
     /* Bolt-style střídavé kroky (foto + text) */
     .bolt-head { text-align: center; max-width: 1080px; margin: 0 auto 56px; padding: 0 24px; }
@@ -48,7 +48,6 @@
     .bolt-head h2 { font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
     .bolt-journey { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
     .bolt-steps { display: flex; flex-direction: column; gap: 88px; }
-    .bolt-path { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
     .bolt-cta { display: flex; justify-content: center; margin-top: 60px; position: relative; z-index: 1; }
     .bolt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
     .bolt-row:nth-child(even) .bolt-media { order: 2; }
@@ -83,7 +82,59 @@
       .bolt-steps { gap: 48px; }
       .bolt-row { grid-template-columns: 1fr; gap: 24px; }
       .bolt-row:nth-child(even) .bolt-media { order: 0; }
-      .bolt-path { display: none; }
+    }
+
+
+    /* ── Kroky jako galerie (stejný vzor jako u zaměstnavatelů) ── */
+    #how-it-works .bolt-steps {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: clamp(20px, 3vw, 40px); align-items: start;
+      position: relative; z-index: 2;
+    }
+    #how-it-works .bolt-row { display: block; grid-template-columns: none; gap: 0; }
+    #how-it-works .bolt-row:nth-child(2) { margin-top: clamp(26px, 5vw, 64px); }
+    /* kaskáda, když do obrazu přijde víc karet najednou */
+    #how-it-works .bolt-row:nth-child(2) { transition-delay: .1s; }
+    #how-it-works .bolt-row:nth-child(3) { transition-delay: .2s; }
+    #how-it-works .bolt-media {
+      aspect-ratio: auto; border-radius: 18px; background: #f4f5fb;
+      border: 1px solid rgba(10,13,46,.07); box-shadow: 0 34px 64px -32px rgba(10,13,46,.45);
+      display: block;
+    }
+    #how-it-works .bolt-media img { width: 100%; height: auto; }
+    #how-it-works .bolt-text { margin-top: 16px; }
+    #how-it-works .bolt-text h3 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: -.01em; margin: 0; }
+    #how-it-works .bolt-text p { font-size: .92rem; line-height: 1.5; margin: 6px 0 0; max-width: 380px; }
+    .hsp-gal-word {
+      position: absolute; left: 0; right: 0; top: 46%; transform: translateY(-50%); text-align: center;
+      font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
+      font-size: clamp(4rem, 15vw, 13rem); letter-spacing: -.04em; color: rgba(10,13,46,.05);
+      line-height: 1; z-index: 0; pointer-events: none; white-space: nowrap;
+    }
+    @media (max-width: 760px) {
+      #how-it-works .bolt-steps { grid-template-columns: 1fr; gap: 34px; }
+      #how-it-works .bolt-row:nth-child(2) { margin-top: 0; }
+      .hsp-gal-word { font-size: clamp(3rem, 22vw, 7rem); }
+    }
+
+
+    /* CTA pod kroky: bílé s modrým obrysem, zmodrá až doscrolluje na obrazovku
+       (stejné jako na /pro-zamestnavatele) */
+    .bolt-cta a.cta-morph {
+      background: #fff !important; color: #0020f6 !important;
+      box-shadow: inset 0 0 0 2px #0020f6 !important;
+      transition: background .5s cubic-bezier(.2,.8,.2,1), color .5s cubic-bezier(.2,.8,.2,1),
+                  box-shadow .5s cubic-bezier(.2,.8,.2,1), transform .35s cubic-bezier(.2,.8,.2,1);
+    }
+    .bolt-cta a.cta-morph.seen {
+      background: #0020f6 !important; color: #fff !important;
+      box-shadow: 0 16px 38px rgba(0,32,246,.30) !important;
+      animation: ctaMorphPop .6s cubic-bezier(.2,.8,.2,1) .12s both;
+    }
+    @keyframes ctaMorphPop { 0% { transform: scale(1); } 42% { transform: scale(1.07); } 100% { transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) {
+      .bolt-cta a.cta-morph { transition: none; }
+      .bolt-cta a.cta-morph.seen { animation: none; }
     }
 
     /* Kroky na bílé (jako employer) */
@@ -94,9 +145,6 @@
     #how-it-works .bolt-text h3 { color: #0a0d2e; }
     #how-it-works .bolt-text p { color: rgba(10,13,46,.6); }
     #how-it-works .bolt-text-label { color: var(--primary); background: rgba(0,32,246,.07); border-color: rgba(0,32,246,.18); }
-    #how-it-works .bolt-path path { stroke: rgba(0,32,246,.3); }
-    /* Scroll-kreslená čára (Makej Scroll Line) — na mobilu skrytá (kroky jdou pod sebe) */
-    @media (max-width: 768px) { #boltSvg { display: none; } }
 
     /* Sekce „Proč si zvolíš Makej" — brandová modrá, na celou výšku obrazovky.
        Obsah zarovnaný nahoru (žádné vertikální centrování), aby po doskočení
@@ -155,6 +203,9 @@
     /* Vlastní swipe ikona (SVG) přebarvená na bílo přes mask */
     #features .bf2-feat-ic .bf2-swipe { display: block; width: 50px; height: 50px; background: #fff;
       -webkit-mask: url(/swipe-to-right.svg) center / contain no-repeat; mask: url(/swipe-to-right.svg) center / contain no-repeat; }
+    /* Vlastní ikona gamifikace — stejný princip: tvar dělá alfa kanál, barvu background */
+    #features .bf2-feat-ic .bf2-gamif { display: block; width: 58px; height: 44px; background: #fff;
+      -webkit-mask: url(/gamifikace-ikona.png) center / contain no-repeat; mask: url(/gamifikace-ikona.png) center / contain no-repeat; }
     #features .bf2-feat:hover .bf2-feat-ic { transform: none; }
     #features .bf2-feat h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1.3rem; color: #fff; margin: 0 0 8px; }
     #features .bf2-feat p { font-size: 1rem; line-height: 1.55; color: rgba(255,255,255,.72); margin: 0; min-height: 3.1em; }
@@ -447,58 +498,46 @@
     <section id="how-it-works" class="nav-light" style="padding-top:90px;">
       <div class="container">
         <div class="bolt-journey" id="boltWrap">
-          <svg id="boltSvg" preserveAspectRatio="none" aria-hidden="true"
-               style="position:absolute; inset:0; width:100%; height:100%; z-index:0; overflow:visible; pointer-events:none">
-            <path id="boltHeadSrc" fill="none" stroke="none"></path>
-            <path id="boltLineSrc" fill="none" stroke="none"></path>
-            <path id="boltHead" stroke="none" fill="#0020f6"></path>
-            <path id="boltLine" stroke="none" fill="#0020f6"></path>
-            <path id="boltLoop" fill="none" stroke="#0020f6" stroke-linecap="round" stroke-linejoin="round"
-                  style="transition: opacity .6s cubic-bezier(.33,0,.2,1), stroke-width .6s cubic-bezier(.33,0,.2,1)"></path>
-          </svg>
-          <div class="bolt-head" style="position:relative; z-index:1;">
+          <div class="bolt-head">
             <span class="bolt-kicker">Jak to funguje</span>
-            <h2>Pojď si vydělat s <span class="gradient-text" id="boltMakej" aria-label="Makej">Make<span id="boltJ" aria-hidden="true" style="position:relative;">&#567;<span id="boltDot" style="position:absolute; left:45%; top:0.24em; width:0.175em; height:0.175em; border-radius:50%; background:#0020f6; transform:translate(-50%,-50%); pointer-events:none;"></span></span></span></h2>
+            <h2>Pojď si vydělat s <span class="gradient-text" id="boltMakej">Makej</span></h2>
           </div>
 
+          <div class="hsp-gal-word" aria-hidden="true">BRIGÁDA</div>
           <div class="bolt-steps">
-          <div class="bolt-row">
+          <div class="bolt-row js-reveal-up">
             <div class="bolt-media">
-              <img src="/krok-1.png?v=2" alt="Brigádník ukazuje appku Makej na telefonu" />
+              <img src="/krok-1.png?v=3" alt="Brigádník ukazuje appku Makej na telefonu" />
             </div>
             <div class="bolt-text">
-
               <h3>Swajpni nabídky</h3>
               <p>Prohlížej nabídky brigád jako na Tinderu. Doprava = chci, doleva = nechci. Rychlé, intuitivní a zábavné.</p>
             </div>
           </div>
 
-          <div class="bolt-row">
+          <div class="bolt-row js-reveal-up">
             <div class="bolt-media">
-              <img src="/krok-2.png" alt="Match s firmou — podání rukou" />
+              <img src="/krok-2.png?v=2" alt="Match s firmou — podání rukou" />
             </div>
             <div class="bolt-text">
-
               <h3>Matchni se s firmou</h3>
               <p>Když tě firma přijme, vznikne match. Začněte si chatovat a domluvte se na detailech přímo v appce.</p>
             </div>
           </div>
 
-          <div class="bolt-row">
+          <div class="bolt-row js-reveal-up">
             <div class="bolt-media">
-              <img src="/krok-3.png" alt="Výplata za odpracovanou brigádu" />
+              <img src="/krok-3.png?v=2" alt="Výplata za odpracovanou brigádu" />
             </div>
             <div class="bolt-text">
-
               <h3>Pracuj a vydělávej</h3>
               <p>Přijď na směnu, odveď práci a vydělanej jdi domů. Žádné životopisy, žádné pohovory. Tak jednoduché to je.</p>
             </div>
           </div>
           </div>
-          <div class="bolt-cta" style="position:relative; z-index:1;">
-            <a href="#" id="boltCta" class="worker-cta-register"
-               style="display:inline-flex; align-items:center; gap:12px; text-decoration:none; font-family:var(--font-heading); font-size:18px; font-weight:800; padding:20px 40px; border-radius:999px; border:3px solid #0020f6; background:#ffffff; color:#0020f6; box-shadow:0 0 0 rgba(0,0,0,0); transition:background .6s cubic-bezier(.33,0,.2,1), color .45s ease, box-shadow .6s ease;">
-              Vytvořit účet <span style="font-size:20px; line-height:1;">→</span>
+          <div class="bolt-cta">
+            <a href="#" class="btn-primary btn-lg worker-cta-register cta-morph">
+              Vytvořit účet <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex-shrink:0"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 12h16m0 0l-6-6m6 6l-6 6"/></svg>
             </a>
           </div>
         </div>
@@ -510,7 +549,6 @@
       <div class="container">
         <div class="bf2">
           <div class="bf2-left">
-            <span class="bf2-kicker">Funkce</span>
             <h2>Proč si zvolíš <span class="grad">Makej</span></h2>
             <p>Všechno, co při hledání brigády potřebuješ, na jednom místě — swajpuj, matchuj a začni makat.</p>
             <a href="#" class="bf2-cta worker-cta-register">Vytvořit účet <span style="font-size:18px;line-height:1;">→</span></a>
@@ -532,7 +570,7 @@
               <p>Jen prověřené nabídky (IČO i provozovna).</p>
             </div>
             <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:cup-star-bold"></iconify-icon></div>
+              <div class="bf2-feat-ic" aria-hidden="true"><span class="bf2-gamif"></span></div>
               <h3>Gamifikace</h3>
               <p>Sbírej XP, leveluj a odemykej odměny.</p>
             </div>
@@ -829,7 +867,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=29"></script>
+  <script src="script.js?v=30"></script>
   <!-- Lazy-play ukázkového videa: stáhne a přehraje až ve viewportu (šetří data + LCP) -->
   <script>
   (function () {
@@ -845,257 +883,6 @@
     io.observe(v);
   })();
 
-  /* ═══════════ Makej Scroll Line — kreslená spojnice od „j" v Makej přes kroky k CTA ═══════════ */
-  /* Vanilla port z DesignCode (Makej Scroll Line.dc.html). Čára se s posunem odkrývá,
-     má rostoucí „hlavu" (tapered brush stroke), na konci obkrouží tlačítko a to se vyplní. */
-  (function () {
-    var wrap = document.getElementById('boltWrap');
-    var svg  = document.getElementById('boltSvg');
-    if (!wrap || !svg) return;
-    var line = document.getElementById('boltLine');
-    var loop = document.getElementById('boltLoop');
-    var head = document.getElementById('boltHead');
-    var headSrc = document.getElementById('boltHeadSrc');
-    var lineSrc = document.getElementById('boltLineSrc');
-    var makej = document.getElementById('boltMakej');
-    var jdot = document.getElementById('boltJ');
-    var dot  = document.getElementById('boltDot');
-    var cta  = document.getElementById('boltCta');
-    var media = wrap.querySelectorAll('.bolt-steps .bolt-media');
-    var s1 = media[0], s2 = media[1], s3 = media[2];
-    if (!line || !loop || !head || !headSrc || !lineSrc || !cta || !s1 || !s2 || !s3) return;
-
-    // LINE_W = plná tloušťka čáry, END_W = tloušťka obrysu tlačítka (border 3px) —
-    // čára se u tlačítka ztenčí z LINE_W na END_W a smyčka je taky END_W.
-    var ACCENT = '#0020f6', LINE_W = 36, W0 = 6, END_W = 6;
-    loop.style.strokeWidth = END_W + 'px';
-    loop.style.strokeLinecap = 'round';
-
-    var headD, headLen, mainD, loopStr, len, loopLen, startY, ctaY, btn;
-    var builtD, lastTop, lastH, lastLocked, locked = false;
-
-    function center(el, base) {
-      if (!el) return null;
-      var r = el.getBoundingClientRect();
-      return { x: r.left - base.left + r.width / 2, y: r.top - base.top + r.height / 2, r: r };
-    }
-    function perimeter(m) { var H = btn.hh + m, S = Math.max(btn.hw + m - H, 0); return 4 * S + 2 * Math.PI * H; }
-    function pillPoint(u, m) {
-      var H = btn.hh + m, S = Math.max(btn.hw + m - H, 0), cap = Math.PI * H, P = 4 * S + 2 * cap, a;
-      u = ((u % P) + P) % P;
-      if (u <= S) return { x: btn.x + u, y: btn.y - H };
-      u -= S;
-      if (u <= cap) { a = -Math.PI / 2 + u / H; return { x: btn.x + S + H * Math.cos(a), y: btn.y + H * Math.sin(a) }; }
-      u -= cap;
-      if (u <= 2 * S) return { x: btn.x + S - u, y: btn.y + H };
-      u -= 2 * S;
-      if (u <= cap) { a = Math.PI / 2 + u / H; return { x: btn.x - S + H * Math.cos(a), y: btn.y + H * Math.sin(a) }; }
-      u -= cap;
-      return { x: btn.x - S + u, y: btn.y - H };
-    }
-    function loopDPath() {
-      if (!btn) return '';
-      var m = 0, P = perimeter(m), steps = 160, d = '', pt;
-      for (var i = 1; i <= steps; i++) { pt = pillPoint(P * (i / steps) - (i === steps ? 0.01 : 0), m); d += ' L ' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1); }
-      return d;
-    }
-    function buildHead(drawnLen) {
-      var src = headSrc;
-      if (!src || !headLen) return '';
-      var L = headLen, end = Math.min(L, drawnLen);
-      if (end <= 0.5) return '';
-      var n = 130, left = [], right = [], i, u, p1, ua, p2, pa, dx, dy, mag, t, w;
-      for (i = 0; i <= n; i++) {
-        u = (end * i) / n;
-        p1 = src.getPointAtLength(u);
-        ua = Math.min(u, L - 1.4);
-        p2 = src.getPointAtLength(Math.min(L, ua + 1.4));
-        pa = src.getPointAtLength(ua);
-        dx = p2.x - pa.x; dy = p2.y - pa.y; mag = Math.sqrt(dx * dx + dy * dy) || 1; dx /= mag; dy /= mag;
-        t = Math.min(1, u / L);
-        w = (W0 + (LINE_W - W0) * (t * t * (3 - 2 * t))) / 2;
-        left.push([p1.x - dy * w, p1.y + dx * w]);
-        right.push([p1.x + dy * w, p1.y - dx * w]);
-      }
-      var cap = function (idx, sign) {
-        var at = idx === 0 ? 0 : Math.min(end, L);
-        var q1 = src.getPointAtLength(at);
-        var back = Math.max(0, Math.min(at, L - 1.4) - (idx === 0 ? -1.4 : 1.4));
-        var q2 = src.getPointAtLength(Math.max(0, Math.min(L, back)));
-        var ddx = (q1.x - q2.x) * (idx === 0 ? -1 : 1), ddy = (q1.y - q2.y) * (idx === 0 ? -1 : 1);
-        var dm = Math.sqrt(ddx * ddx + ddy * ddy) || 1; ddx /= dm; ddy /= dm;
-        var tt = Math.min(1, (idx === 0 ? 0 : end) / L);
-        var ww = (W0 + (LINE_W - W0) * (tt * tt * (3 - 2 * tt))) / 2, s = '', k, th, x, y;
-        for (k = 1; k < 8; k++) {
-          th = (Math.PI * k) / 8;
-          x = q1.x + (-ddy * ww) * Math.cos(th) + ddx * ww * Math.sin(th) * sign;
-          y = q1.y + (ddx * ww) * Math.cos(th) + ddy * ww * Math.sin(th) * sign;
-          s += ' L ' + x.toFixed(1) + ' ' + y.toFixed(1);
-        }
-        return s;
-      };
-      var d = 'M ' + left[0][0].toFixed(1) + ' ' + left[0][1].toFixed(1);
-      for (i = 1; i < left.length; i++) d += ' L ' + left[i][0].toFixed(1) + ' ' + left[i][1].toFixed(1);
-      if (end < L - 0.5) d += cap(1, 1);
-      for (i = right.length - 1; i >= 0; i--) d += ' L ' + right[i][0].toFixed(1) + ' ' + right[i][1].toFixed(1);
-      d += cap(0, -1);
-      return d + ' Z';
-    }
-    // Poloviční šířka hlavní čáry v místě u (plná, u tlačítka klesá na END_W).
-    function lineHW(u, L) {
-      var t = L > 0 ? u / L : 0;
-      var ts = 0.76;                         // odkud se čára začne ztenčovat
-      if (t <= ts) return LINE_W / 2;
-      var s = (t - ts) / (1 - ts); s = s * s * (3 - 2 * s);
-      return (LINE_W + (END_W - LINE_W) * s) / 2;
-    }
-    // Hlavní čára jako proměnná stužka (plná → END_W u tlačítka), odkrývaná do end.
-    function buildLine(end) {
-      var src = lineSrc;
-      if (!src || !len) return '';
-      var L = len;
-      end = Math.min(L, end);
-      if (end <= 0.5) return '';
-      var n = 200, left = [], right = [], i, u, p1, ua, p2, pa, dx, dy, mag, w;
-      for (i = 0; i <= n; i++) {
-        u = (end * i) / n;
-        p1 = src.getPointAtLength(u);
-        ua = Math.min(u, L - 1.4);
-        p2 = src.getPointAtLength(Math.min(L, ua + 1.4));
-        pa = src.getPointAtLength(ua);
-        dx = p2.x - pa.x; dy = p2.y - pa.y; mag = Math.sqrt(dx * dx + dy * dy) || 1; dx /= mag; dy /= mag;
-        w = lineHW(u, L);
-        left.push([p1.x - dy * w, p1.y + dx * w]);
-        right.push([p1.x + dy * w, p1.y - dx * w]);
-      }
-      var cap = function (idx, sign) {
-        var at = idx === 0 ? 0 : Math.min(end, L);
-        var q1 = src.getPointAtLength(at);
-        var back = Math.max(0, Math.min(at, L - 1.4) - (idx === 0 ? -1.4 : 1.4));
-        var q2 = src.getPointAtLength(Math.max(0, Math.min(L, back)));
-        var ddx = (q1.x - q2.x) * (idx === 0 ? -1 : 1), ddy = (q1.y - q2.y) * (idx === 0 ? -1 : 1);
-        var dm = Math.sqrt(ddx * ddx + ddy * ddy) || 1; ddx /= dm; ddy /= dm;
-        var ww = lineHW(idx === 0 ? 0 : end, L), s = '', k, th, x, y;
-        for (k = 1; k < 8; k++) {
-          th = (Math.PI * k) / 8;
-          x = q1.x + (-ddy * ww) * Math.cos(th) + ddx * ww * Math.sin(th) * sign;
-          y = q1.y + (ddx * ww) * Math.cos(th) + ddy * ww * Math.sin(th) * sign;
-          s += ' L ' + x.toFixed(1) + ' ' + y.toFixed(1);
-        }
-        return s;
-      };
-      var d = 'M ' + left[0][0].toFixed(1) + ' ' + left[0][1].toFixed(1);
-      for (i = 1; i < left.length; i++) d += ' L ' + left[i][0].toFixed(1) + ' ' + left[i][1].toFixed(1);
-      if (end < L - 0.5) d += cap(1, 1);
-      for (i = right.length - 1; i >= 0; i--) d += ' L ' + right[i][0].toFixed(1) + ' ' + right[i][1].toFixed(1);
-      d += cap(0, -1);
-      return d + ' Z';
-    }
-    function measure() {
-      var base = wrap.getBoundingClientRect();
-      var a = center(s1, base), b = center(s2, base), c = center(s3, base), ctaC = center(cta, base);
-      if (!a || !b || !c || !ctaC) return;
-      ctaY = ctaC.y;
-      btn = { x: ctaC.x, y: ctaC.y, hw: ctaC.r.width / 2, hh: ctaC.r.height / 2 };
-      // Origin = přesná pozice modré tečky (CSS potomek „ȷ") → čára z ní vždy sedí.
-      var dc = center(dot, base);
-      var jd = dc || center(jdot, base) || center(makej, base);
-      var tip = dc ? { x: dc.x, y: dc.y }
-                   : (jd ? { x: jd.x, y: jd.r.top - base.top + jd.r.height * 0.135 }
-                         : { x: a.x, y: a.y - a.r.height / 2 - 160 });
-      var endHead = { x: a.x - 20, y: a.y + a.r.height * 0.12 };
-      var rx = base.width - 34;
-      var f = function (x, y) { return x.toFixed(1) + ' ' + y.toFixed(1); };
-      // Z tečky nad „j" doprava, pod slovem „Makej", pak kulatá otočka vpravo
-      // a zpět doleva dolů nad první obrázek — bez sevřené špičky.
-      headD = 'M ' + f(tip.x, tip.y) +
-        ' C ' + f(tip.x + (rx - tip.x) * 0.5, tip.y - 8) + ', ' + f(rx - 8, tip.y + 6) + ', ' + f(rx, tip.y + 58) +
-        ' C ' + f(rx, tip.y + 138) + ', ' + f(endHead.x + 230, endHead.y - 34) + ', ' + f(endHead.x, endHead.y);
-      headSrc.setAttribute('d', headD);
-      headLen = headSrc.getTotalLength() || 1;
-      startY = tip.y;
-      var pts = [endHead, b, c, { x: ctaC.x, y: ctaC.y - ctaC.r.height / 2 }];
-      var d = 'M ' + pts[0].x.toFixed(1) + ' ' + pts[0].y.toFixed(1), i2, p, q, dx, dy, horizontal, bowDir, c1, c2, bow;
-      for (i2 = 0; i2 < pts.length - 1; i2++) {
-        p = pts[i2]; q = pts[i2 + 1]; dx = q.x - p.x; dy = q.y - p.y;
-        horizontal = Math.abs(dx) > Math.abs(dy); bowDir = i2 % 2 === 0 ? 1 : -1;
-        if (i2 === 0) {
-          c1 = { x: p.x + 175, y: p.y };
-          c2 = { x: q.x - Math.min(Math.abs(dx) * 0.3, 120), y: q.y - dy * 0.4 };
-        } else if (horizontal) {
-          bow = Math.min(Math.abs(dx) * 0.18, 90) * bowDir;
-          c1 = { x: p.x + dx * 0.42, y: p.y + bow }; c2 = { x: q.x - dx * 0.42, y: q.y - bow };
-        } else {
-          bow = Math.min(Math.abs(dy) * 0.18, 90) * bowDir;
-          c1 = { x: p.x + bow, y: p.y + dy * 0.42 }; c2 = { x: q.x - bow, y: q.y - dy * 0.42 };
-        }
-        d += ' C ' + c1.x.toFixed(1) + ' ' + c1.y.toFixed(1) + ', ' + c2.x.toFixed(1) + ' ' + c2.y.toFixed(1) + ', ' + q.x.toFixed(1) + ' ' + q.y.toFixed(1);
-      }
-      loopStr = 'M ' + btn.x.toFixed(1) + ' ' + (btn.y - btn.hh).toFixed(1) + loopDPath();
-      mainD = d;
-      lastTop = null; builtD = null;
-      svg.setAttribute('viewBox', '0 0 ' + base.width + ' ' + base.height);
-      update();
-    }
-    function setLocked(v) {
-      if (v === locked) return;
-      locked = v;
-      cta.style.background = v ? ACCENT : '#ffffff';
-      cta.style.color = v ? '#ffffff' : ACCENT;
-      cta.style.boxShadow = v ? '0 16px 38px rgba(0,32,246,0.30)' : '0 0 0 rgba(0,0,0,0)';
-    }
-    function update() {
-      var r = wrap.getBoundingClientRect();
-      if (lastTop === r.top && lastH === r.height) return;
-      lastTop = r.top; lastH = r.height;
-      if (!mainD) return;
-      var vh = window.innerHeight || 800;
-      var cY = ctaY != null ? ctaY : r.height;
-      var sY = startY != null ? startY : 0;
-      var span = Math.max(cY - sY - vh * 0.06, 1);
-      var p = (vh * 0.72 - r.top - sY) / span;
-      p = Math.max(0, Math.min(1, p));
-      if (builtD !== mainD) {
-        builtD = mainD;
-        lineSrc.setAttribute('d', mainD);
-        len = lineSrc.getTotalLength() || 1;
-        loop.setAttribute('d', loopStr);
-        loopLen = loop.getTotalLength() || 1;
-        loop.style.strokeDasharray = loopLen;
-      }
-      var hl = headLen || 0;
-      var total = hl + len + (loopLen || 0);
-      var drawn = total * p;
-      head.setAttribute('d', buildHead(drawn));
-      var drawn2 = drawn - hl;
-      line.setAttribute('d', buildLine(Math.max(0, Math.min(drawn2, len))));
-      var ld = Math.max(0, Math.min(loopLen, drawn2 - len));
-      loop.style.strokeDashoffset = loopLen - ld;
-      // Až čára obkreslí tlačítko, čára kolem obrysu zůstane (smyčka nemizí)
-      // a tlačítko se zároveň vyplní / změní barvu.
-      var lk = p > 0.995;
-      if (lk !== lastLocked) { lastLocked = lk; setLocked(lk); }
-    }
-    function tick() { update(); requestAnimationFrame(tick); }
-
-    measure();
-    requestAnimationFrame(tick);
-    window.addEventListener('resize', measure);
-    window.addEventListener('load', measure);
-    if (window.ResizeObserver) { new ResizeObserver(measure).observe(wrap); }
-    wrap.querySelectorAll('img').forEach(function (im) { if (!im.complete) im.addEventListener('load', measure); });
-    // Web font (Bricolage/Inter) doskočí až po prvním renderu a POSUNE slovo „Makej“
-    // i tečku nad „j“ → čára pak občas nevychází z tečky. Přeměříme, jakmile jsou
-    // fonty připravené i po doběhnutí konkrétního fontu nadpisu.
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(measure);
-      try {
-        document.fonts.load('800 3rem "Bricolage Grotesque"').then(measure).catch(function () {});
-      } catch (e) {}
-    }
-    setTimeout(measure, 600);
-    setTimeout(measure, 1600);
-  })();
   </script>
   <!-- FAQ rozbalování -->
   <script>
@@ -1105,6 +892,23 @@
       document.querySelectorAll('.emp-faq-item.open').forEach(function (i) { i.classList.remove('open'); });
       if (!isOpen) item.classList.add('open');
     }
+  </script>
+  <!-- CTA morph: „Vytvořit účet" zmodrá až doscrolluje na obrazovku -->
+  <script>
+    (function () {
+      var btn = document.querySelector('.bolt-cta a.cta-morph');
+      if (!btn) return;
+      if (!('IntersectionObserver' in window)) { btn.classList.add('seen'); return; }
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting && e.intersectionRatio >= 0.6) {
+            btn.classList.add('seen');
+            obs.unobserve(btn);
+          }
+        });
+      }, { threshold: [0, 0.6, 1], rootMargin: '0px 0px -8% 0px' });
+      obs.observe(btn);
+    })();
   </script>
   <!-- Scroll-reveal intro sekce + připnutý navbar -->
   <script>

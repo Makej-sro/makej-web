@@ -1087,7 +1087,20 @@ function initAuth() {
       try { const r = new URLSearchParams(location.search).get('role'); if (r && window.wlSetTab) window.wlSetTab(r); } catch (e) {}
     }, 300);
   } else if (!wlSeen && !wlLogged) {
-    setTimeout(openWaitlist, 900);
+    // Nevyskakovat hned po načtení — ať si návštěvník stránku nejdřív prohlédne.
+    // Popup přijde, až projeví zájem: doscrolluje pod hero, nebo po 25 s na stránce.
+    // Pořád platí, že se ukáže jen jednou (wl-joined / wl-dismissed výš).
+    let wlFired = false;
+    const wlOpenOnce = () => {
+      if (wlFired) return;
+      wlFired = true;
+      window.removeEventListener('scroll', wlOnScroll);
+      clearTimeout(wlTimer);
+      openWaitlist();
+    };
+    const wlOnScroll = () => { if (window.scrollY > window.innerHeight * 0.6) wlOpenOnce(); };
+    const wlTimer = setTimeout(wlOpenOnce, 25000);
+    window.addEventListener('scroll', wlOnScroll, { passive: true });
   }
   }
 }

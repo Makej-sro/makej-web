@@ -217,7 +217,6 @@ img { max-width: 100%; display: block; }
 /* spodek hera je teď světlý → prvky, které byly bílé, potřebují tmavou variantu */
 #hero .btn-ghost { color: #0a0d2e; border-color: rgba(10,13,46,.3); }
 #hero .btn-ghost:hover { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.55); }
-#hero .hero-scroll-indicator { color: rgba(10,13,46,.4); }
 /* ZKOUŠKA: stejný gradient jako hero na /pro-zamestnavatele a /hledam-si-praci.
    Původní animovaný „wash" je zakomentovaný pod tím — návrat = prohodit zpět.
    Stopy jsou roztažené (bílá až na 100 % místo 60 %): nadpis na hlavní stránce
@@ -313,11 +312,9 @@ img { max-width: 100%; display: block; }
 .hero-intro #navbar { animation: heroIntroFade .7s ease-out 2.3s both; }
 .hero-intro .hero-subtitle { animation-delay: 2.25s; }
 .hero-intro .hero-cta { animation-delay: 2.4s; }
-.hero-intro .hero-scroll-indicator { animation: heroIntroFade .7s ease-out 2.55s both, bounce 2s 2.55s infinite; }
 @media (prefers-reduced-motion: reduce) {
   .hero-intro .hero-text h1 { animation: none !important; transform: none !important; }
   .hero-intro #navbar, .hero-intro .hero-subtitle, .hero-intro .hero-cta { animation-delay: 0s !important; }
-  .hero-intro .hero-scroll-indicator { animation: none !important; }
 }
 
 .hero-subtitle {
@@ -343,12 +340,6 @@ img { max-width: 100%; display: block; }
 }
 .hero-learn-more:hover { color: var(--secondary); }
 
-.hero-scroll-indicator {
-  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
-  color: rgba(255,255,255,.5); animation: bounce 2s infinite;
-  z-index: 1;
-}
-
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
@@ -356,10 +347,6 @@ img { max-width: 100%; display: block; }
 @keyframes float {
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
-}
-@keyframes bounce {
-  0%,100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(8px); }
 }
 @keyframes peekerIn {
   from { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.8); }
@@ -379,7 +366,6 @@ img { max-width: 100%; display: block; }
   .hero-text h1 { margin-bottom: 18px; gap: 2px; }
   .hero-subtitle { margin-bottom: 22px; }
   .hero-cta { margin-bottom: 0; }
-  .hero-scroll-indicator { display: none; }
 }
 @media (max-height: 620px) {
   #hero { padding: 76px 24px 36px; }

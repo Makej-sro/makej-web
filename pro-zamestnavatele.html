@@ -38,9 +38,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="preload" as="image" href="/emp-krok-1.png" />
-  <link rel="preload" as="image" href="/emp-krok-2.png" />
-  <link rel="stylesheet" href="style.css?v=57" />
+  <link rel="stylesheet" href="style.css?v=58" />
   <style>
     /* ═══════════ BENTO DESIGN (pro zaměstnavatele) ═══════════ */
     #employers { padding: 0; }
@@ -100,20 +98,31 @@
 
     /* Stats */
     .bz-stats { grid-template-columns: repeat(4, 1fr); margin-bottom: 18px; }
-    .bz-stat { padding: 30px 26px; min-height: 150px; display: flex; flex-direction: column; justify-content: center; }
+    /* flex-start, ne center: karty jsou v gridu stejně vysoké, ale mají různě dlouhý
+       text. Při centrování začínal obsah delší karty výš — a s ním i její ikona. */
+    .bz-stat { padding: 30px 26px; min-height: 150px; display: flex; flex-direction: column; justify-content: flex-start; }
     .bz-stat .v { font-family: var(--font-heading); font-size: clamp(1.9rem, 3vw, 2.6rem); font-weight: 800; color: #fff; line-height: 1; }
     .bz-stat .l { color: rgba(208,208,255,.45); font-size: .82rem; line-height: 1.4; margin-top: 10px; }
     .bz-stat.accent .v { color: #fff; }
     .bz-stat.accent .l { color: rgba(255,255,255,.82); }
     .bz-stat.accent p { color: rgba(255,255,255,.85); }
-    .bz-stat.accent .bz-step2-ic { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.28); color: #fff; }
+    .bz-stat.accent .bz-step2-ic { color: #fff; }
 
     /* Duo: jak to funguje + proč Makej */
     .bz-duo { grid-template-columns: 1fr 1fr; margin-bottom: 18px; }
     .bz-panel { padding: 32px 30px; }
     .bz-steps2 { display: flex; flex-direction: column; gap: 20px; }
     .bz-step2 { display: flex; gap: 14px; align-items: flex-start; }
-    .bz-step2-ic { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,.05); border: 1px solid rgba(208,208,255,.1); display: grid; place-items: center; color: var(--secondary); flex-shrink: 0; }
+    /* bez rámečku — ikona stojí samostatně */
+    .bz-step2-ic { width: 34px; height: 34px; display: grid; place-items: center; color: var(--secondary); flex-shrink: 0; }
+    /* Všechny čtyři ikony jsou PNG masky ořezané těsně na kresbu a vykreslené stejně:
+       32px rámeček, contain, barva z currentColor. Díky tomu mají zaručeně stejnou
+       velikost i výšku — dopočítávat metriky Solar ikon se neosvědčilo. */
+    .bz-step2-ic .bz-ico { display: block; width: 32px; height: 32px; background: currentColor; }
+    .bz-ico-verified { -webkit-mask: url(/ico-verified.png) center / contain no-repeat; mask: url(/ico-verified.png) center / contain no-repeat; }
+    .bz-ico-chart    { -webkit-mask: url(/ico-chart.png)    center / contain no-repeat; mask: url(/ico-chart.png)    center / contain no-repeat; }
+    .bz-ico-chat     { -webkit-mask: url(/ico-chat.png)     center / contain no-repeat; mask: url(/ico-chat.png)     center / contain no-repeat; }
+    .bz-ico-wallet   { -webkit-mask: url(/ico-wallet.png)   center / contain no-repeat; mask: url(/ico-wallet.png)   center / contain no-repeat; }
     .bz-step2 h4, .bz-why2-item h4 { font-family: var(--font-heading); font-size: .98rem; font-weight: 700; margin: 0 0 4px; color: #fff; }
     .bz-step2 p, .bz-why2-item p { color: rgba(208,208,255,.5); font-size: .83rem; line-height: 1.5; margin: 0; }
     .bz-why2 { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 20px; }
@@ -184,11 +193,37 @@
     }
 
     /* Kroky — alternující řady (foto + text), stejné jako pro brigádníky */
-    .bolt-head { text-align: center; max-width: 1080px; margin: 96px auto 56px; padding: 0 24px; }
-    .bolt-head h2 { font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
+
+    /* ── Kroky jako galerie (vzor ze sekce Lidé, přizpůsobený obrázkům na šířku) ──
+       Čtyři screenshoty 2×2 místo čtyř řad pod sebou — pravý sloupec je výškově
+       posunutý, aby mřížka nebyla strohá. Za kartami prosvítá velké slovo. */
+    .emp-gal { position: relative; max-width: 1080px; margin: 0 auto; padding: 10px 24px 0; overflow: hidden; }
+    .emp-gal-word { position: absolute; left: 0; right: 0; top: 46%; transform: translateY(-50%); text-align: center;
+      font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
+      font-size: clamp(4rem, 15vw, 13rem); letter-spacing: -.04em; color: rgba(10,13,46,.05);
+      line-height: 1; z-index: 0; pointer-events: none; white-space: nowrap; }
+    .emp-gal-cards { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(28px, 5vw, 60px) clamp(24px, 4vw, 54px); align-items: start; }
+    .emp-gal-card:nth-child(2), .emp-gal-card:nth-child(4) { margin-top: clamp(28px, 6vw, 74px); }
+    /* kaskáda, když do obrazu přijde víc karet najednou */
+    .emp-gal-card:nth-child(2) { transition-delay: .1s; }
+    .emp-gal-card:nth-child(3) { transition-delay: .2s; }
+    .emp-gal-card:nth-child(4) { transition-delay: .3s; }
+    .emp-gal-ph { border-radius: 18px; border: 1px solid rgba(10,13,46,.07); overflow: hidden;
+      box-shadow: 0 34px 64px -32px rgba(10,13,46,.45); background: #f4f5fb; }
+    .emp-gal-ph img { width: 100%; height: auto; display: block; }
+    .emp-gal-cap { margin-top: 16px; }
+    .emp-gal-cap .n { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 800;
+      font-size: .76rem; letter-spacing: .08em; color: var(--primary); }
+    .emp-gal-cap h3 { font-family: var(--font-heading); font-weight: 800; text-transform: uppercase;
+      font-size: 1.05rem; letter-spacing: -.01em; margin: 5px 0 0; color: #0a0d2e; }
+    .emp-gal-cap p { color: rgba(10,13,46,.6); font-size: .92rem; line-height: 1.5; margin: 6px 0 0; max-width: 380px; }
+    @media (max-width: 760px) {
+      .emp-gal-cards { grid-template-columns: 1fr; gap: 34px; }
+      .emp-gal-card:nth-child(2), .emp-gal-card:nth-child(4) { margin-top: 0; }
+      .emp-gal-word { font-size: clamp(3rem, 22vw, 7rem); }
+    }
     .bolt-journey { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-    .bolt-steps { display: flex; flex-direction: column; gap: 88px; }
-    .bolt-path { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
     .bolt-cta { display: flex; justify-content: center; margin-top: 60px; position: relative; z-index: 1; }
     /* CTA morph: tlačítko je bílé a zmodrá teprve až doscrolluje na obrazovku (chytne pozornost) */
     .bolt-cta a.cta-morph {
@@ -207,24 +242,6 @@
       .bolt-cta a.cta-morph { transition: none; }
       .bolt-cta a.cta-morph.seen { animation: none; }
     }
-    .bolt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
-    .bolt-row:nth-child(even) .bolt-media { order: 2; }
-    .bolt-media {
-      aspect-ratio: 4 / 3; border-radius: 24px; overflow: hidden;
-      background: linear-gradient(150deg, #0a1640, #0a0e26);
-      border: 1px solid rgba(208,208,255,.1); display: grid; place-items: center;
-    }
-    .bolt-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .bolt-media-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; color: rgba(208,208,255,.32); font-size: .85rem; font-weight: 500; }
-    .bolt-text-label {
-      display: inline-block; font-family: var(--font-heading);
-      font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-      color: var(--secondary); margin-bottom: 16px;
-      padding: 5px 14px; border-radius: 100px;
-      background: rgba(0,32,246,.16); border: 1px solid rgba(208,208,255,.14);
-    }
-    .bolt-text h3 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3vw, 2.4rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
-    .bolt-text p { color: var(--muted-fg); font-size: 1.05rem; line-height: 1.7; max-width: 460px; }
 
     /* Dashboard sekce (ovládací panel — 3 karty) */
     .dctrl { padding: 96px 0 24px; }
@@ -239,10 +256,6 @@
       box-shadow: 0 30px 70px rgba(0,0,0,.4);
     }
     @media (max-width: 768px) {
-      .bolt-steps { gap: 48px; }
-      .bolt-row { grid-template-columns: 1fr; gap: 24px; }
-      .bolt-row:nth-child(even) .bolt-media { order: 0; }
-      .bolt-path { display: none; }
     }
 
     /* Bílá zóna: kroky + dashboard + Proč Makej */
@@ -251,33 +264,10 @@
     .emp-white-zone .dctrl-head p { color: rgba(10,13,46,.55); }
     .emp-white-zone .bz-wrap > h2 { color: #0a0d2e; }
     /* Kroky na bílé */
-    .emp-white-zone .bolt-text h3 { color: #0a0d2e; }
-    .emp-white-zone .bolt-text p { color: rgba(10,13,46,.6); }
-    .emp-white-zone .bolt-text-label { color: var(--primary); background: rgba(0,32,246,.07); border-color: rgba(0,32,246,.18); }
-    .emp-white-zone .bolt-path path { stroke: rgba(0,32,246,.3); }
     /* Nadpis nad kroky (paralela k brigádnickému „Pojď si vydělat s Makej") */
-    .emp-white-zone .bolt-head { margin: 4px auto 56px; }
-    .emp-white-zone .bolt-head h2 { color: #0a0d2e; }
-    .emp-white-zone .bolt-head h2 .gradient-text { -webkit-text-fill-color: #0020f6; color: #0020f6; background: none; }
     /* Kicker nad nadpisem — čistý text, bez podkladu */
-    .emp-white-zone .bolt-kicker {
-      display: block; font-family: var(--font-heading); font-weight: 800;
-      font-size: 13px; letter-spacing: .16em; text-transform: uppercase;
-      color: #0020f6; margin-bottom: 16px;
-    }
     /* Zvýrazněné slovo + ručně kreslené podtržení, které se nakreslí při reveal */
-    .emp-white-zone .bolt-head h2 .scribble { position: relative; white-space: nowrap; color: #0020f6; }
-    .emp-white-zone .bolt-head h2 .scribble svg {
-      position: absolute; left: -3%; bottom: -.24em; width: 106%; height: .42em; overflow: visible;
-    }
-    .emp-white-zone .bolt-head h2 .scribble svg path {
-      fill: none; stroke: #0020f6; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round;
-      stroke-dasharray: 1; stroke-dashoffset: 1;
-      transition: stroke-dashoffset .9s cubic-bezier(.6,0,.2,1) .3s;
-    }
-    .emp-white-zone .bolt-head.visible h2 .scribble svg path { stroke-dashoffset: 0; }
     @media (prefers-reduced-motion: reduce) {
-      .emp-white-zone .bolt-head h2 .scribble svg path { transition: none; stroke-dashoffset: 0; }
     }
 
     /* ── Ceník na bílé ── */
@@ -470,59 +460,28 @@
       <!-- ░░░ BÍLÁ ZÓNA: kroky + dashboard + Proč Makej ░░░ -->
       <div class="emp-white-zone nav-light">
 
-      <div class="bolt-head">
-        <span class="bolt-kicker">Jak to funguje</span>
-        <h2>Najděte lidi, co <span class="scribble">makají<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M5 13 C 62 4, 110 6, 152 11 S 246 18, 295 6" /></svg></span></h2>
-      </div>
-
-      <!-- KROKY (alternující řady, prázdná místa pro fotky) -->
+      <!-- KROKY — galerie 2×2 (vzor ze sekce Lidé) -->
       <div class="bolt-journey">
-        <svg class="bolt-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M 26,10 C 26,22 74,23 74,35 C 74,47 26,48 26,59 C 26,71 74,72 74,84 C 74,93 50,93 50,98"
-                fill="none" stroke="rgba(255,255,255,.5)" stroke-width="4"
-                stroke-linecap="round" vector-effect="non-scaling-stroke" />
-        </svg>
-        <div class="bolt-steps">
-        <div class="bolt-row">
-          <div class="bolt-media">
-            <img src="/emp-krok-1.png" alt="Vytvoření inzerátu v appce" />
+        <div class="emp-gal">
+          <div class="emp-gal-word" aria-hidden="true">NÁBOR</div>
+          <div class="emp-gal-cards">
+          <div class="emp-gal-card js-reveal-up">
+            <div class="emp-gal-ph"><img src="/emp-krok-1.jpg?v=2" alt="Vytvoření inzerátu v appce" loading="lazy" decoding="async" /></div>
+            <div class="emp-gal-cap"><span class="n"></span><h3>Vytvořte inzerát</h3><p>Vyplňte pozici, datum, hodinovou mzdu a popis. Hotovo za 60 sekund přímo v aplikaci.</p></div>
           </div>
-          <div class="bolt-text">
-
-            <h3>Vytvořte inzerát</h3>
-            <p>Vyplňte pozici, datum, hodinovou mzdu a popis. Hotovo za 60 sekund přímo v aplikaci.</p>
+          <div class="emp-gal-card js-reveal-up">
+            <div class="emp-gal-ph"><img src="/emp-krok-2.jpg?v=2" alt="Kandidáti swajpují vaši nabídku" loading="lazy" decoding="async" /></div>
+            <div class="emp-gal-cap"><span class="n"></span><h3>Kandidáti swajpují</h3><p>Tisíce brigádníků uvidí vaši nabídku ve feedu. Ti co chtějí, swajpnou doprava — a vy je vidíte okamžitě.</p></div>
           </div>
-        </div>
-        <div class="bolt-row">
-          <div class="bolt-media">
-            <img src="/emp-krok-2.png" alt="Kandidáti swajpují vaši nabídku" />
+          <div class="emp-gal-card js-reveal-up">
+            <div class="emp-gal-ph"><img src="/emp-krok-3.jpg?v=2" alt="Výběr kandidátů" loading="lazy" decoding="async" /></div>
+            <div class="emp-gal-cap"><span class="n"></span><h3>Přijmete nebo odmítnete</h3><p>Podívejte se na profil, hodnocení a zkušenosti. Jedním tapem přijmete — nebo posunete dál.</p></div>
           </div>
-          <div class="bolt-text">
-
-            <h3>Kandidáti swajpují</h3>
-            <p>Tisíce brigádníků uvidí vaši nabídku ve feedu. Ti co chtějí, swajpnou doprava — a vy je vidíte okamžitě.</p>
+          <div class="emp-gal-card js-reveal-up">
+            <div class="emp-gal-ph"><img src="/emp-krok-4.jpg?v=2" alt="Domluva detailů přes chat" loading="lazy" decoding="async" /></div>
+            <div class="emp-gal-cap"><span class="n"></span><h3>Domluvíte detaily</h3><p>Po přijetí se otevře chat. Upřesněte čas, místo a co si vzít. Brigádník je připravený.</p></div>
           </div>
-        </div>
-        <div class="bolt-row">
-          <div class="bolt-media">
-            <img src="/emp-krok-3.png" alt="Výběr kandidátů" />
           </div>
-          <div class="bolt-text">
-
-            <h3>Přijmete nebo odmítnete</h3>
-            <p>Podívejte se na profil, hodnocení a zkušenosti. Jedním tapem přijmete — nebo posunete dál.</p>
-          </div>
-        </div>
-        <div class="bolt-row">
-          <div class="bolt-media">
-            <img src="/emp-krok-4.png" alt="Domluva detailů přes chat" />
-          </div>
-          <div class="bolt-text">
-
-            <h3>Domluvíte detaily</h3>
-            <p>Po přijetí se otevře chat. Upřesněte čas, místo a co si vzít. Brigádník je připravený.</p>
-          </div>
-        </div>
         </div>
         <div class="bolt-cta">
           <a href="#" class="btn-primary btn-lg employer-cta-register cta-morph">
@@ -539,328 +498,29 @@
         </div>
         <div class="dctrl-shot">
           <style>
-          .dashmock-frame{position:relative;width:100%;max-width:1180px;margin:0 auto;aspect-ratio:1440/904;border-radius:22px;overflow:hidden;border:1px solid rgba(16,24,64,.08);box-shadow:0 50px 110px -45px rgba(16,24,64,.55);background:#eef1f9;}
-          .dashmock{position:absolute;top:0;left:0;width:1440px;height:904px;transform-origin:top left;display:flex;font-family:'Inter',system-ui,sans-serif;color:#14162b;text-align:left;background:#eef1f9;}
-          .dashmock *{box-sizing:border-box;}
-          .dm-side{width:252px;flex:0 0 auto;background:#fff;border-right:1px solid #e7ebf5;display:flex;flex-direction:column;padding:26px 18px 18px;}
-          .dm-logo{font:800 26px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.5px;padding:0 8px;}
-          .dm-logo span{color:#1a34e8;}
-          .dm-brandsub{font:700 10px 'Inter';letter-spacing:2.5px;color:#9aa0b8;margin:5px 0 24px 8px;}
-          .dm-seclabel{font:700 10.5px 'Inter';letter-spacing:1.4px;color:#a6abc4;padding:0 10px 9px;margin-top:20px;}
-          .dm-side .dm-seclabel:first-of-type{margin-top:0;}
-          .dm-nav{display:flex;align-items:center;gap:12px;padding:10px 11px;border-radius:12px;color:#5b607a;font:600 14.5px 'Inter';text-decoration:none;margin-bottom:2px;}
-          .dm-nav.on{background:#eaeeff;color:#1a34e8;font-weight:700;}
-          .dm-nav>svg{width:19px;height:19px;flex:0 0 auto;}
-          .dm-nav span{flex:1;}
-          .dm-pro{font:700 10px 'Inter';letter-spacing:.5px;color:#1a34e8;background:#eaeeff;padding:3px 7px;border-radius:6px;font-style:normal;}
-          .dm-count{min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#eef0f6;color:#6b7089;font:700 11.5px 'Inter';display:flex;align-items:center;justify-content:center;font-style:normal;}
-          .dm-spacer{flex:1;}
-          .dm-premium{background:linear-gradient(160deg,#f2f5ff,#e9edff);border:1px solid #dfe4ff;border-radius:16px;padding:16px 15px;margin-bottom:14px;}
-          .dm-premium-h{display:flex;align-items:center;gap:8px;font:700 11px 'Inter';letter-spacing:1px;color:#1a34e8;margin-bottom:11px;}
-          .dm-premium-h svg{width:16px;height:16px;}
-          .dm-premium-t{font:600 13px 'Inter';color:#4a4f6b;margin-bottom:13px;}
-          .dm-premium-btn{background:#1a34e8;color:#fff;border-radius:11px;padding:11px;text-align:center;font:700 13.5px 'Inter';}
-          .dm-user{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:13px;background:#f7f8fc;}
-          .dm-ava{width:38px;height:38px;border-radius:11px;background:linear-gradient(150deg,#8b9bff,#4a5ff2);color:#fff;font:700 14px 'Bricolage Grotesque';display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
-          .dm-user b{font:700 13.5px 'Inter';display:block;}
-          .dm-user small{font:500 11.5px 'Inter';color:#8a8fa6;}
-          .dm-main{flex:1;display:flex;flex-direction:column;min-width:0;}
-          .dm-top{flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:22px 26px;border-bottom:1px solid #e7ebf5;background:#fff;}
-          .dm-th{flex:1;display:flex;align-items:center;gap:10px;}
-          .dm-h1{font:800 24px/1 'Bricolage Grotesque';letter-spacing:-.4px;}
-          .dm-dot{width:5px;height:5px;border-radius:50%;background:#1a34e8;}
-          .dm-sub{font:500 15px 'Inter';color:#8a8fa6;}
-          .dm-seg{display:flex;gap:3px;background:#f4f6fb;border:1px solid #eaedf5;border-radius:13px;padding:4px;}
-          .dm-seg span{padding:8px 15px;border-radius:9px;font:600 13px 'Inter';color:#6b7089;}
-          .dm-seg .on{background:#fff;color:#1a34e8;font-weight:700;box-shadow:0 4px 10px -6px rgba(16,24,64,.3);}
-          .dm-ic{width:44px;height:44px;border-radius:13px;border:1px solid #e7ebf5;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;}
-          .dm-ic svg{width:20px;height:20px;}
-          .dm-bdot{position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:#f04438;border:2px solid #fff;}
-          .dm-primary{display:flex;align-items:center;gap:9px;background:#1a34e8;color:#fff;border:none;border-radius:14px;padding:0 20px;height:44px;font:700 14.5px 'Inter';box-shadow:0 12px 26px -12px rgba(26,52,232,.7);}
-          .dm-primary svg{width:18px;height:18px;}
-          .dm-body{flex:1;padding:24px 26px;display:flex;gap:22px;min-height:0;}
-          .dm-left{flex:1;display:flex;flex-direction:column;gap:22px;min-width:0;}
-          .dm-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-          .dm-kpi{background:#fff;border:1px solid #eef0f6;border-radius:20px;padding:18px;box-shadow:0 14px 34px -26px rgba(16,24,64,.5);}
-          .dm-kpi-r{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-          .dm-kpi-ic{width:40px;height:40px;border-radius:12px;background:#eaeeff;display:flex;align-items:center;justify-content:center;}
-          .dm-kpi-ic.gold{background:#fff5e2;}
-          .dm-kpi-ic svg{width:20px;height:20px;}
-          .dm-chip{display:flex;align-items:center;font:700 11.5px 'Inter';padding:4px 8px;border-radius:8px;}
-          .dm-chip.up{color:#1f9d5c;background:#e9f7ef;}
-          .dm-chip.flat{color:#8a8fa6;background:#f4f6fb;}
-          .dm-kpi-label{font:500 13px 'Inter';color:#8a8fa6;margin-bottom:6px;}
-          .dm-kpi-val{font:800 30px/1 'Bricolage Grotesque';}
-          .dm-kpi-val small{font-size:16px;color:#b3b8cc;font-weight:700;}
-          .dm-bar{height:6px;border-radius:4px;background:#eef0f6;margin-top:12px;overflow:hidden;}
-          .dm-bar i{display:block;height:100%;background:#1a34e8;border-radius:4px;}
-          .dm-spark{width:100%;height:26px;margin-top:10px;display:block;}
-          .dm-stars{display:flex;gap:3px;margin-top:12px;}
-          .dm-stars svg{width:15px;height:15px;}
-          .dm-chart-card{flex:1;background:#fff;border:1px solid #eef0f6;border-radius:22px;padding:24px 26px 18px;box-shadow:0 20px 44px -30px rgba(16,24,64,.5);display:flex;flex-direction:column;min-height:0;}
-          .dm-chart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
-          .dm-chart-t{font:800 19px 'Bricolage Grotesque';letter-spacing:-.3px;}
-          .dm-chart-s{font:500 13.5px 'Inter';color:#8a8fa6;margin-top:3px;}
-          .dm-legend{display:flex;gap:16px;padding-top:3px;}
-          .dm-legend span{display:flex;align-items:center;gap:7px;font:600 12.5px 'Inter';color:#4a4f6b;}
-          .dm-legend i{width:9px;height:9px;border-radius:3px;}
-          .dm-chart-wrap{flex:1;display:flex;gap:14px;min-height:0;}
-          .dm-yax{display:flex;flex-direction:column;justify-content:space-between;font:600 11.5px 'Inter';color:#b3b8cc;padding:2px 0 20px;text-align:right;width:22px;}
-          .dm-plot{flex:1;position:relative;min-width:0;}
-          .dm-grid{position:absolute;inset:0 0 20px;display:flex;flex-direction:column;justify-content:space-between;}
-          .dm-grid div{border-top:1px solid #f0f2f8;}
-          .dm-area{position:absolute;inset:0 0 20px;width:100%;height:calc(100% - 20px);}
-          .dm-xax{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;font:600 11.5px 'Inter';color:#b3b8cc;}
-          .dm-feed{width:326px;flex:0 0 auto;background:#fff;border:1px solid #eef0f6;border-radius:22px;padding:24px 22px;box-shadow:0 20px 44px -30px rgba(16,24,64,.5);display:flex;flex-direction:column;min-height:0;}
-          .dm-feed-h{display:flex;align-items:center;gap:9px;font:800 18px 'Bricolage Grotesque';letter-spacing:-.3px;}
-          .dm-live{width:8px;height:8px;border-radius:50%;background:#1f9d5c;box-shadow:0 0 0 4px #e9f7ef;}
-          .dm-feed-sub{font:500 13px 'Inter';color:#8a8fa6;margin:3px 0 18px 17px;}
-          .dm-tl{position:relative;padding-left:34px;display:flex;flex-direction:column;gap:16px;}
-          .dm-tl-line{position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:#eef0f6;}
-          .dm-tl-i{position:relative;}
-          .dm-tl-ic{position:absolute;left:-34px;top:0;width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
-          .dm-tl-ic svg{width:15px;height:15px;}
-          .dm-tl-ic.green{background:#e9f7ef;}
-          .dm-tl-ic.blue{background:#eaeeff;}
-          .dm-tl-x{font:600 14px 'Inter';color:#14162b;}
-          .dm-tl-x b{font-weight:800;}
-          .dm-tl-x em{color:#1a34e8;font-weight:700;font-style:normal;}
-          .dm-tl-x small{display:block;font:500 12px 'Inter';color:#a6abc4;margin-top:2px;}
-          .dm-feed-all{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:13px;background:#f4f6fb;color:#1a34e8;font:700 13.5px 'Inter';text-decoration:none;}
-          .dm-feed-all svg{width:16px;height:16px;}
+          .dashmock-frame{position:relative;width:100%;max-width:1180px;margin:0 auto;aspect-ratio:2360/1407;border-radius:22px;overflow:hidden;border:1px solid rgba(16,24,64,.08);box-shadow:0 50px 110px -45px rgba(16,24,64,.55);background:#eef1f9;}
           @media (max-width:640px){ .dashmock-frame{border-radius:14px;} }
           /* Before/After posuvník */
           .cmp{position:absolute;inset:0;--pos:55%;cursor:ew-resize;-webkit-user-select:none;user-select:none;touch-action:none;}
           .cmp-lay{position:absolute;inset:0;overflow:hidden;}
+          .cmp-lay img{width:100%;height:100%;object-fit:cover;display:block;}
           .cmp-a{clip-path:inset(0 calc(100% - var(--pos)) 0 0);}
           .cmp-handle{position:absolute;top:0;bottom:0;left:var(--pos);width:3px;margin-left:-1.5px;background:#5b6bff;box-shadow:0 0 0 1px rgba(91,107,255,.35),0 0 18px rgba(91,107,255,.5);z-index:6;pointer-events:none;}
           .cmp-grip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:#5b6bff;box-shadow:0 8px 22px rgba(91,107,255,.45);display:flex;align-items:center;justify-content:center;}
           .cmp-grip svg{width:22px;height:22px;}
           .cmp-tag{position:absolute;top:14px;z-index:6;pointer-events:none;font:700 11.5px 'Inter';letter-spacing:.3px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:#14162b;box-shadow:0 4px 14px rgba(16,24,64,.14);}
           .cmp-tag-l{left:14px;} .cmp-tag-r{right:14px;color:#1a34e8;}
-          .dm-halfs{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-          .dm-card{background:#fff;border:1px solid #eef0f6;border-radius:20px;padding:20px 22px;box-shadow:0 14px 34px -26px rgba(16,24,64,.5);}
-          .dm-card-t{font:800 16px 'Bricolage Grotesque';letter-spacing:-.2px;}
-          .dm-card-s{font:500 12.5px 'Inter';color:#8a8fa6;margin:3px 0 16px;}
-          .dm-bars{display:flex;align-items:flex-end;gap:14px;height:150px;}
-          .dm-barcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;height:100%;}
-          .dm-barcol i{width:100%;max-width:32px;border-radius:6px 6px 0 0;background:#1a34e8;opacity:.9;}
-          .dm-barcol small{font:600 11px 'Inter';color:#8a8fa6;}
-          .dm-donutwrap{display:flex;align-items:center;gap:22px;}
-          .dm-donut{width:132px;height:132px;border-radius:50%;position:relative;flex:0 0 auto;background:conic-gradient(#1a34e8 0 42%,#5b6bff 42% 68%,#8ab4ff 68% 86%,#5bd68a 86% 100%);}
-          .dm-donut::after{content:'';position:absolute;inset:23px;background:#fff;border-radius:50%;}
-          .dm-dleg{display:flex;flex-direction:column;gap:10px;}
-          .dm-dleg span{display:flex;align-items:center;gap:9px;font:600 12.5px 'Inter';color:#4a4f6b;}
-          .dm-dleg i{width:11px;height:11px;border-radius:3px;flex:0 0 auto;}
           </style>
           <div class="dashmock-frame" role="img" aria-label="Náhled dashboardu a analytiky zaměstnavatele">
            <div class="cmp" id="cmpDash" style="--pos:55%">
 
-            <!-- Vrstva B: Analytika (vespod, celá) -->
+            <!-- Vrstva B: Analytika (vespod, vidět vpravo od posuvníku) -->
             <div class="cmp-lay cmp-b">
-             <div class="dashmock">
-              <aside class="dm-side">
-                <div class="dm-logo">Makej<span>.</span></div>
-                <div class="dm-brandsub">PRO FIRMY</div>
-                <div class="dm-seclabel">PŘEHLED</div>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></a>
-                <a class="dm-nav on"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2.1"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Analytika</span><i class="dm-pro">PRO</i></a>
-                <div class="dm-seclabel">NÁBOR</div>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg><span>Inzeráty</span><i class="dm-count">7</i></a>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.4-.9-4.2-2.3-5.3"/></svg><span>Kandidáti</span><i class="dm-count">3</i></a>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1 1 21 11.5Z"/></svg><span>Zprávy</span><i class="dm-count">10</i></a>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span>Plán směn</span></a>
-                <div class="dm-seclabel">FIRMA</div>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 6.6 19l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H2a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 5 6.6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 19 5l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Nastavení</span></a>
-                <div class="dm-spacer"></div>
-                <div class="dm-premium">
-                  <div class="dm-premium-h"><svg viewBox="0 0 24 24" fill="#1a34e8" width="16"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>PREMIUM TARIF</div>
-                  <div class="dm-premium-t">Tarif Business · aktivní</div>
-                  <div class="dm-premium-btn">Spravovat tarif</div>
-                </div>
-                <div class="dm-user"><span class="dm-ava">S</span><div><b>Samuel</b><small>Česká republika</small></div></div>
-              </aside>
-              <div class="dm-main">
-                <div class="dm-top">
-                  <div class="dm-th"><span class="dm-h1">Analytika</span><span class="dm-dot"></span><span class="dm-sub">Pokročilé reporty a segmentace</span></div>
-                  <div class="dm-seg"><span>7d</span><span class="on">30d</span><span>90d</span><span>rok</span></div>
-                  <button class="dm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#4a4f6b" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><i class="dm-bdot"></i></button>
-                  <button class="dm-primary"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Nový inzerát</button>
-                </div>
-                <div class="dm-body">
-                  <div class="dm-left" style="flex:1">
-                    <div class="dm-kpis">
-                      <div class="dm-kpi"><div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="dm-chip up">+18%</span></div><div class="dm-kpi-label">Zhlédnutí</div><div class="dm-kpi-val">8 420</div></div>
-                      <div class="dm-kpi"><div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg></span><span class="dm-chip up">+4%</span></div><div class="dm-kpi-label">Konverze</div><div class="dm-kpi-val">3,1<small> %</small></div></div>
-                      <div class="dm-kpi"><div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="#1a34e8"><path d="M12 21s-7-4.6-9.5-8.6C.9 9.7 2.3 6.4 5.4 6c1.9-.2 3.5.8 4.6 2.3C11.1 6.8 12.7 5.8 14.6 6c3.1.4 4.5 3.7 2.9 6.4C19 16.4 12 21 12 21Z"/></svg></span><span class="dm-chip up">+12%</span></div><div class="dm-kpi-label">Matche</div><div class="dm-kpi-val">142</div></div>
-                      <div class="dm-kpi"><div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></span><span class="dm-chip up">+9%</span></div><div class="dm-kpi-label">Najato</div><div class="dm-kpi-val">28</div></div>
-                    </div>
-                    <div class="dm-chart-card" style="flex:0 0 auto;height:288px">
-                      <div class="dm-chart-head">
-                        <div><div class="dm-chart-t">Vývoj náboru za 30 dní</div><div class="dm-chart-s">Matche a potvrzení podle dne</div></div>
-                        <div class="dm-legend"><span><i style="background:#1a34e8"></i>Matche</span><span><i style="background:#5bd68a"></i>Najato</span></div>
-                      </div>
-                      <div class="dm-chart-wrap">
-                        <div class="dm-yax"><span>40</span><span>30</span><span>20</span><span>10</span><span>0</span></div>
-                        <div class="dm-plot">
-                          <div class="dm-grid"><div></div><div></div><div></div><div></div><div></div></div>
-                          <svg class="dm-area" viewBox="0 0 1000 300" preserveAspectRatio="none">
-                            <defs><linearGradient id="dmgv2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a34e8" stop-opacity=".22"/><stop offset="1" stop-color="#1a34e8" stop-opacity="0"/></linearGradient></defs>
-                            <path d="M0 300 L0 250 L140 210 L280 235 L420 120 L560 160 L700 70 L840 110 L1000 60 L1000 300 Z" fill="url(#dmgv2)"/>
-                            <path d="M0 250 L140 210 L280 235 L420 120 L560 160 L700 70 L840 110 L1000 60" fill="none" stroke="#1a34e8" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-                            <path d="M0 292 L140 286 L280 288 L420 258 L560 270 L700 240 L840 250 L1000 232" fill="none" stroke="#5bd68a" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-                          </svg>
-                          <div class="dm-xax"><span>8. 6.</span><span>13. 6.</span><span>18. 6.</span><span>23. 6.</span><span>28. 6.</span><span>3. 7.</span></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="dm-halfs">
-                      <div class="dm-card">
-                        <div class="dm-card-t">Kandidáti podle krajů</div>
-                        <div class="dm-card-s">Odkud se ti hlásí nejvíc lidí</div>
-                        <div class="dm-bars">
-                          <div class="dm-barcol"><i style="height:88%"></i><small>Praha</small></div>
-                          <div class="dm-barcol"><i style="height:64%"></i><small>Brno</small></div>
-                          <div class="dm-barcol"><i style="height:47%"></i><small>Ostrava</small></div>
-                          <div class="dm-barcol"><i style="height:35%"></i><small>Plzeň</small></div>
-                          <div class="dm-barcol"><i style="height:26%"></i><small>Liberec</small></div>
-                          <div class="dm-barcol"><i style="height:18%"></i><small>Olomouc</small></div>
-                        </div>
-                      </div>
-                      <div class="dm-card">
-                        <div class="dm-card-t">Úroveň kandidátů</div>
-                        <div class="dm-card-s">Rozložení podle Makej Levelu</div>
-                        <div class="dm-donutwrap">
-                          <div class="dm-donut"></div>
-                          <div class="dm-dleg">
-                            <span><i style="background:#1a34e8"></i>Level 1 · 42 %</span>
-                            <span><i style="background:#5b6bff"></i>Level 2 · 26 %</span>
-                            <span><i style="background:#8ab4ff"></i>Level 3 · 18 %</span>
-                            <span><i style="background:#5bd68a"></i>Level 4+ · 14 %</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-             </div>
+              <img src="/emp-dash-analytika.jpg" alt="" width="2360" height="1407" loading="lazy" decoding="async" />
             </div>
-
             <!-- Vrstva A: Dashboard (nahoře, oříznuté zleva) -->
             <div class="cmp-lay cmp-a">
-             <div class="dashmock">
-
-              <!-- Sidebar -->
-              <aside class="dm-side">
-                <div class="dm-logo">Makej<span>.</span></div>
-                <div class="dm-brandsub">PRO FIRMY</div>
-                <div class="dm-seclabel">PŘEHLED</div>
-                <a class="dm-nav on"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2.1"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></a>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Analytika</span><i class="dm-pro">PRO</i></a>
-                <div class="dm-seclabel">NÁBOR</div>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg><span>Inzeráty</span><i class="dm-count">7</i></a>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.5M18 20c0-2.4-.9-4.2-2.3-5.3"/></svg><span>Kandidáti</span><i class="dm-count">3</i></a>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1 1 21 11.5Z"/></svg><span>Zprávy</span><i class="dm-count">10</i></a>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span>Plán směn</span></a>
-                <div class="dm-seclabel">FIRMA</div>
-                <a class="dm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="#9096b0" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 6.6 19l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H2a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 5 6.6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 19 5l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Nastavení</span></a>
-                <div class="dm-spacer"></div>
-                <div class="dm-premium">
-                  <div class="dm-premium-h"><svg viewBox="0 0 24 24" fill="#1a34e8" width="16"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>PREMIUM TARIF</div>
-                  <div class="dm-premium-t">Tarif Business · aktivní</div>
-                  <div class="dm-premium-btn">Spravovat tarif</div>
-                </div>
-                <div class="dm-user"><span class="dm-ava">S</span><div><b>Samuel</b><small>Česká republika</small></div></div>
-              </aside>
-
-              <!-- Main -->
-              <div class="dm-main">
-                <div class="dm-top">
-                  <div class="dm-th"><span class="dm-h1">Dashboard</span><span class="dm-dot"></span><span class="dm-sub">Přehled výkonu náboru za 30 dní</span></div>
-                  <div class="dm-seg"><span>7d</span><span class="on">30d</span><span>90d</span><span>rok</span></div>
-                  <button class="dm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#4a4f6b" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><i class="dm-bdot"></i></button>
-                  <button class="dm-primary"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Nový inzerát</button>
-                </div>
-
-                <div class="dm-body">
-                  <div class="dm-left">
-                    <div class="dm-kpis">
-                      <div class="dm-kpi">
-                        <div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="dm-chip flat">0.0%</span></div>
-                        <div class="dm-kpi-label">Aktivní inzeráty</div>
-                        <div class="dm-kpi-val">2<small> / 10</small></div>
-                        <div class="dm-bar"><i style="width:20%"></i></div>
-                      </div>
-                      <div class="dm-kpi">
-                        <div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="#1a34e8"><path d="M12 21s-7-4.6-9.5-8.6C.9 9.7 2.3 6.4 5.4 6c1.9-.2 3.5.8 4.6 2.3C11.1 6.8 12.7 5.8 14.6 6c3.1.4 4.5 3.7 2.9 6.4C19 16.4 12 21 12 21Z"/></svg></span><span class="dm-chip up">50.0%</span></div>
-                        <div class="dm-kpi-label">Nové matche</div>
-                        <div class="dm-kpi-val">3</div>
-                        <svg class="dm-spark" viewBox="0 0 120 30" preserveAspectRatio="none"><path d="M0 26 L30 24 L48 8 L60 22 L78 14 L96 26 L120 24" fill="none" stroke="#1f9d5c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </div>
-                      <div class="dm-kpi">
-                        <div class="dm-kpi-r"><span class="dm-kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></span><span class="dm-chip up">100%</span></div>
-                        <div class="dm-kpi-label">Najato</div>
-                        <div class="dm-kpi-val">2</div>
-                        <svg class="dm-spark" viewBox="0 0 120 30" preserveAspectRatio="none"><path d="M0 26 L26 24 L40 6 L54 24 L74 8 L92 24 L120 22" fill="none" stroke="#1f9d5c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </div>
-                      <div class="dm-kpi">
-                        <div class="dm-kpi-r"><span class="dm-kpi-ic gold"><svg viewBox="0 0 24 24" fill="#f5b23c"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg></span><span class="dm-chip flat">0.0%</span></div>
-                        <div class="dm-kpi-label">Hodnocení firmy</div>
-                        <div class="dm-kpi-val">4.7<small> / 5</small></div>
-                        <div class="dm-stars">
-                          <svg viewBox="0 0 24 24" fill="#f5b23c"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>
-                          <svg viewBox="0 0 24 24" fill="#f5b23c"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>
-                          <svg viewBox="0 0 24 24" fill="#f5b23c"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>
-                          <svg viewBox="0 0 24 24" fill="#f5b23c"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>
-                          <svg viewBox="0 0 24 24" fill="#e2e5ee"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17l-6.2 3.9 1.6-6.8L2.2 8.9l6.9-.6Z"/></svg>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="dm-chart-card">
-                      <div class="dm-chart-head">
-                        <div><div class="dm-chart-t">Aktivita kandidátů</div><div class="dm-chart-s">Zhlédnutí, swajp-right a matche za 30 dní</div></div>
-                        <div class="dm-legend">
-                          <span><i style="background:#1a34e8"></i>Zhlédnutí</span>
-                          <span><i style="background:#f5b23c"></i>Swajp right</span>
-                          <span><i style="background:#1f9d5c"></i>Matche</span>
-                        </div>
-                      </div>
-                      <div class="dm-chart-wrap">
-                        <div class="dm-yax"><span>28</span><span>21</span><span>14</span><span>7</span><span>0</span></div>
-                        <div class="dm-plot">
-                          <div class="dm-grid"><div></div><div></div><div></div><div></div><div></div></div>
-                          <svg class="dm-area" viewBox="0 0 1000 300" preserveAspectRatio="none">
-                            <defs><linearGradient id="dmgv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a34e8" stop-opacity=".22"/><stop offset="1" stop-color="#1a34e8" stop-opacity="0"/></linearGradient></defs>
-                            <path d="M0 300 L0 292 L360 288 L420 40 L470 292 L740 300 L800 96 L860 292 L1000 296 L1000 300 Z" fill="url(#dmgv)"/>
-                            <path d="M0 292 L360 288 L420 40 L470 292 L740 300 L800 96 L860 292 L1000 296" fill="none" stroke="#1a34e8" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-                            <path d="M0 298 L360 296 L420 244 L470 296 L740 300 L800 258 L860 296 L1000 298" fill="none" stroke="#f5b23c" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-                            <path d="M0 300 L1000 300" fill="none" stroke="#1f9d5c" stroke-width="2.6" stroke-linecap="round"/>
-                            <circle cx="1000" cy="300" r="6" fill="#1f9d5c" opacity=".25"/><circle cx="1000" cy="300" r="3.5" fill="#1f9d5c"/>
-                          </svg>
-                          <div class="dm-xax"><span>8. 6.</span><span>13. 6.</span><span>18. 6.</span><span>23. 6.</span><span>28. 6.</span><span>3. 7.</span></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="dm-feed">
-                    <div class="dm-feed-h"><span class="dm-live"></span><b>Aktivita v reálném čase</b></div>
-                    <div class="dm-feed-sub">Posledních 24 hodin</div>
-                    <div class="dm-tl">
-                      <span class="dm-tl-line"></span>
-                      <div class="dm-tl-i"><span class="dm-tl-ic green"><svg viewBox="0 0 24 24" fill="none" stroke="#1f9d5c" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><div class="dm-tl-x"><b>Samuel Pšeja</b> poslal zprávu<small>před 22 h</small></div></div>
-                      <div class="dm-tl-i"><span class="dm-tl-ic green"><svg viewBox="0 0 24 24" fill="none" stroke="#1f9d5c" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><div class="dm-tl-x"><b>Samuel Pšeja</b> poslal zprávu<small>včera</small></div></div>
-                      <div class="dm-tl-i"><span class="dm-tl-ic blue"><svg viewBox="0 0 24 24" fill="#1a34e8"><path d="M12 21s-7-4.6-9.5-8.6C.9 9.7 2.3 6.4 5.4 6c1.9-.2 3.5.8 4.6 2.3C11.1 6.8 12.7 5.8 14.6 6c3.1.4 4.5 3.7 2.9 6.4C19 16.4 12 21 12 21Z"/></svg></span><div class="dm-tl-x"><b>Samuel Pšeja</b> matchoval na: <em>Pomoc ve skladu</em><small>4. 7.</small></div></div>
-                      <div class="dm-tl-i"><span class="dm-tl-ic blue"><svg viewBox="0 0 24 24" fill="#1a34e8"><path d="M12 21s-7-4.6-9.5-8.6C.9 9.7 2.3 6.4 5.4 6c1.9-.2 3.5.8 4.6 2.3C11.1 6.8 12.7 5.8 14.6 6c3.1.4 4.5 3.7 2.9 6.4C19 16.4 12 21 12 21Z"/></svg></span><div class="dm-tl-x"><b>Šimon Vitásek</b> matchoval na: <em>Makej App developer</em><small>21. 6.</small></div></div>
-                    </div>
-                    <a class="dm-feed-all">Zobrazit vše<svg viewBox="0 0 24 24" fill="none" stroke="#1a34e8" stroke-width="2.3"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-                  </div>
-                </div>
-              </div>
-
-             </div>
+              <img src="/emp-dash-dashboard.jpg" alt="" width="2360" height="1407" loading="lazy" decoding="async" />
             </div>
             <div class="cmp-handle"><span class="cmp-grip"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></svg></span></div>
             <span class="cmp-tag cmp-tag-l">Dashboard</span>
@@ -875,22 +535,22 @@
         <h2 style="padding-bottom: 15px;">Proč <span class="gradient-text">Makej</span></h2>
         <div class="bz-grid bz-stats">
           <div class="bz-card bz-stat accent bz-why2-item">
-            <div class="bz-step2-ic"><iconify-icon icon="solar:shield-star-bold" width="18"></iconify-icon></div>
+            <div class="bz-step2-ic"><span class="bz-ico bz-ico-verified"></span></div>
             <h4>Ověřené profily</h4>
             <p>Viditelné hodnocení, historie brigád a úroveň. Víte, koho přijímáte.</p>
           </div>
-          <div class="bz-card bz-stat bz-why2-item">
-            <div class="bz-step2-ic"><iconify-icon icon="solar:chart-bold" width="18"></iconify-icon></div>
+          <div class="bz-card bz-stat accent bz-why2-item">
+            <div class="bz-step2-ic"><span class="bz-ico bz-ico-chart"></span></div>
             <h4>Analytika v reálném čase</h4>
             <p>Kolik lidí vidělo inzerát, kolik swajplo, kolik matchovalo.</p>
           </div>
-          <div class="bz-card bz-stat bz-why2-item">
-            <div class="bz-step2-ic"><iconify-icon icon="solar:chat-round-bold" width="18"></iconify-icon></div>
+          <div class="bz-card bz-stat accent bz-why2-item">
+            <div class="bz-step2-ic"><span class="bz-ico bz-ico-chat"></span></div>
             <h4>Chat místo emailů</h4>
             <p>Napíšete zprávu, brigádník odpoví do minut. Vše na jednom místě.</p>
           </div>
-          <div class="bz-card bz-stat bz-why2-item">
-            <div class="bz-step2-ic"><iconify-icon icon="solar:wallet-bold" width="18"></iconify-icon></div>
+          <div class="bz-card bz-stat accent bz-why2-item">
+            <div class="bz-step2-ic"><span class="bz-ico bz-ico-wallet"></span></div>
             <h4>Zdarma pro začátek</h4>
             <p>Základní plán bez poplatků. Platíte, až když chcete víc.</p>
           </div>
@@ -957,7 +617,6 @@
     </style>
     <div class="yp-wrap">
       <div class="yp-head reveal">
-        <span class="yp-kick">Náš ceník</span>
         <h2 class="yp-h2">Vyber si svůj plán</h2>
         <p class="yp-sub">Bez závazků. Zrušení kdykoliv.</p>
         <div class="yp-toggle">
@@ -1347,7 +1006,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=29"></script>
+  <script src="script.js?v=30"></script>
   <script>
     // FAQ accordion
     function toggleFaq(el) {
@@ -1417,19 +1076,8 @@
     })();
   </script>
   <script>
-    // Škálování mockupů (fixní 1440px → šířka rámečku) + before/after posuvník
+    // Before/after posuvník nad screenshoty dashboardu
     (function () {
-      function scaleDashmock() {
-        document.querySelectorAll('.dashmock-frame').forEach(function (f) {
-          f.querySelectorAll('.dashmock').forEach(function (m) {
-            m.style.transform = 'scale(' + (f.clientWidth / 1440) + ')';
-          });
-        });
-      }
-      window.addEventListener('resize', scaleDashmock);
-      window.addEventListener('load', scaleDashmock);
-      scaleDashmock();
-
       document.querySelectorAll('.cmp').forEach(function (cmp) {
         var dragging = false;
         function setPos(clientX) {
@@ -1439,11 +1087,49 @@
           cmp.style.setProperty('--pos', p + '%');
         }
         cmp.addEventListener('pointerdown', function (e) {
+          hintStop();
           dragging = true; cmp.setPointerCapture(e.pointerId); setPos(e.clientX); e.preventDefault();
         });
         cmp.addEventListener('pointermove', function (e) { if (dragging) setPos(e.clientX); });
         cmp.addEventListener('pointerup', function () { dragging = false; });
         cmp.addEventListener('pointercancel', function () { dragging = false; });
+
+        // ── Upoutávka: posuvník sám popojede tam a zpět, ať je vidět, že je tažný ──
+        // Spustí se, až je komponenta pořádně v obraze (je pod ohybem), a jen jednou.
+        // Jakmile na ni uživatel sáhne, animace se okamžitě zruší.
+        var hintRaf = null, hintDone = false;
+        function hintStop() { if (hintRaf) cancelAnimationFrame(hintRaf); hintRaf = null; hintDone = true; }
+        function hintRun() {
+          if (hintDone) return;
+          hintDone = true;
+          var home = parseFloat(getComputedStyle(cmp).getPropertyValue('--pos')) || 55;
+          var stops = [home, home - 13, home + 9, home];   // doleva, doprava, zpět
+          var seg = 620, total = seg * (stops.length - 1), t0 = null;
+          var ease = function (x) { return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3)/2; };
+          hintRaf = requestAnimationFrame(function step(ts) {
+            if (t0 === null) t0 = ts;
+            var el = ts - t0;
+            if (el >= total) { cmp.style.setProperty('--pos', home + '%'); hintRaf = null; return; }
+            var i = Math.floor(el / seg), k = ease((el - i * seg) / seg);
+            cmp.style.setProperty('--pos', (stops[i] + (stops[i + 1] - stops[i]) * k) + '%');
+            hintRaf = requestAnimationFrame(step);
+          });
+        }
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          hintDone = true;
+        } else if (!('IntersectionObserver' in window)) {
+          hintDone = true;
+        } else {
+          var hintObs = new IntersectionObserver(function (en) {
+            en.forEach(function (e) {
+              if (e.isIntersecting && e.intersectionRatio >= 0.5) {
+                hintObs.unobserve(cmp);
+                setTimeout(hintRun, 450);
+              }
+            });
+          }, { threshold: [0, 0.5, 1] });
+          hintObs.observe(cmp);
+        }
       });
     })();
   </script>
