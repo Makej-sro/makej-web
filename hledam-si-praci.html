@@ -206,12 +206,14 @@
     /* Tři telefony — vyjedou shora (vxDrop), perspektivu má obrázek zapečenou */
     .mkj-visual { position: relative; margin: clamp(8px, 2.5vh, 28px) auto 0; max-width: 1180px; padding: 0 16px 20px; pointer-events: none; }
     .mkj-stage { display: flex; justify-content: center; }
-    .mkj-phones { display: block; width: 564px; max-width: 100%; height: auto; filter: drop-shadow(0 20px 34px rgba(0,10,80,.32)); }
+    /* Bez CSS drop-shadow — mockup má vlastní měkký stín zapečený v alfě (20 % plochy
+       má alfu 1–40). drop-shadow staví stín ze VŠECH neprůhledných pixelů, takže z toho
+       jemného oparu udělal posunutý šedý obdélník kolem obrázku. */
+    .mkj-phones { display: block; width: 564px; max-width: 100%; height: auto; }
 
     @media (max-width: 600px) {
       .emp-hero-blue { padding-top: 112px; }
       .mkj-visual { padding: 0 10px 14px; }
-      .mkj-phones { filter: drop-shadow(0 18px 30px rgba(0,10,80,.3)); }
     }
 
     /* ── FAQ (brigádníci) — světlá sekce ── */
