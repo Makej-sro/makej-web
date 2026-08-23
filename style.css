@@ -150,45 +150,96 @@ img { max-width: 100%; display: block; }
 .nav-actions { display: flex; gap: 12px; align-items: center; opacity: 0; pointer-events: none; transition: opacity .3s; }
 .nav-actions.nav-actions-visible { opacity: 1; pointer-events: all; }
 .nav-actions .btn-ghost, .nav-actions .btn-primary { padding: 10px 20px; font-size: .85rem; }
-.mobile-menu-btn { display: none; background: none; border: none; color: #fff; cursor: pointer; }
-.mobile-menu {
-  display: none; flex-direction: column; gap: 16px;
-  padding: 24px; background: rgba(15,15,45,.95); backdrop-filter: blur(20px);
-  border-radius: 16px; margin-top: 16px;
+/* ── Hamburger: prosklená pilulka, dvě čárky se překlopí do křížku ── */
+.mobile-menu-btn {
+  display: none; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  width: 44px; height: 44px; border-radius: 999px; padding: 0; cursor: pointer;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.34);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: background .2s, border-color .2s, transform .18s;
 }
-.mobile-menu a { color: var(--muted-fg); font-weight: 500; padding: 8px 0; }
-.mobile-menu.active { display: flex; }
-.mobile-menu-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
-.mobile-menu-actions .btn-ghost, .mobile-menu-actions .btn-primary { width: 100%; justify-content: center; }
+.mobile-menu-btn:active { transform: scale(.94); }
+.mobile-menu-btn span {
+  display: block; width: 17px; height: 2px; border-radius: 2px; background: #fff;
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), background .2s;
+}
+.mobile-menu-btn.open { background: rgba(255,255,255,.2); }
+.mobile-menu-btn.open span:nth-child(1) { transform: translateY(3.5px) rotate(45deg); }
+.mobile-menu-btn.open span:nth-child(2) { transform: translateY(-3.5px) rotate(-45deg); }
+/* nad světlou sekcí se čárky i rámeček musí ztmavit, jinak zmizí */
+#navbar.nav-over-light .mobile-menu-btn { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.22); }
+#navbar.nav-over-light .mobile-menu-btn span { background: #0a0d2e; }
+
+/* ── Rozbalené menu: prosklený panel sjíždějící zpod navbaru ── */
+.mobile-menu {
+  position: fixed; top: 0; left: 0; right: 0; z-index: -1;
+  display: flex; flex-direction: column; gap: 0;
+  padding: 68px 20px 18px; margin: 0; border-radius: 0;
+  background: rgba(10,13,46,.42);
+  backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border-bottom: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 24px 60px -24px rgba(0,0,40,.6);
+  transform: translateY(-101%); opacity: 0; visibility: hidden;
+  transition: transform .42s cubic-bezier(.2,.8,.2,1), opacity .28s ease, visibility .42s;
+}
+.mobile-menu.active { transform: none; opacity: 1; visibility: visible; }
+.mobile-menu a {
+  color: #fff; font-family: var(--font-heading); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em; font-size: .76rem;
+  padding: 11px 2px; text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,.13);
+}
+.mobile-menu-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.mobile-menu-actions a { border-bottom: none; }
+.mobile-menu-actions .btn-ghost, .mobile-menu-actions .btn-primary { width: 100%; justify-content: center; padding: 11px 18px; font-size: .8rem; }
+.mobile-menu-actions .btn-ghost { color: #fff; border: 1.5px solid rgba(255,255,255,.5); background: none; }
+
+/* Hamburger na stránkách s .vx-nav (Lidé / Hledám práci / Pro zaměstnavatele).
+   Ty mají vlastní navbar, ale sdílí panel #mobile-menu ze skrytého #navbar. */
+.vx-burger { position: relative; z-index: 1; }
+@media (max-width: 900px) {
+  .vx-burger { display: flex; }
+  .vx-nav.scrolled .vx-burger { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.22); }
+  .vx-nav.scrolled .vx-burger span { background: #0a0d2e; }
+  .vx-nav.scrolled .vx-burger.open { background: rgba(10,13,46,.1); }
+}
 
 @media (max-width: 768px) {
   .nav-links, .nav-actions { display: none; }
-  .mobile-menu-btn { display: block; }
+  .mobile-menu-btn { display: flex; }
 }
 
 /* ═══════════ HERO ═══════════ */
 #hero {
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  padding: 100px 24px 72px; position: relative; overflow: hidden;
+  min-height: 100vh; display: flex; align-items: flex-start; justify-content: center;
+  padding: clamp(104px, 13vh, 140px) 24px 72px; position: relative; overflow: hidden;
 }
-/* Animated gradient wash — landing-page hero background (our palette) */
+/* spodek hera je teď světlý → prvky, které byly bílé, potřebují tmavou variantu */
+#hero .btn-ghost { color: #0a0d2e; border-color: rgba(10,13,46,.3); }
+#hero .btn-ghost:hover { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.55); }
+#hero .hero-scroll-indicator { color: rgba(10,13,46,.4); }
+/* ZKOUŠKA: stejný gradient jako hero na /pro-zamestnavatele a /hledam-si-praci.
+   Původní animovaný „wash" je zakomentovaný pod tím — návrat = prohodit zpět.
+   Stopy jsou roztažené (bílá až na 100 % místo 60 %): nadpis na hlavní stránce
+   je třířádkový a o dost vyšší, při původním rozložení by spodní řádek padl na bílou. */
 .hero-bg-particles {
   position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(180deg, #0020f6 0%, #1a37ff 22%, #5875ff 52%, #aebcff 80%, #ffffff 100%);
+}
+/* Původní varianta:
+.hero-bg-particles {
   background: linear-gradient(120deg, #0020f6, #0040ff, #0010cc, #0030ee, #0020f6);
   background-size: 300% 300%;
   animation: hero-wash 14s ease infinite;
-}
+} */
 /* fine dot texture */
 .hero-bg-particles::after {
   content: ""; position: absolute; inset: 0;
   background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1.3px);
   background-size: 18px 18px;
 }
-/* vignette so the centre stays readable */
-.hero-bg-particles::before {
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 38%, transparent 38%, rgba(5,7,26,0.55) 100%);
-}
+/* vinětace vypnutá — byla stavěná na celoplošně tmavé pozadí, na světlém spodku špiní */
+.hero-bg-particles::before { content: none; }
 @keyframes hero-wash {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
@@ -233,13 +284,40 @@ img { max-width: 100%; display: block; }
 /* Prostřední slovo „Matchuj" — jemný nekonečný lesk (gradient sweep) */
 #hero .hero-grad {
   background: linear-gradient(100deg, #7c86ff 0%, #c7ceff 28%, #ffffff 50%, #c7ceff 72%, #7c86ff 100%);
-  background-size: 220% auto; -webkit-background-clip: text; background-clip: text;
+  background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent; color: transparent;
   animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) .22s both, heroGradSweep 6s linear 1.3s infinite;
 }
-@keyframes heroGradSweep { to { background-position: 220% center; } }
+/* 200 % = přesně jedna šířka dlaždice → smyčka navazuje beze švu (dřív 220 % → skok) */
+@keyframes heroGradSweep { to { background-position: 200% center; } }
 @media (prefers-reduced-motion: reduce) {
   .hero-line-in, #hero .hero-grad { animation: none !important; transform: none !important; }
+}
+
+/* ── Intro landing page: obří nadpis sám na stránce → zmenší se → zbytek naskočí ──
+   .hero-intro nasazuje inline skript v <head> (jen index.html), --hero-zoom/--hero-shift
+   dopočítá skript pod herem. Bez JS se nic z toho neaplikuje a stránka běží jako dřív. */
+.hero-intro .hero-text h1 {
+  transform-origin: 50% 50%;
+  /* will-change na řádcích by je povýšilo na vrstvu rasterizovanou v cílové velikosti —
+     zvětšený nadpis by pak byl rozmazaný. Řádková animace je krátká, obejde se bez toho. */
+  animation: heroZoomOut 1.1s cubic-bezier(.62,0,.2,1) 1.25s both;
+}
+.hero-intro .hero-line-in { will-change: auto; }
+@keyframes heroZoomOut {
+  from { transform: translateY(var(--hero-shift, 0px)) scale(var(--hero-zoom, 2.6)); }
+  to   { transform: translateY(0) scale(1); }
+}
+@keyframes heroIntroFade { from { opacity: 0; } to { opacity: 1; } }
+/* Do zmenšení nadpisu je stránka prázdná — navbar, podnadpis, tlačítka i šipka čekají */
+.hero-intro #navbar { animation: heroIntroFade .7s ease-out 2.3s both; }
+.hero-intro .hero-subtitle { animation-delay: 2.25s; }
+.hero-intro .hero-cta { animation-delay: 2.4s; }
+.hero-intro .hero-scroll-indicator { animation: heroIntroFade .7s ease-out 2.55s both, bounce 2s 2.55s infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-intro .hero-text h1 { animation: none !important; transform: none !important; }
+  .hero-intro #navbar, .hero-intro .hero-subtitle, .hero-intro .hero-cta { animation-delay: 0s !important; }
+  .hero-intro .hero-scroll-indicator { animation: none !important; }
 }
 
 .hero-subtitle {
@@ -308,6 +386,8 @@ img { max-width: 100%; display: block; }
   .hero-badge { margin-bottom: 10px; }
   .hero-subtitle { margin-bottom: 16px; font-size: 1rem; }
 }
+
+
 
 /* ═══════════ SOCIAL PROOF ═══════════ */
 #social-proof { padding: 40px 0; border-top: 1px solid rgba(208,208,255,.06); border-bottom: 1px solid rgba(208,208,255,.06); }

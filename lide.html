@@ -14,22 +14,22 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hledám si práci — Makej</title>
-  <meta name="description" content="Swajpuj nabídky brigád, part-time i full-time pozic. Matchuj se zaměstnavateli, chatuj a začni pracovat ještě dnes. Vyzkoušej interaktivní demo appky Makej" />
+  <title>Lidé — nabídni své dovednosti | Makej</title>
+  <meta name="description" content="Nová záložka Lidé v appce Makej: zapni si kartu, napiš s čím pomůžeš (řemeslo, doučování, foto…) a swajpuj lidi ve svém okolí. Když je zájem oboustranný, otevře se chat." />
   <meta name="theme-color" content="#0020f6" />
-  <link rel="canonical" href="https://makej.eu/hledam-si-praci.html" />
+  <link rel="canonical" href="https://makej.eu/lide.html" />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://makej.eu/hledam-si-praci.html" />
-  <meta property="og:title" content="Hledám si práci — Makej" />
-  <meta property="og:description" content="Žádné životopisy, žádné pohovory. Swajpni nabídku, matchni se s firmou a začni vydělávat ještě dnes." />
+  <meta property="og:url" content="https://makej.eu/lide.html" />
+  <meta property="og:title" content="Lidé — nabídni své dovednosti | Makej" />
+  <meta property="og:description" content="Zapni si kartu, napiš s čím pomůžeš a swajpuj lidi ve svém okolí. Když je zájem oboustranný, otevře se chat." />
   <meta property="og:image" content="https://makej.eu/og-image.png" />
   <meta property="og:locale" content="cs_CZ" />
   <meta property="og:site_name" content="Makej" />
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Hledám si práci — Makej" />
-  <meta name="twitter:description" content="Žádné životopisy, žádné pohovory. Swajpni nabídku, matchni se s firmou a začni vydělávat ještě dnes." />
+  <meta name="twitter:title" content="Lidé — nabídni své dovednosti | Makej" />
+  <meta name="twitter:description" content="Zapni si kartu, napiš s čím pomůžeš a swajpuj lidi ve svém okolí. Když je zájem oboustranný, otevře se chat." />
   <meta name="twitter:image" content="https://makej.eu/og-image.png" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="/favicon.png?v=3" />
@@ -38,7 +38,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Instrument+Sans:wght@400;500;600&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="preload" as="image" href="/krok-1.png?v=2" />
+  <link rel="preload" as="image" href="/krok-1.png" />
   <link rel="preload" as="image" href="/krok-2.png" />
   <link rel="stylesheet" href="style.css?v=57" />
   <style>
@@ -101,8 +101,8 @@
     /* Sekce „Proč si zvolíš Makej" — brandová modrá, na celou výšku obrazovky.
        Obsah zarovnaný nahoru (žádné vertikální centrování), aby po doskočení
        fontu nadpis nepřecentrovával celý blok = žádný skok při scrollu. */
-    #features { background: linear-gradient(150deg, #2a45ff 0%, #0020f6 58%, #0018c8 100%); box-sizing: border-box;
-      padding-top: 88px; padding-bottom: 88px; }
+    #features { background: linear-gradient(150deg, #2a45ff 0%, #0020f6 58%, #0018c8 100%); min-height: 100vh; box-sizing: border-box;
+      padding-top: max(96px, calc((100vh - 560px) / 2)); padding-bottom: max(96px, calc((100vh - 560px) / 2)); }
 
     /* ── Video ukázka aplikace (full-bleed přes celou šířku stránky) ── */
     #features .feat-video {
@@ -155,7 +155,7 @@
     /* Vlastní swipe ikona (SVG) přebarvená na bílo přes mask */
     #features .bf2-feat-ic .bf2-swipe { display: block; width: 50px; height: 50px; background: #fff;
       -webkit-mask: url(/swipe-to-right.svg) center / contain no-repeat; mask: url(/swipe-to-right.svg) center / contain no-repeat; }
-    #features .bf2-feat:hover .bf2-feat-ic { transform: none; }
+    #features .bf2-feat:hover .bf2-feat-ic { transform: translateY(-3px) scale(1.06); }
     #features .bf2-feat h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1.3rem; color: #fff; margin: 0 0 8px; }
     #features .bf2-feat p { font-size: 1rem; line-height: 1.55; color: rgba(255,255,255,.72); margin: 0; min-height: 3.1em; }
 
@@ -203,15 +203,50 @@
     .eh-btn { display: inline-block; background: #eef6f0; color: #0a0d2e; font-family: var(--font-sans); font-weight: 700; font-size: 1.02rem; padding: 16px 32px; border-radius: 16px; text-decoration: none; cursor: pointer; transition: background .2s, transform .2s; }
     .eh-btn:hover { background: #fff; transform: translateY(-2px); }
 
-    /* Tři telefony — vyjedou shora (vxDrop), perspektivu má obrázek zapečenou */
-    .mkj-visual { position: relative; margin: clamp(8px, 2.5vh, 28px) auto 0; max-width: 1180px; padding: 0 16px 20px; pointer-events: none; }
-    .mkj-stage { display: flex; justify-content: center; }
-    .mkj-phones { display: block; width: 564px; max-width: 100%; height: auto; filter: drop-shadow(0 20px 34px rgba(0,10,80,.32)); }
+    .mkj-visual { position: relative; height: 600px; margin: -110px auto 0; max-width: 1100px; overflow: hidden; pointer-events: none; }
+    .mkj-stage { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); perspective: 1500px; perspective-origin: 50% 28%; }
+    .mkj-phone { width: 384px; height: 790px; background: #0a0b10; border-radius: 50px; padding: 12px; transform: rotateX(46deg); transform-origin: 50% 50%; box-shadow: 0 0 0 2px rgba(255,255,255,.08) inset, 0 40px 90px rgba(0,0,40,.45); }
+    .mkj-screen { width: 100%; height: 100%; border-radius: 32px; overflow: hidden; position: relative; background: #2f33ee; }
+    .mkj-notch { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 108px; height: 26px; background: #0a0b10; border-radius: 999px; z-index: 5; }
+
+    /* Swipe card obsah */
+    .sw-hero { position: relative; height: 238px; background: linear-gradient(180deg,#cdb084 0%,#9e7a4d 46%,#2f33ee 100%); }
+    .sw-facade { position: absolute; inset: 0; opacity: .16; background: repeating-linear-gradient(90deg,transparent 0 24px,rgba(35,22,4,.7) 24px 26px),repeating-linear-gradient(180deg,transparent 0 30px,rgba(35,22,4,.5) 30px 32px); -webkit-mask: linear-gradient(180deg,#000 0%,#000 52%,transparent 78%); mask: linear-gradient(180deg,#000 0%,#000 52%,transparent 78%); }
+    .sw-top { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 40px 16px 0; z-index: 2; }
+    .sw-logo { font-family: var(--font-heading); font-size: 19px; font-weight: 800; color: #fff; letter-spacing: -.02em; text-shadow: 0 1px 6px rgba(0,0,0,.3); }
+    .sw-filt { width: 34px; height: 34px; border-radius: 50%; background: rgba(20,20,40,.45); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .sw-body { position: relative; margin-top: -42px; padding: 0 16px; z-index: 2; }
+    .sw-comp { display: flex; align-items: center; gap: 9px; }
+    .sw-clogo { width: 38px; height: 38px; border-radius: 11px; background: #fff; color: #2f33ee; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+    .sw-cname { font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 4px; }
+    .sw-chk { color: #7fe0ff; font-size: 14px; display: flex; }
+    .sw-rate { font-size: 11px; color: rgba(255,255,255,.8); margin-top: 1px; display: flex; align-items: center; gap: 4px; }
+    .sw-star { color: #ffc83d; font-size: 12px; display: flex; }
+    .sw-top-badge { margin-left: auto; display: flex; align-items: center; gap: 4px; background: #ffc83d; color: #5a3d00; font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 999px; }
+    .sw-title { font-family: var(--font-heading); font-size: 24px; font-weight: 800; color: #fff; line-height: 1.08; letter-spacing: -.01em; margin: 12px 0 9px; text-shadow: 0 1px 8px rgba(0,0,0,.25); }
+    .sw-meta { display: flex; gap: 14px; font-size: 11.5px; color: rgba(255,255,255,.85); }
+    .sw-meta span { display: flex; align-items: center; gap: 5px; }
+    .sw-tags { display: flex; gap: 7px; margin: 13px 0 0; flex-wrap: wrap; }
+    .sw-tag { font-size: 10.5px; font-weight: 600; color: #fff; border: 1px solid rgba(255,255,255,.35); padding: 6px 11px; border-radius: 999px; }
+    .sw-tag.mak { background: linear-gradient(90deg,#ffd34d,#f5b724); color: #5a3d00; border: none; display: flex; align-items: center; gap: 5px; }
+    .sw-mk { width: 15px; height: 15px; border-radius: 50%; background: #2f33ee; color: #fff; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .sw-pay { margin: 18px 0 0; }
+    .sw-pnum { font-family: var(--font-heading); font-size: 28px; font-weight: 800; color: #fff; line-height: 1; }
+    .sw-pbonus { font-size: 10px; letter-spacing: .1em; color: rgba(255,255,255,.7); margin-top: 4px; text-transform: uppercase; }
+    .sw-acts { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 20px 0 0; }
+    .sw-btn { border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #fff; flex-shrink: 0; }
+    .sw-rej { width: 52px; height: 52px; color: #ff4d6a; font-size: 23px; }
+    .sw-fav { width: 52px; height: 52px; color: #ffb02e; font-size: 23px; }
+    .sw-like { width: 64px; height: 64px; background: #3b40ff; color: #fff; font-size: 29px; box-shadow: 0 6px 18px rgba(59,64,255,.5); }
+    .sw-nav { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-around; align-items: center; padding: 11px 0 16px; background: #14155e; border-top: 1px solid rgba(255,255,255,.08); }
+    .sw-ni { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 9px; letter-spacing: .04em; color: rgba(255,255,255,.5); }
+    .sw-ni iconify-icon { font-size: 19px; }
+    .sw-ni.on { color: #fff; }
 
     @media (max-width: 600px) {
       .emp-hero-blue { padding-top: 112px; }
-      .mkj-visual { padding: 0 10px 14px; }
-      .mkj-phones { filter: drop-shadow(0 18px 30px rgba(0,10,80,.3)); }
+      .mkj-visual { height: 470px; margin-top: -70px; }
+      .mkj-stage { transform: translateX(-50%) scale(.8); top: 8px; }
     }
 
     /* ── FAQ (brigádníci) — světlá sekce ── */
@@ -220,16 +255,12 @@
     .emp-faq-item { border-bottom: 1px solid rgba(15,18,40,.1); }
     .emp-faq-q {
       display: flex; justify-content: space-between; align-items: center; gap: 16px;
-      padding: 22px 4px; cursor: pointer; font-family: var(--font-heading); font-weight: 800; font-size: 1.02rem; color: #0f1222;
+      padding: 22px 4px; cursor: pointer; font-weight: 600; font-size: 1rem; color: #0f1222;
       user-select: none; transition: color .15s;
     }
     .emp-faq-q:hover { color: #0020f6; }
-    /* Plusko → minusko jako u FAQ na /lide (kříž z CSS, svislá čárka se otočí a zmizí) */
-    .emp-faq-plus { flex-shrink:0; width:24px; height:24px; position:relative; color:#0020f6; }
-    .emp-faq-plus::before,.emp-faq-plus::after { content:""; position:absolute; background:currentColor; border-radius:2px; }
-    .emp-faq-plus::before { top:11px; left:4px; right:4px; height:2.5px; }
-    .emp-faq-plus::after { left:11px; top:4px; bottom:4px; width:2.5px; transition:transform .25s,opacity .25s; }
-    .emp-faq-item.open .emp-faq-plus::after { transform:rotate(90deg); opacity:0; }
+    .emp-faq-icon { color: #8a93a8; flex-shrink: 0; transition: transform .25s cubic-bezier(.2,.8,.2,1), color .15s; }
+    .emp-faq-item.open .emp-faq-icon { transform: rotate(45deg); color: #0020f6; }
     .emp-faq-a { display: none; padding: 0 4px 22px; color: #5b6478; font-size: .92rem; line-height: 1.7; }
     .emp-faq-a a { color: #0020f6; text-decoration: none; }
     .emp-faq-a a:hover { text-decoration: underline; }
@@ -238,55 +269,275 @@
     #faq .section-header h2 .gradient-text { -webkit-text-fill-color: #0020f6; color: #0020f6; background: none; }
     #faq .section-header p { color: #5b6478; }
     #faq .section-header p a { color: #0020f6; }
-    /* ── Navbar ve stylu Lidé (VEXO) — centrované logo, bílý text na modrém hero ── */
+  </style>
+  <!-- ═══════════ UNIKÁTNÍ STYLY STRÁNKY LIDÉ ═══════════ -->
+  <style>
+    /* Na téhle stránce skrýváme sdílený navbar — máme vlastní rámovanou nav */
     /* #navbar slouží na těchto stránkách jen jako nosič panelu #mobile-menu */
     #navbar { background: none !important; box-shadow: none !important; pointer-events: none; }
     #navbar .nav-inner { display: none !important; }
     #navbar .mobile-menu { pointer-events: auto; }
-    .emp-hero-blue { padding-top: 0 !important; }
-    .eh-head { margin-top: clamp(94px, 12vh, 120px); }
+    body { background: var(--vx-bg); }
+
+    .vx {
+      --vx-bg:#c2cdd8; --vx-frame:#e9edf3; --vx-frame2:#f6f8fc;
+      --ink:#0e1116; --muted:#6b7280; --blue:#0020f6; --blue-deep:#0018c8;
+      --line:rgba(14,17,22,.10); --surface:#fff;
+      font-family: var(--font-sans); color: var(--ink);
+    }
+    .vx *, .vx *::before, .vx *::after { box-sizing: border-box; }
+    .vx-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+    /* ── HERO NA CELOU STRÁNKU — modrá nahoře → bílá v polovině ── */
+    .vx-shell { background: #ffffff; padding: 0; }
+    .vx-frame {
+      position: relative; border-radius: 0; overflow: hidden;
+      background: linear-gradient(180deg, #0020f6 0%, #1a37ff 12%, #5875ff 30%, #aebcff 46%, #ffffff 60%);
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    .vx-frame::before { /* jemné diagonální linky jako v předloze */
+      content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+      background:
+        linear-gradient(115deg, transparent 48%, rgba(14,17,22,.05) 49%, transparent 50%),
+        linear-gradient(65deg, transparent 48%, rgba(14,17,22,.04) 49%, transparent 50%);
+      background-size: 60% 100%, 60% 100%; background-position: 100% 0, 0 0; background-repeat:no-repeat;
+    }
+
+    /* ── NAV se zářezem ── */
     .vx-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 16px 24px; transition: background .25s, box-shadow .25s, padding .2s; }
     .vx-nav.scrolled { background: rgba(255,255,255,.48); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 6px 24px -10px rgba(10,13,46,.3); padding-top: 10px; padding-bottom: 10px; }
     .vx-nav.scrolled .vx-nav-links a { color: #0a0d2e; }
     .vx-nav.scrolled .vx-nav-links a:hover { color: #0020f6; }
     .vx-nav.scrolled .vx-logo { color: #0020f6; }
     .vx-nav.scrolled .vx-nav-actions a.vx-signin { background: #0020f6; color: #fff; box-shadow: 0 8px 20px -8px rgba(0,32,246,.5); }
-    .vx-nav-links { display: flex; align-items: center; gap: 24px; height: 44px; }
+    .vx-nav-links { display: flex; align-items: center; gap: 26px; height: 44px; }
     .vx-nav-links.right { justify-content: flex-end; }
     .vx-nav-links a { font-family: var(--font-heading); font-weight: 700; font-size: .82rem; letter-spacing: .02em; color: #fff; text-decoration: none; text-transform: uppercase; opacity: .88; transition: opacity .2s; }
-    .vx-nav-links a:hover { opacity: 1; }
-    .vx-nav-actions { display: flex; align-items: center; gap: 10px; height: 44px; margin-left: 20px; }
-    .vx-nav-actions a.vx-signin { font-family: var(--font-heading); font-weight: 800; font-size: .8rem; letter-spacing: .03em; text-transform: uppercase; color:#0020f6; opacity:1; background:#fff; border:none; border-radius:999px; padding:11px 20px; cursor:pointer; text-decoration:none; transition:transform .18s, box-shadow .2s; white-space:nowrap; box-shadow:0 8px 20px -8px rgba(0,0,0,.35); }
+    .vx-nav-links a:hover, .vx-nav-links a.on { opacity: 1; }
+    .vx-nav-actions { display: flex; align-items: center; gap: 10px; height: 44px; margin-left: 22px; }
+    .vx-nav-actions a.vx-signin { font-family: var(--font-heading); font-weight: 800; font-size: .8rem; letter-spacing: .03em; text-transform: uppercase; color:var(--blue); opacity:1; background: #fff; border:none; border-radius: 999px; padding: 11px 20px; cursor:pointer; text-decoration:none; transition: transform .18s, box-shadow .2s; white-space:nowrap; box-shadow:0 8px 20px -8px rgba(0,0,0,.35); }
     .vx-nav-actions a.vx-signin:hover { transform: translateY(-1px); box-shadow:0 12px 26px -8px rgba(0,0,0,.45); }
-    .vx-logo-tab { display:flex; justify-content:center; }
-    .vx-logo { font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; letter-spacing: -.01em; color:#fff; text-decoration:none; padding: 8px 30px 14px; line-height:1; }
+    .vx-icon-btn { width: 40px; height: 40px; border-radius: 999px; background: #fff; color:var(--blue); border:none; display:grid; place-items:center; cursor:pointer; flex-shrink:0; }
+    /* zářez: vyvýšený střed s logem + konkávní rohy po stranách */
+    .vx-logo-tab { position: relative; display:flex; justify-content:center; }
+    .vx-logo { font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; letter-spacing: -.01em; color: #fff; text-decoration:none; padding: 8px 30px 14px; line-height:1; }
+
+    /* ── HERO ── */
+    .vx-hero { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; align-items: center; padding: clamp(96px, 13vh, 130px) 24px 0; text-align: center; }
+    /* Typografie stejná jako hero na /pro-zamestnavatele a /hledam-si-praci (.eh-head h1) */
+    .vx-h1 { font-family: var(--font-heading); font-weight: 800; letter-spacing: -.025em; line-height: 1.02; font-size: clamp(2.7rem, 7vw, 5.4rem); color: #fff; margin: 0; text-shadow: 0 6px 30px rgba(0,10,80,.25); }
+    .vx-h1 .vx-glitch {
+      font-family: inherit; font-weight: inherit; letter-spacing: inherit;
+      background: linear-gradient(100deg, #aab2ff 0%, #d8ddff 30%, #ffffff 50%, #d8ddff 70%, #aab2ff 100%);
+      background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      /* Safari: -webkit-background-clip:text ořezává dotažení písmen (j/y) — dolní rezerva to vyřeší, záporný margin drží layout */
+      display: inline-block; padding-bottom: .2em; margin-bottom: -.2em;
+      text-shadow: none; /* zděděný stín z .vx-h1 by prosvítal skrz průhledně vyplněné glyfy */
+      animation: heroGradSweep 6s linear 1.4s infinite;
+    }
+    .vx-sub-btns { display: flex; gap: 12px; justify-content: center; margin-top: 26px; }
+    .vx-btn { font-family: var(--font-heading); font-weight: 800; font-size: .92rem; letter-spacing:.01em; border-radius: 999px; padding: 14px 26px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: transform .18s, background .2s, box-shadow .25s; }
+    .vx-btn-dark { background: #fff; color: var(--blue); box-shadow: 0 14px 30px -12px rgba(0,10,80,.5); }
+    .vx-btn-dark:hover { transform: translateY(-2px); box-shadow: 0 20px 40px -12px rgba(0,10,80,.6); }
+    .vx-btn-light { background: rgba(255,255,255,.12); color: #fff; border: 1.5px solid rgba(255,255,255,.55); }
+    .vx-btn-light:hover { background: rgba(255,255,255,.22); border-color: #fff; }
+
+    /* 3D portrét lidí — hlavní centerpiece */
+    /* Zdrojová fotka měla po stranách ~55 % průhledné plochy — po ořezu odpovídá
+       šířka 422px původním 940px. Bez toho se na mobilu (92vw) postavičky smrskly
+       na ~160px a zbytek výšky hera zůstal prázdný. */
+    .vx-heroimg-wrap { position: absolute; left: 0; right: 0; bottom: -91px; display: flex; justify-content: center; align-items: flex-end; z-index: 1; pointer-events: none; }
+    .vx-heroimg { width: min(422px, 92vw); height: auto; display: block; filter: drop-shadow(0 40px 50px rgba(0,10,80,.28)); }
+
+    /* spodní pás hero: avataři vlevo, preview karta vpravo — překrývá spodek obrázku */
+    .vx-avstack { display:flex; }
+    .vx-avstack span { width: 40px; height: 40px; border-radius: 999px; border: 2px solid var(--vx-frame2); display:grid; place-items:center; color:#fff; font-family:var(--font-heading); font-weight:800; font-size:12px; margin-left:-12px; }
+    .vx-avstack span:first-child { margin-left: 0; }
+
+    /* ── SEKCE POD RÁMEM ── */
+    .vx-sec { padding: 96px 0; }
+    .vx-wrap { width: min(1120px, 90vw); margin: 0 auto; }
+    .vx-kick { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--blue); }
+    .vx-h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.02; margin-top: 12px; }
+    .vx-sec-head { text-align:center; max-width: 640px; margin: 0 auto 48px; }
+    .vx-sec-head p { color: var(--muted); font-size: 1.04rem; line-height: 1.6; margin-top: 14px; }
+
+    .vx-steps { background: var(--vx-frame2); }
+    .vx-steps-grid { display:grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+    .vx-step { background:#fff; border:1px solid var(--line); border-radius: 22px; padding: 30px 26px; position:relative; }
+    .vx-step-n { font-family:'JetBrains Mono',monospace; font-weight:800; font-size:.8rem; color:var(--blue); letter-spacing:.1em; }
+    .vx-step-ic { width:50px; height:50px; border-radius:14px; background:var(--ink); color:#fff; display:grid; place-items:center; margin:16px 0 18px; }
+    .vx-step h3 { font-family:var(--font-heading); font-weight:800; text-transform:uppercase; font-size:1.1rem; letter-spacing:-.01em; margin-bottom:9px; }
+    .vx-step p { color:var(--muted); font-size:.96rem; line-height:1.6; }
+
+    .vx-privacy { background: var(--ink); color:#fff; }
+    .vx-privacy .vx-h2 { color:#fff; } .vx-privacy .vx-kick { color:#9fb0ff; } .vx-privacy .vx-sec-head p { color:rgba(255,255,255,.66); }
+    .vx-pv-cols { display:grid; grid-template-columns:1fr 1fr; gap:18px; max-width:840px; margin:0 auto; }
+    .vx-pv { border-radius:20px; padding:26px; border:1px solid rgba(255,255,255,.14); }
+    .vx-pv h3 { font-family:var(--font-heading); font-weight:800; text-transform:uppercase; font-size:1rem; margin-bottom:16px; display:flex; align-items:center; gap:9px; }
+    .vx-pv.yes { background: rgba(0,32,246,.14); } .vx-pv.yes h3 { color:#9fb0ff; }
+    .vx-pv.no h3 { color: rgba(255,255,255,.6); }
+    .vx-pv li { list-style:none; display:flex; align-items:center; gap:11px; padding:10px 0; border-top:1px solid rgba(255,255,255,.09); color:rgba(255,255,255,.9); font-size:.98rem; }
+    .vx-pv li:first-child { border-top:none; }
+
+    .vx-faq { background: var(--vx-frame2); }
+    /* Oddělené jen linkou (jako FAQ na /pro-zamestnavatele) — žádné karty.
+       Plusko/minusko (.vx-faq-plus) zůstává. */
+    .vx-faq-list { max-width: 760px; margin:0 auto; display:flex; flex-direction:column; gap:0; border-top:1px solid var(--line); }
+    .vx-faq-item { border:0; border-bottom:1px solid var(--line); border-radius:0; background:transparent; }
+    .vx-faq-item summary { list-style:none; cursor:pointer; padding:22px 4px; display:flex; justify-content:space-between; align-items:center; gap:16px; font-family:var(--font-heading); font-weight:800; font-size:1.02rem; transition:color .15s; }
+    .vx-faq-item summary:hover { color: var(--blue); }
+    .vx-faq-item summary::-webkit-details-marker{ display:none; }
+    .vx-faq-plus { flex-shrink:0; width:24px; height:24px; position:relative; color:var(--blue); }
+    .vx-faq-plus::before,.vx-faq-plus::after { content:""; position:absolute; background:currentColor; border-radius:2px; }
+    .vx-faq-plus::before { top:11px; left:4px; right:4px; height:2.5px; }
+    .vx-faq-plus::after { left:11px; top:4px; bottom:4px; width:2.5px; transition:transform .25s,opacity .25s; }
+    .vx-faq-item[open] .vx-faq-plus::after { transform:rotate(90deg); opacity:0; }
+    .vx-faq-a { padding:0 4px 22px; color:var(--muted); font-size:.98rem; line-height:1.65; }
+
+    #download.vx-cta { background: var(--ink); text-align:center; padding: 96px 0; }
+    .vx-cta h2 { font-family:var(--font-heading); font-weight:900; text-transform:uppercase; font-size:clamp(2rem,5vw,3.4rem); letter-spacing:-.02em; color:#fff; }
+    .vx-cta p { color:rgba(255,255,255,.7); font-size:1.06rem; max-width:520px; margin:16px auto 0; line-height:1.6; }
+    .vx-cta-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:32px 0 14px; }
+    .vx-store { display:inline-flex; align-items:center; gap:11px; background:#fff; border-radius:14px; padding:12px 22px; text-decoration:none; color:var(--ink); transition:transform .18s; }
+    .vx-store:hover { transform:translateY(-2px); }
+    .vx-store svg { width:24px; height:24px; }
+    .vx-store span { display:flex; flex-direction:column; line-height:1.15; text-align:left; }
+    .vx-store small { font-size:.7rem; color:var(--muted); }
+    .vx-store strong { font-family:var(--font-heading); font-size:.98rem; }
+    .vx-cta-note { color:rgba(255,255,255,.5); font-family:'JetBrains Mono',monospace; font-size:.78rem; letter-spacing:.04em; }
+
+    /* ── ANIMACE (ambientní pohyb jako v předloze + jemný nálet) ── */
+    /* 1) filmové zrno přes celé hero — nepřetržitě se vlní */
+    .vx-frame::after {
+      content:""; position:absolute; inset:-25%; pointer-events:none; z-index:4;
+      opacity:.045; mix-blend-mode:overlay;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: vxGrain .6s steps(3) infinite;
+    }
+    @keyframes vxGrain {
+      0%{transform:translate(0,0)} 33%{transform:translate(-5%,3%)} 66%{transform:translate(4%,-4%)} 100%{transform:translate(-2%,2%)}
+    }
+    /* 3) jemný nálet prvků při načtení */
+    @keyframes vxRise { from { opacity:0; transform:translateY(26px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes vxFade { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+    .vx-nav       { animation: vxFade .7s cubic-bezier(.2,.8,.2,1) both; }
+    /* Postavičky nejdřív nahoře, po ~0,5 s sjedou dolů a odkryjí nadpis */
+    .vx-heroimg-wrap { animation: vxDrop 1.5s cubic-bezier(.5,0,.15,1) both; }
+    @keyframes vxDrop { 0%,33% { transform: translateY(-42vh); } 100% { transform: translateY(0); } }
+    /* Nadpis + tlačítka se odkryjí až když postavičky začnou sjíždět */
+    .vx-h1        { animation: vxHeadIn .8s cubic-bezier(.2,.8,.2,1) .6s both; }
+    @keyframes vxHeadIn { from { opacity:0; transform:translateY(-18px); } to { opacity:1; transform:translateY(0); } }
+    .vx-sub-btns  { animation: vxRise .8s cubic-bezier(.2,.8,.2,1) .92s both; }
+    @media (prefers-reduced-motion: reduce) {
+      .vx-frame::after, .vx-h1 .vx-glitch, .vx-nav, .vx-h1, .vx-sub-btns, .vx-heroimg-wrap { animation: none !important; }
+    }
+
+    /* ── DETAIL: marketplace vysvětlení ── */
+    .vx-intro { background: var(--vx-frame2); padding-bottom: 40px; }
+    .vx-intro .vx-sec-head { max-width: 780px; margin-bottom: 0; }
+    .vx-intro .vx-sec-head p { font-size: 1.16rem; }
+    /* Dvě strany — bez karet: dva sloupce dělené linkou, kroky se šipkou */
+    .vx-two { background: #fff; padding-top: 40px; }
+    .vx-two-head { max-width: 640px; margin: 0 0 64px; }
+    .vx-two-head h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2rem, 4.4vw, 3.25rem); letter-spacing: -.03em; line-height: 1.05; text-wrap: balance; }
+    .vx-two-head h2 em { font-style: normal; color: var(--blue); }
+    .vx-two-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .vx-aud { display:flex; flex-direction:column; gap:44px; padding-right:48px; }
+    .vx-aud.seek { padding-right:0; padding-left:48px; border-left:1px solid var(--line); }
+    .vx-aud-head { padding-bottom:0; }
+    .vx-aud-head h3 { font-family:var(--font-heading); font-weight:800; font-size:1.5rem; letter-spacing:-.02em; line-height:1.15; }
+    .vx-aud-step { display:flex; gap:20px; }
+    .vx-aud-arrow { flex:0 0 26px; font-size:1.35rem; line-height:1; font-weight:800; color:var(--blue); padding-top:3px; transition: transform .18s ease; }
+    .vx-aud-step:hover .vx-aud-arrow { transform: translateX(4px); }
+    .vx-aud-step h4 { font-family:var(--font-heading); font-weight:800; font-size:1.2rem; letter-spacing:-.01em; margin-bottom:8px; }
+    .vx-aud-step p { color:var(--muted); font-size:1.02rem; line-height:1.55; text-wrap:pretty; }
+    /* Postupný reveal při scrollu — kratší dráha než u karet, aby řádky neposkakovaly */
+    .vx-aud-head.js-reveal-up, .vx-aud-step.js-reveal-up { transform: translateY(26px); transition-duration: .7s; }
+    .vx-aud > .vx-aud-step:nth-child(2) { transition-delay: .08s; }
+    .vx-aud > .vx-aud-step:nth-child(3) { transition-delay: .16s; }
+    .vx-aud > .vx-aud-step:nth-child(4) { transition-delay: .24s; }
+    .vx-aud > .vx-aud-step:nth-child(5) { transition-delay: .32s; }
+    .vx-close { background: linear-gradient(150deg,#2a45ff,#0020f6 60%,#0018c8); text-align:center; }
+    .vx-close .vx-sec-head { margin-bottom:0; }
+    .vx-close .vx-kick { color:#aebcff; }
+    .vx-close .vx-h2 { color:#fff; }
+    .vx-close .vx-sec-head p { color: rgba(255,255,255,.85); max-width:640px; margin: 16px auto 0; font-size:1.08rem; }
+    .vx-close .vx-btn { margin-top: 30px; }
+
+    /* ── GALERIE 3 KROKŮ (styl VEXO) ── */
+    .vx-gallery { background: #eceef3; }
+    .vx-gallery .vx-wrap { width: 100%; max-width: none; }
+    .vx-gal-panel { position:relative; background: transparent; border-radius:0; padding: 20px clamp(28px,6vw,90px) 10px; overflow:hidden; }
+    .vx-gal-word { position:absolute; left:0; right:0; top:48%; transform:translateY(-50%); text-align:center; font-family:var(--font-heading); font-weight:900; text-transform:uppercase; font-size: clamp(4rem, 15vw, 14rem); letter-spacing:-.04em; color: rgba(14,17,22,.055); line-height:1; z-index:0; pointer-events:none; white-space:nowrap; }
+    .vx-gal-cards { position:relative; z-index:2; display:flex; justify-content:center; align-items:flex-start; gap: clamp(24px, 5vw, 72px); }
+    .vx-gal-card { flex:0 0 auto; }
+    .vx-gal-card.c1 { margin-top: 0; }
+    .vx-gal-card.c2 { margin-top: 0; }
+    .vx-gal-card.c3 { margin-top: 150px; }
+    .vx-gal-ph { position:relative; border-radius:20px; border:1px solid rgba(14,17,22,.07); box-shadow:0 34px 64px -32px rgba(14,17,22,.45); overflow:hidden; }
+    .vx-gal-card.c3 .vx-gal-ph { width: clamp(210px,18vw,285px); }
+    .vx-gal-card.c1 .vx-gal-ph { width: clamp(315px,27vw,427px); }
+    .vx-gal-card.c2 .vx-gal-ph { width: clamp(290px,25vw,380px); }
+    .vx-gal-ph iconify-icon { color: rgba(14,17,22,.22); }
+    .vx-gal-ph img { width:100%; height:auto; display:block; }
+    .vx-gal-ph .ph-label { position:absolute; bottom:12px; font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.1em; color:rgba(14,17,22,.32); text-transform:uppercase; }
+    .vx-gal-cap { margin-top: 16px; }
+    .vx-gal-cap .n { font-family:'JetBrains Mono',monospace; font-weight:800; font-size:.76rem; color:var(--blue); letter-spacing:.08em; }
+    .vx-gal-cap h4 { font-family:var(--font-heading); font-weight:800; text-transform:uppercase; font-size:1rem; letter-spacing:-.01em; margin-top:5px; }
+    .vx-gal-cap p { color:var(--muted); font-size:.86rem; line-height:1.45; margin-top:5px; max-width:230px; }
+    .vx-gal-txt { position:absolute; z-index:3; max-width:230px; font-size:.9rem; line-height:1.5; color:var(--muted); }
+    .vx-gal-txt b { color:var(--ink); }
+    .vx-gal-txt.bl { bottom: 42px; left: 44px; }
+    .vx-gal-txt.tr { top: 42px; right: 44px; text-align:right; }
+
+    /* Scroll-reveal: prostřední karta se „načte" (pop), boční karty + nadpisy přijedou zespoda */
+    .js-reveal-up { opacity:0; transform: translateY(80px); transition: opacity 1.1s cubic-bezier(.2,.8,.25,1), transform 1.1s cubic-bezier(.2,.8,.25,1); will-change: transform, opacity; }
+    .js-reveal-pop { opacity:0; transform: scale(.9); transition: opacity 1s ease, transform 1.1s cubic-bezier(.2,.8,.25,1); will-change: transform, opacity; }
+    .js-reveal-up.is-in, .js-reveal-pop.is-in { opacity:1; transform: none; }
+    .vx-gal-card.c2.js-reveal-pop { transition-delay: .1s; }
+    .vx-gal-card.c1.js-reveal-up { transition-delay: .34s; }
+    .vx-gal-card.c3.js-reveal-up { transition-delay: .58s; }
+    /* velké slovo DOVEDNOSTI — taky přijede zespoda (zachová centrování translateY(-50%)) */
+    .js-reveal-word { opacity:0; transform: translateY(calc(-50% + 70px)); transition: opacity 1.2s cubic-bezier(.2,.8,.25,1), transform 1.2s cubic-bezier(.2,.8,.25,1); will-change: transform, opacity; }
+    .js-reveal-word.is-in { opacity:1; transform: translateY(-50%); }
+    @media (prefers-reduced-motion: reduce) {
+      .js-reveal-up, .js-reveal-pop, .js-reveal-word { opacity:1 !important; transition:none !important; }
+      .js-reveal-up, .js-reveal-pop { transform:none !important; }
+      .js-reveal-word { transform: translateY(-50%) !important; }
+    }
+
+    /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       /* Mobil: odkazy i CTA schované pod hamburger (panel #mobile-menu ve skrytém #navbar) */
       .vx-nav-links a, .vx-nav-actions { display: none; }
       .vx-nav { grid-template-columns: 1fr auto 1fr; padding: 10px 16px; }
       .vx-logo { font-size: 1.3rem; padding: 4px 0 6px; }
       .vx-nav-links.right { justify-content: flex-end; }
+      .vx-steps-grid { grid-template-columns:1fr; }
+      .vx-two-grid { grid-template-columns:1fr; }
+      .vx-two-head { margin-bottom:44px; }
+      .vx-aud { padding-right:0; }
+      .vx-aud.seek { padding-left:0; padding-top:44px; border-left:none; border-top:1px solid var(--line); }
+      .vx-pv-cols { grid-template-columns:1fr; }
+      .vx-fan { transform: scale(.86); margin-top:16px; }
+      .vx-heroimg-wrap { bottom: -46px; }
+      .vx-heroimg { width: min(422px, 96vw); }
+      .vx-gal-cards { flex-direction:column; align-items:center; gap:34px; }
+      .vx-gal-card.c1, .vx-gal-card.c2, .vx-gal-card.c3 { margin-top:0; }
+      .vx-gal-card.c2 .vx-gal-ph, .vx-gal-card.c1 .vx-gal-ph, .vx-gal-card.c3 .vx-gal-ph { width: min(300px,80vw); }
+      .vx-gal-cap { text-align:center; }
+      .vx-gal-cap p { margin-left:auto; margin-right:auto; }
+      .vx-gal-word { font-size: 4.5rem; top: 30px; transform:none; }
+      .vx-gal-txt.bl, .vx-gal-txt.tr { position:static; max-width:none; text-align:center; margin:0 auto; }
+      .vx-gal-txt.tr { margin-top: 8px; }
     }
-
-    /* ── Hero jako u Lidé: modrý→bílý gradient + „drop" animace telefonu ── */
-    .emp-hero-blue { background: linear-gradient(180deg,#0020f6 0%,#1a37ff 12%,#5875ff 30%,#aebcff 46%,#ffffff 60%) !important; min-height: 100vh; }
-    .mkj-visual { position: relative; z-index: 3; animation: vxDrop 1.5s cubic-bezier(.5,0,.15,1) both; }
-    @keyframes vxDrop { 0%,33% { transform: translateY(-42vh); } 100% { transform: translateY(0); } }
-    .eh-line:nth-child(1) .eh-line-in { animation-delay: .62s; }
-    .eh-line:nth-child(2) .eh-line-in { animation-delay: .78s; }
-    .eh-sub { animation-delay: .95s; }
-    .eh-btn { animation-delay: 1.08s; }
-    @media (prefers-reduced-motion: reduce) { .mkj-visual { animation: none !important; } }
-
-    /* ── Intro sekce (styl jako u Lidé) ── */
-    .vx-intro { background:#f6f7fb; padding: 92px 0; }
-    .vx-intro .vx-wrap { width: min(1100px, 90vw); margin: 0 auto; text-align:center; }
-    .vx-intro .vx-kick { display:inline-block; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.72rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:#0020f6; }
-    .vx-intro h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.03; margin: 12px 0 0; color:#0a0d2e; }
-    .vx-intro p { max-width: 780px; margin: 16px auto 0; color:#5b6478; font-size: 1.16rem; line-height: 1.6; }
-    .js-reveal-up { opacity:0; transform: translateY(60px); transition: opacity 1s cubic-bezier(.2,.8,.25,1), transform 1s cubic-bezier(.2,.8,.25,1); }
-    .js-reveal-up.is-in { opacity:1; transform:none; }
-    @media (prefers-reduced-motion: reduce){ .js-reveal-up { opacity:1 !important; transform:none !important; } }
+    @media (max-width: 560px) {
+      .vx-fan { width: 100%; height: 380px; }
+      .vx-fcard.c1 { transform:translateX(-50%) translateX(-90px) rotate(-9deg) scale(.82); }
+      .vx-fcard.c2 { transform:translateX(-50%) translateX(90px) rotate(9deg) scale(.82); }
+    }
   </style>
 </head>
 <body>
@@ -296,9 +547,9 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej</a>
       <div class="nav-links">
-        <a href="/hledam-si-praci.html" class="nav-active">Hledám si práci</a>
+        <a href="/hledam-si-praci.html">Hledám práci</a>
         <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-        <a href="/lide.html">Lidé</a>
+        <a href="/lide.html" class="nav-active">Lidé</a>
         <a href="#download">Stáhnout</a>
         <a href="/podpora.html">Podpora</a>
       </div>
@@ -312,9 +563,9 @@
     </div>
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobile-menu">
-      <a href="/hledam-si-praci.html" class="nav-active">Hledám si práci</a>
+      <a href="/hledam-si-praci.html">Hledám práci</a>
       <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-      <a href="/lide.html">Lidé</a>
+      <a href="/lide.html" class="nav-active">Lidé</a>
       <a href="#download">Stáhnout</a>
       <a href="/podpora.html">Podpora</a>
       <div class="mobile-menu-actions">
@@ -324,224 +575,155 @@
     </div>
   </nav>
 
-  <main>
-    <!-- ═══════════ HERO (modré, swipe telefon) ═══════════ -->
-    <section class="emp-hero-blue">
-      <!-- Navbar ve stylu Lidé (aktuální stránka „Hledám práci" skrytá) -->
-      <nav class="vx-nav">
-        <div class="vx-nav-links">
-          <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-          <a href="/lide.html">Lidé</a>
+  <main class="vx">
+
+    <!-- ═══════════ RÁMOVANÉ HERO ═══════════ -->
+    <div class="vx-shell">
+      <div class="vx-frame">
+
+        <!-- NAV se zářezem -->
+        <nav class="vx-nav">
+          <div class="vx-nav-links">
+            <a href="/hledam-si-praci.html">Hledám práci</a>
+            <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+          
+          </div>
+          <div class="vx-logo-tab">
+            <a href="/" class="vx-logo">Makej</a>
+          </div>
+          <div class="vx-nav-links right">
+            <a href="#download">Stáhnout</a>
+            <a href="/podpora.html">Podpora</a>
+            <button class="mobile-menu-btn vx-burger" aria-label="Menu" aria-expanded="false">
+              <span></span><span></span>
+            </button>
+            <div class="vx-nav-actions">
+              <a href="#" class="vx-signin worker-cta-register">Vytvořit účet</a>
+              
+            </div>
+          </div>
+        </nav>
+
+        <!-- HERO obsah -->
+        <div class="vx-hero">
+          <h1 class="vx-h1">Najdi lidi pro<br><span class="vx-glitch">cokoliv</span> potřebuješ</h1>
+          <div class="vx-sub-btns">
+            <a href="#" class="vx-btn vx-btn-dark worker-cta-register">Vytvořit účet</a>
+            <a href="#jak" class="vx-btn vx-btn-light">Jak to funguje</a>
+          </div>
+
+          <!-- 3D portrét lidí — hlavní centerpiece -->
+          <div class="vx-heroimg-wrap">
+            <img class="vx-heroimg" src="/lide-hero-v2.png" alt="Lidé na Makej — nabízejí své dovednosti přes appku" />
+          </div>
+
+
         </div>
-        <div class="vx-logo-tab"><a href="/" class="vx-logo">Makej</a></div>
-        <div class="vx-nav-links right">
-          <a href="#download">Stáhnout</a>
-          <a href="/podpora.html">Podpora</a>
-          <button class="mobile-menu-btn vx-burger" aria-label="Menu" aria-expanded="false">
-            <span></span><span></span>
-          </button>
-          <div class="vx-nav-actions">
-            <a href="#" class="vx-signin worker-cta-register">Vytvořit účet</a>
-          </div>
-        </div>
-      </nav>
-      <div class="eh-head">
-        <h1>
-          <span class="eh-line"><span class="eh-line-in">Najdi si brigádu</span></span>
-          <span class="eh-line"><span class="eh-line-in eh-accent eh-grad">ještě dnes</span></span>
-        </h1>
-        <p class="eh-sub">Žádné zdlouhavé projíždění portálů. Swajpni nabídku, matchni se s firmou a začni vydělávat.</p>
-        <a href="#" class="eh-btn worker-cta-register">Vytvořit účet zdarma</a>
+
       </div>
+    </div>
 
-      <!-- Tři telefony s appkou -->
-      <div class="mkj-visual" aria-hidden="true">
-        <div class="mkj-stage">
-          <img class="mkj-phones" src="/hsp-hero-mobily.png" alt="" width="1053" height="882" fetchpriority="high" decoding="async" />
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══════════ INTRO (styl Lidé) ═══════════ -->
-    <section class="vx-intro">
-      <div class="vx-wrap js-reveal-up">
-        <h2>Najdi si brigádu za pár swajpů</h2>
-        <p>Konec posílání životopisů a čekání na odpověď. Swajpni nabídku, matchni se s firmou a domluv se přímo v chatu. Brigády, part-time i full-time — jen pár minut od tebe a bez zdlouhavého hledání po inzerátech.</p>
-      </div>
-    </section>
-
-    <!-- ═══════════ HOW IT WORKS ═══════════ -->
-    <section id="how-it-works" class="nav-light" style="padding-top:90px;">
-      <div class="container">
-        <div class="bolt-journey" id="boltWrap">
-          <svg id="boltSvg" preserveAspectRatio="none" aria-hidden="true"
-               style="position:absolute; inset:0; width:100%; height:100%; z-index:0; overflow:visible; pointer-events:none">
-            <path id="boltHeadSrc" fill="none" stroke="none"></path>
-            <path id="boltLineSrc" fill="none" stroke="none"></path>
-            <path id="boltHead" stroke="none" fill="#0020f6"></path>
-            <path id="boltLine" stroke="none" fill="#0020f6"></path>
-            <path id="boltLoop" fill="none" stroke="#0020f6" stroke-linecap="round" stroke-linejoin="round"
-                  style="transition: opacity .6s cubic-bezier(.33,0,.2,1), stroke-width .6s cubic-bezier(.33,0,.2,1)"></path>
-          </svg>
-          <div class="bolt-head" style="position:relative; z-index:1;">
-            <span class="bolt-kicker">Jak to funguje</span>
-            <h2>Pojď si vydělat s <span class="gradient-text" id="boltMakej" aria-label="Makej">Make<span id="boltJ" aria-hidden="true" style="position:relative;">&#567;<span id="boltDot" style="position:absolute; left:45%; top:0.24em; width:0.175em; height:0.175em; border-radius:50%; background:#0020f6; transform:translate(-50%,-50%); pointer-events:none;"></span></span></span></h2>
-          </div>
-
-          <div class="bolt-steps">
-          <div class="bolt-row">
-            <div class="bolt-media">
-              <img src="/krok-1.png?v=2" alt="Brigádník ukazuje appku Makej na telefonu" />
-            </div>
-            <div class="bolt-text">
-
-              <h3>Swajpni nabídky</h3>
-              <p>Prohlížej nabídky brigád jako na Tinderu. Doprava = chci, doleva = nechci. Rychlé, intuitivní a zábavné.</p>
-            </div>
-          </div>
-
-          <div class="bolt-row">
-            <div class="bolt-media">
-              <img src="/krok-2.png" alt="Match s firmou — podání rukou" />
-            </div>
-            <div class="bolt-text">
-
-              <h3>Matchni se s firmou</h3>
-              <p>Když tě firma přijme, vznikne match. Začněte si chatovat a domluvte se na detailech přímo v appce.</p>
-            </div>
-          </div>
-
-          <div class="bolt-row">
-            <div class="bolt-media">
-              <img src="/krok-3.png" alt="Výplata za odpracovanou brigádu" />
-            </div>
-            <div class="bolt-text">
-
-              <h3>Pracuj a vydělávej</h3>
-              <p>Přijď na směnu, odveď práci a vydělanej jdi domů. Žádné životopisy, žádné pohovory. Tak jednoduché to je.</p>
-            </div>
-          </div>
-          </div>
-          <div class="bolt-cta" style="position:relative; z-index:1;">
-            <a href="#" id="boltCta" class="worker-cta-register"
-               style="display:inline-flex; align-items:center; gap:12px; text-decoration:none; font-family:var(--font-heading); font-size:18px; font-weight:800; padding:20px 40px; border-radius:999px; border:3px solid #0020f6; background:#ffffff; color:#0020f6; box-shadow:0 0 0 rgba(0,0,0,0); transition:background .6s cubic-bezier(.33,0,.2,1), color .45s ease, box-shadow .6s ease;">
-              Vytvořit účet <span style="font-size:20px; line-height:1;">→</span>
-            </a>
-          </div>
+    <!-- ═══════════ JAK TO FUNGUJE ═══════════ -->
+    <!-- INTRO — marketplace -->
+    <section id="jak" class="vx-sec vx-intro">
+      <div class="vx-wrap">
+        <div class="vx-sec-head js-reveal-up">
+          <h2 class="vx-h2">Představujeme funkci Lidé</h2>
+          <p>Umíš spravit kapající kohoutek, smontovat skříň, doučovat matiku nebo vyvenčit psa? Nová sekce Lidé mění Makej v osobní tržiště talentů a dovedností. Nemusíš čekat na vypsanou brigádu od firmy — teď můžeš jednoduše nabízet to, co tě baví a v čem jsi dobrý, přímo lidem ve tvém okolí.</p>
         </div>
       </div>
     </section>
 
-    <!-- ═══════════ FEATURES — text vlevo + funkce vpravo ═══════════ -->
-    <section id="features">
-      <div class="container">
-        <div class="bf2">
-          <div class="bf2-left">
-            <span class="bf2-kicker">Funkce</span>
-            <h2>Proč si zvolíš <span class="grad">Makej</span></h2>
-            <p>Všechno, co při hledání brigády potřebuješ, na jednom místě — swajpuj, matchuj a začni makat.</p>
-            <a href="#" class="bf2-cta worker-cta-register">Vytvořit účet <span style="font-size:18px;line-height:1;">→</span></a>
-          </div>
-          <div class="bf2-feats">
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><span class="bf2-swipe"></span></div>
-              <h3>Swajp rozhraní</h3>
-              <p>Prohlížej nabídky jako karty.</p>
+    <!-- GALERIE 3 KROKŮ (styl VEXO) -->
+    <section class="vx-sec vx-gallery">
+      <div class="vx-wrap">
+        <div class="vx-gal-panel">
+          <div class="vx-gal-word js-reveal-word">DOVEDNOSTI</div>
+          <div class="vx-gal-txt bl"><b>Marketplace dovedností.</b> Nabízej, co umíš, přímo lidem ve svém okolí.</div>
+          <div class="vx-gal-txt tr">Od opravy nábytku po doučování. Bez formulářů, bez prostředníků.</div>
+          <div class="vx-gal-cards">
+            <div class="vx-gal-card c1 js-reveal-up">
+              <div class="vx-gal-ph"><img src="/lide-krok-1.png" alt="Karta dovedností — Klára Dvořáková" loading="lazy"></div>
+              <div class="vx-gal-cap"><h4>Vytvoř si kartu</h4><p>Napiš, co umíš, a přidej štítky.</p></div>
             </div>
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon></div>
-              <h3>Real-time chat</h3>
-              <p>Piš si přímo s firmou po matchi.</p>
+            <div class="vx-gal-card c2 js-reveal-pop">
+              <div class="vx-gal-ph"><img src="/lide-krok-2.png" alt="Swajpování karet lidí — Matěj Kučera" loading="lazy"></div>
+              <div class="vx-gal-cap"><h4>Swajpuj lidi</h4><p>Procházej profily šikovných lidí kolem tebe.</p></div>
             </div>
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:verified-check-bold"></iconify-icon></div>
-              <h3>Ověřené firmy</h3>
-              <p>Jen prověřené nabídky (IČO i provozovna).</p>
-            </div>
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:cup-star-bold"></iconify-icon></div>
-              <h3>Gamifikace</h3>
-              <p>Sbírej XP, leveluj a odemykej odměny.</p>
-            </div>
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:star-bold"></iconify-icon></div>
-              <h3>Recenze</h3>
-              <p>Buduj si reputaci, získávej lepší nabídky.</p>
-            </div>
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:map-point-bold"></iconify-icon></div>
-              <h3>Blízko tebe</h3>
-              <p>Práce pár minut od domova nebo školy.</p>
+            <div class="vx-gal-card c3 js-reveal-up">
+              <div class="vx-gal-ph"><img src="/lide-krok-3.png" alt="Chat po domluvě — Matěj Kučera" loading="lazy"></div>
+              <div class="vx-gal-cap"><h4>Domluvte se</h4><p>Po potvrzení se otevře společný chat.</p></div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ═══════════ FAQ (brigádníci) ═══════════ -->
-    <section id="faq" class="nav-light" style="padding:40px 0 110px; background:#fff;">
-      <div class="container">
-        <div class="section-header reveal">
-          <h2>Časté <span class="gradient-text">otázky</span></h2>
-          <p>Nenašel jsi odpověď? Napiš nám na <a href="mailto:admin@makej.eu">admin@makej.eu</a></p>
+    <!-- DVĚ STRANY — nabízíš / sháníš -->
+    <section class="vx-sec vx-two">
+      <div class="vx-wrap">
+        <div class="vx-two-head js-reveal-up">
+          <h2>Dvě cesty, <em>jedna appka.</em></h2>
         </div>
-        <div class="emp-faq">
-          <div class="emp-faq-list">
-            <div class="emp-faq-item">
-              <div class="emp-faq-q" onclick="toggleFaq(this)">
-                <span>Kolik stojí Makej pro brigádníky?</span>
-                <span class="emp-faq-plus"></span>
-              </div>
-              <div class="emp-faq-a">Makej je pro brigádníky úplně zdarma. Žádné poplatky ani provize z výdělku — stáhneš, zaregistruješ se a swajpuješ.</div>
-            </div>
-            <div class="emp-faq-item">
-              <div class="emp-faq-q" onclick="toggleFaq(this)">
-                <span>Jak si najdu brigádu?</span>
-                <span class="emp-faq-plus"></span>
-              </div>
-              <div class="emp-faq-a">Swajpuješ nabídky ve svém okolí jako na Tinderu: doprava „mám zájem", doleva „přeskočit". Když firma projeví zájem taky, vznikne match a otevře se chat.</div>
-            </div>
-            <div class="emp-faq-item">
-              <div class="emp-faq-q" onclick="toggleFaq(this)">
-                <span>Musím psát životopis?</span>
-                <span class="emp-faq-plus"></span>
-              </div>
-              <div class="emp-faq-a">Ne. Stačí vyplnit profil (jméno, pár údajů, případně zkušenosti) a swajpovat — žádné zdlouhavé životopisy ani motivační dopisy.</div>
-            </div>
-            <div class="emp-faq-item">
-              <div class="emp-faq-q" onclick="toggleFaq(this)">
-                <span>Jsou firmy ověřené?</span>
-                <span class="emp-faq-plus"></span>
-              </div>
-              <div class="emp-faq-a">Ano. Každý zaměstnavatel projde verifikací IČO i provozovny, takže swajpuješ jen prověřené nabídky.</div>
-            </div>
-            <div class="emp-faq-item">
-              <div class="emp-faq-q" onclick="toggleFaq(this)">
-                <span>Kdy a jak dostanu zaplaceno?</span>
-                <span class="emp-faq-plus"></span>
-              </div>
-              <div class="emp-faq-a">Formu i termín výplaty (hotově, na účet) si domluvíš přímo s firmou v chatu po matchi. Hodinovku navíc vidíš už u inzerátu — žádné „mzda dle dohody".</div>
-            </div>
-            <div class="emp-faq-item">
-              <div class="emp-faq-q" onclick="toggleFaq(this)">
-                <span>Od kolika let a kde Makej funguje?</span>
-                <span class="emp-faq-plus"></span>
-              </div>
-              <div class="emp-faq-a">Brigády jsou zpravidla od 15 let (u některých pozic může být podmínka 18 let — vždy je to uvedené u nabídky). Nabídky filtruješ podle lokace, ať máš práci pár minut od domova nebo školy.</div>
-            </div>
+        <div class="vx-two-grid">
+          <div class="vx-aud offer">
+            <div class="vx-aud-head js-reveal-up"><h3>Nabízíš své služby</h3></div>
+            <div class="vx-aud-step js-reveal-up"><div class="vx-aud-arrow" aria-hidden="true">→</div><div><h4>Vytvoř si kartu dovedností</h4><p>Vypíšeš, co umíš — např. „Opravuji nábytek“, „Stříhám videa“, „Peču dorty na zakázku“.</p></div></div>
+            <div class="vx-aud-step js-reveal-up"><div class="vx-aud-arrow" aria-hidden="true">→</div><div><h4>Čekej na poptávky</h4><p>Tvoje karta se začne zobrazovat ostatním uživatelům ve tvém okolí.</p></div></div>
+            <div class="vx-aud-step js-reveal-up"><div class="vx-aud-arrow" aria-hidden="true">→</div><div><h4>Měj vše pod kontrolou</h4><p>Když tě někdo osloví, přijde ti krátká zpráva se zadáním. Ty se rozhodneš, jestli zakázku přijmeš, nebo odmítneš.</p></div></div>
           </div>
+          <div class="vx-aud seek">
+            <div class="vx-aud-head js-reveal-up"><h3>Sháníš někoho šikovného</h3></div>
+            <div class="vx-aud-step js-reveal-up"><div class="vx-aud-arrow" aria-hidden="true">→</div><div><h4>Projížděj marketplace lidí</h4><p>Procházej profily šikovných lidí ve tvém okolí stejně jednoduše jako pracovní nabídky.</p></div></div>
+            <div class="vx-aud-step js-reveal-up"><div class="vx-aud-arrow" aria-hidden="true">→</div><div><h4>Najdi přesně toho pravého</h4><p>Hledáš někoho na opravu stolu? Narazíš na kartu s opravou nábytku a swajpneš doprava.</p></div></div>
+            <div class="vx-aud-step js-reveal-up"><div class="vx-aud-arrow" aria-hidden="true">→</div><div><h4>Napiš poptávku</h4><p>Rovnou napíšeš krátkou zprávu, co konkrétně potřebuješ vyřešit.</p></div></div>
+            <div class="vx-aud-step js-reveal-up"><div class="vx-aud-arrow" aria-hidden="true">→</div><div><h4>Domluvte se v chatu</h4><p>Jakmile druhá strana žádost potvrdí, otevře se vám společný chat, kde doladíte detaily a pustíte se do toho.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZÁVĚR -->
+    <section class="vx-sec vx-close">
+      <div class="vx-wrap">
+        <div class="vx-sec-head">
+          <h2 class="vx-h2">Nabídni skill a vydělávej</h2>
+          <p>Žádné složité formuláře ani zdlouhavé hledání po inzerátech. Jednoduše vytvoř kartu, nabídni svůj skill a vydělávej na tom, co umíš nejlíp.</p>
+        </div>
+        <div style="text-align:center;">
+          <a href="#" class="vx-btn vx-btn-dark worker-cta-register">Vytvořit účet zdarma</a>
+        </div>
+      </div>
+    </section>
+
+    
+    <!-- ═══════════ FAQ ═══════════ -->
+    <section id="faq" class="vx-sec vx-faq">
+      <div class="vx-wrap">
+        <div class="vx-sec-head">
+          <h2 class="vx-h2">Časté otázky</h2>
+          <p>Nenašel jsi odpověď? Napiš nám na <a href="mailto:admin@makej.eu" style="color:var(--blue);font-weight:700;">admin@makej.eu</a></p>
+        </div>
+        <div class="vx-faq-list">
+          <details class="vx-faq-item"><summary>Co je záložka Lidé? <span class="vx-faq-plus"></span></summary><div class="vx-faq-a">Místo v appce, kde nabídneš své dovednosti nebo pomoc a najdeš lidi ve svém okolí. Není to jen o brigádách — klidně doučování, řemeslo, foto nebo chuť poznat lidi se stejným zájmem.</div></details>
+          <details class="vx-faq-item"><summary>Jak si zapnu vlastní kartu? <span class="vx-faq-plus"></span></summary><div class="vx-faq-a">V appce otevři záložku Lidé → zapni si kartu, napiš „co nabízíš" a přidej štítky. Jméno, město a hodnocení se přeberou z profilu. Dokud kartu nezapneš, nikdo tě v Lidé nevidí.</div></details>
+          <details class="vx-faq-item"><summary>Uvidí ostatní můj e-mail nebo telefon? <span class="vx-faq-plus"></span></summary><div class="vx-faq-a">Ne. Karta ukazuje jen jméno, město, dovednosti a hodnocení. E-mail, telefon ani datum narození se nikomu cizímu nezobrazují — kontakt probíhá jen přes chat v appce.</div></details>
+          <details class="vx-faq-item"><summary>Jak vznikne kontakt? <span class="vx-faq-plus"></span></summary><div class="vx-faq-a">Swajpuješ karty lidí: doprava „mám zájem", doleva „přeskočit". Když projeví zájem oba, otevře se chat — oddělený od chatů k brigádám (najdeš ho ve Zprávy → Lidé).</div></details>
+          <details class="vx-faq-item"><summary>Kolik to stojí? <span class="vx-faq-plus"></span></summary><div class="vx-faq-a">Nic. Záložka Lidé je zdarma a Makej si z domluv mezi lidmi nebere žádnou provizi — domlouváte se napřímo.</div></details>
+          <details class="vx-faq-item"><summary>Musím nabízet zrovna brigádu? <span class="vx-faq-plus"></span></summary><div class="vx-faq-a">Vůbec ne. Můžeš nabídnout jednorázovou pomoc, dovednost nebo koníček. Lidé je o propojení lidí — od „opravím ti kolo" po „zahraju na svatbě".</div></details>
         </div>
       </div>
     </section>
   </main>
 
+  
   <!-- ═══════════ DOWNLOAD CTA ═══════════ -->
   <section id="download">
     <div class="container">
       <div class="dl-stage">
         <div class="dl-card">
-          <h2 class="dl-title">Připraven <span>Makat?</span></h2>
-          <p class="dl-sub">Stáhni si aplikaci zdarma a prozkoumej pracovní příležitosti ve tvém okolí ještě dnes.</p>
+          <h2 class="dl-title">Připraven poznat lidi?</h2>
+          <p class="dl-sub">Stáhni si Makej zdarma, zapni si kartu a najdi lidi ve svém okolí ještě dnes.</p>
           <div class="dl-btns">
             <a href="#" class="dl-btn" aria-disabled="true">
               <svg class="dl-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 315" aria-hidden="true"><path d="M213.803 167.03c.442 47.58 41.74 63.413 42.197 63.615c-.35 1.116-6.599 22.563-21.757 44.716c-13.104 19.153-26.705 38.235-48.13 38.63c-21.05.388-27.82-12.483-51.888-12.483c-24.061 0-31.582 12.088-51.51 12.871c-20.68.783-36.428-20.71-49.64-39.793c-27-39.033-47.633-110.3-19.928-158.406c13.763-23.89 38.36-39.017 65.056-39.405c20.307-.387 39.475 13.662 51.889 13.662c12.406 0 35.699-16.895 60.186-14.414c10.25.427 39.026 4.14 57.503 31.186c-1.49.923-34.335 20.044-33.978 59.822M174.24 50.199c10.98-13.29 18.369-31.79 16.353-50.199c-15.826.636-34.962 10.546-46.314 23.828c-10.173 11.763-19.082 30.589-16.678 48.633c17.64 1.365 35.66-8.964 46.64-22.262"/></svg>
@@ -557,6 +739,7 @@
       </div>
     </div>
   </section>
+
 
   <!-- ═══════════ FOOTER ═══════════ -->
   <footer id="footer">
@@ -1033,9 +1216,20 @@
       if (!isOpen) item.classList.add('open');
     }
   </script>
-  <!-- Scroll-reveal intro sekce + připnutý navbar -->
+  <!-- Scroll-reveal pro sekci Lidé (galerie + nadpis) -->
   <script>
-  (function(){var els=document.querySelectorAll('.js-reveal-up');if(!els.length)return;if(!('IntersectionObserver'in window)){els.forEach(function(e){e.classList.add('is-in');});return;}var io=new IntersectionObserver(function(en){en.forEach(function(e){if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target);}});},{threshold:.2,rootMargin:'0px 0px -8% 0px'});els.forEach(function(e){io.observe(e);});})();
+  (function () {
+    var els = document.querySelectorAll('.js-reveal-up, .js-reveal-pop, .js-reveal-word');
+    if (!els.length) return;
+    if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('is-in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+  // Připnutý navbar — po odscrollování dostane matné pozadí
   (function(){var n=document.querySelector('.vx-nav');if(!n)return;var f=function(){n.classList.toggle('scrolled',(window.scrollY||document.documentElement.scrollTop)>40);};f();window.addEventListener('scroll',f,{passive:true});})();
   </script>
 </body>

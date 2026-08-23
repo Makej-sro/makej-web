@@ -1,0 +1,19 @@
+<!doctype html><meta charset=utf-8>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<pre id=r></pre><div id="root" style="width:960px"></div>
+<script>
+const log=s=>document.getElementById('r').textContent+=s+"\n";
+window.onerror=(m)=>log('ERR:'+m);
+const chan={on(){return chan;},subscribe(){return chan;}};
+const qb={select(){return qb;},eq(){return qb;},order(){return qb;},in(){return qb;},not(){return qb;},limit(){return qb;},single(){return Promise.resolve({data:null});},insert(){return qb;},update(){return qb;}};
+window.sb={auth:{getSession:()=>Promise.resolve({data:{session:null}}),onAuthStateChange(){return{data:{subscription:{unsubscribe(){}}}}},signOut(){return Promise.resolve()}},channel:()=>chan,removeChannel(){},from:()=>qb};
+const F=['app.jsx','employer-data.jsx','employer-shell.jsx','employer-dashboard.jsx','employer-pages.jsx','employer-pages3.jsx','_premium/analytics.jsx','employer-supabase.jsx'];
+(async()=>{let b='';for(const f of F){b+='\n;'+await(await fetch(f+'?t='+Date.now())).text()}
+(new Function(Babel.transform(b,{presets:['react']}).code))();
+window.ECOMPANY.plan='Standard';
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(window.EPricing,{onTab:()=>{},onPlanChange:()=>{}}));
+setTimeout(()=>{const root=document.getElementById('root');log('root width: '+root.clientWidth+'  scrollWidth: '+root.scrollWidth+'  (stejné = žádné přetékání/uříznutí)');log('overflow (uříznuto): '+(root.scrollWidth>root.clientWidth+2));log('má 5 tarifů: '+['Starter','Standard','Business','Agency','Enterprise'].every(x=>root.innerHTML.includes(x)));log('DONE')},700)})();
+</script>

@@ -129,10 +129,36 @@ const THREAD = [
 // ─────────────────────────────────────────────────────────────
 // Tokens
 // ─────────────────────────────────────────────────────────────
-const T = {
+const THEME_LIGHT = {
+  bg: '#0020F6',
+  card: '#ffffff',
+  cardSoft: 'rgba(0,32,246,0.05)',
+  cardText: '#0a0a1a',
+  cardMuted: '#4a4a6a',
+  cardMutedSoft: '#7a7a9a',
+  cardLight: '#2D2CA7',
+  cardBorder: 'rgba(0,32,246,0.12)',
+  navBg: 'rgba(0,12,200,0.92)',
+  primary: '#0020F6',
+  primaryDeep: '#2D2CA7',
+  light: '#E8EBFF',
+  text: '#ffffff',
+  muted: '#ffffff',
+  mutedSoft: 'rgba(255,255,255,0.8)',
+  destructive: '#f43f5e',
+  super: '#FFD166',
+  border: 'rgba(255,255,255,0.18)',
+};
+const THEME_DARK = {
   bg: 'linear-gradient(180deg, #2a2ab5 0%, #050510 100%)',
   card: '#16163b',
   cardSoft: 'rgba(255,255,255,0.06)',
+  cardText: '#ffffff',
+  cardMuted: '#9999cc',
+  cardMutedSoft: '#6e6ea8',
+  cardLight: '#E8EBFF',
+  cardBorder: 'rgba(255,255,255,0.08)',
+  navBg: 'rgba(7,7,26,0.55)',
   primary: '#0020F6',
   primaryDeep: '#2D2CA7',
   light: '#E8EBFF',
@@ -142,10 +168,22 @@ const T = {
   destructive: '#f43f5e',
   super: '#FFD166',
   border: 'rgba(255,255,255,0.08)',
-  fontUI: '"Plus Jakarta Sans", -apple-system, system-ui, sans-serif',
-  fontHead: '"Inter", -apple-system, system-ui, sans-serif',
-  fontMono: '"JetBrains Mono", ui-monospace, monospace',
+};
+
+const T = {
+  ...THEME_LIGHT,
+  fontUI: '"League Spartan", -apple-system, system-ui, sans-serif',
+  fontHead: '"League Spartan", -apple-system, system-ui, sans-serif',
+  fontMono: '"League Spartan", -apple-system, system-ui, sans-serif',
   fontDeco: '"Playfair Display", Georgia, serif',
+};
+
+window._makejIsDark = false;
+window.toggleMakejTheme = function() {
+  window._makejIsDark = !window._makejIsDark;
+  const theme = window._makejIsDark ? THEME_DARK : THEME_LIGHT;
+  Object.assign(T, theme);
+  window.dispatchEvent(new CustomEvent('makej-theme-toggle'));
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -263,15 +301,10 @@ function JobCard({ job, drag, onTap, isTop, depth = 0 }) {
           }}>
             <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 600, fontFamily: T.fontUI, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
               {job.company}
-              {job.rating > 0 && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: T.super }}>
-                  <Icon name="star-bold" size={12} color={T.super} />
-                  <span style={{ fontFamily: T.fontMono, fontWeight: 700, fontSize: 12 }}>{job.rating.toFixed(1)}</span>
-                </span>
-              )}
-              {job.verified && (
-                <Icon name="verified-check-bold" size={13} color="#5B6BFF" />
-              )}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: T.super }}>
+                <Icon name="star-bold" size={12} color={T.super} />
+                <span style={{ fontFamily: T.fontMono, fontWeight: 700, fontSize: 12 }}>{job.rating.toFixed(1)}</span>
+              </span>
             </div>
             <div style={{
               color: '#fff', fontSize: 22, lineHeight: 1.15, fontWeight: 700,

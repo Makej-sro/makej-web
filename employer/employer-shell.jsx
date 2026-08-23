@@ -45,10 +45,10 @@ function ELogo() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
       <div>
-        <div style={{ fontFamily: T.fontHead, fontWeight: 800, fontSize: 22, color: T.primary, letterSpacing: -0.5, lineHeight: 1 }}>
-          Makej<span style={{ color: T.super }}>.</span>
+        <div style={{ fontFamily: T.fontHead, fontWeight: 800, fontSize: 22, color: '#0020F6', letterSpacing: -0.5, lineHeight: 1 }}>
+          Makej
         </div>
-        <div style={{ fontFamily: T.fontUI, fontSize: 9, color: T.mutedSoft, letterSpacing: 1.5, textTransform: 'uppercase', marginTop: 3, fontWeight: 700 }}>
+        <div style={{ fontFamily: T.fontUI, fontSize: 9, color: '#6B7280', letterSpacing: 1.5, textTransform: 'uppercase', marginTop: 3, fontWeight: 700 }}>
           pro firmy
         </div>
       </div>
@@ -59,72 +59,72 @@ function ELogo() {
 // ─────────────────────────────────────────────────────────────
 // SIDEBAR
 // ─────────────────────────────────────────────────────────────
-function ESidebar({ tab, onTab, mobile = false, open = false, onClose }) {
-  // Na mobilu navigace zavře drawer
-  const go = (k) => { onTab(k); if (mobile && onClose) onClose(); };
-  // Dynamické počty z reálných dat (0 → bez badge)
-  const jobCount  = (typeof E_JOBS !== 'undefined') ? E_JOBS.length : 0;
-  const candCount = (typeof E_CANDIDATES !== 'undefined' && E_CANDIDATES.new) ? E_CANDIDATES.new.length : 0;
-  const chatCount = (typeof E_THREADS !== 'undefined') ? E_THREADS.length : 0;
+function ESidebar({ tab, onTab, onSignOut, mobile = false, open = false, onClose }) {
+  // Reálné počty z živých globálů (0 → badge se skryje)
+  const jobsBadge = (typeof E_JOBS !== 'undefined' ? E_JOBS.filter(j => j.status === 'active' || j.status === 'urgent').length : 0) || null;
+  const candBadge = (typeof E_CANDIDATES !== 'undefined' ? (E_CANDIDATES.new || []).length : 0) || null;
+  const chatBadge = (typeof E_THREADS !== 'undefined' ? E_THREADS.reduce((s, t) => s + (t.unread || 0), 0) : 0) || null;
+  const reviewsBadge = (typeof E_REVIEWS !== 'undefined' ? E_REVIEWS.length : 0) || null;
+
   const sections = [
     {
       label: 'Přehled',
       items: [
         { k: 'dash',      label: 'Dashboard', icon: 'chart-square-bold',  iconLine: 'chart-square-linear' },
-        { k: 'analytics', label: 'Analytika', icon: 'graph-up-bold',      iconLine: 'graph-up-linear',    badge: (typeof can === 'function' && can('analytics')) ? null : 'PRO' },
+        { k: 'analytics', label: 'Analytika', icon: 'graph-up-bold',      iconLine: 'graph-up-linear',    badge: 'PRO' },
       ],
     },
     {
       label: 'Nábor',
       items: [
-        { k: 'jobs', label: 'Inzeráty', icon: 'document-text-bold', iconLine: 'document-text-linear', badge: jobCount || null },
-        { k: 'candidates', label: 'Kandidáti', icon: 'users-group-rounded-bold', iconLine: 'users-group-rounded-linear', badge: candCount || null },
-        { k: 'chat', label: 'Zprávy', icon: 'chat-round-line-bold', iconLine: 'chat-round-line-linear', badge: chatCount || null },
+        { k: 'jobs', label: 'Inzeráty', icon: 'document-text-bold', iconLine: 'document-text-linear', badge: jobsBadge },
+        { k: 'candidates', label: 'Kandidáti', icon: 'users-group-rounded-bold', iconLine: 'users-group-rounded-linear', badge: candBadge },
+        { k: 'chat', label: 'Zprávy', icon: 'chat-round-line-bold', iconLine: 'chat-round-line-linear', badge: chatBadge },
         { k: 'calendar', label: 'Plán směn', icon: 'calendar-bold', iconLine: 'calendar-linear' },
       ],
     },
     {
       label: 'Firma',
       items: [
-        { k: 'team', label: 'Tým', icon: 'users-group-two-rounded-bold', iconLine: 'users-group-two-rounded-linear' },
+        { k: 'reviews', label: 'Recenze', badge: reviewsBadge },
         { k: 'settings', label: 'Nastavení', icon: 'settings-bold', iconLine: 'settings-linear' },
       ],
     },
   ];
 
-  const asideBase = {
-    width: 256, flexShrink: 0,
-    display: 'flex', flexDirection: 'column',
-    padding: '20px 14px',
-    borderRight: '1px solid ' + T.border,
-    background: '#ffffff',
-    overflowY: 'auto',
-    position: 'relative', zIndex: 1,
-  };
-  const asideMobile = {
-    ...asideBase,
-    position: 'fixed', top: 0, left: 0, bottom: 0, width: 272, maxWidth: '84vw',
-    zIndex: 260, boxShadow: '0 0 60px rgba(15,18,40,0.28)',
-    transform: open ? 'translateX(0)' : 'translateX(-100%)',
-    transition: 'transform .28s cubic-bezier(.4,0,.2,1)',
-  };
-
   return (
-    <>
-      {mobile && (
-        <div onClick={onClose} style={{
-          position: 'fixed', inset: 0, zIndex: 250,
-          background: 'rgba(15,18,40,0.5)', backdropFilter: 'blur(2px)',
-          opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none',
-          transition: 'opacity .28s ease',
-        }} />
-      )}
-    <aside style={mobile ? asideMobile : asideBase}>
+    <aside style={{
+      width: 256, flexShrink: 0,
+      display: 'flex', flexDirection: 'column',
+      padding: '20px 14px',
+      borderRight: '1px solid #E5E7EB',
+      background: '#ffffff',
+      overflowY: 'auto',
+      // Desktop = pevný sloupec. Mobil = drawer vysunutý přes obsah.
+      ...(mobile ? {
+        position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 60,
+        transform: open ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform .28s cubic-bezier(.2,.8,.2,1)',
+        boxShadow: open ? '0 0 60px rgba(10,13,46,.35)' : 'none',
+      } : { position: 'relative', zIndex: 1 }),
+    }}>
       <div style={{ padding: '4px 8px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <ELogo />
-        {mobile && (
-          <button onClick={onClose} aria-label="Zavřít menu" style={{ background: 'none', border: 'none', color: T.muted, cursor: 'pointer', fontSize: 20, lineHeight: 1, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-        )}
+        <button
+          title="Přepnout světlý/tmavý režim"
+          onClick={() => window.toggleMakejTheme && window.toggleMakejTheme()}
+          style={{
+            width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+            background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)',
+            cursor: 'pointer',
+            display: 'grid', placeItems: 'center',
+            transition: 'background .15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.08)'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.04)'; }}
+        >
+          <Icon name={window._makejIsDark ? 'sun-bold' : 'moon-stars-bold'} size={16} color="#6B7280" />
+        </button>
       </div>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: 18, flex: 1 }}>
@@ -132,19 +132,19 @@ function ESidebar({ tab, onTab, mobile = false, open = false, onClose }) {
           <div key={i}>
             <div style={{
               padding: '0 12px 6px',
-              fontSize: 10, color: T.mutedSoft, fontFamily: T.fontUI,
+              fontSize: 10, color: '#9CA3AF', fontFamily: T.fontUI,
               fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase',
             }}>{sec.label}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {sec.items.map(it => {
                 const active = tab === it.k;
                 return (
-                  <button key={it.k} onClick={() => !it.disabled && go(it.k)} style={{
+                  <button key={it.k} onClick={() => { if (it.disabled) return; onTab(it.k); if (mobile && onClose) onClose(); }} style={{
                     display: 'flex', alignItems: 'center', gap: 11,
                     padding: '9px 12px', borderRadius: 10,
                     background: active ? 'rgba(0,32,246,0.08)' : 'transparent',
                     border: 'none',
-                    color: active ? T.primary : it.disabled ? '#D1D5DB' : '#374151',
+                    color: active ? '#0020F6' : it.disabled ? '#D1D5DB' : '#374151',
                     cursor: it.disabled ? 'not-allowed' : 'pointer', textAlign: 'left',
                     fontFamily: T.fontUI, fontWeight: active ? 700 : 500, fontSize: 13.5,
                     transition: 'all .15s',
@@ -152,24 +152,23 @@ function ESidebar({ tab, onTab, mobile = false, open = false, onClose }) {
                   }}
                   onMouseEnter={e => { if (!active && !it.disabled) e.currentTarget.style.background = '#F3F4F6'; }}
                   onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}>
-                    {(() => { const iconMap = { dash: 'dashboard-icon.png', analytics: 'analytics-icon.png', jobs: 'jobs-icon.png', candidates: 'candidates-icon.png', chat: 'messages-icon.png', calendar: 'calendar-icon.png', settings: 'settings-icon.png' };
-                      return iconMap[it.k]
-                        ? <img src={iconMap[it.k]} style={{ width: 18, height: 18, flexShrink: 0, objectFit: 'contain', filter: active ? 'brightness(0) saturate(100%) invert(13%) sepia(100%) saturate(4000%) hue-rotate(228deg) brightness(103%)' : 'opacity(0.4)' }} />
-                        : <Icon name={active ? it.icon : it.iconLine} size={18} color={active ? T.primary : '#6B7280'} />;
-                    })()}
+                    {['dash', 'analytics', 'jobs', 'candidates', 'chat', 'calendar', 'reviews', 'settings'].includes(it.k)
+                      ? (() => { const iconMap = { dash: 'dashboard-icon.png', analytics: 'analytics-icon.png', jobs: 'jobs-icon.png', candidates: 'candidates-icon.png', chat: 'messages-icon.png', calendar: 'calendar-icon.png', reviews: 'reviews-icon.png?v=2', settings: 'settings-icon.png' }; return <img src={iconMap[it.k]} style={{ width: 18, height: 18, flexShrink: 0, objectFit: 'contain', filter: active ? 'brightness(0) saturate(100%) invert(13%) sepia(100%) saturate(4000%) hue-rotate(228deg) brightness(103%)' : 'opacity(0.4)' }} />; })()
+                      : <Icon name={active ? it.icon : it.iconLine} size={18} color={active ? '#0020F6' : it.disabled ? '#D1D5DB' : '#6B7280'} />
+                    }
                     <span style={{ flex: 1 }}>{it.label}</span>
-                    {it.disabled && <span style={{ fontSize: 9, fontWeight: 700, fontFamily: T.fontUI, color: 'rgba(153,153,204,0.5)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Brzy</span>}
+                    {it.disabled && <span style={{ fontSize: 9, fontWeight: 700, fontFamily: T.fontUI, color: '#D1D5DB', letterSpacing: 0.5, textTransform: 'uppercase' }}>Brzy</span>}
                     {it.badge != null ? (
                       typeof it.badge === 'string' ? (
                         <span style={{
                           padding: '2px 6px', borderRadius: 4,
-                          background: 'rgba(0,32,246,0.12)', color: T.primary,
+                          background: 'rgba(251,191,36,0.2)', color: '#92400E',
                           fontSize: 9, fontWeight: 800, fontFamily: T.fontUI, letterSpacing: 0.5,
                         }}>{it.badge}</span>
                       ) : (
                         <span style={{
                           minWidth: 18, height: 18, padding: '0 5px', borderRadius: 999,
-                          background: T.primary, color: '#fff',
+                          background: '#0020F6', color: '#fff',
                           fontSize: 10, fontWeight: 800, fontFamily: T.fontUI,
                           display: 'grid', placeItems: 'center',
                         }}>{it.badge}</span>
@@ -184,63 +183,23 @@ function ESidebar({ tab, onTab, mobile = false, open = false, onClose }) {
       </nav>
 
       {/* Plan card */}
-      <div style={{
-        margin: '12px 0',
-        padding: 16, borderRadius: 14,
-        background: 'rgba(0,32,246,0.05)',
-        border: '1px solid rgba(0,32,246,0.15)',
-        position: 'relative', overflow: 'hidden',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <Icon name="crown-star-bold" size={16} color={T.primary} />
-          <span style={{ color: T.primary, fontSize: 10, fontWeight: 800, fontFamily: T.fontUI, letterSpacing: 1, textTransform: 'uppercase' }}>Premium tarif</span>
-          <span style={{ flex: 1 }} />
-          <TierBadge plan={(typeof planId === 'function' && typeof PLAN_LIMITS !== 'undefined' && PLAN_LIMITS[planId()]) ? PLAN_LIMITS[planId()].label : (ECOMPANY && ECOMPANY.plan) || 'Starter'} />
+      <div style={{ margin: '12px 0', padding: '0 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+          <span style={{ color: '#6B7280', fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 600 }}>Tarif:</span>
+          <TierBadge plan={ECOMPANY.plan} />
         </div>
-        {(() => {
-          const expStr = EPROFILE.premium_until || EPROFILE.plan_expires_at || null;
-          const now = new Date();
-          if (!expStr) {
-            const pid = typeof planId === 'function' ? planId() : 'starter';
-            const label = (typeof PLAN_LIMITS !== 'undefined' && PLAN_LIMITS[pid]) ? PLAN_LIMITS[pid].label : 'Starter';
-            return (
-              <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 12, marginBottom: 12 }}>
-                {pid === 'starter' ? 'Bezplatný tarif' : 'Tarif ' + label + ' · aktivní'}
-              </div>
-            );
-          }
-          const exp = new Date(expStr);
-          const daysLeft = Math.ceil((exp - now) / 86400000);
-          const isActive = daysLeft > 0;
-          const pct = isActive ? Math.min(100, Math.round((daysLeft / 365) * 100)) : 0;
-          const expLabel = exp.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' });
-          return (
-            <>
-              <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
-                {isActive ? `Aktivní · do ${expLabel}` : `Vypršel · ${expLabel}`}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                <div style={{ flex: 1, height: 4, borderRadius: 999, background: 'rgba(0,32,246,0.12)', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: pct + '%', borderRadius: 999, background: 'linear-gradient(90deg, #5B6BFF, #0020F6)' }} />
-                </div>
-                <span style={{ color: T.muted, fontFamily: T.fontMono, fontSize: 10, fontWeight: 600 }}>{isActive ? daysLeft + 'd' : '0d'}</span>
-              </div>
-            </>
-          );
-        })()}
-        <button onClick={() => onTab && onTab('pricing')} style={{
-          width: '100%', padding: '8px 10px', borderRadius: 8,
-          background: T.primary, border: 'none',
+        <button style={{
+          width: '100%', padding: '9px 10px', borderRadius: 9,
+          background: '#0020F6', border: 'none',
           color: '#fff', cursor: 'pointer',
-          fontFamily: T.fontUI, fontSize: 11.5, fontWeight: 700,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-        }}>Spravovat tarif</button>
+          fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 700,
+        }} onClick={() => { onTab('pricing'); if (mobile && onClose) onClose(); }}>Spravovat tarif</button>
       </div>
 
       {/* Company footer */}
       <div style={{
         padding: '10px 8px', display: 'flex', alignItems: 'center', gap: 10,
-        borderTop: '1px solid ' + T.border, marginTop: 6,
+        borderTop: '1px solid #E5E7EB', marginTop: 6,
       }}>
         <div style={{
           width: 36, height: 36, borderRadius: 10,
@@ -250,113 +209,180 @@ function ESidebar({ tab, onTab, mobile = false, open = false, onClose }) {
           color: ECOMPANY.logoColor, fontFamily: T.fontHead, fontWeight: 800, fontSize: 13,
         }}>{ECOMPANY.logo}</div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ color: T.ink, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ECOMPANY.name}</div>
-          <div style={{ color: T.muted, fontSize: 10.5, fontFamily: T.fontUI }}>{ECOMPANY.city}</div>
+          <div style={{ color: '#111827', fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ECOMPANY.name}</div>
+          <div style={{ color: '#6B7280', fontSize: 10.5, fontFamily: T.fontUI }}>{ECOMPANY.city}</div>
         </div>
+        <button onClick={onSignOut} title="Odhlásit se" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+          <Icon name="logout-2-bold" size={16} color="#f87171" />
+        </button>
       </div>
     </aside>
-    </>
   );
 }
 
 // ─────────────────────────────────────────────────────────────
 // TOPBAR
 // ─────────────────────────────────────────────────────────────
-function ETopbar({ title, subtitle, onNew, onSignOut, period = '30d', onPeriod, showPeriod = false, mobile = false, onMenu }) {
-  const [bellOpen, setBellOpen] = useStateE(false);
-  const periodLabel = { '7d': 'za 7 dní', '30d': 'za 30 dní', '90d': 'za 90 dní', 'rok': 'za rok' }[period];
-  const acts = (typeof E_ACTIVITY !== 'undefined') ? E_ACTIVITY : [];
+// Ikona podle typu oznámení + relativní čas (jako v appce)
+const _E_NOTIF_ICON = {
+  message: 'chat-round-line-bold', match: 'users-group-rounded-bold',
+  shift: 'calendar-bold', review: 'star-bold', success: 'check-circle-bold', info: 'bell-bold',
+};
+function _eAgo(ts) {
+  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return 'teď';
+  const m = Math.floor(s / 60); if (m < 60) return 'před ' + m + ' min';
+  const h = Math.floor(m / 60); if (h < 24) return 'před ' + h + ' h';
+  const d = Math.floor(h / 24); return 'před ' + d + (d === 1 ? ' dnem' : ' dny');
+}
+
+// Zvoneček s panelem oznámení — čte tabulku notifications, realtime, označí přečteno.
+function ENotifBell() {
+  const [notifs, setNotifs] = useStateE([]);
+  const [open, setOpen]     = useStateE(false);
+  const [ring, setRing]     = useStateE(false);
+  const [confirmClear, setConfirmClear] = useStateE(false);
+  const uid = useRefE(null);
+  const wrapRef = useRefE(null);
+
+  useEffectE(() => {
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (!session?.user) return;
+      uid.current = session.user.id;
+      fetchNotifsE(uid.current).then(setNotifs);   // persistovaná (pokud je trigger plní)
+    });
+    // Živá oznámení jedou z příchozích zpráv (realtime messages k firmě funguje).
+    const onNewMsg = (e) => {
+      const d = e.detail || {};
+      setNotifs(prev => (prev.some(x => x.id === 'm-' + d.id) ? prev
+        : [{ id: 'm-' + d.id, ts: d.ts || Date.now(), read: !!d.read, type: 'message', title: d.title || 'Nová zpráva', text: d.text || '', matchId: d.matchId || null }, ...prev].slice(0, 40)));
+      if (!d.read) { setRing(true); setTimeout(() => setRing(false), 750); }
+    };
+    const onThreadRead = (e) => {
+      const mid = e.detail && e.detail.matchId;
+      if (mid) setNotifs(prev => prev.map(n => n.matchId === mid ? { ...n, read: true } : n));
+    };
+    window.addEventListener('emp-new-message', onNewMsg);
+    window.addEventListener('emp-thread-read', onThreadRead);
+    return () => { window.removeEventListener('emp-new-message', onNewMsg); window.removeEventListener('emp-thread-read', onThreadRead); };
+  }, []);
+
+  // Klik kamkoli mimo panel ho zavře (fixní překryv nefunguje kvůli backdrop-filter v topbaru)
+  useEffectE(() => {
+    if (!open) return;
+    const onDoc = e => { if (wrapRef.current && !wrapRef.current.contains(e.target)) { setOpen(false); setConfirmClear(false); } };
+    document.addEventListener('click', onDoc, true);
+    return () => document.removeEventListener('click', onDoc, true);
+  }, [open]);
+
+  const unread = notifs.filter(n => !n.read).length;
+
+  function toggle() {
+    const wasOpen = open;
+    setOpen(o => !o);
+    if (wasOpen) setConfirmClear(false);
+    if (!wasOpen && unread > 0) {
+      setNotifs(prev => prev.map(n => ({ ...n, read: true })));
+      if (uid.current) markNotifsReadE(uid.current);
+    }
+  }
+  function clearAll() {
+    setNotifs([]);
+    if (uid.current) clearNotifsE(uid.current);
+  }
+
   return (
-    <header style={{
-      display: 'flex', alignItems: 'center', gap: mobile ? 10 : 16,
-      padding: mobile ? '11px 14px' : '14px 28px',
-      borderBottom: '1px solid ' + T.border,
-      background: 'rgba(255,255,255,0.9)',
-      backdropFilter: 'blur(16px)',
-      flexShrink: 0,
-    }}>
-      {mobile && (
-        <button onClick={onMenu} aria-label="Menu" style={{
-          width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-          background: '#fff', border: '1px solid ' + T.border,
-          display: 'grid', placeItems: 'center', cursor: 'pointer',
-        }}>
-          <Icon name="hamburger-menu-bold" size={20} color={T.ink} />
-        </button>
-      )}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <h1 style={{ margin: 0, fontFamily: T.fontHead, fontSize: mobile ? 16 : 20, fontWeight: 800, color: T.ink, letterSpacing: -0.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</h1>
-          {!mobile && <span style={{ width: 4, height: 4, borderRadius: 999, background: T.mutedSoft }} />}
-          {!mobile && <span style={{ fontFamily: T.fontUI, fontSize: 13, color: T.muted, fontWeight: 500 }}>{(subtitle || '').replace(/za \d+ dní|za rok/, periodLabel)}</span>}
-        </div>
-      </div>
+    <div ref={wrapRef} style={{ position: 'relative' }}>
+      <button onClick={toggle} title="Upozornění" style={{
+        width: 38, height: 38, borderRadius: 10,
+        background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
+        color: T.muted, cursor: 'pointer', display: 'grid', placeItems: 'center', position: 'relative',
+      }}>
+        <span style={{ display: 'grid', placeItems: 'center', animation: ring ? 'wBellRing .75s cubic-bezier(.36,.07,.19,.97)' : 'none', transformOrigin: 'top center' }}>
+          <Icon name="bell-bold" size={18} color={T.light} />
+        </span>
+        {unread > 0 && (
+          <span style={{ position: 'absolute', top: -4, right: -4, minWidth: 17, height: 17, padding: '0 4px', borderRadius: 999, background: T.destructive, color: '#fff', fontSize: 10, fontWeight: 800, fontFamily: T.fontUI, display: 'grid', placeItems: 'center', border: '2px solid #07071a' }}>{unread}</span>
+        )}
+      </button>
 
-      {/* Period selector — jen na dashboardu, na mobilu skryto */}
-      {showPeriod && !mobile && (
+      {open && (
         <div style={{
-          display: 'flex', gap: 2, padding: 3, borderRadius: 10,
-          background: T.surfaceAlt, border: '1px solid ' + T.border,
+          position: 'absolute', top: 48, right: 0, zIndex: 201,
+          width: 'min(360px, calc(100vw - 32px))', maxHeight: '70vh', overflowY: 'auto',
+          background: T.card, border: '1px solid ' + T.border, borderRadius: 16,
+          boxShadow: '0 24px 50px rgba(4,4,20,0.4)',
         }}>
-          {['7d', '30d', '90d', 'rok'].map((p) => {
-            const on = period === p;
-            return (
-              <button key={p} onClick={() => onPeriod && onPeriod(p)} style={{
-                padding: '6px 12px', borderRadius: 7,
-                background: on ? '#fff' : 'transparent',
-                border: 'none',
-                color: on ? T.primary : T.muted,
-                fontFamily: T.fontMono, fontSize: 12, fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: on ? '0 1px 3px rgba(20,22,40,0.1)' : 'none',
-              }}>{p}</button>
-            );
-          })}
-        </div>
-      )}
-
-      <div style={{ position: 'relative' }}>
-        <button onClick={() => setBellOpen(o => !o)} style={{
-          width: 38, height: 38, borderRadius: 10,
-          background: bellOpen ? 'rgba(0,32,246,0.08)' : '#fff', border: '1px solid ' + T.border,
-          color: T.muted, cursor: 'pointer',
-          display: 'grid', placeItems: 'center', position: 'relative',
-        }}>
-          <Icon name="bell-bold" size={18} color={T.ink} />
-          {acts.length > 0 && <span style={{
-            position: 'absolute', top: 8, right: 8,
-            width: 7, height: 7, borderRadius: 999, background: T.destructive,
-            border: '2px solid #fff',
-          }} />}
-        </button>
-        {bellOpen && (
-          <>
-            <div onClick={() => setBellOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
-            <div style={{
-              position: 'absolute', top: 46, right: 0, width: 320, zIndex: 41,
-              background: '#fff', border: '1px solid ' + T.border, borderRadius: 14,
-              boxShadow: '0 20px 50px rgba(20,22,40,0.18)', overflow: 'hidden',
-            }}>
-              <div style={{ padding: '12px 14px', borderBottom: '1px solid ' + T.border, fontFamily: T.fontUI, fontWeight: 700, fontSize: 13, color: T.ink }}>Notifikace</div>
-              <div style={{ maxHeight: 320, overflowY: 'auto' }}>
-                {acts.length === 0 ? (
-                  <div style={{ padding: '22px 14px', textAlign: 'center', color: T.muted, fontFamily: T.fontUI, fontSize: 12.5 }}>Žádné nové notifikace</div>
-                ) : acts.map((a, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 10, padding: '11px 14px', borderBottom: i < acts.length - 1 ? '1px solid ' + T.border : 'none' }}>
-                    <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: (a.color || T.primary) + '22', display: 'grid', placeItems: 'center' }}>
-                      <Icon name={a.icon || 'bell-bold'} size={15} color={a.color || T.primary} />
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontFamily: T.fontUI, fontSize: 12.5, color: T.ink }}><strong>{a.who}</strong> {a.what}</div>
-                      <div style={{ fontFamily: T.fontUI, fontSize: 11, color: T.muted, marginTop: 1 }}>{a.when}</div>
-                    </div>
-                  </div>
-                ))}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid ' + T.border, position: 'sticky', top: 0, background: T.card, zIndex: 1 }}>
+            <span style={{ color: T.cardText, fontFamily: T.fontHead, fontSize: 15, fontWeight: 800 }}>Upozornění</span>
+            {notifs.length > 0 && !confirmClear && <button onClick={() => setConfirmClear(true)} style={{ background: 'rgba(244,63,94,0.12)', border: '1px solid rgba(244,63,94,0.4)', color: T.destructive, borderRadius: 999, padding: '5px 12px', fontFamily: T.fontUI, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>Vymazat</button>}
+          </div>
+          {confirmClear && (
+            <div style={{ padding: '13px 16px', borderBottom: '1px solid ' + T.border, background: 'rgba(244,63,94,0.06)' }}>
+              <div style={{ color: T.cardText, fontFamily: T.fontUI, fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Opravdu smazat všechna oznámení?</div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => setConfirmClear(false)} style={{ flex: 1, padding: '8px 0', borderRadius: 10, background: 'transparent', border: '1px solid ' + T.border, color: T.cardMuted, fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 800, cursor: 'pointer' }}>Zrušit</button>
+                <button onClick={() => { clearAll(); setConfirmClear(false); }} style={{ flex: 1, padding: '8px 0', borderRadius: 10, background: T.destructive, border: 'none', color: '#fff', fontFamily: T.fontUI, fontSize: 12.5, fontWeight: 800, cursor: 'pointer' }}>Smazat</button>
               </div>
             </div>
-          </>
-        )}
+          )}
+          {notifs.length === 0 ? (
+            <div style={{ padding: '34px 20px', textAlign: 'center', color: T.cardMuted, fontFamily: T.fontUI, fontSize: 13 }}>Zatím žádná upozornění.</div>
+          ) : notifs.map(n => (
+            <div key={n.id} style={{ display: 'flex', gap: 11, alignItems: 'flex-start', padding: '12px 16px', borderBottom: '1px solid ' + T.border, background: n.read ? 'transparent' : 'rgba(0,32,246,0.06)' }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(0,32,246,0.10)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                <Icon name={_E_NOTIF_ICON[n.type] || 'bell-bold'} size={17} color={T.primary} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {n.title ? <div style={{ color: T.cardText, fontFamily: T.fontHead, fontSize: 13.5, fontWeight: n.read ? 700 : 800 }}>{n.title}</div> : null}
+                <div style={{ color: T.cardMuted, fontFamily: T.fontUI, fontSize: 12.5, marginTop: 1, lineHeight: 1.4, fontWeight: n.read ? 400 : 600 }}>{n.text}</div>
+                <div style={{ color: T.cardMutedSoft, fontFamily: T.fontUI, fontSize: 11, marginTop: 3 }}>{_eAgo(n.ts)}</div>
+              </div>
+              {!n.read ? <span style={{ width: 8, height: 8, borderRadius: 999, background: T.primary, flexShrink: 0, marginTop: 6 }} /> : null}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ETopbar({ title, subtitle, onNew, onSignOut, period = '30d', onPeriod }) {
+  return (
+    <header style={{
+      display: 'flex', alignItems: 'center', gap: 16,
+      padding: '14px 28px',
+      borderBottom: '1px solid ' + T.border,
+      background: T.navBg,
+      backdropFilter: 'blur(16px)',
+      boxShadow: '0 1px 0 ' + T.border,
+      flexShrink: 0,
+    }}>
+      <div style={{ flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <h1 style={{ margin: 0, fontFamily: T.fontHead, fontSize: 20, fontWeight: 800, color: T.text, letterSpacing: -0.4 }}>{title}</h1>
+          {subtitle ? <><span style={{ width: 4, height: 4, borderRadius: 999, background: T.mutedSoft }} /><span style={{ fontFamily: T.fontUI, fontSize: 13, color: T.muted, fontWeight: 500 }}>{subtitle}</span></> : null}
+        </div>
       </div>
+
+      {/* Period selector */}
+      <div style={{
+        display: 'flex', gap: 2, padding: 3, borderRadius: 10,
+        background: 'rgba(255,255,255,0.04)', border: '1px solid ' + T.border,
+      }}>
+        {['7d', '30d', '90d', 'rok'].map((p) => (
+          <button key={p} onClick={() => onPeriod && onPeriod(p)} style={{
+            padding: '6px 12px', borderRadius: 7,
+            background: p === period ? 'rgba(255,255,255,0.18)' : 'transparent',
+            border: 'none',
+            color: p === period ? T.text : T.muted,
+            fontFamily: T.fontMono, fontSize: 12, fontWeight: 700,
+            cursor: 'pointer',
+          }}>{p}</button>
+        ))}
+      </div>
+
+      <ENotifBell />
 
       <button
         onClick={onSignOut}
@@ -373,17 +399,16 @@ function ETopbar({ title, subtitle, onNew, onSignOut, period = '30d', onPeriod, 
         <Icon name="logout-2-bold" size={18} color="#f87171" />
       </button>
 
-      <button onClick={onNew} title="Nový inzerát" style={{
-        padding: mobile ? 0 : '10px 16px', borderRadius: 10,
-        width: mobile ? 38 : 'auto', height: mobile ? 38 : 'auto', flexShrink: 0,
-        background: 'linear-gradient(135deg, #0020F6, #2D2CA7)',
-        border: 'none', color: '#fff', cursor: 'pointer',
+      <button onClick={onNew} style={{
+        padding: '10px 16px', borderRadius: 10,
+        background: 'rgba(255,255,255,0.95)',
+        border: 'none', color: '#0020F6', cursor: 'pointer',
         fontFamily: T.fontUI, fontSize: 13, fontWeight: 700,
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-        boxShadow: '0 6px 16px rgba(0,32,246,0.4)',
+        display: 'inline-flex', alignItems: 'center', gap: 7,
+        boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
       }}>
-        <Icon name="add-circle-bold" size={16} color="#fff" />
-        {!mobile && 'Nový inzerát'}
+        <Icon name="add-circle-bold" size={16} color="#0020F6" />
+        Nový inzerát
       </button>
     </header>
   );
@@ -445,8 +470,8 @@ function AreaChart({ series, width = 600, height = 220, labels = [] }) {
         const y = padT + H - ((v - min) / range) * H;
         return (
           <g key={i}>
-            <line x1={padL} y1={y} x2={width - padR} y2={y} stroke="rgba(15,18,40,0.06)" strokeWidth="1" />
-            <text x={padL - 8} y={y + 3} textAnchor="end" fill={T.mutedSoft} fontFamily={T.fontMono} fontSize="9.5">
+            <line x1={padL} y1={y} x2={width - padR} y2={y} stroke="rgba(0,32,246,0.06)" strokeWidth="1" />
+            <text x={padL - 8} y={y + 3} textAnchor="end" fill="#111111" fontFamily={T.fontMono} fontSize="9.5" fontWeight="700">
               {Math.round(v).toLocaleString('cs-CZ')}
             </text>
           </g>
@@ -456,7 +481,7 @@ function AreaChart({ series, width = 600, height = 220, labels = [] }) {
       {labels.map((l, i) => {
         if (i % Math.ceil(labels.length / 6) !== 0) return null;
         const x = padL + i * stepX;
-        return <text key={i} x={x} y={height - 6} textAnchor="middle" fill={T.mutedSoft} fontFamily={T.fontMono} fontSize="9.5">{l}</text>;
+        return <text key={i} x={x} y={height - 6} textAnchor="middle" fill="#111111" fontFamily={T.fontMono} fontSize="9.5" fontWeight="700">{l}</text>;
       })}
       {/* series */}
       {series.map((s, idx) => {
@@ -492,7 +517,7 @@ function BarChart({ data, width = 360, height = 180, color = T.primary }) {
     <svg width={width} height={height} style={{ display: 'block' }}>
       {[0, 0.5, 1].map((t, i) => {
         const y = padT + H - t * H;
-        return <line key={i} x1={padL} y1={y} x2={width - padR} y2={y} stroke="rgba(15,18,40,0.06)" />;
+        return <line key={i} x1={padL} y1={y} x2={width - padR} y2={y} stroke="rgba(0,32,246,0.06)" />;
       })}
       {data.map((d, i) => {
         const h = (d.v / max) * H;
@@ -501,8 +526,8 @@ function BarChart({ data, width = 360, height = 180, color = T.primary }) {
         return (
           <g key={i}>
             <rect x={x} y={y} width={bw} height={h} rx="3" fill={d.color || color} opacity="0.85" />
-            <text x={x + bw / 2} y={y - 4} textAnchor="middle" fill={T.light} fontFamily={T.fontMono} fontSize="9.5" fontWeight="700">{d.v}</text>
-            <text x={x + bw / 2} y={height - 6} textAnchor="middle" fill={T.mutedSoft} fontFamily={T.fontUI} fontSize="9.5">{d.l}</text>
+            <text x={x + bw / 2} y={y - 4} textAnchor="middle" fill="#111111" fontFamily={T.fontMono} fontSize="9.5" fontWeight="700">{d.v}</text>
+            <text x={x + bw / 2} y={height - 6} textAnchor="middle" fill="#111111" fontFamily={T.fontUI} fontSize="9.5" fontWeight="600">{d.l}</text>
           </g>
         );
       })}
@@ -518,7 +543,7 @@ function Donut({ data, size = 140, thickness = 18 }) {
   let acc = 0;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(15,18,40,0.06)" strokeWidth={thickness} />
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(0,32,246,0.08)" strokeWidth={thickness} />
       {data.map((d, i) => {
         const dash = (d.v / total) * c;
         const off = -acc;
@@ -542,14 +567,15 @@ function Donut({ data, size = 140, thickness = 18 }) {
 // ─────────────────────────────────────────────────────────────
 // COMMON — Card + KPI + Section
 // ─────────────────────────────────────────────────────────────
-function ECard({ children, style, padding = 22 }) {
+function ECard({ children, style, padding = 22, onClick }) {
   return (
-    <div style={{
+    <div onClick={onClick} style={{
       borderRadius: 18,
-      background: '#ffffff',
-      border: '1px solid ' + T.border,
+      background: T.card,
+      border: '1px solid ' + T.cardBorder,
       padding,
-      boxShadow: '0 4px 14px rgba(20,22,40,0.05)',
+      backdropFilter: 'blur(8px)',
+      color: T.cardText,
       ...style,
     }}>{children}</div>
   );
@@ -559,8 +585,8 @@ function SectionHeader({ title, subtitle, action }) {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 14 }}>
       <div>
-        <div style={{ fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, color: T.ink, letterSpacing: -0.2 }}>{title}</div>
-        {subtitle ? <div style={{ fontFamily: T.fontUI, fontSize: 12, color: T.muted, marginTop: 2 }}>{subtitle}</div> : null}
+        <div style={{ fontFamily: T.fontHead, fontSize: 16, fontWeight: 800, color: '#111111', letterSpacing: -0.2 }}>{title}</div>
+        {subtitle ? <div style={{ fontFamily: T.fontUI, fontSize: 12, color: '#555555', marginTop: 2 }}>{subtitle}</div> : null}
       </div>
       {action || null}
     </div>

@@ -59,19 +59,16 @@ function KrajeMap() {
   const [selected, setSelected] = useStateE([]);
   const [hovered, setHovered] = useStateE(null);
   const keys = Object.keys(KRAJE_PATHS);
-  // Reálná data z employer-supabase (kandidáti/najatí podle kraje), fallback = ukázka
-  const STATS = (typeof window !== 'undefined' && window.E_KRAJE_STATS) || KRAJE_STATS;
-  const stat = k => STATS[k] || { workers: 0, companies: 0 };
-  const totalWorkers = keys.reduce((s, k) => s + stat(k).workers, 0);
-  const totalCompanies = keys.reduce((s, k) => s + stat(k).companies, 0);
+  const totalWorkers = keys.reduce((s, k) => s + KRAJE_STATS[k].workers, 0);
+  const totalCompanies = keys.reduce((s, k) => s + KRAJE_STATS[k].companies, 0);
 
   const toggleSelect = (k) => setSelected(prev => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k]);
 
   // Při hoveru se ukazuje náhled daného kraje, jinak součet všech vybraných krajů
   const target = hovered
-    ? stat(hovered)
+    ? KRAJE_STATS[hovered]
     : selected.length > 0
-      ? selected.reduce((acc, k) => ({ workers: acc.workers + stat(k).workers, companies: acc.companies + stat(k).companies }), { workers: 0, companies: 0 })
+      ? selected.reduce((acc, k) => ({ workers: acc.workers + KRAJE_STATS[k].workers, companies: acc.companies + KRAJE_STATS[k].companies }), { workers: 0, companies: 0 })
       : { workers: totalWorkers, companies: totalCompanies };
 
   const labelKeys = hovered ? [hovered] : selected;
@@ -110,8 +107,7 @@ function KrajeMap() {
 
       {/* Nadpis — celá sekce je na bílém pozadí, tmavý text */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontFamily: T.fontHead, fontSize: 17, fontWeight: 800, color: '#111111', letterSpacing: -0.2 }}>Regionální přehled</div>
-        <div style={{ fontFamily: T.fontUI, fontSize: 12.5, color: '#666666', marginTop: 3 }}>Klikni na kraj pro počet brigádníků a firem v dané oblasti</div>
+        <div style={{ fontFamily: T.fontHead, fontSize: 17, fontWeight: 800, color: '#111111', letterSpacing: -0.2 }}>Vyber kraj a zjisti všechny informace o trhu práce</div>
       </div>
 
       {/* Mapa — kraje modré; hover/výběr vybarvení sundá, obrys zesvětlí, jemné zvětšení + záře */}
@@ -170,17 +166,17 @@ function KrajeMap() {
         )}
 
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ padding: '14px 22px', borderRadius: 12, background: 'rgba(0,32,246,0.07)', border: '1px solid rgba(0,32,246,0.16)', minWidth: 150, transition: 'background .2s ease' }}>
+          <div style={{ padding: '14px 22px', borderRadius: 12, background: 'rgba(0,32,246,0.07)', border: '1px solid rgba(0,32,246,0.16)', minWidth: 150, textAlign: 'center', transition: 'background .2s ease' }}>
             <div style={{ color: '#0a0a1a', fontFamily: T.fontMono, fontSize: 26, fontWeight: 700, letterSpacing: -0.8 }}>
               {animWorkers.toLocaleString('cs-CZ')}
             </div>
-            <div style={{ color: '#555555', fontFamily: T.fontUI, fontSize: 11, marginTop: 2 }}>Tvých kandidátů</div>
+            <div style={{ color: '#555555', fontFamily: T.fontUI, fontSize: 11, marginTop: 2 }}>Aktivních uživatelů</div>
           </div>
-          <div style={{ padding: '14px 22px', borderRadius: 12, background: 'rgba(0,32,246,0.07)', border: '1px solid rgba(0,32,246,0.16)', minWidth: 150, transition: 'background .2s ease' }}>
+          <div style={{ padding: '14px 22px', borderRadius: 12, background: 'rgba(0,32,246,0.07)', border: '1px solid rgba(0,32,246,0.16)', minWidth: 150, textAlign: 'center', transition: 'background .2s ease' }}>
             <div style={{ color: '#0a0a1a', fontFamily: T.fontMono, fontSize: 26, fontWeight: 700, letterSpacing: -0.8 }}>
               {animCompanies.toLocaleString('cs-CZ')}
             </div>
-            <div style={{ color: '#555555', fontFamily: T.fontUI, fontSize: 11, marginTop: 2 }}>Z toho najato</div>
+            <div style={{ color: '#555555', fontFamily: T.fontUI, fontSize: 11, marginTop: 2 }}>Pracovních příležitostí</div>
           </div>
         </div>
       </div>

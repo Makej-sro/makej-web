@@ -1,0 +1,35 @@
+<!doctype html><html lang="cs"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Náhled — Spravovat tarify</title>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:#0020F6}
+  @keyframes empPop{0%{transform:scale(.92) translateY(12px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+  @keyframes empSpin{to{transform:rotate(360deg)}}
+  /* stejný font override jako v dashboardu */
+  #root, #root * { font-family: "Inter", -apple-system, system-ui, sans-serif !important; }
+  #root{display:flex;flex-direction:column;min-height:calc(100vh - 38px)}
+  .banner{background:rgba(0,0,0,.25);color:#fff;padding:9px 18px;font:600 13px Inter,sans-serif}
+</style>
+</head><body>
+<div class="banner">🔍 Náhled záložky „Spravovat tarify" (ukázka bez přihlášení) — najeď myší na karty, klikni „Zobrazit více", přepni Měsíčně/Ročně.</div>
+<div id="root"></div>
+<script>
+const chan={on(){return chan;},subscribe(){return chan;}};
+const qb={select(){return qb;},eq(){return qb;},order(){return qb;},in(){return qb;},not(){return qb;},limit(){return qb;},single(){return Promise.resolve({data:null,error:null});},insert(){return qb;},update(){return qb;}};
+window.sb={auth:{getSession:()=>Promise.resolve({data:{session:null}}),onAuthStateChange(){return{data:{subscription:{unsubscribe(){}}}};},signOut(){return Promise.resolve();}},channel:()=>chan,removeChannel(){},from:()=>qb};
+const files=['app.jsx','employer-data.jsx','employer-shell.jsx','employer-dashboard.jsx','employer-pages.jsx','employer-pages3.jsx','_premium/analytics.jsx','employer-supabase.jsx'];
+(async()=>{
+  let blob='';
+  for(const f of files){ const c=await(await fetch(f+'?t='+Date.now())).text(); blob+='\n;/*'+f+'*/\n'+c; }
+  (new Function(Babel.transform(blob,{presets:['react']}).code))();
+  window.ECOMPANY.plan='Standard'; // ukázka: aktuální tarif = Standard
+  ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(window.EPricing,{onTab:()=>{},onPlanChange:()=>{}}));
+})();
+</script>
+</body></html>

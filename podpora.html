@@ -38,7 +38,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="stylesheet" href="/style.css?v=44" />
+  <link rel="stylesheet" href="/style.css?v=57" />
   <style>
     /* ── Podpora sekce ── */
     .sup-page { padding: 0; }
@@ -562,6 +562,7 @@
       <div class="nav-links">
         <a href="/hledam-si-praci.html">Hledám si práci</a>
         <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+        <a href="/lide.html">Lidé</a>
         <a href="/#download">Stáhnout</a>
         <a href="/podpora.html" class="nav-active">Podpora</a>
       </div>
@@ -569,14 +570,15 @@
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
         <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       </div>
-      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
-        <iconify-icon icon="solar:hamburger-menu-bold" width="24"></iconify-icon>
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span>
       </button>
     </div>
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobile-menu">
       <a href="/hledam-si-praci.html">Hledám si práci</a>
       <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+      <a href="/lide.html">Lidé</a>
       <a href="/#download">Stáhnout</a>
       <a href="/podpora.html" class="nav-active">Podpora</a>
       <div class="mobile-menu-actions">
@@ -997,7 +999,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=26"></script>
+  <script src="/script.js?v=29"></script>
   <script src="/chat-widget.js"></script>
 
   <!-- ── Podpora: FAQ + typewriter ── -->

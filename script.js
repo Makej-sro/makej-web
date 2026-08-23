@@ -76,7 +76,9 @@ function setupNavDropdowns() {
     wrap.appendChild(menu);
   });
 }
-setupNavDropdowns();
+// Vypnuto: rozbalovací podmenu v navbaru při najetí myší.
+// Funkce i CSS (.nav-dropdown*) zůstávají — stačí odkomentovat řádek níž.
+// setupNavDropdowns();
 
 // Po načtení (vč. obrázků) doskroluj přesně na kotvu z URL — opraví posun z lazy-load
 window.addEventListener('load', function () {
@@ -91,14 +93,33 @@ window.addEventListener('load', function () {
 });
 
 // ═══════════ MOBILE MENU ═══════════
-const menuBtn = document.getElementById('mobile-menu-btn');
+// Tlačítek může být na stránce víc — .vx-nav (Lidé / Hledám práci / Pro zaměstnavatele)
+// má vlastní hamburger, ale sdílí jeden panel #mobile-menu.
+const menuBtns = document.querySelectorAll('.mobile-menu-btn');
 const mobileMenu = document.getElementById('mobile-menu');
-menuBtn.addEventListener('click', () => {
-  mobileMenu.classList.toggle('active');
-});
-mobileMenu.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => mobileMenu.classList.remove('active'));
-});
+if (mobileMenu && menuBtns.length) {
+  const setMenu = (open) => {
+    mobileMenu.classList.toggle('active', open);
+    menuBtns.forEach(b => {
+      b.classList.toggle('open', open);
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.body.style.overflow = open ? 'hidden' : '';
+  };
+  menuBtns.forEach(btn => {
+    btn.addEventListener('click', () => setMenu(!mobileMenu.classList.contains('active')));
+  });
+  mobileMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => setMenu(false));
+  });
+  // klik mimo panel a Esc menu zavřou
+  document.addEventListener('click', (e) => {
+    if (!mobileMenu.classList.contains('active')) return;
+    if (mobileMenu.contains(e.target) || e.target.closest('.mobile-menu-btn')) return;
+    setMenu(false);
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+}
 
 // ═══════════ SMOOTH SCROLL FOR NAV LINKS ═══════════
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -142,7 +163,7 @@ function setupReveal() {
   // s kreslenou spojnicí), aby se transform nepřebil.
   const SEL = [
     '.step-card', '.feature-card', '.testimonial-card', '.download-card',
-    '.section-header', '.cn-plan',
+    '.section-header', '.cn-plan', '.yp-head',
     '.ref-grid', '.bolt-head', '.bolt-text',
     '.ab-lead', '.ab-col', '.ab-team-block', '.ab-person', '.ab-quote', '.ab-cta',
     '.emp-faq-item', '.faq-item',

@@ -24,11 +24,11 @@ const E_KPIS = [
 
 
 const E_JOBS = [
-  { id: 'ej1', title: 'Barista do specialty kavárny', status: 'active', plan: 'Premium · Top', views: 4_280, swipes: 1_120, matches: 142, hired: 18, ctr: 26.1, daysLeft: 5, pay: 180, payUnit: 'Kč/h', accent: '#F4A261' },
-  { id: 'ej2', title: 'Servírka — víkendová směna', status: 'active', plan: 'Standard', views: 2_140, swipes: 380, matches: 41, hired: 6, ctr: 17.8, daysLeft: 12, pay: 165, payUnit: 'Kč/h', accent: '#8AB4FF' },
-  { id: 'ej3', title: 'Pomocník do kuchyně — ASAP', status: 'urgent', plan: 'ASAP · Boost', views: 3_910, swipes: 940, matches: 98, hired: 11, ctr: 24.0, daysLeft: 2, pay: 200, payUnit: 'Kč/h', accent: '#f43f5e' },
-  { id: 'ej4', title: 'Cateringový tým — 14.5.', status: 'filled', plan: 'Standard', views: 1_530, swipes: 290, matches: 27, hired: 8, ctr: 18.9, daysLeft: 0, pay: 220, payUnit: 'Kč/h', accent: '#5BD68A' },
-  { id: 'ej5', title: 'Brand ambassador', status: 'paused', plan: 'Premium', views: 980, swipes: 130, matches: 12, hired: 0, ctr: 13.2, daysLeft: 8, pay: 210, payUnit: 'Kč/h', accent: '#E0B0FF' },
+  { id: 'ej1', title: 'Barista do specialty kavárny', status: 'active', plan: 'Standard', views: 4_280, swipes: 1_120, matches: 142, hired: 18, ctr: 26.1, daysLeft: 5, pay: 180, payUnit: 'Kč/h', accent: '#F4A261', created_at: '2026-06-07T10:00:00Z' },
+  { id: 'ej2', title: 'Servírka — víkendová směna', status: 'active', plan: 'Standard', views: 2_140, swipes: 380, matches: 41, hired: 6, ctr: 17.8, daysLeft: 12, pay: 165, payUnit: 'Kč/h', accent: '#8AB4FF', created_at: '2026-06-14T08:30:00Z' },
+  { id: 'ej3', title: 'Pomocník do kuchyně — ASAP', status: 'urgent', plan: 'Standard', views: 3_910, swipes: 940, matches: 98, hired: 11, ctr: 24.0, daysLeft: 2, pay: 200, payUnit: 'Kč/h', accent: '#f43f5e', created_at: '2026-06-04T15:45:00Z' },
+  { id: 'ej4', title: 'Cateringový tým — 14.5.', status: 'filled', plan: 'Standard', views: 1_530, swipes: 290, matches: 27, hired: 8, ctr: 18.9, daysLeft: 0, pay: 220, payUnit: 'Kč/h', accent: '#5BD68A', created_at: '2026-06-01T12:00:00Z' },
+  { id: 'ej5', title: 'Brand ambassador', status: 'paused', plan: 'Standard', views: 980, swipes: 130, matches: 12, hired: 0, ctr: 13.2, daysLeft: 8, pay: 210, payUnit: 'Kč/h', accent: '#E0B0FF', created_at: '2026-06-10T09:15:00Z' },
 ];
 
 const E_CANDIDATES = {
@@ -51,12 +51,12 @@ const E_CANDIDATES = {
 };
 
 const E_ACTIVITY = [
-  { type: 'match', who: 'Klára Novotná', what: 'matchla na Servírka — víkend', when: 'před 4 min', icon: 'heart-bold', color: '#0020F6' },
-  { type: 'msg', who: 'Tomáš Marek', what: 'poslal zprávu', when: 'před 12 min', icon: 'chat-round-line-bold', color: '#5BD68A' },
-  { type: 'view', who: '78 brigádníků', what: 'vidělo Pomocník do kuchyně — ASAP', when: 'za poslední hodinu', icon: 'eye-bold', color: '#FFD166' },
-  { type: 'hire', who: 'Sára Dvořáková', what: 'přijala směnu Po-Pá', when: 'včera', icon: 'check-circle-bold', color: '#5BD68A' },
-  { type: 'review', who: 'Adam Procházka', what: 'dal recenzi 5★', when: 'včera', icon: 'star-bold', color: '#FFD166' },
-  { type: 'sub', who: 'Tarif Premium', what: 'obnoven na 30 dní', when: 'před 2 dny', icon: 'shield-check-bold', color: '#5B6BFF' },
+  { type: 'match', who: 'Klára Novotná', what: 'matchla na Servírka — víkend', when: 'před 4 min · 14:32', icon: 'heart-bold', color: '#0020F6' },
+  { type: 'msg', who: 'Tomáš Marek', what: 'poslal zprávu', when: 'před 12 min · 14:24', icon: 'chat-round-line-bold', color: '#5BD68A' },
+  { type: 'view', who: '78 brigádníků', what: 'vidělo Pomocník do kuchyně — ASAP', when: 'za poslední hodinu · 13:45', icon: 'eye-bold', color: '#FFD166' },
+  { type: 'hire', who: 'Sára Dvořáková', what: 'přijala směnu Po-Pá', when: 'včera · 09:15', icon: 'check-circle-bold', color: '#5BD68A' },
+  { type: 'review', who: 'Adam Procházka', what: 'dal recenzi 5★', when: 'včera · 18:07', icon: 'star-bold', color: '#FFD166' },
+  { type: 'sub', who: 'Tarif Premium', what: 'obnoven na 30 dní', when: 'před 2 dny · 11:00', icon: 'shield-check-bold', color: '#5B6BFF' },
 ];
 
 // Recenze firmy — přepsány reálnými daty z Supabase při načtení

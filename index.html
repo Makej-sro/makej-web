@@ -38,7 +38,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="stylesheet" href="style.css?v=44" />
+  <link rel="stylesheet" href="style.css?v=57" />
+  <!-- Intro animace hera: bez JS se neaplikuje a stránka vypadá jako dřív -->
+  <script>document.documentElement.classList.add('hero-intro');</script>
   <!-- Structured data -->
   <script type="application/ld+json">
   {
@@ -113,6 +115,7 @@
       <div class="nav-links">
         <a href="/hledam-si-praci.html">Hledám si práci</a>
         <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+        <a href="/lide.html">Lidé</a>
         <a href="#download">Stáhnout</a>
         <a href="/podpora.html">Podpora</a>
       </div>
@@ -120,14 +123,15 @@
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
         <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       </div>
-      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
-        <iconify-icon icon="solar:hamburger-menu-bold" width="24"></iconify-icon>
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span>
       </button>
     </div>
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobile-menu">
       <a href="/hledam-si-praci.html">Hledám si práci</a>
       <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+      <a href="/lide.html">Lidé</a>
       <a href="#download">Stáhnout</a>
       <a href="/podpora.html">Podpora</a>
       <div class="mobile-menu-actions">
@@ -174,6 +178,29 @@
       <iconify-icon icon="solar:alt-arrow-down-bold" width="24"></iconify-icon>
     </div>
   </section>
+
+  <script>
+  /* Kolik se nadpis musí zvětšit, aby vyplnil skoro celou obrazovku, a o kolik posunout,
+     aby byl při zvětšení uprostřed viewportu (normálně sedí výš — pod ním je podnadpis a CTA). */
+  (function () {
+    var root = document.documentElement;
+    if (!root.classList.contains('hero-intro')) return;
+    var h1 = document.querySelector('#hero .hero-text h1');
+    if (!h1) return;
+    function fit() {
+      h1.style.animation = 'none';           // vypnout, ať měříme nezvětšený nadpis
+      var r = h1.getBoundingClientRect();
+      h1.style.animation = '';               // zpět (animace se rozjede znovu od nuly)
+      if (!r.width || !r.height) return;
+      var z = Math.min(window.innerWidth * 0.94 / r.width, window.innerHeight * 0.86 / r.height);
+      root.style.setProperty('--hero-zoom', Math.max(1, Math.min(z, 7)).toFixed(3));
+      root.style.setProperty('--hero-shift', (window.innerHeight / 2 - (r.top + r.height / 2)).toFixed(1) + 'px');
+    }
+    fit();
+    // Písmo se načítá s font-display:swap — po dotažení fontu se šířka nadpisu změní, přeměřit.
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  })();
+  </script>
 
   <!-- ═══════════ REFERENCE ═══════════ -->
   <section id="makaci" class="nav-light">
@@ -236,6 +263,7 @@
           <h4>Produkt</h4>
           <a href="/hledam-si-praci.html">Hledám si práci</a>
           <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+          <a href="/lide.html">Lidé</a>
           <a href="/pro-zamestnavatele.html#pricing">Ceník</a>
           <a href="#download">Stáhnout</a>
         </div>
@@ -577,6 +605,6 @@
   </button>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=26"></script>
+  <script src="script.js?v=29"></script>
 </body>
 </html>
