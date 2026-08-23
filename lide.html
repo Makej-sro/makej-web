@@ -327,7 +327,9 @@
     /* Typografie stejná jako hero na /pro-zamestnavatele a /hledam-si-praci (.eh-head h1) */
     /* .vx-heroimg-wrap má z-index 1, nadpis a tlačítka měly auto (0) → obrázek je překrýval */
     .vx-h1, .vx-sub-btns { position: relative; z-index: 2; }
-    .vx-h1 { font-family: var(--font-heading); font-weight: 800; letter-spacing: -.025em; line-height: 1.02; font-size: clamp(2.7rem, 7vw, 5.4rem); color: #fff; margin: 0; text-shadow: 0 6px 30px rgba(0,10,80,.25); }
+    .vx-h1 { font-family: var(--font-heading); font-weight: 800; letter-spacing: -.025em; line-height: 1.02; font-size: clamp(2.7rem, 7vw, 5.4rem); color: #fff; margin: 0; display: flex; flex-direction: column; align-items: center; text-shadow: 0 6px 30px rgba(0,10,80,.25); }
+    .vx-line { display: block; overflow: hidden; padding-bottom: .3em; margin-bottom: -.3em; }
+    .vx-line-in { display: inline-block; transform: translateY(120%); will-change: transform; }
     .vx-h1 .vx-glitch {
       font-family: inherit; font-weight: inherit; letter-spacing: inherit;
       background: linear-gradient(100deg, #aab2ff 0%, #d8ddff 30%, #ffffff 50%, #d8ddff 70%, #aab2ff 100%);
@@ -429,12 +431,14 @@
     /* Postavičky nejdřív nahoře, po ~0,5 s sjedou dolů a odkryjí nadpis */
     .vx-heroimg-wrap { animation: vxDrop 1.5s cubic-bezier(.5,0,.15,1) both; }
     @keyframes vxDrop { 0%,33% { transform: translateY(-42vh); } 100% { transform: translateY(0); } }
-    /* Nadpis + tlačítka se odkryjí až když postavičky začnou sjíždět */
-    .vx-h1        { animation: vxHeadIn .8s cubic-bezier(.2,.8,.2,1) .6s both; }
-    @keyframes vxHeadIn { from { opacity:0; transform:translateY(-18px); } to { opacity:1; transform:translateY(0); } }
-    .vx-sub-btns  { animation: vxRise .8s cubic-bezier(.2,.8,.2,1) .92s both; }
+    /* Text má z-index 2, takže by během letu překrýval hlavy postaviček. Každý řádek
+       se proto odkryje přesně ve chvíli, kdy ho padající obrázek mine — 1. řádek v 0,85 s
+       (obrázek na 38 % cesty), 2. řádek v 0,97 s (62 %), tlačítka v 1,10 s (86 %). */
+    .vx-line:nth-child(1) .vx-line-in { animation: heroLineUp .9s cubic-bezier(.19,1,.22,1) .85s both; }
+    .vx-line:nth-child(2) .vx-line-in { animation: heroLineUp .9s cubic-bezier(.19,1,.22,1) .97s both; }
+    .vx-sub-btns  { animation: vxRise .6s cubic-bezier(.2,.8,.2,1) 1.10s both; }
     @media (prefers-reduced-motion: reduce) {
-      .vx-frame::after, .vx-h1 .vx-glitch, .vx-nav, .vx-h1, .vx-sub-btns, .vx-heroimg-wrap { animation: none !important; }
+      .vx-frame::after, .vx-h1 .vx-glitch, .vx-nav, .vx-line-in, .vx-sub-btns, .vx-heroimg-wrap { animation: none !important; transform: none !important; }
     }
 
     /* ── DETAIL: marketplace vysvětlení ── */
@@ -609,7 +613,10 @@
 
         <!-- HERO obsah -->
         <div class="vx-hero">
-          <h1 class="vx-h1">Najdi lidi pro<br><span class="vx-glitch">cokoliv</span> potřebuješ</h1>
+          <h1 class="vx-h1">
+            <span class="vx-line"><span class="vx-line-in">Najdi lidi pro</span></span>
+            <span class="vx-line"><span class="vx-line-in"><span class="vx-glitch">cokoliv</span> potřebuješ</span></span>
+          </h1>
           <div class="vx-sub-btns">
             <a href="#" class="vx-btn vx-btn-dark worker-cta-register">Vytvořit účet</a>
             <a href="#jak" class="vx-btn vx-btn-light">Jak to funguje</a>

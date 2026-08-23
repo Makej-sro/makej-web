@@ -191,29 +191,90 @@
       -webkit-text-fill-color: transparent; color: transparent;
       /* Safari: -webkit-background-clip:text ořezává dotažení písmen (j/y) — dolní rezerva to vyřeší, záporný margin drží layout */
       padding-bottom: .2em; margin-bottom: -.2em;
-      animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) .26s both, heroGradSweep 6s linear 1.4s infinite;
+      animation: heroLineUp .7s cubic-bezier(.19,1,.22,1) 1.05s both, heroGradSweep 6s linear 2s infinite;
     }
     .eh-sub { animation: fadeInUp .7s ease-out .5s both; }
     .eh-btn { animation: fadeInUp .7s ease-out .62s both; }
-    .mkj-visual { animation: fadeInUp .9s cubic-bezier(.19,1,.22,1) .5s both; }
     @media (prefers-reduced-motion: reduce) {
-      .eh-line-in, .emp-hero-blue .eh-grad, .eh-sub, .eh-btn, .mkj-visual { animation: none !important; transform: none !important; }
+      .eh-line-in, .emp-hero-blue .eh-grad, .eh-sub, .eh-btn { animation: none !important; transform: none !important; }
     }
     .eh-sub { color: rgba(255,255,255,.85); font-size: clamp(1.02rem, 1.6vw, 1.3rem); line-height: 1.5; max-width: 640px; margin: 0 auto 34px; }
     .eh-btn { display: inline-block; background: #eef6f0; color: #0a0d2e; font-family: var(--font-sans); font-weight: 700; font-size: 1.02rem; padding: 16px 32px; border-radius: 16px; text-decoration: none; cursor: pointer; transition: background .2s, transform .2s; }
     .eh-btn:hover { background: #fff; transform: translateY(-2px); }
 
-    /* Tři telefony — vyjedou shora (vxDrop), perspektivu má obrázek zapečenou */
-    .mkj-visual { position: relative; margin: clamp(8px, 2.5vh, 28px) auto 0; max-width: 1180px; padding: 0 16px 20px; pointer-events: none; }
-    .mkj-stage { display: flex; justify-content: center; }
-    /* Bez CSS drop-shadow — mockup má vlastní měkký stín zapečený v alfě (20 % plochy
-       má alfu 1–40). drop-shadow staví stín ze VŠECH neprůhledných pixelů, takže z toho
-       jemného oparu udělal posunutý šedý obdélník kolem obrázku. */
-    .mkj-phones { display: block; width: 564px; max-width: 100%; height: auto; }
+    /* ── iPhone mockup (převedeno z Claude Design exportu do čistého CSS) ──
+       Scéna: nejdřív velký telefon zblízka bez náklonu, po 0,8 s se zmenší,
+       sjede dolů a překlopí k zemi. Text hera naskočí až po dosednutí.
+       Zoomy a pád jsou v proměnných, aby se daly na malých oknech přiškrtit. */
+    .mkj-visual {
+      --z0: .80; --z1: .40; --dy0: 26px; --dy: 258px; --tilt: 42deg;
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      perspective: 1700px; perspective-origin: 50% 42%;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .ph-anim { transform-style: preserve-3d; }
+    @keyframes phEnter {
+      0%, 34.8% { transform: translateZ(-560px) translateY(var(--dy0)) rotateX(0deg) scale(var(--z0)); }
+      100%      { transform: translateZ(-560px) translateY(var(--dy)) rotateX(var(--tilt)) scale(var(--z1)); }
+    }
+    @keyframes phShadow {
+      0%, 34.8% { opacity: 0; transform: translateZ(-660px) translateY(calc(var(--dy0) + 220px)) rotateX(0deg) scale(calc(var(--z0) * 1.05)); }
+      100%      { opacity: 1; transform: translateZ(-660px) translateY(calc(var(--dy) + 220px)) rotateX(var(--tilt)) scale(calc(var(--z1) * 1.05)); }
+    }
+    @keyframes phContact {
+      0%, 34.8% { opacity: 0; transform: translateZ(-620px) translateY(calc(var(--dy0) + 150px)) rotateX(0deg) scale(var(--z0)); }
+      100%      { opacity: 1; transform: translateZ(-620px) translateY(calc(var(--dy) + 150px)) rotateX(var(--tilt)) scale(var(--z1)); }
+    }
+    .ph-anim   { animation: phEnter   2.3s cubic-bezier(.22,.72,.05,1) both; }
+    .ph-shadow { animation: phShadow  2.3s cubic-bezier(.22,.72,.05,1) both; }
+    .ph-contact{ animation: phContact 2.3s cubic-bezier(.22,.72,.05,1) both; }
+
+    .ph-shadow, .ph-contact { position: absolute; }
+    .ph-shadow { width: 430px; height: 890px; border-radius: 60px; filter: blur(30px);
+      background: radial-gradient(52% 52% at 50% 55%, rgba(28,22,16,.55), rgba(28,22,16,.18) 62%, rgba(28,22,16,0) 80%); }
+    .ph-contact { width: 393px; height: 852px; border-radius: 54px; filter: blur(10px); background: rgba(24,19,14,.34); }
+
+    .ph-body { position: relative; width: 393px; height: 852px; transform-style: preserve-3d; }
+    /* boční hrana s tlačítky — otočená o 90°, takže je vidět při náklonu */
+    .ph-rail { position: absolute; left: 0; top: 52px; width: 42px; height: 748px; transform-origin: left center; transform: rotateY(90deg);
+      background: linear-gradient(180deg,#6f6a63 0%,#a9a49b 10%,#55504a 45%,#8d8880 78%,#4c4842 100%); }
+    .ph-rail i { position: absolute; left: 7px; width: 28px; border-radius: 4px; display: block;
+      background: linear-gradient(90deg,#8b867d,#55514b); box-shadow: 0 1px 0 rgba(255,255,255,.2) inset; }
+    .ph-rail i:nth-child(1) { top: 124px; height: 30px; }
+    .ph-rail i:nth-child(2) { top: 198px; height: 62px; }
+    .ph-rail i:nth-child(3) { top: 274px; height: 62px; }
+    .ph-bottom { position: absolute; left: 52px; bottom: 0; width: 289px; height: 42px; transform-origin: center top; transform: rotateX(-90deg);
+      background: linear-gradient(90deg,#4f4b45 0%,#918c84 20%,#5b5751 52%,#a09b92 80%,#4a4640 100%); }
+    .ph-back { position: absolute; inset: 0; transform: translateZ(-42px); border-radius: 54px;
+      background: linear-gradient(140deg,#d8d3ca,#a8a39a 45%,#cbc6bd); }
+    .ph-frame { position: absolute; inset: 0; border-radius: 54px; padding: 3px;
+      background: linear-gradient(140deg,#f2efe9 0%,#a29d94 22%,#6d685f 48%,#b8b3aa 72%,#efece6 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.35) inset, 0 30px 60px rgba(30,25,20,.35); }
+    .ph-bezel { width: 100%; height: 100%; border-radius: 51px; padding: 4px; background: #07070a; box-sizing: border-box;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.9) inset; }
+    .ph-screen { position: relative; width: 100%; height: 100%; border-radius: 47px; overflow: hidden; background: #f4f5f9; }
+    .ph-screen img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .ph-screen::after { content: ""; position: absolute; inset: 0; border-radius: 47px; pointer-events: none;
+      background: linear-gradient(118deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.10) 22%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 72%, rgba(255,255,255,.14) 100%);
+      box-shadow: 0 0 40px rgba(0,0,0,.20) inset; }
+
+    /* Zoomy podle výšky okna: --z0 aby velký telefon vyplnil ~92 % výšky, --z1 aby
+       po dosednutí zbylo místo pod tlačítkem. --dy0 posadí start kousek níž, aby velký
+       telefon nezajel pod logo v navbaru. */
+    @media (min-height: 650px)  { .mkj-visual { --z0: .86;  --z1: .47; --dy: 275px; } }
+    @media (min-height: 710px)  { .mkj-visual { --z0: .92;  --z1: .54; --dy: 295px; } }
+    @media (min-height: 770px)  { .mkj-visual { --z0: .98;  --z1: .60; --dy: 320px; } }
+    @media (min-height: 830px)  { .mkj-visual { --z0: 1.05; --z1: .66; --dy: 345px; } }
+    @media (min-height: 950px)  { .mkj-visual { --z0: 1.18; --z1: .72; --dy: 380px; } }
+    @media (min-height: 1050px) { .mkj-visual { --z0: 1.30; --z1: .78; --dy: 415px; } }
+    @media (prefers-reduced-motion: reduce) {
+      .ph-anim, .ph-shadow, .ph-contact { animation: none !important; }
+      .ph-anim { transform: translateZ(-560px) translateY(var(--dy)) rotateX(var(--tilt)) scale(var(--z1)); }
+      .ph-shadow, .ph-contact { opacity: 1; }
+    }
 
     @media (max-width: 600px) {
       .emp-hero-blue { padding-top: 112px; }
-      .mkj-visual { padding: 0 10px 14px; }
     }
 
     /* ── FAQ (brigádníci) — světlá sekce ── */
@@ -272,13 +333,14 @@
 
     /* ── Hero jako u Lidé: modrý→bílý gradient + „drop" animace telefonu ── */
     .emp-hero-blue { background: linear-gradient(180deg,#0020f6 0%,#1a37ff 12%,#5875ff 30%,#aebcff 46%,#ffffff 60%) !important; min-height: 100vh; }
-    .mkj-visual { position: relative; z-index: 3; animation: vxDrop 1.5s cubic-bezier(.5,0,.15,1) both; }
-    @keyframes vxDrop { 0%,33% { transform: translateY(-42vh); } 100% { transform: translateY(0); } }
-    .eh-line:nth-child(1) .eh-line-in { animation-delay: .62s; }
-    .eh-line:nth-child(2) .eh-line-in { animation-delay: .78s; }
-    .eh-sub { animation-delay: .95s; }
-    .eh-btn { animation-delay: 1.08s; }
-    @media (prefers-reduced-motion: reduce) { .mkj-visual { animation: none !important; } }
+    /* Každý kus textu naskočí ve chvíli, kdy ho vrch padajícího telefonu mine —
+       ne až po dosednutí. Časy jsou dopočítané z průběhu phEnter (drží do 0,8 s,
+       pak easing): řádek 1 v 0,96 s, řádek 2 v 1,05 s, podnadpis 1,15 s, tlačítko 1,28 s. */
+    .eh-line-in { animation-duration: .7s; }
+    .eh-line:nth-child(1) .eh-line-in { animation-delay: .96s; }
+    .eh-line:nth-child(2) .eh-line-in { animation-delay: 1.05s; }
+    .eh-sub { animation-duration: .45s; animation-delay: 1.15s; }
+    .eh-btn { animation-duration: .45s; animation-delay: 1.28s; }
 
     /* ── Intro sekce (styl jako u Lidé) ── */
     .vx-intro { background:#f6f7fb; padding: 92px 0; }
@@ -356,10 +418,19 @@
         <a href="#" class="eh-btn worker-cta-register">Vytvořit účet zdarma</a>
       </div>
 
-      <!-- Tři telefony s appkou -->
+      <!-- iPhone mockup — přiblížený, pak se zmenší, sjede dolů a nakloní -->
       <div class="mkj-visual" aria-hidden="true">
-        <div class="mkj-stage">
-          <img class="mkj-phones" src="/hsp-hero-mobily.png?v=2" alt="" width="1170" height="956" fetchpriority="high" decoding="async" />
+        <div class="ph-shadow"></div>
+        <div class="ph-contact"></div>
+        <div class="ph-anim">
+          <div class="ph-body">
+            <div class="ph-rail"><i></i><i></i><i></i></div>
+            <div class="ph-bottom"></div>
+            <div class="ph-back"></div>
+            <div class="ph-frame"><div class="ph-bezel"><div class="ph-screen">
+              <img src="/hsp-phone-screen.jpg" alt="" width="786" height="1704" fetchpriority="high" decoding="async" />
+            </div></div></div>
+          </div>
         </div>
       </div>
     </section>
