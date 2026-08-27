@@ -17,10 +17,10 @@
   <title>O nás — Makej</title>
   <meta name="description" content="Příběh, hodnoty a tým za Makej — pracovní platformou nové generace. Swajpuj, matchuj a pracuj." />
   <meta name="theme-color" content="#0020f6" />
-  <link rel="canonical" href="https://makej.eu/o-nas.html" />
+  <link rel="canonical" href="https://makej.eu/o-nas" />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://makej.eu/o-nas.html" />
+  <meta property="og:url" content="https://makej.eu/o-nas" />
   <meta property="og:title" content="O nás — Makej" />
   <meta property="og:description" content="Příběh, hodnoty a tým za Makej — pracovní platformou nové generace. Swajpuj, matchuj a pracuj." />
   <meta property="og:image" content="https://makej.eu/og-image.png" />
@@ -65,12 +65,29 @@
     .on { --ink:#0B1233; --sec:#3A4266; --mut:#7A82A6; --mut2:#A6ADCB; --line:#E6E9F5; --soft:#F6F7FC; --band:#F1F3FB; }
     .on-wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
     .on section { padding: 56px 0; }
+
+    /* ── Sekce O nás — kicker, velký nadpis, obsah dělený linkami (styl jako
+       na /pro-zamestnavatele a /lide) ── */
+    .on-sec { padding: clamp(56px, 9vw, 104px) 0; }
+    .on-narrow { max-width: 720px; }
+    .on-kick { display: inline-block; font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #0020F6; }
+    .on-lead { font-size: 1.08rem; line-height: 1.65; color: #4A4A57; margin: 18px 0 0; text-wrap: pretty; }
+    .on-list { list-style: none; margin: 30px 0 0; padding: 0; border-top: 1px solid #E6E9F5; }
+    .on-list li { position: relative; padding: 15px 0 15px 30px; border-bottom: 1px solid #E6E9F5;
+      font-size: 1rem; line-height: 1.5; color: #0B1233; }
+    .on-list li::before { content: "—"; position: absolute; left: 0; color: #9AA3C4; }
+    .on-list--next li::before { content: "→"; color: #0020F6; font-weight: 700; }
+    .on-quote-sec { background: #F5F7FD; }
+    .on-quote { margin: 0; font-family: var(--font-heading); font-weight: 800;
+      font-size: clamp(1.4rem, 3.2vw, 2.1rem); line-height: 1.3; letter-spacing: -.02em;
+      color: #0B1233; text-wrap: balance; }
+    .on-quote::before { content: "„"; color: #0020F6; }
+    .on-quote::after  { content: "“"; color: #0020F6; }
     .on-h2 { font-family: var(--font-heading); font-size: clamp(26px,4.2vw,40px); font-weight: 800; color: var(--ink); letter-spacing: -.025em; text-align: center; margin: 0 0 34px; }
-    .on-sub { text-align: center; color: var(--mut); font-size: 15px; line-height: 1.65; max-width: 60ch; margin: -22px auto 34px; }
 
     /* ── Hero ── */
     .on-hero { text-align: center; padding: 128px 24px 40px; max-width: 780px; margin: 0 auto; }
-    .on-badge { display: inline-block; font-size: 13px; font-weight: 700; color: var(--primary); background: #EEF1FF; padding: 7px 15px; border-radius: 999px; margin-bottom: 22px; }
     .on-hero h1 { font-family: var(--font-heading); font-size: clamp(30px,5.6vw,50px); font-weight: 800; color: var(--ink); letter-spacing: -.03em; line-height: 1.12; margin: 0 0 20px; text-wrap: balance; }
     .on-hero p { color: var(--sec); font-size: 16px; line-height: 1.7; max-width: 60ch; margin: 0 auto 28px; }
     .on-hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
@@ -82,92 +99,39 @@
     .on-btn--ghost:hover { background: #F1F3FB; border-color: #D5DAF0; }
 
     /* ── Pain band ── */
-    .on-band { background: var(--band); border-radius: 24px; padding: 44px 40px; }
-    .on-pain-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 0 auto; max-width: 760px; }
-    .on-pain { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px 15px; font-size: 13.5px; font-weight: 700; color: var(--ink); }
-    .on-pain iconify-icon { flex: none; color: #E5484D; }
-    .on-band-note { text-align: center; font-size: 15px; font-weight: 800; color: var(--ink); margin: 26px 0 0; }
 
     /* ── Kroky ── */
-    .on-steps { max-width: 620px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
-    .on-step { display: flex; gap: 15px; align-items: flex-start; }
-    .on-step__n { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
-    .on-step__t { font-family: var(--font-heading); font-size: 16px; font-weight: 800; color: var(--ink); margin: 0 0 3px; }
-    .on-step__d { font-size: 14px; color: var(--mut); line-height: 1.55; margin: 0; }
 
     /* ── Dvě strany ── */
-    .on-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 820px; margin: 0 auto; }
-    .on-card { border-radius: 20px; padding: 26px 26px 28px; }
-    .on-card--dark { background: #0B1233; color: #fff; }
-    .on-card--blue { background: var(--primary); color: #fff; }
-    .on-card h3 { font-family: var(--font-heading); font-size: 18px; font-weight: 800; margin: 0 0 16px; }
-    .on-check { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
-    .on-check li { display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; line-height: 1.45; color: rgba(255,255,255,.9); }
-    .on-check iconify-icon { flex: none; margin-top: 1px; color: #fff; opacity: .95; }
 
     /* ── Nejsme portál ── */
-    .on-feat { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; max-width: 820px; margin: 0 auto; }
-    .on-feat__cell { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px 20px 22px; }
-    .on-feat__ic { width: 38px; height: 38px; border-radius: 11px; background: #EEF1FF; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
-    .on-feat__cell h4 { font-family: var(--font-heading); font-size: 15px; font-weight: 800; color: var(--ink); margin: 0 0 5px; }
-    .on-feat__cell p { font-size: 13px; color: var(--mut); line-height: 1.5; margin: 0; }
 
     /* ── Řešení pro každého ── */
-    .on-sol { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 900px; margin: 0 auto; align-items: stretch; }
-    .on-sol__col { border-radius: 20px; padding: 26px 26px 28px; }
-    .on-sol__col--light { background: #fff; border: 1px solid var(--line); }
-    .on-sol__col--blue { background: var(--primary); }
-    .on-sol__col h3 { font-family: var(--font-heading); font-size: 17px; font-weight: 800; margin: 0 0 8px; }
-    .on-sol__col--light h3 { color: var(--ink); }
-    .on-sol__col--blue h3 { color: #fff; }
-    .on-sol__lead { font-size: 13.5px; line-height: 1.55; margin: 0 0 16px; }
-    .on-sol__col--light .on-sol__lead { color: var(--mut); }
-    .on-sol__col--blue .on-sol__lead { color: rgba(255,255,255,.85); }
     .on-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
     .on-list li { position: relative; padding-left: 17px; font-size: 13.5px; line-height: 1.45; }
     .on-list li::before { content: ""; position: absolute; left: 0; top: 7px; width: 6px; height: 6px; border-radius: 50%; }
-    .on-sol__col--light .on-list li { color: var(--sec); }
-    .on-sol__col--light .on-list li::before { background: var(--primary); }
-    .on-sol__col--blue .on-list li { color: rgba(255,255,255,.92); }
-    .on-sol__col--blue .on-list li::before { background: #fff; }
 
     /* ── Blue banner ── */
-    .on-banner { background: var(--primary); border-radius: 24px; padding: 48px 40px; text-align: center; max-width: 900px; margin: 0 auto; }
-    .on-banner p { color: #fff; font-family: var(--font-heading); font-size: clamp(19px,2.6vw,26px); font-weight: 700; line-height: 1.4; letter-spacing: -.01em; margin: 0; max-width: 40ch; margin-inline: auto; }
 
     /* ── Příběh ── */
-    .on-story { max-width: 640px; margin: 0 auto; text-align: center; }
-    .on-story p { color: var(--sec); font-size: 15.5px; line-height: 1.75; margin: 0; }
 
     /* ── Kam směřuje (tmavá karta) ── */
-    .on-future { background: #0B1233; border-radius: 26px; padding: 48px 40px 44px; max-width: 900px; margin: 0 auto; }
-    .on-future h2 { color: #fff; text-align: center; margin: 0 0 28px; font-family: var(--font-heading); font-size: clamp(24px,3.6vw,34px); font-weight: 800; letter-spacing: -.02em; }
-    .on-future-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 680px; margin: 0 auto; }
-    .on-future-item { display: flex; align-items: center; gap: 11px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 14px 16px; font-size: 13.5px; font-weight: 700; color: #fff; }
-    .on-future-item iconify-icon { flex: none; color: var(--secondary); }
-    .on-future-note { text-align: center; color: rgba(255,255,255,.72); font-size: 13px; font-weight: 700; margin: 26px 0 0; }
-    .on-team-h { color: #fff; text-align: center; font-family: var(--font-heading); font-size: 22px; font-weight: 800; margin: 44px 0 4px; }
-    .on-team-sub { text-align: center; color: rgba(255,255,255,.55); font-size: 12.5px; margin: 0 0 24px; }
-    .on-team { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; max-width: 680px; margin: 0 auto; }
-    .on-person { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 18px; padding: 26px 16px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
-    .on-person__av { width: 74px; height: 74px; border-radius: 50%; background: var(--primary); }
-    .on-person__n { color: #fff; font-family: var(--font-heading); font-size: 14.5px; font-weight: 700; }
+    /* tým na světlém pozadí — původní varianta byla pro tmavou sekci (bílý text) */
+    .on-team { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin: 30px 0 0; }
+    .on-person { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 4px; }
+    .on-person__av { width: 68px; height: 68px; border-radius: 50%; background: #0020F6; color: #fff;
+      display: grid; place-items: center; font-family: var(--font-heading); font-weight: 800;
+      font-size: 20px; letter-spacing: .02em; }
+    .on-person__n { color: #0B1233; font-family: var(--font-heading); font-size: 15px; font-weight: 700; }
+    @media (max-width: 560px) { .on-team { grid-template-columns: 1fr; } }
 
     /* ── Závěr CTA ── */
-    .on-final { text-align: center; max-width: 620px; margin: 0 auto; }
-    .on-final h2 { margin-bottom: 10px; }
-    .on-final p { color: var(--mut); font-size: 15px; line-height: 1.6; margin: 0 auto 26px; max-width: 44ch; }
-    .on-final-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
-      .on-pain-grid { grid-template-columns: 1fr 1fr; }
-      .on-two, .on-feat, .on-sol, .on-future-grid, .on-team { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
       .on-hero { padding-top: 104px; }
-      .on-band, .on-banner, .on-future { padding-left: 22px; padding-right: 22px; }
-      .on-pain-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -178,11 +142,11 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej</a>
       <div class="nav-links">
-        <a href="/hledam-si-praci.html">Hledám si práci</a>
-        <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-        <a href="/o-nas.html" class="nav-active">O nás</a>
+        <a href="/hledam-si-praci">Hledám si práci</a>
+        <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+        <a href="/lide">Lidé</a>
         <a href="/#download">Stáhnout</a>
-        <a href="/podpora.html">Podpora</a>
+        <a href="/podpora">Podpora</a>
       </div>
       <div class="nav-actions nav-actions-visible" id="nav-actions">
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
@@ -193,11 +157,11 @@
       </button>
     </div>
     <div class="mobile-menu" id="mobile-menu">
-      <a href="/hledam-si-praci.html">Hledám si práci</a>
-      <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-      <a href="/o-nas.html">O nás</a>
+      <a href="/hledam-si-praci">Hledám si práci</a>
+      <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+      <a href="/lide">Lidé</a>
       <a href="/#download">Stáhnout</a>
-      <a href="/podpora.html">Podpora</a>
+      <a href="/podpora">Podpora</a>
       <div class="mobile-menu-actions">
         <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
         <a href="javascript:void(0)" class="btn-primary" id="mobile-register-btn">Vytvořit účet</a>
@@ -210,177 +174,60 @@
 
     <!-- Hero -->
     <div class="on-hero">
-      <h1>Spojujeme lidi, kteří chtějí pracovat, s těmi, kteří pomoc skutečně potřebují. Zábavně, rychle a jednoduše.</h1>
-      <p>Makej je platforma a mobilní aplikace, která propojuje lidi hledající práci, brigádu nebo jednorázovou výpomoc s firmami, živnostníky i jednotlivci, kteří práci nabízejí. Díky jednoduchému swipe systému a přehlednému rozhraní pro firmy je Makej pro kohokoliv.</p>
+      <h1>Spojujeme lidi, kteří chtějí pracovat, s těmi, kteří pomoc skutečně potřebují.</h1>
+      <p>Makej propojuje lidi hledající práci, brigádu nebo jednorázovou výpomoc s firmami i jednotlivci, kteří ji nabízejí. Zábavně, rychle a jednoduše.</p>
       <div class="on-hero-cta">
-        <a href="#kroky" class="on-btn on-btn--primary">Jak funguje Makej?</a>
-        <a href="/hledam-si-praci.html" class="on-btn on-btn--ghost">Hledám si práci</a>
-        <a href="/pro-zamestnavatele.html" class="on-btn on-btn--ghost">Pro firmy</a>
+        <a href="/hledam-si-praci" class="on-btn on-btn--primary">Hledám si práci</a>
+        <a href="/pro-zamestnavatele" class="on-btn on-btn--ghost">Pro firmy</a>
       </div>
     </div>
 
-    <!-- Dnes je hledání práce složité -->
-    <section>
-      <div class="on-wrap">
-        <div class="on-band">
-          <h2 class="on-h2">Dnes je hledání práce složité a zdlouhavé.</h2>
-          <div class="on-pain-grid">
-            <div class="on-pain"><iconify-icon icon="solar:close-circle-bold" width="18"></iconify-icon>Desítky pracovních portálů</div>
-            <div class="on-pain"><iconify-icon icon="solar:close-circle-bold" width="18"></iconify-icon>Dlouhé životopisy</div>
-            <div class="on-pain"><iconify-icon icon="solar:close-circle-bold" width="18"></iconify-icon>Týdny čekání v nejistotě</div>
-            <div class="on-pain"><iconify-icon icon="solar:close-circle-bold" width="18"></iconify-icon>Složitá komunikace</div>
-            <div class="on-pain"><iconify-icon icon="solar:close-circle-bold" width="18"></iconify-icon>Firmy platí desítky tisíc</div>
-            <div class="on-pain"><iconify-icon icon="solar:close-circle-bold" width="18"></iconify-icon>Neproklientské prostředí</div>
-          </div>
-          <p class="on-band-note">Ale obě strany se často vůbec nepotkají.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Makej v osmi krocích -->
-    <section id="kroky">
-      <div class="on-wrap">
-        <h2 class="on-h2">Makej v osmi krocích</h2>
-        <div class="on-steps">
-          <div class="on-step"><span class="on-step__n">1</span><div><p class="on-step__t">Firma přidá nabídku</p><p class="on-step__d">Vyplní pozici, mzdu a popis přímo v aplikaci.</p></div></div>
-          <div class="on-step"><span class="on-step__n">2</span><div><p class="on-step__t">Aplikace ji ukáže vhodným lidem</p><p class="on-step__d">Nabídku uvidí lidé hledající práci pro daný rádius.</p></div></div>
-          <div class="on-step"><span class="on-step__n">3</span><div><p class="on-step__t">Uživatelé swajpují</p><p class="on-step__d">Doprava, co je zajímá — doleva, co ne.</p></div></div>
-          <div class="on-step"><span class="on-step__n">4</span><div><p class="on-step__t">Firma označí kandidáty zpětným like</p><p class="on-step__d">Prochází zájemce a vybírá ty, kteří ji zaujmou.</p></div></div>
-          <div class="on-step"><span class="on-step__n">5</span><div><p class="on-step__t">Nastává MATCH</p><p class="on-step__d">Obě strany si řekly ano — a vidí to.</p></div></div>
-          <div class="on-step"><span class="on-step__n">6</span><div><p class="on-step__t">Propojení přes chat</p><p class="on-step__d">Domluví si podmínky práce přímo v aplikaci.</p></div></div>
-          <div class="on-step"><span class="on-step__n">7</span><div><p class="on-step__t">Výkon práce</p><p class="on-step__d">Brigádník nastoupí a odvede svou práci.</p></div></div>
-          <div class="on-step"><span class="on-step__n">8</span><div><p class="on-step__t">Výplata a smlouva</p><p class="on-step__d">Peníze putují na účet brigádníka, smlouva je podepsaná.</p></div></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Jedna platforma, dvě strany -->
-    <section>
-      <div class="on-wrap">
-        <h2 class="on-h2">Jedna platforma, dvě strany</h2>
-        <div class="on-two">
-          <div class="on-card on-card--dark">
-            <h3>Pro firmy</h3>
-            <ul class="on-check">
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Rychlé nalezení výpomoci</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Krátkodobé i dlouhodobé spolupráce</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Pro FO i PO</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Jednoduchá správa inzerátů</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Přehledné statistiky</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Okamžité reakce</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Transparentní historie a hodnocení brigádníků</li>
-            </ul>
-          </div>
-          <div class="on-card on-card--blue">
-            <h3>Pro lidi</h3>
-            <ul class="on-check">
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Brigády</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Jednorázové práce</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Dlouhodobá práce</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Možnost přivýdělku</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Jednoduchý swipe systém</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Jednoduché filtrování</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Přímý kontakt se zaměstnavateli</li>
-              <li><iconify-icon icon="solar:check-circle-bold" width="16"></iconify-icon>Transparentní hodnocení firem</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Nejsme další pracovní portál -->
-    <section>
-      <div class="on-wrap">
-        <h2 class="on-h2">Nejsme další pracovní portál</h2>
-        <div class="on-feat">
-          <div class="on-feat__cell"><div class="on-feat__ic"><iconify-icon icon="solar:card-2-bold" width="19" style="color:var(--primary)"></iconify-icon></div><h4>Swipe systém</h4><p>Žádné složité formuláře.</p></div>
-          <div class="on-feat__cell"><div class="on-feat__ic"><iconify-icon icon="solar:users-group-two-rounded-bold" width="19" style="color:var(--primary)"></iconify-icon></div><h4>FO i PO</h4><p>Hledat i nabízet práci mohou jednotlivci i firmy.</p></div>
-          <div class="on-feat__cell"><div class="on-feat__ic"><iconify-icon icon="solar:smartphone-2-bold" width="19" style="color:var(--primary)"></iconify-icon></div><h4>Jedna platforma</h4><p>Mobilní aplikace i web na jednom místě.</p></div>
-          <div class="on-feat__cell"><div class="on-feat__ic"><iconify-icon icon="solar:bolt-bold" width="19" style="color:var(--primary)"></iconify-icon></div><h4>Okamžité propojení</h4><p>Nečekáte týdny na odpověď.</p></div>
-          <div class="on-feat__cell"><div class="on-feat__ic"><iconify-icon icon="solar:chat-round-line-bold" width="19" style="color:var(--primary)"></iconify-icon></div><h4>Přehledná komunikace</h4><p>Vše na jednom místě, v jednom chatu.</p></div>
-          <div class="on-feat__cell"><div class="on-feat__ic"><iconify-icon icon="solar:magic-stick-3-bold" width="19" style="color:var(--primary)"></iconify-icon></div><h4>Moderní technologie</h4><p>Jednoduché a intuitivní ovládání.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Nabízíme řešení pro každého -->
-    <section>
-      <div class="on-wrap">
-        <h2 class="on-h2">Nabízíme řešení pro každého</h2>
-        <div class="on-sol">
-          <div class="on-sol__col on-sol__col--light">
-            <h3>Hledám práci nebo přivýdělek</h3>
-            <p class="on-sol__lead">Makej je pro každého, kdo chce najít práci rychle, jednoduše a bez zbytečných překážek.</p>
-            <ul class="on-list">
-              <li>Studenty hledající brigádu</li>
-              <li>Lidi, kteří si chtějí přivydělat</li>
-              <li>Uchazeče hledající hlavní pracovní poměr</li>
-              <li>Zájemce o krátkodobé i dlouhodobé práce</li>
-              <li>Lidi mezi zaměstnáními</li>
-              <li>Freelancery a živnostníky hledající nové zakázky</li>
-              <li>Seniory, kteří chtějí zůstat aktivní</li>
-              <li>Rodiče hledající flexibilní práci</li>
-              <li>Cizince hledající pracovní příležitosti</li>
-              <li>Každého, kdo chce pracovat nebo nabídnout své dovednosti</li>
-            </ul>
-          </div>
-          <div class="on-sol__col on-sol__col--blue">
-            <h3>Hledám zaměstnance nebo výpomoc</h3>
-            <p class="on-sol__lead">Makej je určený každému, kdo potřebuje rychle najít spolehlivého člověka.</p>
-            <ul class="on-list">
-              <li>Firmám všech velikostí</li>
-              <li>Fyzickým osobám</li>
-              <li>Podnikatelům a živnostníkům</li>
-              <li>Zaměstnavatelům hledajícím nové zaměstnance</li>
-              <li>Těm, kteří potřebují jednorázovou výpomoc</li>
-              <li>Organizátorům akcí a sezónních projektů</li>
-              <li>Těm, kteří potřebují rychlé personální řešení</li>
-              <li>Těm, kteří hledají dlouhodobou spolupráci</li>
-              <li>Každému, kdo hledá spolehlivé lidi na práci</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Blue banner -->
-    <section>
-      <div class="on-wrap">
-        <div class="on-banner">
-          <p>Věříme, že najít práci nebo spolehlivou výpomoc v dnešní době by mělo být stejně jednoduché jako objednat si taxi k sobě domů. Proto jsme vytvořili platformu, která spojuje lidi rychle, jednoduše a zábavnou formou.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Z neuspokojené potřeby vzniklo řešení -->
-    <section>
-      <div class="on-wrap on-story">
+    <!-- Proč Makej vzniklo -->
+    <section class="on-sec">
+      <div class="on-wrap on-narrow">
+        <span class="on-kick">Proč Makej vzniklo</span>
         <h2 class="on-h2">Z neuspokojené potřeby vzniklo řešení</h2>
-        <p>Opakovaně jsme naráželi na stejný problém. Firmy nemohly najít spolehlivé lidi, zatímco mnoho lidí — včetně nás — hledalo práci nebo brigádu. Stávající pracovní portály byly zdlouhavé, nepřehledné a často neumožňovaly rychlé spojení obou stran. A tak z neuspokojené potřeby vzniklo Makej.</p>
+        <p class="on-lead">Opakovaně jsme naráželi na stejný problém. Firmy nemohly najít spolehlivé lidi, zatímco spousta lidí — včetně nás — hledala práci nebo brigádu. Existující portály byly zdlouhavé, nepřehledné a rychlé spojení obou stran většinou vůbec neumožňovaly.</p>
+        <ul class="on-list">
+          <li>Desítky roztříštěných portálů</li>
+          <li>Dlouhé životopisy a formuláře</li>
+          <li>Týdny čekání v nejistotě</li>
+          <li>Firmy platí desetitisíce za inzerci</li>
+        </ul>
       </div>
     </section>
 
-    <!-- Kam Makej směřuje + tým -->
-    <section>
-      <div class="on-wrap">
-        <div class="on-future">
-          <h2>Kam Makej směřuje</h2>
-          <div class="on-future-grid">
-            <div class="on-future-item"><iconify-icon icon="solar:arrow-right-bold" width="16"></iconify-icon>AI předvyplněný inzerát</div>
-            <div class="on-future-item"><iconify-icon icon="solar:arrow-right-bold" width="16"></iconify-icon>Podepisování smluv přímo přes platformu</div>
-            <div class="on-future-item"><iconify-icon icon="solar:arrow-right-bold" width="16"></iconify-icon>Vlastní HR software pro správu</div>
-            <div class="on-future-item"><iconify-icon icon="solar:arrow-right-bold" width="16"></iconify-icon>Bezpečný převod peněz přes middleman funkci</div>
-            <div class="on-future-item"><iconify-icon icon="solar:arrow-right-bold" width="16"></iconify-icon>Expanze v rámci celé ČR</div>
-          </div>
-          <p class="on-future-note">To budí důvěru.</p>
+    <!-- Čemu věříme -->
+    <section class="on-sec on-quote-sec">
+      <div class="on-wrap on-narrow">
+        <blockquote class="on-quote">Najít práci nebo spolehlivou výpomoc by mělo být stejně jednoduché jako objednat si taxi domů.</blockquote>
+      </div>
+    </section>
 
-          <div class="on-team-h">Náš tým</div>
-          <div class="on-team-sub">Lidé, kteří stojí za Makej</div>
-          <div class="on-team">
-            <div class="on-person"><span class="on-person__av"></span><span class="on-person__n">Jan Weber</span></div>
-            <div class="on-person"><span class="on-person__av"></span><span class="on-person__n">Samuel Pšeja</span></div>
-            <div class="on-person"><span class="on-person__av"></span><span class="on-person__n">Yasin Benmerzouk</span></div>
-          </div>
+    <!-- Kam směřujeme -->
+    <section class="on-sec">
+      <div class="on-wrap on-narrow">
+        <span class="on-kick">Kam směřujeme</span>
+        <h2 class="on-h2">Na čem pracujeme dál</h2>
+        <ul class="on-list on-list--next">
+          <li>Inzerát předvyplněný AI</li>
+          <li>Podepisování smluv přímo v platformě</li>
+          <li>Vlastní HR software pro správu náboru</li>
+          <li>Bezpečný převod peněz přes prostředníka</li>
+          <li>Expanze do celé ČR</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Tým -->
+    <section class="on-sec">
+      <div class="on-wrap on-narrow">
+        <span class="on-kick">Náš tým</span>
+        <h2 class="on-h2">Lidé, kteří stojí za Makej</h2>
+        <div class="on-team">
+          <div class="on-person"><span class="on-person__av">JW</span><span class="on-person__n">Jan Weber</span></div>
+          <div class="on-person"><span class="on-person__av">SP</span><span class="on-person__n">Samuel Pšeja</span></div>
+          <div class="on-person"><span class="on-person__av">YB</span><span class="on-person__n">Yasin Benmerzouk</span></div>
         </div>
       </div>
     </section>
@@ -418,29 +265,32 @@
           <a href="/" class="footer-logo">Makej</a>
           <p>Pracovní platforma nové generace. Propojujeme lidi s příležitostmi.</p>
           <div class="footer-social">
-            <a href="#" aria-label="Instagram"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a>
-            <a href="#" aria-label="TikTok"><iconify-icon icon="ic:baseline-tiktok" width="22"></iconify-icon></a>
-            <a href="#" aria-label="LinkedIn"><iconify-icon icon="mdi:linkedin" width="22"></iconify-icon></a>
+            <a href="https://www.instagram.com/makej.eu" aria-label="Instagram" target="_blank" rel="noopener"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a>
+            <a href="https://www.facebook.com/share/19Kq5N1R2u/?mibextid=wwXIfr" aria-label="Facebook" target="_blank" rel="noopener"><iconify-icon icon="mdi:facebook" width="22"></iconify-icon></a>
+            <a href="https://www.tiktok.com/@makejaplikace" aria-label="TikTok" target="_blank" rel="noopener"><iconify-icon icon="ic:baseline-tiktok" width="22"></iconify-icon></a>
+            <a href="https://www.linkedin.com/company/makej-s-r-o/" aria-label="LinkedIn" target="_blank" rel="noopener"><iconify-icon icon="mdi:linkedin" width="22"></iconify-icon></a>
           </div>
         </div>
         <div class="footer-col">
           <h4>Produkt</h4>
-          <a href="/hledam-si-praci.html">Hledám si práci</a>
-          <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-          <a href="/pro-zamestnavatele.html#pricing">Ceník</a>
+          <a href="/hledam-si-praci">Hledám si práci</a>
+          <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+          <a href="/lide">Lidé</a>
+          <a href="/pro-zamestnavatele#pricing">Ceník</a>
           <a href="/#download">Stáhnout</a>
         </div>
         <div class="footer-col">
           <h4>Firma</h4>
-          <a href="/podpora.html">Podpora</a>
-          <a href="mailto:hello@makej.eu">Kontakt</a>
-          <a href="/o-nas.html">O nás</a>
+          <a href="/blog">Blog</a>
+          <a href="/podpora">Podpora</a>
+          <a href="mailto:admin@makej.eu">Kontakt</a>
+          <a href="/o-nas">O nás</a>
         </div>
         <div class="footer-col">
           <h4>Právní</h4>
-          <a href="/terms.html">Podmínky použití</a>
-          <a href="/privacy.html">Ochrana soukromí</a>
-          <a href="/privacy.html#cookies">Cookies</a>
+          <a href="/terms">Podmínky použití</a>
+          <a href="/privacy">Ochrana soukromí</a>
+          <a href="/privacy#cookies">Cookies</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -602,12 +452,12 @@
           </div>
           <label for="reg-marketing" class="reg-consent" style="display:flex;align-items:flex-start;gap:10px;margin:2px 2px 15px;cursor:pointer;font-size:.82rem;line-height:1.45;color:rgba(10,13,46,.62);text-align:left;">
             <input type="checkbox" id="reg-marketing" style="width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--primary);cursor:pointer;" />
-            <span>Souhlasím se zasíláním novinek, výhodných nabídek a dalších sdělení pro <a href="/privacy.html#marketing" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--primary);font-weight:600;">marketingové účely</a>. <em style="font-style:normal;opacity:.65;">(nepovinné)</em></span>
+            <span>Souhlasím se zasíláním novinek, výhodných nabídek a dalších sdělení pro <a href="/privacy#marketing" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--primary);font-weight:600;">marketingové účely</a>. <em style="font-style:normal;opacity:.65;">(nepovinné)</em></span>
           </label>
           <button type="submit" class="btn-primary btn-full btn-lg" id="register-submit">Vytvořit účet</button>
           <p style="font-size:.78rem;color:rgba(10,13,46,.55);text-align:center;margin-top:12px;line-height:1.5;">
-            Registrací souhlasíš s našimi <a href="/terms.html" target="_blank" style="color:var(--primary);font-weight:600">Obchodními podmínkami</a>
-            a <a href="/privacy.html" target="_blank" style="color:var(--primary);font-weight:600">Zásadami ochrany osobních údajů</a>.
+            Registrací souhlasíš s našimi <a href="/terms" target="_blank" style="color:var(--primary);font-weight:600">Obchodními podmínkami</a>
+            a <a href="/privacy" target="_blank" style="color:var(--primary);font-weight:600">Zásadami ochrany osobních údajů</a>.
           </p>
         </form>
       </div>
@@ -623,9 +473,7 @@
   <script>
   (function () {
     if (!('IntersectionObserver' in window)) return;
-    var sel = '.on-h2, .on-sub, .on-band, .on-banner, .on-story, .on-future, .dl-stage,'
-            + '.on-pain, .on-step, .on-two > .on-card, .on-feat__cell, .on-sol__col,'
-            + '.on-future-item, .on-person';
+    var sel = '.on-kick, .on-h2, .on-lead, .on-quote, .on-list li, .on-person, .dl-stage';
     var els = Array.prototype.slice.call(document.querySelectorAll(sel));
     if (!els.length) return;
     // Stagger: postupné zpoždění pro sourozence ve stejném gridu

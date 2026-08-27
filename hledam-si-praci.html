@@ -17,10 +17,10 @@
   <title>Hledám si práci — Makej</title>
   <meta name="description" content="Swajpuj nabídky brigád, part-time i full-time pozic. Matchuj se zaměstnavateli, chatuj a začni pracovat ještě dnes. Vyzkoušej interaktivní demo appky Makej" />
   <meta name="theme-color" content="#0020f6" />
-  <link rel="canonical" href="https://makej.eu/hledam-si-praci.html" />
+  <link rel="canonical" href="https://makej.eu/hledam-si-praci" />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://makej.eu/hledam-si-praci.html" />
+  <meta property="og:url" content="https://makej.eu/hledam-si-praci" />
   <meta property="og:title" content="Hledám si práci — Makej" />
   <meta property="og:description" content="Žádné životopisy, žádné pohovory. Swajpni nabídku, matchni se s firmou a začni vydělávat ještě dnes." />
   <meta property="og:image" content="https://makej.eu/og-image.png" />
@@ -309,7 +309,9 @@
       background: linear-gradient(118deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.10) 22%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 72%, rgba(255,255,255,.14) 100%);
       box-shadow: 0 0 40px rgba(0,0,0,.20) inset; }
 
-    /* Zoomy podle výšky okna: --z0 aby velký telefon vyplnil ~92 % výšky, --z1 aby
+    /* Záloha pro případ vypnutého JS — jinak hodnoty nastaví skript dole,
+       aby se při scrollu na mobilu nepřepínaly stupně.
+       Zoomy podle výšky okna: --z0 aby velký telefon vyplnil ~92 % výšky, --z1 aby
        po dosednutí zbylo místo pod tlačítkem. --dy0 posadí start kousek níž, aby velký
        telefon nezajel pod logo v navbaru. */
     @media (min-height: 650px)  { .mkj-visual { --z0: .86;  --z1: .47; --dy: 275px; } }
@@ -358,7 +360,7 @@
     #navbar .nav-inner { display: none !important; }
     #navbar .mobile-menu { pointer-events: auto; }
     .emp-hero-blue { padding-top: 0 !important; }
-    .eh-head { margin-top: clamp(94px, 12vh, 120px); }
+    .eh-head { margin-top: clamp(94px, 12vh, 120px); margin-top: clamp(94px, calc(var(--hero-h, 100vh) * .12), 120px); }
     .vx-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 16px 24px; transition: background .25s, box-shadow .25s, padding .2s; }
     .vx-nav.scrolled { background: rgba(255,255,255,.48); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 6px 24px -10px rgba(10,13,46,.3); padding-top: 10px; padding-bottom: 10px; }
     .vx-nav.scrolled .vx-nav-links a { color: #0a0d2e; }
@@ -383,7 +385,7 @@
     }
 
     /* ── Hero jako u Lidé: modrý→bílý gradient + „drop" animace telefonu ── */
-    .emp-hero-blue { background: linear-gradient(180deg,#0020f6 0%,#1a37ff 12%,#5875ff 30%,#aebcff 46%,#ffffff 60%) !important; min-height: 100vh; }
+    .emp-hero-blue { background: linear-gradient(180deg,#0020f6 0%,#1a37ff 12%,#5875ff 30%,#aebcff 46%,#ffffff 60%) !important; min-height: 100vh; min-height: var(--hero-h, 100vh); }
     /* Každý kus textu naskočí ve chvíli, kdy ho vrch padajícího telefonu mine —
        ne až po dosednutí. Časy jsou dopočítané z průběhu phEnter (drží do 0,8 s,
        pak easing): řádek 1 v 0,96 s, řádek 2 v 1,05 s, podnadpis 1,15 s, tlačítko 1,28 s. */
@@ -403,6 +405,24 @@
     .js-reveal-up.is-in { opacity:1; transform:none; }
     @media (prefers-reduced-motion: reduce){ .js-reveal-up { opacity:1 !important; transform:none !important; } }
   </style>
+  <!-- Výška hero se zafixuje podle okna při načtení. Vestavěné prohlížeče (Instagram,
+       Facebook) i mobilní Safari mění při scrollu velikost okna — a s ní každou výškovou
+       jednotku (vh, svh i dvh). Cokoli na nich visí pak při scrollu poskakuje.
+       Přepočítá se jen při skutečné změně: otočení displeje / změna šířky. -->
+  <script>
+    (function () {
+      var r = document.documentElement, lastW = null;
+      function set() {
+        r.style.setProperty('--hero-h', window.innerHeight + 'px');
+        lastW = window.innerWidth;
+      }
+      set();
+      window.addEventListener('resize', function () {
+        if (window.innerWidth !== lastW) set();
+      }, { passive: true });
+      window.addEventListener('orientationchange', set, { passive: true });
+    })();
+  </script>
 </head>
 <body>
 
@@ -411,11 +431,11 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej</a>
       <div class="nav-links">
-        <a href="/hledam-si-praci.html" class="nav-active">Hledám si práci</a>
-        <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-        <a href="/lide.html">Lidé</a>
+        <a href="/hledam-si-praci" class="nav-active">Hledám si práci</a>
+        <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+        <a href="/lide">Lidé</a>
         <a href="#download">Stáhnout</a>
-        <a href="/podpora.html">Podpora</a>
+        <a href="/podpora">Podpora</a>
       </div>
       <div class="nav-actions nav-actions-visible" id="nav-actions">
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
@@ -427,11 +447,11 @@
     </div>
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobile-menu">
-      <a href="/hledam-si-praci.html" class="nav-active">Hledám si práci</a>
-      <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-      <a href="/lide.html">Lidé</a>
+      <a href="/hledam-si-praci" class="nav-active">Hledám si práci</a>
+      <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+      <a href="/lide">Lidé</a>
       <a href="#download">Stáhnout</a>
-      <a href="/podpora.html">Podpora</a>
+      <a href="/podpora">Podpora</a>
       <div class="mobile-menu-actions">
         <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
         <a href="javascript:void(0)" class="btn-primary" id="mobile-register-btn">Vytvořit účet</a>
@@ -445,13 +465,13 @@
       <!-- Navbar ve stylu Lidé (aktuální stránka „Hledám práci" skrytá) -->
       <nav class="vx-nav">
         <div class="vx-nav-links">
-          <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-          <a href="/lide.html">Lidé</a>
+          <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+          <a href="/lide">Lidé</a>
         </div>
         <div class="vx-logo-tab"><a href="/" class="vx-logo">Makej</a></div>
         <div class="vx-nav-links right">
           <a href="#download">Stáhnout</a>
-          <a href="/podpora.html">Podpora</a>
+          <a href="/podpora">Podpora</a>
           <button class="mobile-menu-btn vx-burger" aria-label="Menu" aria-expanded="false">
             <span></span><span></span>
           </button>
@@ -685,23 +705,23 @@
         </div>
         <div class="footer-col">
           <h4>Produkt</h4>
-          <a href="/hledam-si-praci.html">Hledám si práci</a>
-          <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-          <a href="/lide.html">Lidé</a>
+          <a href="/hledam-si-praci">Hledám si práci</a>
+          <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+          <a href="/lide">Lidé</a>
           <a href="#download">Stáhnout</a>
         </div>
         <div class="footer-col">
           <h4>Firma</h4>
-          <a href="/blog.html">Blog</a>
-          <a href="/podpora.html">Podpora</a>
+          <a href="/blog">Blog</a>
+          <a href="/podpora">Podpora</a>
           <a href="mailto:admin@makej.eu">Kontakt</a>
-          <a href="/o-nas.html">O nás</a>
+          <a href="/o-nas">O nás</a>
         </div>
         <div class="footer-col">
           <h4>Právní</h4>
-          <a href="/terms.html">Podmínky použití</a>
-          <a href="/privacy.html">Ochrana soukromí</a>
-          <a href="/privacy.html#cookies">Cookies</a>
+          <a href="/terms">Podmínky použití</a>
+          <a href="/privacy">Ochrana soukromí</a>
+          <a href="/privacy#cookies">Cookies</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -837,12 +857,12 @@
           </div>
           <label for="reg-marketing" class="reg-consent" style="display:flex;align-items:flex-start;gap:10px;margin:2px 2px 15px;cursor:pointer;font-size:.82rem;line-height:1.45;color:rgba(10,13,46,.62);text-align:left;">
             <input type="checkbox" id="reg-marketing" style="width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--primary);cursor:pointer;" />
-            <span>Souhlasím se zasíláním novinek, výhodných nabídek a dalších sdělení pro <a href="/privacy.html#marketing" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--primary);font-weight:600;">marketingové účely</a>. <em style="font-style:normal;opacity:.65;">(nepovinné)</em></span>
+            <span>Souhlasím se zasíláním novinek, výhodných nabídek a dalších sdělení pro <a href="/privacy#marketing" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--primary);font-weight:600;">marketingové účely</a>. <em style="font-style:normal;opacity:.65;">(nepovinné)</em></span>
           </label>
           <button type="submit" class="btn-primary btn-full btn-lg" id="register-submit">Vytvořit účet</button>
           <p style="font-size:.78rem;color:var(--muted-fg);text-align:center;margin-top:12px;line-height:1.5;">
-            Registrací souhlasíš s našimi <a href="/terms.html" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
-            a <a href="/privacy.html" target="_blank" style="color:var(--secondary)">Zásadami ochrany osobních údajů</a>.
+            Registrací souhlasíš s našimi <a href="/terms" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
+            a <a href="/privacy" target="_blank" style="color:var(--secondary)">Zásadami ochrany osobních údajů</a>.
           </p>
         </form>
       </div>
@@ -857,7 +877,7 @@
     <div class="cookie-inner">
       <p class="cookie-text">
         🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
-        Žádné reklamní trackery. Více informací v naší <a href="/privacy.html#cookies">Politice ochrany soukromí</a>.
+        Žádné reklamní trackery. Více informací v naší <a href="/privacy#cookies">Politice ochrany soukromí</a>.
       </p>
       <div class="cookie-actions">
         <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
@@ -892,6 +912,34 @@
       document.querySelectorAll('.emp-faq-item.open').forEach(function (i) { i.classList.remove('open'); });
       if (!isOpen) item.classList.add('open');
     }
+  </script>
+  <!-- Velikost telefonu v hero: dopočítá se z výšky okna JEDNOU, ne přes výškové
+       media query. Na mobilu se totiž výška okna mění při scrollu (schovává se lišta
+       prohlížeče) — media query pak přeskakuje mezi stupni a telefon poskakuje.
+       Přepočítá se jen při skutečné změně: otočení displeje nebo změna šířky okna. -->
+  <script>
+    (function () {
+      var el = document.querySelector('.mkj-visual');
+      if (!el) return;
+      var lastW = null;
+      var STUPNE = [
+        [1050, 1.30, .78, 415], [950, 1.18, .72, 380], [830, 1.05, .66, 345],
+        [770,  .98, .60, 320], [710,  .92, .54, 295], [650,  .86, .47, 275],
+        [0,    .80, .40, 258]
+      ];
+      function apply() {
+        var h = window.innerHeight, s;
+        for (var i = 0; i < STUPNE.length; i++) { if (h >= STUPNE[i][0]) { s = STUPNE[i]; break; } }
+        el.style.setProperty('--z0', s[1]);
+        el.style.setProperty('--z1', s[2]);
+        el.style.setProperty('--dy', s[3] + 'px');
+        lastW = window.innerWidth;
+      }
+      apply();
+      window.addEventListener('resize', function () {
+        if (window.innerWidth !== lastW) apply();
+      }, { passive: true });
+    })();
   </script>
   <!-- CTA morph: „Vytvořit účet" zmodrá až doscrolluje na obrazovku -->
   <script>

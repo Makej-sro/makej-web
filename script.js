@@ -45,16 +45,16 @@ updateNav();
 // ═══════════ NAVBAR DROPDOWNS ═══════════
 function setupNavDropdowns() {
   const menus = {
-    'pro-zamestnavatele.html': [
-      ['Jak to funguje', '/pro-zamestnavatele.html#jak-to-funguje'],
-      ['Dashboard',      '/pro-zamestnavatele.html#dashboard'],
-      ['Ceník',          '/pro-zamestnavatele.html#pricing'],
-      ['Časté dotazy',   '/pro-zamestnavatele.html#faq'],
+    'pro-zamestnavatele': [
+      ['Jak to funguje', '/pro-zamestnavatele#jak-to-funguje'],
+      ['Dashboard',      '/pro-zamestnavatele#dashboard'],
+      ['Ceník',          '/pro-zamestnavatele#pricing'],
+      ['Časté dotazy',   '/pro-zamestnavatele#faq'],
     ],
-    'hledam-si-praci.html': [
-      ['Jak to funguje', '/hledam-si-praci.html#how-it-works'],
-      ['Vyzkoušej appku','/hledam-si-praci.html#features'],
-      ['Stáhnout',       '/hledam-si-praci.html#download'],
+    'hledam-si-praci': [
+      ['Jak to funguje', '/hledam-si-praci#how-it-works'],
+      ['Vyzkoušej appku','/hledam-si-praci#features'],
+      ['Stáhnout',       '/hledam-si-praci#download'],
     ],
   };
   document.querySelectorAll('.nav-links > a').forEach(a => {

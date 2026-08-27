@@ -17,10 +17,10 @@
   <title>Lidé — nabídni své dovednosti | Makej</title>
   <meta name="description" content="Nová záložka Lidé v appce Makej: zapni si kartu, napiš s čím pomůžeš (řemeslo, doučování, foto…) a swajpuj lidi ve svém okolí. Když je zájem oboustranný, otevře se chat." />
   <meta name="theme-color" content="#0020f6" />
-  <link rel="canonical" href="https://makej.eu/lide.html" />
+  <link rel="canonical" href="https://makej.eu/lide" />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://makej.eu/lide.html" />
+  <meta property="og:url" content="https://makej.eu/lide" />
   <meta property="og:title" content="Lidé — nabídni své dovednosti | Makej" />
   <meta property="og:description" content="Zapni si kartu, napiš s čím pomůžeš a swajpuj lidi ve svém okolí. Když je zájem oboustranný, otevře se chat." />
   <meta property="og:image" content="https://makej.eu/og-image.png" />
@@ -293,7 +293,7 @@
     .vx-frame {
       position: relative; border-radius: 0; overflow: hidden;
       background: linear-gradient(180deg, #0020f6 0%, #1a37ff 12%, #5875ff 30%, #aebcff 46%, #ffffff 60%);
-      min-height: 100vh; display: flex; flex-direction: column;
+      min-height: 100vh; min-height: var(--hero-h, 100vh); display: flex; flex-direction: column;
     }
 
     /* ── NAV se zářezem ── */
@@ -345,8 +345,10 @@
        šířka 422px původním 940px. Bez toho se na mobilu (92vw) postavičky smrskly
        na ~160px a zbytek výšky hera zůstal prázdný. */
     .vx-heroimg-wrap { position: absolute; left: 0; right: 0; bottom: -91px; display: flex; justify-content: center; align-items: flex-end; z-index: 1; pointer-events: none; }
-    /* 44vh strop: na nízkém okně (dock, lišta záložek) by fixních 422px vyjelo až do tlačítek */
-    .vx-heroimg { width: min(422px, 92vw, 44vh); height: auto; display: block; filter: drop-shadow(0 40px 50px rgba(0,10,80,.28)); }
+    /* Strop 44 % výšky hera — na nízkém okně by fixních 422px vyjelo až do tlačítek.
+       Počítá se ze zafixované --hero-h, ne z vh: na mobilu se vh při scrollu mění
+       (schovává se lišta prohlížeče) a obrázek by rostl a zmenšoval se. */
+    .vx-heroimg { width: min(422px, 92vw, 44vh); width: min(422px, 92vw, calc(var(--hero-h, 100vh) * .44)); height: auto; display: block; filter: drop-shadow(0 40px 50px rgba(0,10,80,.28)); }
 
     /* spodní pás hero: avataři vlevo, preview karta vpravo — překrývá spodek obrázku */
     .vx-avstack { display:flex; }
@@ -523,7 +525,7 @@
       .vx-pv-cols { grid-template-columns:1fr; }
       .vx-fan { transform: scale(.86); margin-top:16px; }
       .vx-heroimg-wrap { bottom: -46px; }
-      .vx-heroimg { width: min(422px, 96vw, 44vh); }
+      .vx-heroimg { width: min(422px, 96vw, 44vh); width: min(422px, 96vw, calc(var(--hero-h, 100vh) * .44)); }
       .vx-gal-cards { flex-direction:column; align-items:center; gap:34px; }
       .vx-gal-card.c1, .vx-gal-card.c2, .vx-gal-card.c3 { margin-top:0; }
       .vx-gal-card.c2 .vx-gal-ph, .vx-gal-card.c1 .vx-gal-ph, .vx-gal-card.c3 .vx-gal-ph { width: min(300px,80vw); }
@@ -539,6 +541,24 @@
       .vx-fcard.c2 { transform:translateX(-50%) translateX(90px) rotate(9deg) scale(.82); }
     }
   </style>
+  <!-- Výška hero se zafixuje podle okna při načtení. Vestavěné prohlížeče (Instagram,
+       Facebook) i mobilní Safari mění při scrollu velikost okna — a s ní každou výškovou
+       jednotku (vh, svh i dvh). Cokoli na nich visí pak při scrollu poskakuje.
+       Přepočítá se jen při skutečné změně: otočení displeje / změna šířky. -->
+  <script>
+    (function () {
+      var r = document.documentElement, lastW = null;
+      function set() {
+        r.style.setProperty('--hero-h', window.innerHeight + 'px');
+        lastW = window.innerWidth;
+      }
+      set();
+      window.addEventListener('resize', function () {
+        if (window.innerWidth !== lastW) set();
+      }, { passive: true });
+      window.addEventListener('orientationchange', set, { passive: true });
+    })();
+  </script>
 </head>
 <body>
 
@@ -547,11 +567,11 @@
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej</a>
       <div class="nav-links">
-        <a href="/hledam-si-praci.html">Hledám práci</a>
-        <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-        <a href="/lide.html" class="nav-active">Lidé</a>
+        <a href="/hledam-si-praci">Hledám práci</a>
+        <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+        <a href="/lide" class="nav-active">Lidé</a>
         <a href="#download">Stáhnout</a>
-        <a href="/podpora.html">Podpora</a>
+        <a href="/podpora">Podpora</a>
       </div>
       <div class="nav-actions nav-actions-visible" id="nav-actions">
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
@@ -563,11 +583,11 @@
     </div>
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobile-menu">
-      <a href="/hledam-si-praci.html">Hledám práci</a>
-      <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-      <a href="/lide.html" class="nav-active">Lidé</a>
+      <a href="/hledam-si-praci">Hledám práci</a>
+      <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+      <a href="/lide" class="nav-active">Lidé</a>
       <a href="#download">Stáhnout</a>
-      <a href="/podpora.html">Podpora</a>
+      <a href="/podpora">Podpora</a>
       <div class="mobile-menu-actions">
         <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
         <a href="javascript:void(0)" class="btn-primary" id="mobile-register-btn">Vytvořit účet</a>
@@ -584,8 +604,8 @@
         <!-- NAV se zářezem -->
         <nav class="vx-nav">
           <div class="vx-nav-links">
-            <a href="/hledam-si-praci.html">Hledám práci</a>
-            <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
+            <a href="/hledam-si-praci">Hledám práci</a>
+            <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
           
           </div>
           <div class="vx-logo-tab">
@@ -593,7 +613,7 @@
           </div>
           <div class="vx-nav-links right">
             <a href="#download">Stáhnout</a>
-            <a href="/podpora.html">Podpora</a>
+            <a href="/podpora">Podpora</a>
             <button class="mobile-menu-btn vx-burger" aria-label="Menu" aria-expanded="false">
               <span></span><span></span>
             </button>
@@ -650,8 +670,8 @@
               <div class="vx-gal-cap"><h4>Vytvoř si kartu</h4><p>Napiš, co umíš, a přidej štítky.</p></div>
             </div>
             <div class="vx-gal-card c2 js-reveal-pop">
-              <div class="vx-gal-ph"><img src="/lide-krok-2.png" alt="Swajpování karet lidí — Matěj Kučera" loading="lazy"></div>
-              <div class="vx-gal-cap"><h4>Swajpuj lidi</h4><p>Procházej profily šikovných lidí kolem tebe.</p></div>
+              <div class="vx-gal-ph"><img src="/lide-krok-2.png" alt="Marketplace lidí — nabídky podle oboru a okolí" loading="lazy"></div>
+              <div class="vx-gal-cap"><h4>Procházej lidi</h4><p>Filtruj podle oboru a najdi šikovné lidi ve svém okolí.</p></div>
             </div>
             <div class="vx-gal-card c3 js-reveal-up">
               <div class="vx-gal-ph"><img src="/lide-krok-3.png" alt="Chat po domluvě — Matěj Kučera" loading="lazy"></div>
@@ -760,23 +780,23 @@
         </div>
         <div class="footer-col">
           <h4>Produkt</h4>
-          <a href="/hledam-si-praci.html">Hledám si práci</a>
-          <a href="/pro-zamestnavatele.html">Pro zaměstnavatele</a>
-          <a href="/lide.html">Lidé</a>
+          <a href="/hledam-si-praci">Hledám si práci</a>
+          <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+          <a href="/lide">Lidé</a>
           <a href="#download">Stáhnout</a>
         </div>
         <div class="footer-col">
           <h4>Firma</h4>
-          <a href="/blog.html">Blog</a>
-          <a href="/podpora.html">Podpora</a>
+          <a href="/blog">Blog</a>
+          <a href="/podpora">Podpora</a>
           <a href="mailto:admin@makej.eu">Kontakt</a>
-          <a href="/o-nas.html">O nás</a>
+          <a href="/o-nas">O nás</a>
         </div>
         <div class="footer-col">
           <h4>Právní</h4>
-          <a href="/terms.html">Podmínky použití</a>
-          <a href="/privacy.html">Ochrana soukromí</a>
-          <a href="/privacy.html#cookies">Cookies</a>
+          <a href="/terms">Podmínky použití</a>
+          <a href="/privacy">Ochrana soukromí</a>
+          <a href="/privacy#cookies">Cookies</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -912,12 +932,12 @@
           </div>
           <label for="reg-marketing" class="reg-consent" style="display:flex;align-items:flex-start;gap:10px;margin:2px 2px 15px;cursor:pointer;font-size:.82rem;line-height:1.45;color:rgba(10,13,46,.62);text-align:left;">
             <input type="checkbox" id="reg-marketing" style="width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--primary);cursor:pointer;" />
-            <span>Souhlasím se zasíláním novinek, výhodných nabídek a dalších sdělení pro <a href="/privacy.html#marketing" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--primary);font-weight:600;">marketingové účely</a>. <em style="font-style:normal;opacity:.65;">(nepovinné)</em></span>
+            <span>Souhlasím se zasíláním novinek, výhodných nabídek a dalších sdělení pro <a href="/privacy#marketing" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--primary);font-weight:600;">marketingové účely</a>. <em style="font-style:normal;opacity:.65;">(nepovinné)</em></span>
           </label>
           <button type="submit" class="btn-primary btn-full btn-lg" id="register-submit">Vytvořit účet</button>
           <p style="font-size:.78rem;color:var(--muted-fg);text-align:center;margin-top:12px;line-height:1.5;">
-            Registrací souhlasíš s našimi <a href="/terms.html" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
-            a <a href="/privacy.html" target="_blank" style="color:var(--secondary)">Zásadami ochrany osobních údajů</a>.
+            Registrací souhlasíš s našimi <a href="/terms" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
+            a <a href="/privacy" target="_blank" style="color:var(--secondary)">Zásadami ochrany osobních údajů</a>.
           </p>
         </form>
       </div>
@@ -932,7 +952,7 @@
     <div class="cookie-inner">
       <p class="cookie-text">
         🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
-        Žádné reklamní trackery. Více informací v naší <a href="/privacy.html#cookies">Politice ochrany soukromí</a>.
+        Žádné reklamní trackery. Více informací v naší <a href="/privacy#cookies">Politice ochrany soukromí</a>.
       </p>
       <div class="cookie-actions">
         <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
