@@ -1,0 +1,13 @@
+# Kanonické jsou adresy bez .html — .html verze na ně trvale přesměrujeme.
+# Vykřičník vynutí přesměrování i když soubor existuje (jinak by Netlify poslal jeho obsah).
+/index.html    /    301!
+/hledam-si-praci.html    /hledam-si-praci    301!
+/pro-zamestnavatele.html    /pro-zamestnavatele    301!
+/lide.html    /lide    301!
+/cenik.html    /cenik    301!
+/blog.html    /blog    301!
+/pruvodce.html    /pruvodce    301!
+/podpora.html    /podpora    301!
+/o-nas.html    /o-nas    301!
+/privacy.html    /privacy    301!
+/terms.html    /terms    301!
