@@ -34,6 +34,8 @@
   --radius: 1rem;
   --font-sans: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
   --font-heading: 'Inter', 'Inter Fallback', 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+  /* navigace má vlastní font — League Spartan, stejně jako employer dashboard */
+  --font-nav: 'League Spartan', 'Inter', 'Plus Jakarta Sans', sans-serif;
 }
 
 html { scroll-behavior: smooth; overflow-x: clip; }
@@ -126,7 +128,7 @@ img { max-width: 100%; display: block; }
   display: flex; align-items: center; justify-content: space-between;
 }
 .nav-logo {
-  font-family: var(--font-heading); font-size: 1.8rem; font-weight: 900;
+  font-family: var(--font-nav); font-size: 1.8rem; font-weight: 900;
   background: none; -webkit-background-clip: unset; background-clip: unset;
   -webkit-text-fill-color: #ffffff; color: #ffffff;
 }
@@ -136,7 +138,8 @@ img { max-width: 100%; display: block; }
   pointer-events: none;
 }
 .nav-links a {
-  color: #ffffff; font-weight: 500; font-size: .9rem;
+  color: #ffffff; font-family: var(--font-nav); font-weight: 600; font-size: .92rem;
+  text-transform: uppercase; letter-spacing: .04em;
   padding-bottom: 4px;
   border-bottom: 2px solid transparent;
   transition: color .2s, font-weight .2s, border-bottom-color .2s;
@@ -149,7 +152,7 @@ img { max-width: 100%; display: block; }
 }
 .nav-actions { display: flex; gap: 12px; align-items: center; opacity: 0; pointer-events: none; transition: opacity .3s; }
 .nav-actions.nav-actions-visible { opacity: 1; pointer-events: all; }
-.nav-actions .btn-ghost, .nav-actions .btn-primary { padding: 10px 20px; font-size: .85rem; }
+.nav-actions .btn-ghost, .nav-actions .btn-primary { padding: 10px 21px; font-size: .92rem; font-family: var(--font-nav); }
 /* ── Hamburger: prosklená pilulka, dvě čárky se překlopí do křížku ── */
 .mobile-menu-btn {
   display: none; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
@@ -184,7 +187,7 @@ img { max-width: 100%; display: block; }
 }
 .mobile-menu.active { transform: none; opacity: 1; visibility: visible; }
 .mobile-menu a {
-  color: #fff; font-family: var(--font-heading); font-weight: 700;
+  color: #fff; font-family: var(--font-nav); font-weight: 700;
   text-transform: uppercase; letter-spacing: .05em; font-size: .76rem;
   padding: 11px 2px; text-decoration: none;
   border-bottom: 1px solid rgba(255,255,255,.13);
@@ -232,11 +235,6 @@ img { max-width: 100%; display: block; }
   animation: hero-wash 14s ease infinite;
 } */
 /* fine dot texture */
-.hero-bg-particles::after {
-  content: ""; position: absolute; inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1.3px);
-  background-size: 18px 18px;
-}
 /* vinětace vypnutá — byla stavěná na celoplošně tmavé pozadí, na světlém spodku špiní */
 .hero-bg-particles::before { content: none; }
 @keyframes hero-wash {
