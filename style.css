@@ -138,8 +138,8 @@ img { max-width: 100%; display: block; }
   pointer-events: none;
 }
 .nav-links a {
-  color: #ffffff; font-family: var(--font-nav); font-weight: 600; font-size: .92rem;
-  text-transform: uppercase; letter-spacing: .04em;
+  color: #ffffff; font-family: var(--font-nav); font-weight: 600; font-size: 1rem;
+  letter-spacing: .01em;
   padding-bottom: 4px;
   border-bottom: 2px solid transparent;
   transition: color .2s, font-weight .2s, border-bottom-color .2s;
@@ -152,7 +152,7 @@ img { max-width: 100%; display: block; }
 }
 .nav-actions { display: flex; gap: 12px; align-items: center; opacity: 0; pointer-events: none; transition: opacity .3s; }
 .nav-actions.nav-actions-visible { opacity: 1; pointer-events: all; }
-.nav-actions .btn-ghost, .nav-actions .btn-primary { padding: 10px 21px; font-size: .92rem; font-family: var(--font-nav); }
+.nav-actions .btn-ghost, .nav-actions .btn-primary { padding: 10px 21px; font-size: .95rem; font-family: var(--font-nav); }
 /* ── Hamburger: prosklená pilulka, dvě čárky se překlopí do křížku ── */
 .mobile-menu-btn {
   display: none; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
@@ -187,9 +187,9 @@ img { max-width: 100%; display: block; }
 }
 .mobile-menu.active { transform: none; opacity: 1; visibility: visible; }
 .mobile-menu a {
-  color: #fff; font-family: var(--font-nav); font-weight: 700;
-  text-transform: uppercase; letter-spacing: .05em; font-size: .76rem;
-  padding: 11px 2px; text-decoration: none;
+  color: #fff; font-family: var(--font-nav); font-weight: 600;
+  letter-spacing: .01em; font-size: 1rem;
+  padding: 12px 2px; text-decoration: none;
   border-bottom: 1px solid rgba(255,255,255,.13);
 }
 .mobile-menu-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
@@ -207,7 +207,13 @@ img { max-width: 100%; display: block; }
   .vx-nav.scrolled .vx-burger.open { background: rgba(10,13,46,.1); }
 }
 
-@media (max-width: 768px) {
+/* Odkazy jsou centrované absolutně přes celou šířku navbaru, takže se při
+   zúžení podsunou pod logo a pod tlačítka vpravo. Řádek potřebuje ~1160 px
+   (5 odkazů ≈ 545 px + „Přihlásit se" a „Vytvořit účet" ≈ 285 px na každé
+   straně od středu), pod tím jde všechno pod hamburger — stejně jako na
+   Lidé / Hledám práci / Pro zaměstnavatele, jen o kousek dřív: ty mají
+   vpravo jen jednu pilulku, a proto jim stačí 900 px. */
+@media (max-width: 1200px) {
   .nav-links, .nav-actions { display: none; }
   .mobile-menu-btn { display: flex; }
 }
@@ -981,7 +987,7 @@ img { max-width: 100%; display: block; }
 .about-pill {
   display: inline-block; padding: 4px 12px;
   border: 1px solid rgba(208,208,255,.2); border-radius: 100px;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em;
+  font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.06em;
   color: var(--muted-fg); margin-bottom: 12px;
 }
 .about-principle p { color: rgba(208,208,255,.7); font-size: 14px; line-height: 1.65; margin: 0; }
@@ -1011,8 +1017,9 @@ img { max-width: 100%; display: block; }
   width: 9px; height: 9px; border-radius: 50%; background: var(--secondary);
 }
 .about-yr {
-  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  font-family: var(--font-heading); font-size: 12px;
   letter-spacing: 0.06em; color: var(--secondary); font-weight: 500;
+  font-variant-numeric: tabular-nums;
   display: block; margin-bottom: 12px;
 }
 .about-timeline-item h3 {
@@ -1032,8 +1039,9 @@ img { max-width: 100%; display: block; }
   display: flex; flex-direction: column; min-height: 340px; position: relative;
 }
 .about-value-num {
-  font-family: 'JetBrains Mono', monospace; font-size: 11px;
-  color: var(--muted-fg); letter-spacing: 0.1em;
+  font-family: var(--font-heading); font-size: 11px;
+  color: var(--muted-fg); letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
 }
 .about-value h3 {
   font-family: 'Bricolage Grotesque', sans-serif;
@@ -1072,8 +1080,9 @@ img { max-width: 100%; display: block; }
 .about-num-lbl { margin-top: 14px; font-size: 13px; color: var(--muted-fg); line-height: 1.5; max-width: 22ch; }
 .about-delta {
   display: inline-flex; align-items: center;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  font-family: var(--font-heading); font-size: 11px;
   color: var(--secondary); margin-top: 12px; letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
   padding: 3px 8px; background: rgba(208,208,255,.07);
   border-radius: 4px; border: 1px solid rgba(208,208,255,.1);
 }
@@ -1091,22 +1100,22 @@ img { max-width: 100%; display: block; }
   background: repeating-linear-gradient(135deg, rgba(208,208,255,.04) 0 1px, transparent 1px 20px);
 }
 .about-photo::after {
-  content: 'FOTO'; font-family: 'JetBrains Mono', monospace;
-  font-size: 10px; letter-spacing: 0.12em; color: var(--muted-fg); opacity: 0.4;
+  content: 'FOTO'; font-family: var(--font-heading);
+  font-size: 10px; letter-spacing: 0.1em; color: var(--muted-fg); opacity: 0.4;
   position: relative; z-index: 1;
 }
 .about-photo-badge {
   position: absolute; top: 10px; left: 10px;
   background: rgba(15,15,45,.85); backdrop-filter: blur(6px);
   padding: 3px 10px; border-radius: 100px;
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+  font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.08em;
   color: var(--secondary); border: 1px solid rgba(208,208,255,.14); z-index: 2;
 }
 .about-person h4 {
   margin: 0; font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
 }
-.about-role { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted-fg); letter-spacing: 0.04em; }
+.about-role { font-family: var(--font-heading); font-size: 11px; color: var(--muted-fg); letter-spacing: 0.04em; }
 
 /* Quote */
 .about-quote {
@@ -1127,7 +1136,7 @@ img { max-width: 100%; display: block; }
 }
 .about-quote cite {
   display: block; margin-top: 24px; font-style: normal;
-  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  font-family: var(--font-heading); font-size: 12px;
   color: var(--muted-fg); letter-spacing: 0.04em;
 }
 
@@ -1399,7 +1408,7 @@ img { max-width: 100%; display: block; }
 .dp-prof-stars { color:#fbbf24; font-size:.78rem; }
 .dp-prof-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:14px; }
 .dp-prof-stat { background:rgba(22,22,59,.4); border:1px solid rgba(255,255,255,.05); border-radius:16px; padding:10px 6px; text-align:center; backdrop-filter:blur(12px); }
-.dp-prof-stat-val { font-family:var(--font-mono); font-size:.95rem; font-weight:700; color:#fff; }
+.dp-prof-stat-val { font-family:var(--font-heading); font-size:.95rem; font-weight:700; color:#fff; font-variant-numeric:tabular-nums; }
 .dp-prof-stat-lbl { font-size:.6rem; color:rgba(153,153,204,.6); margin-top:1px; }
 .dp-prof-sec-title { font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:rgba(208,208,255,.28); margin-bottom:8px; }
 .dp-skills { display:flex; flex-wrap:wrap; gap:5px; }
@@ -1719,6 +1728,54 @@ html { scroll-padding-top: 92px; }
   background: transparent; color: #0a0d2e; border-color: rgba(10,13,46,.22);
 }
 #navbar.nav-over-light #nav-login-btn:hover { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.4); }
+
+/* ═══════════ NAVBAR na světlé stránce (blog, články) ═══════════
+   Stejné chování jako na /podpora: nad bílým obsahem modrý text na skle,
+   nad modrou patičkou bílý. Zapíná se třídou nav-light-page na #navbar,
+   stav nad modrou přepíná script.js podle prvku [data-nav-blue]. */
+#navbar.nav-light-page {
+  background: rgba(255,255,255,.15);
+  box-shadow: 0 1px 0 rgba(0,32,246,.1);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+}
+#navbar.nav-light-page .nav-logo { color: #0020f6; -webkit-text-fill-color: #0020f6; }
+#navbar.nav-light-page .nav-links a { color: #0020f6; }
+#navbar.nav-light-page .nav-links a:hover { color: #001bc8; }
+#navbar.nav-light-page .nav-links a.nav-active { color: #0020f6; border-bottom-color: #0020f6; }
+#navbar.nav-light-page #nav-login-btn {
+  background: transparent; color: #0020f6; border-color: rgba(0,32,246,.3); font-weight: 600;
+}
+#navbar.nav-light-page #nav-login-btn:hover { background: rgba(0,32,246,.06); border-color: #0020f6; }
+#navbar.nav-light-page #nav-register-btn { background: linear-gradient(135deg,#0020f6,#3a3a99); color: #fff; }
+#navbar.nav-light-page .mobile-menu-btn {
+  color: #0020f6; background: rgba(0,32,246,.06); border-color: rgba(0,32,246,.22);
+}
+#navbar.nav-light-page .mobile-menu-btn span { background: #0020f6; }
+
+/* otevřené mobilní menu je tmavý panel — modrý navbar by se v něm ztratil */
+#navbar.nav-light-page:has(.mobile-menu-btn.open) .nav-logo { color: #fff; -webkit-text-fill-color: #fff; }
+#navbar.nav-light-page .mobile-menu-btn.open {
+  background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.34); color: #fff;
+}
+#navbar.nav-light-page .mobile-menu-btn.open span { background: #fff; }
+
+/* dojel jsem k modré patičce → navbar zpátky do bílé, jinak by zmizel */
+#navbar.nav-light-page.nav-over-blue {
+  background: rgba(0,20,220,.55); box-shadow: none;
+}
+#navbar.nav-light-page.nav-over-blue .nav-logo { color: #fff; -webkit-text-fill-color: #fff; }
+#navbar.nav-light-page.nav-over-blue .nav-links a { color: rgba(255,255,255,.85); }
+#navbar.nav-light-page.nav-over-blue .nav-links a:hover,
+#navbar.nav-light-page.nav-over-blue .nav-links a.nav-active { color: #fff; border-bottom-color: #fff; }
+#navbar.nav-light-page.nav-over-blue #nav-login-btn {
+  background: transparent; color: #fff; border-color: rgba(255,255,255,.4);
+}
+#navbar.nav-light-page.nav-over-blue #nav-login-btn:hover { background: rgba(255,255,255,.12); border-color: #fff; }
+#navbar.nav-light-page.nav-over-blue .mobile-menu-btn {
+  color: #fff; background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.34);
+}
+#navbar.nav-light-page.nav-over-blue .mobile-menu-btn span { background: #fff; }
 
 /* ═══════════════════════════════════════════════════════════════
    WAITLIST (čekací list) + vlastní kurzor — přeneseno z Makej-sro/Yasin
@@ -2492,3 +2549,87 @@ html { scroll-padding-top: 92px; }
   transition: color .15s, font-size .15s; white-space: nowrap;
 }
 .mdp-item.is-active { font-size: 16px; font-weight: 800; color: var(--primary); }
+
+/* ═══════════ BLOG — stránka článku ═══════════ */
+  .art-shell { max-width: 720px; margin: 0 auto; padding: 140px 24px 40px; }
+
+  /* drobečky zpět na blog */
+  .art-back { display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+    font-family: var(--font-heading); font-weight: 600; font-size: .88rem; color: rgba(10,13,46,.5);
+    transition: color .18s; margin-bottom: 26px; }
+  .art-back:hover { color: #0020f6; }
+
+  /* hlavička článku */
+  .art-meta { display: flex; align-items: center; gap: 11px; margin-bottom: 15px; }
+  .art-cat { font-family: var(--font-heading); font-size: .64rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase; color: rgba(10,13,46,.4); }
+  .art-h1 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.9rem, 4.4vw, 2.9rem);
+    line-height: 1.1; letter-spacing: -.03em; color: #0a0d2e; margin: 0 0 20px; text-wrap: balance; }
+  .art-lead { font-size: 1.12rem; line-height: 1.65; color: rgba(10,13,46,.66); margin: 0 0 34px; }
+
+  /* náhledový obrázek článku */
+.art-hero { margin: 0 0 38px; border-radius: 20px; overflow: hidden; background: #eef1fb;
+  aspect-ratio: 16/7; }
+.art-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* tělo článku */
+  .art-body h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+    line-height: 1.25; letter-spacing: -.02em; color: #0a0d2e; margin: 46px 0 14px; }
+  .art-body h2:first-child { margin-top: 0; }
+  .art-body p { font-size: 1.03rem; line-height: 1.78; color: rgba(10,13,46,.74); margin: 0 0 18px; }
+  .art-body strong { color: #0a0d2e; font-weight: 700; }
+
+  /* CTA na konci */
+  .art-cta { margin-top: 52px; padding: 30px 32px; border-radius: 20px;
+    background: #0020f6; color: #fff; }
+  .art-cta h3 { font-family: var(--font-heading); font-weight: 800; font-size: 1.3rem; line-height: 1.25;
+    letter-spacing: -.02em; margin: 0 0 9px; color: #fff; }
+  .art-cta p { font-size: .97rem; line-height: 1.6; color: rgba(255,255,255,.8); margin: 0 0 20px; }
+  .art-cta-links { display: flex; flex-wrap: wrap; gap: 10px; }
+  .art-cta-links a { display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 16px; border-radius: 100px; background: rgba(255,255,255,.14);
+    font-family: var(--font-heading); font-weight: 600; font-size: .9rem; color: #fff;
+    text-decoration: none; transition: background .18s; }
+  .art-cta-links a:hover { background: rgba(255,255,255,.26); }
+  .art-claim { margin-top: 22px; font-family: var(--font-heading); font-weight: 800;
+    font-size: .82rem; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+
+/* seznamy uvnitř článku */
+.art-body ul { margin: 0 0 18px; padding: 0; list-style: none; }
+.art-body ul li { position: relative; padding: 0 0 0 26px; margin-bottom: 11px;
+  font-size: 1.03rem; line-height: 1.7; color: rgba(10,13,46,.74); }
+.art-body ul li::before { content: ''; position: absolute; left: 6px; top: .62em;
+  width: 6px; height: 6px; border-radius: 50%; background: #0020f6; }
+
+/* poznámka / disclaimer pod textem */
+.art-note { margin-top: 34px; padding: 16px 20px; border-left: 3px solid rgba(10,13,46,.14);
+  background: rgba(10,13,46,.03); border-radius: 0 10px 10px 0;
+  font-size: .9rem; line-height: 1.6; color: rgba(10,13,46,.58); }
+.art-note p { margin: 0; }
+
+/* zvýrazněný odkaz v textu článku */
+.art-body a { color: #0020f6; text-decoration: none; border-bottom: 1px solid rgba(0,32,246,.3); }
+.art-body a:hover { border-bottom-color: #0020f6; }
+
+/* ═══════════ IKONY — rezervace místa, ať se nic nepřeskládá ═══════════
+   <iconify-icon> je do upgradu komponenty neznámý inline prvek s nulovou
+   šířkou. Bez tohohle se po načtení skriptu rozšíří všechno, co ikonu
+   obsahuje (pilulky sítí v CTA, patička, tlačítka). Šířky odpovídají
+   atributu width="…" v HTML — když přidáš novou velikost, doplň ji sem.
+   Viz gotcha v CLAUDE.md a `node kontrola-ikon.mjs`. */
+iconify-icon { display: inline-block; width: 1em; height: 1em; vertical-align: -0.125em; flex-shrink: 0; }
+/* nečtvercové ikony — rezervace podle skutečného poměru stran, ať se nedeformují */
+iconify-icon[icon="logos:apple"] { width: 0.813em; }            /* 256×315 */
+iconify-icon[icon="logos:google-play-icon"] { width: 0.905em; } /* 256×283 */
+iconify-icon[width="12"] { width: 12px; height: 12px; }
+iconify-icon[width="13"] { width: 13px; height: 13px; }
+iconify-icon[width="14"] { width: 14px; height: 14px; }
+iconify-icon[width="15"] { width: 15px; height: 15px; }
+iconify-icon[width="16"] { width: 16px; height: 16px; }
+iconify-icon[width="17"] { width: 17px; height: 17px; }
+iconify-icon[width="18"] { width: 18px; height: 18px; }
+iconify-icon[width="20"] { width: 20px; height: 20px; }
+iconify-icon[width="22"] { width: 22px; height: 22px; }
+iconify-icon[width="26"] { width: 26px; height: 26px; }
+iconify-icon[width="32"] { width: 32px; height: 32px; }
+iconify-icon[width="56"] { width: 56px; height: 56px; }

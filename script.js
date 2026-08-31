@@ -25,6 +25,16 @@ function updateNav() {
   });
   navbar.classList.toggle('nav-over-light', overLight);
 
+  // Světlá stránka (blog, články): nad modrou patičkou přepnout navbar zpátky do bílé
+  if (navbar.classList.contains('nav-light-page')) {
+    let overBlue = false;
+    document.querySelectorAll('[data-nav-blue]').forEach(sec => {
+      const r = sec.getBoundingClientRect();
+      if (r.top <= 70 && r.bottom >= 10) overBlue = true;
+    });
+    navbar.classList.toggle('nav-over-blue', overBlue);
+  }
+
   if (hasStaticActive) return; // aktivní je jen odkaz aktuální stránky
 
   const mid = window.innerHeight * 0.35;

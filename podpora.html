@@ -35,10 +35,11 @@
   <link rel="icon" type="image/png" href="/favicon.png?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=League+Spartan:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="/iconify-solar.js"></script>
-  <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
-  <link rel="stylesheet" href="/style.css?v=62" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=League+Spartan:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="/iconify-icons.js"></script>
+  <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
+  <script src="/iconify-icon.min.js?v=3.0.0"></script>
+  <link rel="stylesheet" href="/style.css?v=70" />
   <style>
     /* ── Podpora sekce ── */
     .sup-page { padding: 0; }
@@ -999,7 +1000,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=30"></script>
+  <script src="/script.js?v=31"></script>
   <script src="/chat-widget.js"></script>
 
   <!-- ── Podpora: FAQ + typewriter ── -->

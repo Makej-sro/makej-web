@@ -36,4 +36,8 @@ Obě appky sdílí jednu Supabase a session → změny se přes realtime propisu
 - **Employer dashboard mock data** (`employer-data.jsx`) se přepíší reálnými při načtení — neodstraňovat, jsou fallback.
 - **DB trigger** (`match accepted → job filled`) je primární zdroj pravdy; aplikační kód to dělá taky pro jistotu.
 - **JSX v dashboardu nemá build** — validuj parserem (postup v STAV.md).
+- **Ikony na webu musí být v `iconify-icons.js`.** `<iconify-icon>` si ikonu, kterou nemá lokálně, stáhne z api.iconify.design **až když prvek přijde scrollem do viewportu** → viditelné naskakování (nejvíc v patičce a v CTA na konci stránky). Když přidáš novou ikonu do HTML, **přidej ji i do předloadu**:
+  `curl -s "https://api.iconify.design/<prefix>.json?icons=<a>,<b>"` → vlož jako další `IconifyPreload.push({...})`.
+  Kontrola: **`node kontrola-ikon.mjs`** — vypíše, co chybí, včetně hotového `curl` příkazu.
+  Komponenta `iconify-icon.min.js` se načítá **lokálně a synchronně** (přes CDN s `async` se upgradovala pozdě). V `style.css` je navíc blok, který ikonám **rezervuje místo** podle `width="…"` — bez něj se po upgradu roztáhne všechno, co ikonu obsahuje. **Nová velikost v HTML → přidat pravidlo i tam.**
 - Commit message končí: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`.

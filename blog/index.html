@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-25X9CMKGRD"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    // GDPR: výchozí souhlas odepřen (žádné analytické cookies), dokud uživatel nepřijme cookie lištu.
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500 });
+    try { if (localStorage.getItem('makej-cookie-consent') === 'accepted') gtag('consent', 'update', { analytics_storage: 'granted' }); } catch (e) {}
+    gtag('js', new Date());
+    gtag('config', 'G-25X9CMKGRD');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Novinky ze světa brigád a práce | Makej</title>
+  <meta name="description" content="Zajímavosti, tipy a novinky ze světa brigád a práce. Co je nového v aplikaci Makej a co pro vás chystáme." />
+  <meta name="theme-color" content="#0020f6" />
+  <link rel="canonical" href="https://makej.eu/blog" />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://makej.eu/blog" />
+  <meta property="og:title" content="Novinky ze světa brigád a práce | Makej" />
+  <meta property="og:description" content="Zajímavosti, tipy a novinky ze světa brigád a práce. Co je nového v aplikaci Makej a co pro vás chystáme." />
+  <meta property="og:image" content="https://makej.eu/og-image.png" />
+  <meta property="og:locale" content="cs_CZ" />
+  <meta property="og:site_name" content="Makej" />
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Novinky ze světa brigád a práce | Makej" />
+  <meta name="twitter:description" content="Zajímavosti, tipy a novinky ze světa brigád a práce. Co je nového v aplikaci Makej a co pro vás chystáme." />
+  <meta name="twitter:image" content="https://makej.eu/og-image.png" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="/favicon.png?v=3" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=League+Spartan:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="/iconify-icons.js"></script>
+  <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
+  <script src="/iconify-icon.min.js?v=3.0.0"></script>
+  <link rel="stylesheet" href="/style.css?v=70" />
+  <style>
+    /* ═══════════ BLOG — světlá stránka ═══════════ */
+    body { background: #ffffff; }
+    body::before { display: none; }
+
+
+    /* Hlavička */
+    @media (hover: hover) and (pointer: fine) {
+    }
+
+    /* Přepínač sekcí */
+
+    /* Sekce blogu */
+
+    /* Barevné štítky novinek */
+    .blog-chip.is-new { color: #0a7d3c; background: rgba(16,160,72,.12); }
+    .blog-chip.is-soon { color: #b26a00; background: rgba(230,150,0,.14); }
+    .blog-chip.is-update { color: #0020f6; background: rgba(0,32,246,.08); }
+
+    /* Mřížka karet */
+
+    @media (hover: hover) and (pointer: fine) {
+    }
+
+    /* Placeholder když ještě není fotka */
+
+    .blog-chip {
+      font-family: var(--font-heading); font-weight: 700;
+      font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
+      color: #0020f6; background: rgba(0,32,246,.08);
+      padding: 4px 10px; border-radius: 100px;
+    }
+    .blog-date { font-size: 12.5px; color: #9aa0bf; }
+
+    /* Updatlej modrý footer (jako na indexu) */
+    #footer { background: #0020f6; border-top: none; }
+    #footer .footer-logo { background: none !important; -webkit-text-fill-color: #fff !important; color: #fff !important; }
+    #footer .footer-brand > p,
+    #footer .footer-col h4,
+    #footer .footer-col a,
+    #footer .footer-bottom span { color: rgba(255,255,255,.85) !important; }
+    #footer .footer-col a:hover { color: #fff !important; }
+    #footer .footer-bottom { border-top-color: rgba(255,255,255,.18); }
+    #footer .footer-social a { background: rgba(255,255,255,.12); color: #fff; }
+    #footer .footer-social a:hover { background: rgba(255,255,255,.22); }
+
+    @media (max-width: 900px) {
+    }
+    @media (max-width: 620px) {
+    }
+    /* ══ Blog: boční panel + tři sekce pod sebou ══ */
+    .blog-shell { max-width: 1180px; margin: 0 auto; padding: 140px 24px 40px;
+      display: grid; grid-template-columns: 230px 1fr; gap: clamp(32px, 5vw, 72px); align-items: start; }
+
+    /* boční panel — drží se při scrollu */
+    .blog-side { position: sticky; top: 120px; }
+    .blog-side-h { font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.9rem, 3vw, 2.5rem);
+      line-height: 1.05; letter-spacing: -.03em; color: #0a0d2e; margin: 0; }
+    .blog-side-p { color: rgba(10,13,46,.55); font-size: .95rem; line-height: 1.5; margin: 14px 0 26px; }
+    .blog-nav { display: flex; flex-direction: column; }
+    .blog-nav a { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 11px 12px; border-radius: 10px; text-decoration: none;
+      font-family: var(--font-heading); font-weight: 600; font-size: .96rem; color: rgba(10,13,46,.62);
+      transition: background .18s, color .18s; }
+    .blog-nav a span { font-size: .82rem; color: rgba(10,13,46,.38); font-weight: 600; }
+    .blog-nav a:hover { background: rgba(10,13,46,.04); color: #0a0d2e; }
+    .blog-nav a.on { background: #eef1fb; color: #0020f6; font-weight: 700; }
+    .blog-nav a.on span { color: #0020f6; }
+    .blog-follow { margin-top: 30px; padding-top: 22px; border-top: 1px solid rgba(10,13,46,.1);
+      display: flex; flex-direction: column; gap: 9px; }
+    .blog-follow-l { font-family: var(--font-heading); font-size: .7rem;
+      font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(10,13,46,.4); margin-bottom: 4px; }
+    .blog-follow a { color: #0020f6; font-size: .92rem; font-weight: 600; text-decoration: none; }
+    .blog-follow a:hover { text-decoration: underline; }
+
+    /* hlavička sekce */
+    .blog-sec { margin-bottom: clamp(48px, 7vw, 86px); scroll-margin-top: 120px; }
+    .blog-sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: 20px;
+      margin-bottom: 22px; }
+    .blog-sec-h h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+      letter-spacing: -.02em; color: #0a0d2e; margin: 0; }
+    .blog-sec-h span { font-size: .84rem; color: rgba(10,13,46,.45); white-space: nowrap; }
+
+    /* 1) sociální sítě — karty s obrázkem nahoře */
+    .bs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 18px; }
+    .bs-card { background: #fff; border: 1px solid rgba(10,13,46,.09); border-radius: 16px; overflow: hidden;
+      transition: transform .22s, box-shadow .22s, border-color .22s; }
+    .bs-card:hover { transform: translateY(-3px); border-color: rgba(0,32,246,.28);
+      box-shadow: 0 18px 40px -22px rgba(10,13,46,.5); }
+    .bs-card a { text-decoration: none; display: block; color: inherit; }
+    .bs-media { position: relative; aspect-ratio: 1/1; overflow: hidden; background: #eef1fb; }
+    .bs-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* dočasně, než doplníme fotku z příspěvku */
+    .bs-media.is-waiting { display: grid; place-items: center;
+      background: linear-gradient(140deg, #eef1fb 0%, #dfe4ff 100%); }
+    .bs-media.is-waiting .bs-ph { font-size: 34px; color: rgba(0,32,246,.28); }
+    .bs-ig { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; border-radius: 8px;
+      background: rgba(255,255,255,.92); display: grid; place-items: center; color: #0a0d2e; font-size: 15px; }
+    .bs-body { padding: 14px 15px 17px; }
+    .bs-meta { margin-bottom: 9px; }
+    .bs-body h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1rem; line-height: 1.3;
+      color: #0a0d2e; margin: 0 0 6px; }
+    .bs-body p { font-size: .85rem; line-height: 1.5; color: rgba(10,13,46,.58); margin: 0; }
+
+    /* 2) novinky — řádky, štítek vlevo, datum vpravo */
+    .bn-list { display: flex; flex-direction: column; gap: 10px; }
+    .bn-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px;
+      padding: 18px 20px; background: #fff; border: 1px solid rgba(10,13,46,.09); border-radius: 14px;
+      text-decoration: none; color: inherit; transition: border-color .18s, box-shadow .18s; }
+    .bn-row:hover { border-color: rgba(0,32,246,.3); box-shadow: 0 14px 32px -24px rgba(10,13,46,.5); }
+    .bn-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .bn-text strong { font-family: var(--font-heading); font-weight: 700; font-size: 1.02rem; color: #0a0d2e; }
+    .bn-text span { font-size: .88rem; line-height: 1.5; color: rgba(10,13,46,.58); }
+    .bn-date { font-size: .82rem; color: rgba(10,13,46,.42); white-space: nowrap; }
+
+    /* 3) články — dva sloupce, náhled vlevo */
+    .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .ba-card { background: #fff; border: 1px solid rgba(10,13,46,.09); border-radius: 16px; overflow: hidden;
+      transition: transform .22s, box-shadow .22s, border-color .22s; }
+    .ba-card:hover { transform: translateY(-3px); border-color: rgba(0,32,246,.28);
+      box-shadow: 0 18px 40px -22px rgba(10,13,46,.5); }
+    .ba-card a { display: grid; grid-template-columns: 108px 1fr; text-decoration: none; color: inherit; }
+    /* karta bez odkazu — článek teprve vyjde */
+    .ba-soon-inner { display: grid; grid-template-columns: 108px 1fr; }
+    .ba-card.is-soon { opacity: .72; }
+    .ba-card.is-soon:hover { transform: none; border-color: rgba(10,13,46,.09); box-shadow: none; }
+    .ba-media { background: #eef1fb; display: grid; place-items: center; color: rgba(10,13,46,.22); font-size: 26px; overflow: hidden; }
+    .ba-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ba-body { padding: 16px 18px 18px; }
+    .ba-meta { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+    .ba-cat { font-family: var(--font-heading); font-size: .64rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase; color: rgba(10,13,46,.4); }
+    .ba-body h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1.02rem; line-height: 1.3;
+      color: #0a0d2e; margin: 0 0 6px; }
+    .ba-body p { font-size: .86rem; line-height: 1.5; color: rgba(10,13,46,.58); margin: 0; }
+
+    /* náběh karet při scrollu */
+    .bs-card, .bn-row, .ba-card { opacity: 0; transform: translateY(18px);
+      transition: opacity .6s cubic-bezier(.2,.8,.25,1), transform .6s cubic-bezier(.2,.8,.25,1),
+                  border-color .18s, box-shadow .22s; }
+    .bs-card.visible, .bn-row.visible, .ba-card.visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .bs-card, .bn-row, .ba-card { opacity: 1 !important; transform: none !important; }
+    }
+    @media (max-width: 900px) {
+      .blog-shell { grid-template-columns: 1fr; gap: 34px; padding-top: 120px; }
+      .blog-side { position: static; }
+      .blog-nav { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+      .blog-nav a { background: rgba(10,13,46,.04); }
+      .ba-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .ba-card a, .ba-soon-inner { grid-template-columns: 1fr; }
+      .ba-media { aspect-ratio: 5/2; }
+      .bn-row { grid-template-columns: auto 1fr; }
+      .bn-date { grid-column: 2; }
+    }
+</style>
+</head>
+<body>
+
+  <!-- ═══════════ NAV ═══════════ -->
+  <nav id="navbar" class="nav-light-page">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Makej</a>
+      <div class="nav-links">
+        <a href="/hledam-si-praci">Hledám si práci</a>
+        <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+        <a href="/lide">Lidé</a>
+        <a href="/#download">Stáhnout</a>
+        <a href="/podpora">Podpora</a>
+      </div>
+      <div class="nav-actions nav-actions-visible" id="nav-actions">
+        <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
+        <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
+      </div>
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/hledam-si-praci">Hledám si práci</a>
+      <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+      <a href="/lide">Lidé</a>
+      <a href="/#download">Stáhnout</a>
+      <a href="/podpora">Podpora</a>
+      <div class="mobile-menu-actions">
+        <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
+        <a href="javascript:void(0)" class="btn-primary" id="mobile-register-btn">Vytvořit účet</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main>
+    <div class="blog-shell">
+
+        <!-- ── Boční panel: nadpis, přepínač sekcí, odkazy na sítě ── -->
+        <aside class="blog-side">
+          <h1 class="blog-side-h">Blog<br>Makej</h1>
+          <p class="blog-side-p">Novinky z appky, články a naše sítě.</p>
+          <nav class="blog-nav">
+            <a href="#socialni-site" class="on">Sociální sítě <span>6</span></a>
+            <a href="#novinky">Novinky <span>1</span></a>
+            <a href="#clanky">Články <span>2</span></a>
+          </nav>
+          <div class="blog-follow">
+            <span class="blog-follow-l">Sleduj nás</span>
+            <a href="https://www.instagram.com/makej.eu" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://www.tiktok.com/@makejaplikace" target="_blank" rel="noopener">TikTok</a>
+            <a href="https://www.linkedin.com/company/makej-s-r-o/" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </aside>
+
+        <div class="blog-main">
+
+          <section class="blog-sec" id="socialni-site">
+            <div class="blog-sec-h"><h2>Sociální sítě</h2><span>Nejnovější příspěvky</span></div>
+            <div class="bs-grid">
+            <article class="bs-card">
+              <a href="https://www.instagram.com/p/DcltG34DH6V/" target="_blank" rel="noopener">
+                <div class="bs-media is-waiting"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><iconify-icon class="bs-ph" icon="solar:document-text-bold"></iconify-icon></div>
+                <div class="bs-body">
+                  <div class="bs-meta"><span class="blog-chip">Ze světa práce</span></div>
+                  <h3>TF? Ještě pořád posíláš CV přes portály z roku 2012?</h3>
+                  <p>Zdlouhavé formuláře, přílohy a pak ticho. Hledání práce může vypadat úplně jinak.</p>
+                </div>
+              </a>
+            </article>
+            <article class="bs-card">
+              <a href="https://www.instagram.com/p/DcdD6HcjA4A/" target="_blank" rel="noopener">
+                <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-5.jpg" alt="Novinky ze světa práce — postavička s megafonem" loading="lazy" /></div>
+                <div class="bs-body">
+                  <div class="bs-meta"><span class="blog-chip">Ze světa práce</span></div>
+                  <h3>Novinky ze světa práce — 2. týden</h3>
+                  <p>Další porce novinek z Česka i ze světa práce. Co ti tenhle týden nemělo uniknout?</p>
+                </div>
+              </a>
+            </article>
+            <article class="bs-card">
+              <a href="https://www.instagram.com/p/DcB42c1jNKn/" target="_blank" rel="noopener">
+                <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-4.jpg" alt="Překvapivé nabídky brigád na Makej" loading="lazy" /></div>
+                <div class="bs-body">
+                  <div class="bs-meta"><span class="blog-chip">Ze života</span></div>
+                  <h3>Brigády, které by tě nenapadly</h3>
+                  <p>Na Makej narazíš i na nabídky, co tě dostanou. Kterou bys poslal kamarádovi?</p>
+                </div>
+              </a>
+            </article>
+            <article class="bs-card">
+              <a href="https://www.instagram.com/p/Db6S507DJ-U/" target="_blank" rel="noopener">
+                <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-3.jpg" alt="Novinky ze světa práce" loading="lazy" /></div>
+                <div class="bs-body">
+                  <div class="bs-meta"><span class="blog-chip">Ze světa práce</span></div>
+                  <h3>Novinky ze světa práce — 1. týden</h3>
+                  <p>5 čerstvých novinek z Česka i ze světa práce za poslední týden. Která tě překvapila nejvíc?</p>
+                </div>
+              </a>
+            </article>
+            <article class="bs-card">
+              <a href="https://www.instagram.com/p/DbiO-tBjDQD/" target="_blank" rel="noopener">
+                <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-2.jpg" alt="Posíláš životopisy a pořád ticho?" loading="lazy" /></div>
+                <div class="bs-body">
+                  <div class="bs-meta"><span class="blog-chip">Ze světa práce</span></div>
+                  <h3>Posíláš životopisy a pořád ticho? Není to tvoje vina</h3>
+                  <p>Novináři poslali životopis do 1000 firem — přes polovina měsíc mlčela. Přesně tohle ticho jsme zažili taky. Proto vzniklo Makej.</p>
+                </div>
+              </a>
+            </article>
+            <article class="bs-card">
+              <a href="https://www.instagram.com/p/Da-f75SjKc2/" target="_blank" rel="noopener">
+                <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-1.jpg" alt="Co je Makej?" loading="lazy" /></div>
+                <div class="bs-body">
+                  <div class="bs-meta"><span class="blog-chip">O Makej</span></div>
+                  <h3>Co je Makej?</h3>
+                  <p>Platforma, na které si jednoduše domluvíš jednorázové i pravidelné brigády. Vysvětlujeme, jak to celé funguje.</p>
+                </div>
+              </a>
+            </article>
+            </div>
+          </section>
+
+          <section class="blog-sec" id="novinky">
+            <div class="blog-sec-h"><h2>Novinky</h2><span>Co je nového a co chystáme</span></div>
+            <!-- PŘIDAT NOVINKU: zkopíruj jeden <a class="bn-row"> a dej ho nahoru.
+                 Štítek: blog-chip is-new (Nové) · is-soon (Chystáme) · is-update (Update) -->
+            <div class="bn-list">
+            <a class="bn-row" href="/lide">
+              <span class="blog-chip is-new">Nové</span>
+              <span class="bn-text"><strong>Spouštíme Lidé — tržiště dovedností</strong><span>Makej už není jen o brigádách od firem. Zapni si kartu, napiš, co umíš — od opravy nábytku po doučování — a najdi lidi ve svém okolí, kteří to zrovna shánějí.</span></span>
+              <span class="bn-date">Srpen 2026</span>
+            </a>
+            </div>
+          </section>
+
+          <section class="blog-sec" id="clanky">
+            <div class="blog-sec-h"><h2>Články</h2><span>Delší čtení</span></div>
+            <div class="ba-grid">
+            <article class="ba-card">
+              <a href="/blog/proc-jsme-zalozili-makej">
+                <div class="ba-media"><img src="/blog-img/art-proc-jsme-zalozili-makej.svg" alt="Stoh nabídek práce, vrchní se swipuje doprava" loading="lazy" /></div>
+                <div class="ba-body">
+                  <div class="ba-meta"><span class="blog-chip is-new">Nové</span><span class="ba-cat">O Makej</span></div>
+                  <h3>Proč jsme založili Makej: příběh tří spolužáků</h3>
+                  <p>Nekonečné scrollování nudných portálů, tři spolužáci z vysoké a jeden nápad. Jak a proč vznikl Makej.</p>
+                </div>
+              </a>
+            </article>
+            <article class="ba-card is-soon">
+              <div class="ba-soon-inner">
+                <div class="ba-media"><img src="/blog-img/art-brigada-bez-smlouvy.svg" alt="Podepsaná dohoda s razítkem" loading="lazy" /></div>
+                <div class="ba-body">
+                  <div class="ba-meta"><span class="blog-chip is-soon">Připravujeme</span><span class="ba-cat">Návod</span></div>
+                  <h3>Brigáda bez smlouvy: co na to zákon a na co si dát pozor</h3>
+                  <p>Vypadá to jako zkratka, ale u firmy to skoro nikdy legálně nefunguje. Co riskuješ ty, co firma – a kdy je to naopak v pořádku.</p>
+                </div>
+              </div>
+            </article>
+            </div>
+          </section>
+
+        </div>
+      </div>
+  </main>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer id="footer" data-nav-blue>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="footer-logo">Makej</a>
+          <p>Aplikace na brigády a práci ve tvém okolí. Swajpuj, matchuj a pracuj.</p>
+          <div class="footer-social">
+            <a href="https://www.instagram.com/makej.eu" aria-label="Instagram" target="_blank" rel="noopener"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a>
+            <a href="https://www.facebook.com/share/19Kq5N1R2u/?mibextid=wwXIfr" aria-label="Facebook" target="_blank" rel="noopener"><iconify-icon icon="mdi:facebook" width="22"></iconify-icon></a>
+            <a href="https://www.tiktok.com/@makejaplikace" aria-label="TikTok" target="_blank" rel="noopener"><iconify-icon icon="ic:baseline-tiktok" width="22"></iconify-icon></a>
+            <a href="https://www.linkedin.com/company/makej-s-r-o/" aria-label="LinkedIn" target="_blank" rel="noopener"><iconify-icon icon="mdi:linkedin" width="22"></iconify-icon></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Produkt</h4>
+          <a href="/hledam-si-praci">Hledám si práci</a>
+          <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+          <a href="/lide">Lidé</a>
+          <a href="/pro-zamestnavatele#pricing">Ceník</a>
+          <a href="/#download">Stáhnout</a>
+        </div>
+        <div class="footer-col">
+          <h4>Firma</h4>
+          <a href="/blog">Blog</a>
+          <a href="/podpora">Podpora</a>
+          <a href="mailto:admin@makej.eu">Kontakt</a>
+          <a href="/o-nas">O nás</a>
+        </div>
+        <div class="footer-col">
+          <h4>Právní</h4>
+          <a href="/terms">Podmínky použití</a>
+          <a href="/privacy">Ochrana soukromí</a>
+          <a href="/privacy#cookies">Cookies</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Makej Všechna práva vyhrazena.</span>
+      </div>
+    </div>
+  </footer>
+
+    <!-- Modals -->
+  <div class="modal-overlay" id="modal-overlay">
+
+    <!-- LOGIN MODAL -->
+    <div class="modal" id="login-modal" style="overflow:visible;">
+      <!-- Makač peeker -->
+      <div id="main-peeker" style="
+        position:absolute; top:-70px; left:50%; transform:translateX(-50%);
+        pointer-events:none; z-index:3;
+        filter: drop-shadow(0 14px 36px rgba(0,0,60,0.65));
+        transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+        animation: peekerIn 0.45s cubic-bezier(.2,.8,.2,1) both;
+      ">
+        <div style="width:88px;height:76px;background:linear-gradient(160deg,#4848c4 0%,#1c1c7a 100%);border-radius:50% 50% 44% 44%;position:relative;box-shadow:0 14px 36px rgba(0,0,60,0.65),inset 0 1px 0 rgba(255,255,255,0.18);border:2px solid rgba(140,140,255,0.3);">
+          <div id="main-browL" style="position:absolute;left:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-browR" style="position:absolute;right:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-eyeL" style="position:absolute;left:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilL" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidL" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div id="main-eyeR" style="position:absolute;right:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilR" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidR" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div style="position:absolute;bottom:11px;left:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+          <div style="position:absolute;bottom:11px;right:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+        </div>
+      </div>
+      <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
+      <div class="modal-logo">Makej</div>
+      <h2 class="modal-title">Přihlásit se</h2>
+      <p class="modal-subtitle">Vítej zpět! Přihlaš se ke svému účtu.</p>
+      <div class="modal-error" id="login-error"></div>
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email</label>
+          <input class="form-input" type="email" id="login-email" placeholder="tvuj@email.cz" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Heslo</label>
+          <input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="login-key">Přístupový klíč</label>
+            <input class="form-input" type="text" id="login-key" placeholder="Zadej klíč" inputmode="numeric" autocomplete="off" />
+            <p class="form-hint">Pouze pro oficiální testovací a vývojářské účty.</p>
+          </div>
+          <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
+      </form>
+      <div class="modal-divider"><span>nebo</span></div>
+      <button class="btn-google" id="login-google">
+        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.6 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.3C29.4 35.5 26.8 36.5 24 36.5c-5.2 0-9.6-3.4-11.2-8l-6.6 5C9.7 39.7 16.3 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.2 5.3C37.5 39.7 44 35.4 44 24c0-1.3-.1-2.6-.4-3.9z"/>
+        </svg>
+        Pokračovat s Google
+      </button>
+      <p class="modal-switch">Nemáš účet? <a href="#" id="switch-to-register">Zaregistruj se</a></p>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div class="modal" id="register-modal">
+      <button class="modal-close" id="register-close" aria-label="Zavřít">✕</button>
+      <div class="modal-logo">Makej</div>
+
+      <!-- Krok 1: výběr role -->
+      <div id="reg-step-1">
+        <h2 class="modal-title">Vytvořit účet</h2>
+        <p class="modal-subtitle">Kdo jsi?</p>
+        <div class="role-cards">
+          <button type="button" class="role-card" data-role="worker">
+            <iconify-icon icon="solar:user-bold" width="32"></iconify-icon>
+            <strong>Brigádník</strong>
+            <small>Hledám práci</small>
+          </button>
+          <button type="button" class="role-card" data-role="employer">
+            <iconify-icon icon="solar:buildings-bold" width="32"></iconify-icon>
+            <strong>Zaměstnavatel</strong>
+            <small>Hledám brigádníky</small>
+          </button>
+        </div>
+      </div>
+
+      <!-- Krok 2: údaje -->
+      <div id="reg-step-2" style="display:none">
+        <button class="modal-back" id="reg-back">
+          <iconify-icon icon="solar:arrow-left-bold" width="16"></iconify-icon>
+          Zpět
+        </button>
+        <h2 class="modal-title">Tvoje údaje</h2>
+        <p class="modal-subtitle" id="reg-role-subtitle">Brigádník</p>
+        <div class="modal-error" id="register-error"></div>
+        <form id="register-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Jméno</label>
+            <input class="form-input" type="text" id="reg-name" placeholder="Tvoje jméno" autocomplete="name" required />
+          </div>
+          <div class="form-group" id="reg-company-group" style="display:none">
+            <label class="form-label" for="reg-company">Název firmy</label>
+            <input class="form-input" type="text" id="reg-company" placeholder="Název tvé firmy" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email</label>
+            <input class="form-input" type="email" id="reg-email" placeholder="tvuj@email.cz" autocomplete="email" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Heslo</label>
+            <div class="password-wrap">
+              <input class="form-input" type="password" id="reg-password" placeholder="Min. 6 znaků" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" id="reg-pw-toggle" aria-label="Zobrazit heslo" tabindex="-1">
+                <iconify-icon icon="solar:eye-bold" width="18" id="reg-pw-icon"></iconify-icon>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password2">Heslo znovu</label>
+            <div class="password-wrap">
+              <input class="form-input" type="password" id="reg-password2" placeholder="Zopakuj heslo" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" id="reg-pw2-toggle" aria-label="Zobrazit heslo" tabindex="-1">
+                <iconify-icon icon="solar:eye-bold" width="18" id="reg-pw2-icon"></iconify-icon>
+              </button>
+            </div>
+          </div>
+          <label for="reg-marketing" class="reg-consent" style="display:flex;align-items:flex-start;gap:10px;margin:2px 2px 15px;cursor:pointer;font-size:.82rem;line-height:1.45;color:rgba(10,13,46,.62);text-align:left;">
+            <input type="checkbox" id="reg-marketing" style="width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--primary);cursor:pointer;" />
+            <span>Souhlasím se zasíláním novinek, výhodných nabídek a dalších sdělení pro <a href="/privacy#marketing" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--primary);font-weight:600;">marketingové účely</a>. <em style="font-style:normal;opacity:.65;">(nepovinné)</em></span>
+          </label>
+          <button type="submit" class="btn-primary btn-full btn-lg" id="register-submit">Vytvořit účet</button>
+          <p style="font-size:.78rem;color:var(--muted-fg);text-align:center;margin-top:12px;line-height:1.5;">
+            Registrací souhlasíš s našimi <a href="/terms" target="_blank" style="color:var(--secondary)">Obchodními podmínkami</a>
+            a <a href="/privacy" target="_blank" style="color:var(--secondary)">Zásadami ochrany osobních údajů</a>.
+          </p>
+        </form>
+      </div>
+
+      <p class="modal-switch">Už máš účet? <a href="#" id="switch-to-login">Přihlásit se</a></p>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ COOKIE BANNER ═══════════ -->
+  <div id="cookie-banner" role="dialog" aria-label="Souhlas s cookies" aria-live="polite">
+    <div class="cookie-inner">
+      <p class="cookie-text">
+        🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
+        Žádné reklamní trackery. Více informací v naší <a href="/privacy#cookies">Politice ochrany soukromí</a>.
+      </p>
+      <div class="cookie-actions">
+        <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
+        <button class="cookie-btn cookie-btn-accept" id="cookie-accept">Rozumím, souhlasím</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Boční navigace: zvýrazní sekci, ve které zrovna jsi -->
+  <script>
+    (function () {
+      var odkazy = [].slice.call(document.querySelectorAll('.blog-nav a'));
+      if (!odkazy.length) return;
+      var sekce = odkazy.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+      var PRAH = 140;      // pár pixelů pod scroll-margin-top sekcí
+      var zamek = false;   // po kliknutí drží zvýraznění klik, ne scroll
+
+      function zvyrazni(i) {
+        odkazy.forEach(function (a, k) { a.classList.toggle('on', k === i); });
+      }
+
+      function podleScrollu() {
+        if (zamek) return;
+        var i = 0;
+        if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
+          i = sekce.length - 1;              // u konce stránky vždy poslední sekce
+        } else {
+          for (var j = 0; j < sekce.length; j++) {
+            if (sekce[j] && sekce[j].getBoundingClientRect().top <= PRAH) i = j;
+          }
+        }
+        zvyrazni(i);
+      }
+
+      // Klik = rozhodnutí uživatele. Drží, dokud sám nezačne scrollovat.
+      odkazy.forEach(function (a, i) {
+        a.addEventListener('click', function () { zamek = true; zvyrazni(i); });
+      });
+      ['wheel', 'touchmove', 'keydown'].forEach(function (ev) {
+        window.addEventListener(ev, function () { zamek = false; }, { passive: true });
+      });
+
+      window.addEventListener('scroll', podleScrollu, { passive: true });
+      window.addEventListener('resize', podleScrollu, { passive: true });
+      podleScrollu();
+    })();
+  </script>
+
+  <!-- Postupné odkrývání karet -->
+  <script>
+    (function () {
+      var els = document.querySelectorAll('.bs-card, .bn-row, .ba-card');
+      if (!els.length) return;
+      if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('visible'); }); return; }
+      els.forEach(function (el, i) { el.style.transitionDelay = (Math.min(i % 4, 3) * 0.07).toFixed(2) + 's'; });
+      var obs = new IntersectionObserver(function (zaznamy) {
+        zaznamy.forEach(function (z) {
+          if (z.isIntersecting) { z.target.classList.add('visible'); obs.unobserve(z.target); }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+      els.forEach(function (el) { obs.observe(el); });
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/script.js?v=31"></script>
+</body>
+</html>

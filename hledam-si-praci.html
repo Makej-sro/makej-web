@@ -35,12 +35,13 @@
   <link rel="icon" type="image/png" href="/favicon.png?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Instrument+Sans:wght@400;500;600&family=Caveat:wght@500;600;700&family=League+Spartan:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="/iconify-solar.js"></script>
-  <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Instrument+Sans:wght@400;500;600&family=Caveat:wght@500;600;700&family=League+Spartan:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="/iconify-icons.js"></script>
+  <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
+  <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" as="image" href="/krok-1.png?v=3" />
   <link rel="preload" as="image" href="/krok-2.png?v=2" />
-  <link rel="stylesheet" href="style.css?v=62" />
+  <link rel="stylesheet" href="style.css?v=70" />
   <style>
     /* Bolt-style střídavé kroky (foto + text) */
     .bolt-journey { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
@@ -356,28 +357,30 @@
     #navbar .mobile-menu { pointer-events: auto; }
     .emp-hero-blue { padding-top: 0 !important; }
     .eh-head { margin-top: clamp(94px, 12vh, 120px); margin-top: clamp(94px, calc(var(--hero-h, 100vh) * .12), 120px); }
-    .vx-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 16px 24px; transition: background .25s, box-shadow .25s, padding .2s; }
+        /* Rozložení stejné jako hlavní navbar: logo vlevo, odkazy absolutně vycentrované
+       přes celou lištu, CTA vpravo. */
+    .vx-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 16px 24px; transition: background .25s, box-shadow .25s, padding .2s; }
+    .vx-nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; position: relative; }
     .vx-nav.scrolled { background: rgba(255,255,255,.48); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 6px 24px -10px rgba(10,13,46,.3); padding-top: 10px; padding-bottom: 10px; }
     .vx-nav.scrolled .vx-nav-links a { color: #0a0d2e; }
     .vx-nav.scrolled .vx-nav-links a:hover { color: #0020f6; }
     .vx-nav.scrolled .vx-logo { color: #0020f6; }
     .vx-nav.scrolled .vx-nav-actions a.vx-signin { background: #0020f6; color: #fff; box-shadow: 0 8px 20px -8px rgba(0,32,246,.5); }
-    .vx-nav-links { display: flex; align-items: center; gap: 24px; height: 44px; }
-    .vx-nav-links.right { justify-content: flex-end; }
-    .vx-nav-links a { font-family: var(--font-nav); font-weight: 700; font-size: .82rem; letter-spacing: .02em; color: #fff; text-decoration: none; text-transform: uppercase; opacity: .88; transition: opacity .2s; }
+    .vx-nav-links { position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 32px; height: 44px; pointer-events: none; }
+    .vx-nav-links a { pointer-events: all; }
+    .vx-nav-links a.vx-active { opacity: 1; font-weight: 700; border-bottom: 2px solid currentColor; padding-bottom: 2px; }
+    .vx-nav-links a { font-family: var(--font-nav); font-weight: 600; font-size: 1rem; letter-spacing: .01em; color: #fff; text-decoration: none; opacity: .88; transition: opacity .2s; }
     .vx-nav-links a:hover { opacity: 1; }
-    .vx-nav-actions { display: flex; align-items: center; gap: 10px; height: 44px; margin-left: 20px; }
-    .vx-nav-actions a.vx-signin { font-family: var(--font-nav); font-weight: 800; font-size: .8rem; letter-spacing: .03em; text-transform: uppercase; color:#0020f6; opacity:1; background:#fff; border:none; border-radius:999px; padding:11px 20px; cursor:pointer; text-decoration:none; transition:transform .18s, box-shadow .2s; white-space:nowrap; box-shadow:0 8px 20px -8px rgba(0,0,0,.35); }
+    .vx-nav-actions { display: flex; align-items: center; gap: 10px; height: 44px; }
+    .vx-nav-actions a.vx-signin { font-family: var(--font-nav); font-weight: 700; font-size: .95rem; letter-spacing: .01em; color:#0020f6; opacity:1; background:#fff; border:none; border-radius:999px; padding:11px 20px; cursor:pointer; text-decoration:none; transition:transform .18s, box-shadow .2s; white-space:nowrap; box-shadow:0 8px 20px -8px rgba(0,0,0,.35); }
     .vx-nav-actions a.vx-signin:hover { transform: translateY(-1px); box-shadow:0 12px 26px -8px rgba(0,0,0,.45); }
-    .vx-logo-tab { display:flex; justify-content:center; }
-    .vx-logo { font-family: var(--font-nav); font-weight: 800; font-size: 1.5rem; letter-spacing: -.01em; color:#fff; text-decoration:none; padding: 8px 30px 14px; line-height:1; }
+    .vx-logo { font-family: var(--font-nav); font-weight: 800; font-size: 1.5rem; letter-spacing: -.01em; color:#fff; text-decoration:none; line-height:1; }
     @media (max-width: 900px) {
       /* Mobil: odkazy i CTA schované pod hamburger (panel #mobile-menu ve skrytém #navbar) */
-      .vx-nav-links a, .vx-nav-actions { display: none; }
-      .vx-nav { grid-template-columns: 1fr auto 1fr; padding: 10px 16px; }
-      .vx-logo { font-size: 1.3rem; padding: 4px 0 6px; }
-      .vx-nav-links.right { justify-content: flex-end; }
-    }
+      .vx-nav-links, .vx-nav-actions { display: none; }
+      .vx-nav { padding: 10px 16px; }
+      .vx-logo { font-size: 1.4rem; }
+      }
 
     /* ── Hero jako u Lidé: modrý→bílý gradient + „drop" animace telefonu ── */
     .emp-hero-blue { background: linear-gradient(180deg,#0020f6 0%,#1a37ff 12%,#5875ff 30%,#aebcff 46%,#ffffff 60%) !important; min-height: 100vh; min-height: var(--hero-h, 100vh); }
@@ -393,7 +396,7 @@
     /* ── Intro sekce (styl jako u Lidé) ── */
     .vx-intro { background:#f6f7fb; padding: 92px 0; }
     .vx-intro .vx-wrap { width: min(1100px, 90vw); margin: 0 auto; text-align:center; }
-    .vx-intro .vx-kick { display:inline-block; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.72rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:#0020f6; }
+    .vx-intro .vx-kick { display:inline-block; font-family:var(--font-heading); font-size:.72rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#0020f6; }
     .vx-intro h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.03; margin: 12px 0 0; color:#0a0d2e; }
     .vx-intro p { max-width: 780px; margin: 16px auto 0; color:#5b6478; font-size: 1.16rem; line-height: 1.6; }
     .js-reveal-up { opacity:0; transform: translateY(60px); transition: opacity 1s cubic-bezier(.2,.8,.25,1), transform 1s cubic-bezier(.2,.8,.25,1); }
@@ -459,14 +462,15 @@
     <section class="emp-hero-blue">
       <!-- Navbar ve stylu Lidé (aktuální stránka „Hledám práci" skrytá) -->
       <nav class="vx-nav">
-        <div class="vx-nav-links">
-          <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
-          <a href="/lide">Lidé</a>
-        </div>
-        <div class="vx-logo-tab"><a href="/" class="vx-logo">Makej</a></div>
-        <div class="vx-nav-links right">
-          <a href="#download">Stáhnout</a>
-          <a href="/podpora">Podpora</a>
+        <div class="vx-nav-inner">
+          <a href="/" class="vx-logo">Makej</a>
+          <div class="vx-nav-links">
+            <a href="/hledam-si-praci" class="vx-active">Hledám si práci</a>
+            <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
+            <a href="/lide">Lidé</a>
+            <a href="#download">Stáhnout</a>
+            <a href="/podpora">Podpora</a>
+          </div>
           <button class="mobile-menu-btn vx-burger" aria-label="Menu" aria-expanded="false">
             <span></span><span></span>
           </button>
@@ -891,7 +895,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=30"></script>
+  <script src="script.js?v=31"></script>
   <!-- Lazy-play ukázkového videa: stáhne a přehraje až ve viewportu (šetří data + LCP) -->
   <script>
   (function () {

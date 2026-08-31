@@ -14,23 +14,24 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jak najít brigádu i brigádníka — průvodce | Makej</title>
-  <meta name="description" content="Krok za krokem: jak si najít brigádu, nebo jak zadat inzerát a najít brigádníka. Průvodce aplikací Makej pro obě strany." />
+  <title>Proč jsme založili Makej: příběh tří spolužáků, co nesnášeli hledání brigád | Makej</title>
+  <meta name="description" content="Tři spolužáci z vysoké školy, nekonečné scrollování nudných portálů a jeden společný nápad. Tohle je příběh, jak a proč vznikl Makej." />
   <meta name="theme-color" content="#0020f6" />
-  <link rel="canonical" href="https://makej.eu/pruvodce" />
+  <meta name="keywords" content="Makej příběh, kdo stojí za Makej, o Makej" />
+  <link rel="canonical" href="https://makej.eu/blog/proc-jsme-zalozili-makej" />
   <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://makej.eu/pruvodce" />
-  <meta property="og:title" content="Jak najít brigádu i brigádníka — průvodce | Makej" />
-  <meta property="og:description" content="Krok za krokem: jak si najít brigádu, nebo jak zadat inzerát a najít brigádníka. Průvodce aplikací Makej pro obě strany." />
-  <meta property="og:image" content="https://makej.eu/og-image.png" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://makej.eu/blog/proc-jsme-zalozili-makej" />
+  <meta property="og:title" content="Proč jsme založili Makej: příběh tří spolužáků, co nesnášeli hledání brigád | Makej" />
+  <meta property="og:description" content="Tři spolužáci z vysoké školy, nekonečné scrollování nudných portálů a jeden společný nápad. Tohle je příběh, jak a proč vznikl Makej." />
+  <meta property="og:image" content="https://makej.eu/og-clanek-proc-jsme-zalozili-makej.png" />
   <meta property="og:locale" content="cs_CZ" />
   <meta property="og:site_name" content="Makej" />
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Jak najít brigádu i brigádníka — průvodce | Makej" />
-  <meta name="twitter:description" content="Krok za krokem: jak si najít brigádu, nebo jak zadat inzerát a najít brigádníka. Průvodce aplikací Makej pro obě strany." />
-  <meta name="twitter:image" content="https://makej.eu/og-image.png" />
+  <meta name="twitter:title" content="Proč jsme založili Makej: příběh tří spolužáků, co nesnášeli hledání brigád | Makej" />
+  <meta name="twitter:description" content="Tři spolužáci z vysoké školy, nekonečné scrollování nudných portálů a jeden společný nápad. Tohle je příběh, jak a proč vznikl Makej." />
+  <meta name="twitter:image" content="https://makej.eu/og-clanek-proc-jsme-zalozili-makej.png" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="/favicon.png?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -41,115 +42,56 @@
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="stylesheet" href="/style.css?v=70" />
   <style>
-    .pg-page { padding: 80px 0 100px; }
+    /* ═══════════ ČLÁNEK — světlá stránka ═══════════ */
+    body { background: #ffffff; }
+    body::before { display: none; }
 
-    /* Hero */
-    .pg-hero { text-align: center; max-width: 600px; margin: 0 auto 44px; padding: 0 24px; }
-    .pg-hero h1 {
-      font-family: var(--font-heading);
-      font-size: clamp(2.4rem, 5.5vw, 3.8rem);
-      font-weight: 800; line-height: 1.1; margin: 16px 0 20px;
+    .blog-chip {
+      font-family: var(--font-heading); font-weight: 700;
+      font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
+      color: #0020f6; background: rgba(0,32,246,.08);
+      padding: 4px 10px; border-radius: 100px;
     }
-    .pg-hero p { color: var(--muted-fg); font-size: 1.05rem; line-height: 1.65; max-width: 480px; margin: 0 auto; }
 
-    /* Role toggle (segmented control) */
-    .pg-toggle {
-      position: relative;
-      display: inline-flex;
-      padding: 5px;
-      border-radius: 100px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(208,208,255,.12);
-      margin: 0 auto 56px;
-      gap: 4px;
-    }
-    .pg-toggle-wrap { text-align: center; padding: 0 24px; }
-    .pg-thumb {
-      position: absolute;
-      top: 5px; left: 5px;
-      width: calc(50% - 5px); height: calc(100% - 10px);
-      border-radius: 100px;
-      background: linear-gradient(135deg, #00103f, #0a1aa3);
-      box-shadow: 0 8px 22px rgba(0,32,246,.35);
-      transition: transform .32s cubic-bezier(.34,1.3,.5,1);
-      z-index: 0;
-    }
-    .pg-toggle.employer .pg-thumb { transform: translateX(100%); }
-    .pg-btn {
-      position: relative; z-index: 1;
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 11px 26px;
-      border: none; background: transparent;
-      color: var(--muted-fg);
-      font-family: var(--font-heading);
-      font-weight: 600; font-size: .92rem;
-      cursor: pointer; white-space: nowrap;
-      transition: color .25s;
-    }
-    .pg-btn.is-active { color: #fff; }
+    /* Modrý footer (stejně jako na blogu a indexu) */
+    #footer { background: #0020f6; border-top: none; }
+    #footer .footer-logo { background: none !important; -webkit-text-fill-color: #fff !important; color: #fff !important; }
+    #footer .footer-brand > p,
+    #footer .footer-col h4,
+    #footer .footer-col a,
+    #footer .footer-bottom span { color: rgba(255,255,255,.85) !important; }
+    #footer .footer-col a:hover { color: #fff !important; }
+    #footer .footer-bottom { border-top-color: rgba(255,255,255,.18); }
+    #footer .footer-social a { background: rgba(255,255,255,.12); color: #fff; }
+    #footer .footer-social a:hover { background: rgba(255,255,255,.22); }
 
-    /* Panels */
-    .pg-panel { display: none; }
-    .pg-panel.is-active { display: block; animation: pgFade .4s ease both; }
-    @keyframes pgFade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Steps grid */
-    .pg-steps {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-    .pg-step {
-      position: relative;
-      background: rgba(255,255,255,.035);
-      border: 1px solid rgba(208,208,255,.1);
-      border-radius: 20px;
-      padding: 28px 24px 26px;
-      transition: border-color .25s, transform .3s cubic-bezier(.34,1.3,.5,1), box-shadow .3s;
-    }
-    .pg-step:hover {
-      transform: translateY(-6px);
-      border-color: rgba(91,107,255,.4);
-      box-shadow: 0 20px 46px rgba(0,0,0,.28);
-    }
-    .pg-step-icon {
-      width: 54px; height: 54px;
-      display: grid; place-items: center;
-      border-radius: 15px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: #fff;
-      box-shadow: 0 8px 22px rgba(0,32,246,.3);
-      margin-bottom: 18px;
-    }
-    .pg-step h3 {
-      font-family: var(--font-heading);
-      font-size: 1.08rem; font-weight: 700; color: #fff;
-      margin-bottom: 9px;
-    }
-    .pg-step p { color: var(--muted-fg); font-size: .88rem; line-height: 1.6; }
-
-    /* Bottom CTA */
-    .pg-cta { text-align: center; padding: 80px 24px 0; }
-    .pg-cta h2 { font-family: var(--font-heading); font-size: clamp(1.8rem,4vw,2.6rem); font-weight: 800; margin-bottom: 14px; }
-    .pg-cta p { color: var(--muted-fg); margin-bottom: 32px; font-size: 1rem; }
-    .pg-cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-
-    @media (max-width: 900px) {
-      .pg-steps { grid-template-columns: repeat(2, 1fr); max-width: 560px; }
-    }
-    @media (max-width: 480px) {
-      .pg-steps { grid-template-columns: 1fr; max-width: 360px; }
-      .pg-btn { padding: 11px 18px; font-size: .86rem; }
-    }
+    @media (max-width: 900px) { .art-shell { padding-top: 120px; } }
+    @media (max-width: 560px) { .art-cta { padding: 26px 22px; } }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Proč jsme založili Makej: příběh tří spolužáků, co nesnášeli hledání brigád",
+    "description": "Tři spolužáci z vysoké školy, nekonečné scrollování nudných portálů a jeden společný nápad. Tohle je příběh, jak a proč vznikl Makej.",
+    "datePublished": "2026-08-31",
+    "dateModified": "2026-08-31",
+    "inLanguage": "cs-CZ",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://makej.eu/blog/proc-jsme-zalozili-makej" },
+    "image": "https://makej.eu/og-clanek-proc-jsme-zalozili-makej.png",
+    "author": { "@type": "Organization", "name": "Makej" },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Makej",
+      "logo": { "@type": "ImageObject", "url": "https://makej.eu/favicon.png" }
+    }
+  }
+  </script>
 </head>
 <body>
 
   <!-- ═══════════ NAV ═══════════ -->
-  <nav id="navbar">
+  <nav id="navbar" class="nav-light-page">
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej</a>
       <div class="nav-links">
@@ -180,94 +122,64 @@
     </div>
   </nav>
 
-  <!-- ═══════════ MAIN ═══════════ -->
-  <main class="pg-page">
+  <!-- ═══════════ ČLÁNEK ═══════════ -->
+  <main>
+    <article class="art-shell">
 
-    <!-- Hero -->
-    <section class="pg-hero">
-      <h1>Jak Makej <span class="gradient-text">funguje</span></h1>
-      <p>Vyber si svou stranu a projdi si ve zkratce celý průběh — od prvního swajpu po hotovou brigádu.</p>
-    </section>
+      <a href="/blog" class="art-back">
+        <iconify-icon icon="solar:arrow-left-bold" width="15"></iconify-icon>
+        Zpět na blog
+      </a>
 
-    <!-- Role toggle -->
-    <div class="pg-toggle-wrap">
-      <div class="pg-toggle" id="pg-toggle">
-        <span class="pg-thumb"></span>
-        <button class="pg-btn is-active" data-role="worker" onclick="showRole(this,'worker')">
-          <iconify-icon icon="solar:user-bold" width="18"></iconify-icon> Jsem brigádník
-        </button>
-        <button class="pg-btn" data-role="employer" onclick="showRole(this,'employer')">
-          <iconify-icon icon="solar:buildings-bold" width="18"></iconify-icon> Jsem zaměstnavatel
-        </button>
+      <div class="art-meta">
+        <span class="blog-chip">O Makej</span>
+        <span class="art-cat">Příběh</span>
       </div>
-    </div>
 
-    <!-- PANEL: Brigádník -->
-    <div class="pg-panel is-active" data-role="worker">
-      <div class="pg-steps">
-        <div class="pg-step">
-          <div class="pg-step-icon"><iconify-icon icon="solar:user-bold" width="26"></iconify-icon></div>
-          <h3>Založ si profil</h3>
-          <p>Zaregistruj se, přidej zkušenosti a co tě baví. Hotovo za minutu.</p>
-        </div>
-        <div class="pg-step">
-          <div class="pg-step-icon"><iconify-icon icon="solar:card-recive-bold" width="26"></iconify-icon></div>
-          <h3>Swajpuj nabídky</h3>
-          <p>Procházej brigády jako na Tinderu. Doprava = mám zájem, doleva = další.</p>
-        </div>
-        <div class="pg-step">
-          <div class="pg-step-icon"><iconify-icon icon="solar:hand-heart-bold" width="26"></iconify-icon></div>
-          <h3>Matchni se</h3>
-          <p>Když kývne i zaměstnavatel, vznikne match a otevře se vám chat.</p>
-        </div>
-        <div class="pg-step">
-          <div class="pg-step-icon"><iconify-icon icon="solar:chat-round-dots-bold" width="26"></iconify-icon></div>
-          <h3>Domluv se a pracuj</h3>
-          <p>Upřesni čas a místo v chatu, odpracuj brigádu a sbírej hodnocení.</p>
-        </div>
+      <h1 class="art-h1">Proč jsme založili Makej: příběh tří spolužáků, co nesnášeli hledání brigád</h1>
+
+      <p class="art-lead">Tenhle článek nezačíná byznys plánem ani tabulkou v Excelu. Začíná třemi spolužáky z vysoké školy, kteří měli stejný problém jako skoro každý, kdo si kdy zkoušel sehnat brigádu – a rozhodli se ho vyřešit sami.</p>
+
+      <figure class="art-hero">
+        <img src="/blog-img/art-proc-jsme-zalozili-makej.svg" alt="Stoh nabídek práce, vrchní se swipuje doprava" />
+      </figure>
+
+      <div class="art-body">
+
+        <h2>Problém, který znal každý z nás</h2>
+        <p>Hledání brigády nás bavilo asi tak, jako čekání ve frontě na úřadě. Staré portály plné neaktuálních inzerátů, dlouhé formuláře, e-maily, na které týden nikdo neodpoví, a pak nakonec pohovor domluvený přes tři různé kanály najednou. Chtěli jsme si jen rychle přivydělat – a místo toho jsme trávili víc času hledáním práce než tou prací samotnou. Tušili jsme, že takhle to fungovat nemusí.</p>
+
+        <h2>Jak vznikl nápad na swipe systém</h2>
+        <p>Inspiraci jsme našli tam, kde ji dnes hledá skoro každý z naší generace – v aplikacích, které jsou rychlé, jednoduché a intuitivní. Řekli jsme si: proč by hledání brigády nemohlo fungovat na stejném principu? Swipneš nabídku, která tě zaujme, firma swipne tebe, a když se potkáte, vznikne match a rovnou si napíšete detaily. Žádné zdlouhavé formuláře, žádné čekání na odpověď, která možná nikdy nepřijde.</p>
+
+        <h2>Kdo stojí za Makej</h2>
+        <p>Za Makej stojíme my tři – <strong>Jan Weber</strong>, <strong>Samuel Pšeja</strong> a <strong>Yasin Benmerzouk</strong>, tou dobou spolužáci z vysoké školy. Nejsme žádná velká korporace s oddělením na výzkum trhu – jsme součástí té samé skupiny lidí, pro kterou Makej tvoříme. Brigády jsme si sami hledali, sami jsme naráželi na stejné problémy, a přesně proto víme, na čem záleží.</p>
+
+        <h2>Proč na tom záleží i mimo firmy</h2>
+        <p>Jedna z věcí, která nás při stavbě Makeje bavila nejvíc, je to, že nejde jen o brigády u firem. Mladší bratr jednoho z nás má 15 let – a i on si díky Makeji může swipnout nabídku a druhý den jít posekat zahradu sousedovi. Jednorázová výpomoc totiž nemusí být doménou jen firem a agentur – klidně ji může nabídnout i soukromá osoba, která potřebuje pomoct tady a teď. Tahle myšlenka je jedna z věcí, které dělají Makej jiným než klasické pracovní portály.</p>
+
+        <h2>Co chceme, aby Makej byl</h2>
+        <p>Chceme, aby hledání práce nebylo stresující, ale naopak zábavné a přehledné – ať už jde o jednorázovku na víkend, nebo o první krok k pořádné kariéře. Stojíme si za tím, že platforma má být férová ke všem stranám, brigádníkům i firmám, a že za tím, co děláme, musí být reálná hodnota, ne jen další aplikace navíc. V prvním roce se soustředíme hlavně na Jihomoravský kraj a Brno – tam, kde jsme sami začínali – a odtud chceme růst dál.</p>
+
       </div>
-    </div>
 
-    <!-- PANEL: Zaměstnavatel -->
-    <div class="pg-panel" data-role="employer">
-      <div class="pg-steps">
-        <div class="pg-step">
-          <div class="pg-step-icon"><iconify-icon icon="solar:document-add-bold" width="26"></iconify-icon></div>
-          <h3>Vytvoř inzerát</h3>
-          <p>Pozice, datum, hodinová mzda a popis. Hotovo za 60 sekund.</p>
+      <div class="art-cta">
+        <h3>Chceš být u toho, až Makej naostro vyjede?</h3>
+        <p>Sleduj nás, ať ti start neuteče.</p>
+        <div class="art-cta-links">
+          <a href="https://www.instagram.com/makej.eu" target="_blank" rel="noopener"><iconify-icon icon="mdi:instagram" width="17"></iconify-icon> Instagram</a>
+          <a href="https://www.tiktok.com/@makejaplikace" target="_blank" rel="noopener"><iconify-icon icon="ic:baseline-tiktok" width="17"></iconify-icon> TikTok</a>
+          <a href="https://www.linkedin.com/company/makej-s-r-o/" target="_blank" rel="noopener"><iconify-icon icon="mdi:linkedin" width="17"></iconify-icon> LinkedIn</a>
         </div>
-        <div class="pg-step">
-          <div class="pg-step-icon"><iconify-icon icon="solar:card-recive-bold" width="26"></iconify-icon></div>
-          <h3>Kandidáti swajpují</h3>
-          <p>Tisíce brigádníků uvidí tvou nabídku ve feedu. Zájemci swajpnou doprava.</p>
-        </div>
-        <div class="pg-step">
-          <div class="pg-step-icon"><iconify-icon icon="solar:user-check-rounded-bold" width="26"></iconify-icon></div>
-          <h3>Přijmi nebo odmítni</h3>
-          <p>Projdi profily a hodnocení. Jedním tapem přijmeš toho pravého.</p>
-        </div>
-        <div class="pg-step">
-          <div class="pg-step-icon"><iconify-icon icon="solar:chat-round-dots-bold" width="26"></iconify-icon></div>
-          <h3>Domluvte detaily</h3>
-          <p>Po přijetí se otevře chat. Upřesníte čas a místo — a máš člověka.</p>
-        </div>
+        <p class="art-claim">Swajpuj. Matchuj. Pracuj.</p>
       </div>
-    </div>
 
-    <!-- Bottom CTA -->
-    <section class="pg-cta">
-      <h2>Připraven <span class="gradient-text">začít?</span></h2>
-      <p>Založ si účet zdarma a vyzkoušej si to na vlastní kůži.</p>
-      <div class="pg-cta-btns">
-        <a href="javascript:void(0)" class="btn-primary btn-lg" id="hero-register-btn">Vytvořit účet zdarma</a>
-        <a href="/#download" class="btn-ghost btn-lg">Stáhnout appku</a>
-      </div>
-    </section>
-
+    </article>
   </main>
 
+
   <!-- ═══════════ FOOTER ═══════════ -->
-  <footer id="footer">
+  <footer id="footer" data-nav-blue>
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
@@ -285,6 +197,7 @@
           <a href="/hledam-si-praci">Hledám si práci</a>
           <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
           <a href="/lide">Lidé</a>
+          <a href="/pro-zamestnavatele#pricing">Ceník</a>
           <a href="/#download">Stáhnout</a>
         </div>
         <div class="footer-col">
@@ -307,11 +220,34 @@
     </div>
   </footer>
 
-  <!-- ═══════════ AUTH MODALS ═══════════ -->
+    <!-- Modals -->
   <div class="modal-overlay" id="modal-overlay">
 
     <!-- LOGIN MODAL -->
-    <div class="modal" id="login-modal">
+    <div class="modal" id="login-modal" style="overflow:visible;">
+      <!-- Makač peeker -->
+      <div id="main-peeker" style="
+        position:absolute; top:-70px; left:50%; transform:translateX(-50%);
+        pointer-events:none; z-index:3;
+        filter: drop-shadow(0 14px 36px rgba(0,0,60,0.65));
+        transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+        animation: peekerIn 0.45s cubic-bezier(.2,.8,.2,1) both;
+      ">
+        <div style="width:88px;height:76px;background:linear-gradient(160deg,#4848c4 0%,#1c1c7a 100%);border-radius:50% 50% 44% 44%;position:relative;box-shadow:0 14px 36px rgba(0,0,60,0.65),inset 0 1px 0 rgba(255,255,255,0.18);border:2px solid rgba(140,140,255,0.3);">
+          <div id="main-browL" style="position:absolute;left:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-browR" style="position:absolute;right:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+          <div id="main-eyeL" style="position:absolute;left:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilL" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidL" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div id="main-eyeR" style="position:absolute;right:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
+            <div id="main-pupilR" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
+            <div id="main-lidR" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+          </div>
+          <div style="position:absolute;bottom:11px;left:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+          <div style="position:absolute;bottom:11px;right:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+        </div>
+      </div>
       <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej</div>
       <h2 class="modal-title">Přihlásit se</h2>
@@ -335,8 +271,13 @@
       </form>
       <div class="modal-divider"><span>nebo</span></div>
       <button class="btn-google" id="login-google">
-        <iconify-icon icon="flat-color-icons:google" width="18"></iconify-icon>
-        Pokračovat přes Google
+        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.6 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.3C29.4 35.5 26.8 36.5 24 36.5c-5.2 0-9.6-3.4-11.2-8l-6.6 5C9.7 39.7 16.3 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.2 5.3C37.5 39.7 44 35.4 44 24c0-1.3-.1-2.6-.4-3.9z"/>
+        </svg>
+        Pokračovat s Google
       </button>
       <p class="modal-switch">Nemáš účet? <a href="#" id="switch-to-register">Zaregistruj se</a></p>
     </div>
@@ -435,16 +376,20 @@
     </div>
   </div>
 
+  <!-- Postupné odkrývání karet -->
   <script>
-    function showRole(btn, role) {
-      document.getElementById('pg-toggle').classList.toggle('employer', role === 'employer');
-      document.querySelectorAll('.pg-btn').forEach(function (b) {
-        b.classList.toggle('is-active', b.dataset.role === role);
-      });
-      document.querySelectorAll('.pg-panel').forEach(function (p) {
-        p.classList.toggle('is-active', p.dataset.role === role);
-      });
-    }
+    (function () {
+      var els = document.querySelectorAll('.bs-card, .bn-row, .ba-card');
+      if (!els.length) return;
+      if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('visible'); }); return; }
+      els.forEach(function (el, i) { el.style.transitionDelay = (Math.min(i % 4, 3) * 0.07).toFixed(2) + 's'; });
+      var obs = new IntersectionObserver(function (zaznamy) {
+        zaznamy.forEach(function (z) {
+          if (z.isIntersecting) { z.target.classList.add('visible'); obs.unobserve(z.target); }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+      els.forEach(function (el) { obs.observe(el); });
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="/script.js?v=31"></script>
