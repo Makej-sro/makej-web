@@ -12,6 +12,7 @@
     gtag('js', new Date());
     gtag('config', 'G-25X9CMKGRD');
   </script>
+  <script>document.documentElement.classList.add('oc-intro');</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>O nás — kdo stojí za aplikací Makej</title>
@@ -35,114 +36,154 @@
   <link rel="icon" type="image/png" href="/favicon.png?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=League+Spartan:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-icons.js"></script>
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
-  <link rel="stylesheet" href="/style.css?v=70" />
+  <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/style.css?v=83" />
   <style>
-    /* ═══════════ O NÁS — světlá stránka (přebíjí tmavé téma jen zde) ═══════════ */
-    body { background: #ffffff; color: #0B1233; }
+    /* ═══════════ O NÁS — návrh z Claude Design, doplněný o náš navbar,
+       sekci se stažením a patičku. Modrá sjednocena na značkovou #0020f6. ═══════════ */
+    body { background: #fff; color: #0A0A0F; font-family: var(--font-sans); }
     body::before { display: none !important; }
 
-    /* Nav → světlá varianta pro tuto stránku */
-    #navbar.scrolled { background: rgba(255,255,255,.82); border-bottom: 1px solid #E9ECF7; box-shadow: 0 1px 0 rgba(11,18,51,.03); }
-    .nav-logo { -webkit-text-fill-color: var(--primary) !important; color: var(--primary) !important; }
-    .nav-links a { color: #3A4266 !important; }
-    .nav-links a:hover, .nav-links a.nav-active { color: var(--primary) !important; border-bottom-color: var(--primary) !important; }
-    #nav-login-btn.btn-ghost { background: transparent !important; color: #3A4266 !important; border: 1px solid #E6E9F5 !important; font-weight: 600 !important; }
-    #nav-login-btn.btn-ghost:hover { background: #F1F3FB !important; border-color: #D5DAF0 !important; }
-    /* světlý navbar → tmavé čárky hamburgeru a světlý prosklený panel */
-    .mobile-menu-btn { background: rgba(11,18,51,.06); border-color: rgba(11,18,51,.22); }
-    .mobile-menu-btn span { background: #0B1233; }
-    .mobile-menu-btn.open { background: rgba(11,18,51,.1); }
-    .mobile-menu { background: rgba(255,255,255,.72); border-bottom: 1px solid #E6E9F5; box-shadow: 0 24px 60px -24px rgba(11,18,51,.25); }
-    .mobile-menu a { color: #0B1233; border-bottom-color: rgba(11,18,51,.12); }
-    .mobile-menu-actions .btn-ghost { color: #0B1233; border-color: rgba(11,18,51,.35); }
+    .oc { --blue: #0020f6; --ink: #0A0A0F; --txt: #3C4053; --mut: #565B70;
+          --band: #F4F6FD; --line: #E4E7F7; --chip: #EFF1FF; --wm: #D9DDFF; }
+    .oc h1, .oc h2, .oc h3 { font-family: var(--font-heading); }
+    .oc a { color: var(--blue); text-decoration: none; }
 
-    /* Patička: modrá jako na ostatních stránkách — řídí ji #download + #footer ze style.css */
-
-    /* ── Layout ── */
-    .on { --ink:#0B1233; --sec:#3A4266; --mut:#7A82A6; --mut2:#A6ADCB; --line:#E6E9F5; --soft:#F6F7FC; --band:#F1F3FB; }
-    .on-wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-    .on section { padding: 56px 0; }
-
-    /* ── Sekce O nás — kicker, velký nadpis, obsah dělený linkami (styl jako
-       na /pro-zamestnavatele a /lide) ── */
-    .on-sec { padding: clamp(56px, 9vw, 104px) 0; }
-    .on-narrow { max-width: 720px; }
-    .on-kick { display: inline-block; font-family: var(--font-heading);
-      font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #0020F6; }
-    .on-lead { font-size: 1.08rem; line-height: 1.65; color: #4A4A57; margin: 18px 0 0; text-wrap: pretty; }
-    .on-list { list-style: none; margin: 30px 0 0; padding: 0; border-top: 1px solid #E6E9F5; }
-    .on-list li { position: relative; padding: 15px 0 15px 30px; border-bottom: 1px solid #E6E9F5;
-      font-size: 1rem; line-height: 1.5; color: #0B1233; }
-    .on-list li::before { content: "—"; position: absolute; left: 0; color: #9AA3C4; }
-    .on-list--next li::before { content: "→"; color: #0020F6; font-weight: 700; }
-    .on-next-more { margin-top: 34px; display: flex; flex-direction: column; align-items: center;
-      gap: 16px; text-align: center; }
-    .on-next-more p { margin: 0; font-size: 1rem; line-height: 1.6; color: #4A4A57; max-width: 46ch; }
-    .on-quote-sec { background: #F5F7FD; }
-    .on-quote { margin: 0; font-family: var(--font-heading); font-weight: 800;
-      font-size: clamp(1.4rem, 3.2vw, 2.1rem); line-height: 1.3; letter-spacing: -.02em;
-      color: #0B1233; text-wrap: balance; }
-    .on-quote::before { content: "„"; color: #0020F6; }
-    .on-quote::after  { content: "“"; color: #0020F6; }
-    .on-h2 { font-family: var(--font-heading); font-size: clamp(26px,4.2vw,40px); font-weight: 800; color: var(--ink); letter-spacing: -.025em; text-align: center; margin: 0 0 34px; }
-
-    /* ── Hero ── */
-    .on-hero { text-align: center; padding: 128px 24px 40px; max-width: 780px; margin: 0 auto; }
-    .on-hero h1 { font-family: var(--font-heading); font-size: clamp(30px,5.6vw,50px); font-weight: 800; color: var(--ink); letter-spacing: -.03em; line-height: 1.12; margin: 0 0 20px; text-wrap: balance; }
-    .on-hero p { color: var(--sec); font-size: 16px; line-height: 1.7; max-width: 60ch; margin: 0 auto 28px; }
-    .on-hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .on-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--font-sans); font-size: 15px; font-weight: 700; padding: 14px 24px; border-radius: 999px; cursor: pointer; border: 1px solid transparent; text-decoration: none; transition: transform .15s ease, background .2s ease, border-color .2s ease; }
-    .on-btn:active { transform: scale(.98); }
-    .on-btn--primary { background: var(--primary); color: #fff; box-shadow: 0 10px 22px rgba(0,32,246,.24); }
-    .on-btn--primary:hover { background: #001fd0; }
-    .on-btn--ghost { background: #fff; color: #0B1233; border-color: #E6E9F5; }
-    .on-btn--ghost:hover { background: #F1F3FB; border-color: #D5DAF0; }
-
-    /* ── Pain band ── */
-
-    /* ── Kroky ── */
-
-    /* ── Dvě strany ── */
-
-    /* ── Nejsme portál ── */
-
-    /* ── Řešení pro každého ── */
-    .on-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
-    .on-list li { position: relative; padding-left: 17px; font-size: 13.5px; line-height: 1.45; }
-    .on-list li::before { content: ""; position: absolute; left: 0; top: 7px; width: 6px; height: 6px; border-radius: 50%; }
-
-    /* ── Blue banner ── */
-
-    /* ── Příběh ── */
-
-    /* ── Kam směřuje (tmavá karta) ── */
-    /* tým na světlém pozadí — původní varianta byla pro tmavou sekci (bílý text) */
-    .on-team { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin: 30px 0 0; }
-    .on-person { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 4px; }
-    .on-person__av { width: 68px; height: 68px; border-radius: 50%; background: #0020F6; color: #fff;
-      display: grid; place-items: center; font-family: var(--font-heading); font-weight: 800;
-      font-size: 20px; letter-spacing: .02em; }
-    .on-person__n { color: #0B1233; font-family: var(--font-heading); font-size: 15px; font-weight: 700; }
-    @media (max-width: 560px) { .on-team { grid-template-columns: 1fr; } }
-
-    /* ── Závěr CTA ── */
-
-    /* ── Responsive ── */
-    @media (max-width: 900px) {
+    @keyframes omRise { from { opacity: 0; transform: translateY(34px) } to { opacity: 1; transform: none } }
+    /* -30 % nahoře: bez toho maska uřízne čárku nad „Á“ */
+    /* Horní ořez -30 %, aby maska neuřízla čárku nad „Á“. Dolní musí proto
+       ve výchozím stavu být 130 %, jinak zbyde viditelný pruh právě s tou čárkou. */
+    @keyframes omMask { from { clip-path: inset(-30% 0 130% 0); transform: translateY(18px) }
+                        to   { clip-path: inset(-30% 0 -14% 0); transform: none } }
+    @keyframes omWm   { from { opacity: 0; transform: translateY(90px) } to { opacity: 1; transform: none } }
+    @media (prefers-reduced-motion: reduce) {
+      .oc-h1, .oc-h1 span, .oc-cols { animation: none !important; transform: none !important; }
+      .oc-intro #navbar, .oc-intro .wl-fab { animation: none !important; }
     }
-    @media (max-width: 560px) {
-      .on-hero { padding-top: 104px; }
+
+    /* ── hero: jen nadpis a dva sloupce textu ── */
+    /* hero na celou výšku obrazovky, obsah svisle na střed */
+    .oc-hero { background: #fff; min-height: 100vh; min-height: 100svh;
+      display: flex; align-items: center; }
+    .oc-hero-txt { width: min(1280px, 92vw); margin: 0 auto;
+      padding: clamp(104px, 12vh, 150px) 0 clamp(48px, 6vw, 84px); }
+    .oc-h1 { margin: 0; font-weight: 900; font-size: clamp(56px, 9vw, 132px); line-height: 1;
+      letter-spacing: -.05em; text-transform: uppercase; }
+    .oc-h1 span { display: block; animation: omMask .9s cubic-bezier(.22,1,.36,1) both; }
+    .oc-h1 span:nth-child(2) { animation-delay: .12s; }
+
+    /* dva sloupce pod nadpisem — vlevo tvrzení, vpravo podrobnosti */
+    .oc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(26px, 4vw, 72px);
+      margin-top: clamp(36px, 5vw, 64px); max-width: 980px;
+      animation: omRise .9s cubic-bezier(.22,1,.36,1) .34s both; }
+    .oc-cols .lead { margin: 0; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.5;
+      font-weight: 500; color: var(--ink); text-wrap: pretty; }
+    .oc-cols .detail p { margin: 0 0 16px; font-size: 15.5px; line-height: 1.7; color: var(--mut); }
+    .oc-cols .detail p:last-child { margin-bottom: 0; }
+    .oc-cols .detail b { color: var(--ink); font-weight: 600; }
+
+    /* ── Intro: nápis „Makej“ sám uprostřed obrazovky → sjede na své místo dole.
+       Stejný princip jako na hlavní stránce (.hero-intro): --wm-zoom a --wm-shift
+       dopočítá skript pod herem, bez JS se nic neaplikuje a stránka běží normálně. ── */
+    .oc-intro .oc-h1 { transform-origin: 50% 50%;
+      animation: ocWmIn 1.15s cubic-bezier(.62,0,.2,1) 1.25s both; }
+    @keyframes ocWmIn {
+      from { transform: translateY(var(--wm-shift, 0px)) scale(var(--wm-zoom, 2.2)); }
+      to   { transform: none; }
+    }
+    @keyframes ocIntroFade { from { opacity: 0; } to { opacity: 1; } }
+    /* dokud nápis nedojede, je stránka prázdná */
+    .oc-intro #navbar,
+    .oc-intro .wl-fab { animation: ocIntroFade .7s ease-out 2.15s both; }
+    /* nadpis se odkryje hned na začátku — zvětšený uprostřed obrazovky.
+       Kdyby se odkrýval až po zmenšení, celé zvětšení by proběhlo pod maskou. */
+    .oc-intro .oc-h1 span { animation-delay: .15s; }
+    .oc-intro .oc-h1 span:nth-child(2) { animation-delay: .3s; }
+    .oc-intro .oc-cols { animation-delay: 2.2s; }
+
+    /* ── společné pro sekce ── */
+    .oc-sec { padding: clamp(64px, 9vw, 110px) 56px; }
+    .oc-band { background: var(--band); }
+    .oc-in { max-width: 1280px; margin: 0 auto; }
+    .oc-h2 { margin: 0; font-weight: 900; font-size: clamp(32px, 4.6vw, 56px); line-height: 1.02;
+      letter-spacing: -.035em; text-transform: uppercase; text-wrap: balance; }
+    .oc-h2 .b { color: var(--blue); }
+
+    /* ── problémy ── */
+    .oc-two { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(36px, 6vw, 88px); align-items: start; }
+    .oc-two p { margin: 28px 0 0; font-size: 17px; line-height: 1.65; color: var(--txt); text-wrap: pretty; }
+    .oc-cards { display: grid; gap: 16px; }
+    .oc-card { display: grid; grid-template-columns: 26px 1fr; gap: 18px; padding: 26px 28px;
+      background: #fff; border-radius: 18px; align-items: start; }
+    /* ikona bez podkladu — jen kresba */
+    .oc-ic { width: 26px; height: 26px; display: grid; place-items: center; margin-top: 2px; }
+    .oc-ic svg { width: 26px; height: 26px; }
+    .oc-card h3 { margin: 0 0 7px; font-weight: 700; font-size: 18px; letter-spacing: -.01em; }
+    .oc-card p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--mut); }
+
+    /* ── modrý pás s citátem ── */
+    .oc-quote { background: var(--blue); color: #fff; padding: clamp(60px, 7vw, 88px) 56px; }
+    .oc-quote-in { display: grid; grid-template-columns: 1.25fr .75fr; gap: clamp(36px, 5vw, 72px);
+      align-items: center; max-width: 1280px; margin: 0 auto; }
+    .oc-quote h2 { margin: 0 0 22px; font-weight: 900; font-size: clamp(34px, 5vw, 62px); line-height: 1;
+      letter-spacing: -.04em; text-transform: uppercase; text-wrap: balance; }
+    .oc-quote p { margin: 0; max-width: 520px; font-size: 18px; line-height: 1.6; color: rgba(255,255,255,.82); }
+    /* Ikona appky bez rámu — její modrá je shodná s pásem (#0020f6),
+       takže čtverec splyne s pozadím a zůstane vidět jen bílé „M“. */
+    .oc-shot { justify-self: end; display: grid; place-items: center; }
+    .oc-shot img { width: min(100%, 500px); height: auto; display: block; }
+
+    /* ── na čem pracujeme ── */
+    .oc-sec > .oc-in > p.oc-sub { margin: 12px 0 52px; max-width: 560px; font-size: 17px;
+      line-height: 1.6; color: var(--mut); }
+    .oc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .oc-cell { padding: 30px; border: 1px solid var(--line); border-radius: 20px;
+      transition: border-color .2s ease; }
+    .oc-cell:hover { border-color: var(--blue); }
+    .oc-cell svg { margin-bottom: 22px; }
+    .oc-cell h3 { margin: 0 0 8px; font-weight: 700; font-size: 19px; letter-spacing: -.01em; }
+    .oc-cell p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--mut); }
+    .oc-cta { display: flex; justify-content: center; margin-top: 44px; }
+    .oc-cta a { display: inline-flex; align-items: center; gap: 12px; padding: 15px 30px;
+      border-radius: 999px; color: #fff; font-size: 15px; font-weight: 700; background: var(--blue);
+      transition: transform .18s ease, box-shadow .2s ease; }
+    .oc-cta a:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -12px rgba(0,32,246,.55); color: #fff; }
+
+    /* ── tým ── */
+    .oc-team-head { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 88px);
+      align-items: end; margin-bottom: 56px; }
+    .oc-team-head p { margin: 0; font-size: 17px; line-height: 1.65; color: var(--txt); text-wrap: pretty; }
+    .oc-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .oc-person { background: #fff; border-radius: 22px; padding: 40px 32px 42px; }
+    .oc-person h3 { margin: 0 0 8px; font-weight: 800; font-size: 22px; letter-spacing: -.02em; }
+    .oc-person p { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--blue); }
+
+    /* ── responsive ── */
+    @media (max-width: 1000px) {
+      .oc-cols { gap: 26px; }
+      .oc-two, .oc-quote-in, .oc-team-head { grid-template-columns: 1fr; }
+      .oc-shot { justify-self: start; }
+      .oc-grid, .oc-team { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 680px) {
+      .oc-sec, .oc-quote { padding-left: 22px; padding-right: 22px; }
+      .oc-hero { min-height: 92vh; min-height: 92svh; }
+      .oc-hero-txt { padding: 108px 0 48px; }
+      .oc-cols { grid-template-columns: 1fr; gap: 24px; }
+      .oc-grid, .oc-team { grid-template-columns: 1fr; }
+      .oc-shot { justify-self: center; }
     }
   </style>
 </head>
-<body class="on">
+<body>
 
   <!-- ═══════════ NAV ═══════════ -->
-  <nav id="navbar">
+  <nav id="navbar" class="nav-light-page">
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej</a>
       <div class="nav-links">
@@ -174,71 +215,161 @@
   </nav>
 
   <!-- ═══════════ MAIN ═══════════ -->
-  <main>
+  <main class="oc">
 
-    <!-- Hero -->
-    <div class="on-hero">
-      <h1>Spojujeme lidi, kteří chtějí pracovat, s těmi, kteří pomoc skutečně potřebují.</h1>
-      <p>Makej propojuje lidi hledající práci, brigádu nebo jednorázovou výpomoc s firmami i jednotlivci, kteří ji nabízejí. Zábavně, rychle a jednoduše.</p>
-      <div class="on-hero-cta">
-        <a href="/hledam-si-praci" class="on-btn on-btn--primary">Hledám si práci</a>
-        <a href="/pro-zamestnavatele" class="on-btn on-btn--ghost">Pro firmy</a>
-      </div>
-    </div>
-
-    <!-- Proč Makej vzniklo -->
-    <section class="on-sec">
-      <div class="on-wrap on-narrow">
-        <span class="on-kick">Proč Makej vzniklo</span>
-        <h2 class="on-h2">Z neuspokojené potřeby vzniklo řešení</h2>
-        <p class="on-lead">Opakovaně jsme naráželi na stejný problém. Firmy nemohly najít spolehlivé lidi, zatímco spousta lidí — včetně nás — hledala práci nebo brigádu. Existující portály byly zdlouhavé, nepřehledné a rychlé spojení obou stran většinou vůbec neumožňovaly.</p>
-        <ul class="on-list">
-          <li>Desítky roztříštěných portálů</li>
-          <li>Dlouhé životopisy a formuláře</li>
-          <li>Týdny čekání v nejistotě</li>
-          <li>Firmy platí desetitisíce za inzerci</li>
-        </ul>
+    <!-- ═══════════ HERO ═══════════ -->
+    <section class="oc-hero">
+      <div class="oc-hero-txt">
+        <h1 class="oc-h1"><span>O</span><span>nás.</span></h1>
+        <div class="oc-cols">
+          <p class="lead">Makej propojuje lidi hledající práci, brigádu nebo jednorázovou výpomoc s firmami i jednotlivci, kteří ji nabízejí. Zábavně, rychle a jednoduše.</p>
+          <div class="detail">
+            <p>Jsme <b>tři spolužáci z vysoké školy</b>, kteří si sami hledali brigády a naráželi na stejné problémy — roztříštěné portály, zdlouhavé formuláře a týdny ticha místo odpovědi.</p>
+            <p>Postavili jsme proto platformu, kde spojení obou stran trvá minuty, ne týdny. Začínáme v Brně a Jihomoravském kraji, odkud sami pocházíme, a odtud chceme růst dál.</p>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Čemu věříme -->
-    <section class="on-sec on-quote-sec">
-      <div class="on-wrap on-narrow">
-        <blockquote class="on-quote">Najít práci nebo spolehlivou výpomoc by mělo být stejně jednoduché jako objednat si taxi domů.</blockquote>
+    <script>
+    /* Kolik se nadpis musí zvětšit, aby vyplnil skoro celou obrazovku, a o kolik posunout,
+       aby byl při zvětšení uprostřed viewportu (normálně sedí v pravém sloupci). */
+    (function () {
+      var root = document.documentElement;
+      if (!root.classList.contains('oc-intro')) return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var wm = document.querySelector('.oc-h1');
+      if (!wm) return;
+      function fit() {
+        wm.style.animation = 'none';          // vypnout, ať měříme nezvětšený nápis
+        var r = wm.getBoundingClientRect();
+        wm.style.animation = '';              // zpět (animace se rozjede znovu od nuly)
+        if (!r.width || !r.height) return;
+        var z = Math.min(window.innerWidth * 0.82 / r.width, window.innerHeight * 0.6 / r.height);
+        root.style.setProperty('--wm-zoom', Math.max(1, Math.min(z, 6)).toFixed(3));
+        root.style.setProperty('--wm-shift', (window.innerHeight / 2 - (r.top + r.height / 2)).toFixed(1) + 'px');
+      }
+      fit();
+      /* Písmo se načítá se swapem — po dotažení se šířka nápisu změní, přeměřit. */
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    })();
+    </script>
+
+    <!-- ═══════════ PROČ MAKEJ VZNIKLO ═══════════ -->
+    <section class="oc-sec oc-band">
+      <div class="oc-in oc-two">
+        <div>
+          <h2 class="oc-h2">Z neuspokojené potřeby vzniklo <span class="b">řešení</span></h2>
+          <p>Opakovaně jsme naráželi na stejný problém. Firmy nemohly najít spolehlivé lidi, zatímco spousta lidí — včetně nás — hledala práci nebo brigádu. Existující portály byly zdlouhavé, nepřehledné a rychlé spojení obou stran většinou vůbec neumožňovaly.</p>
+        </div>
+        <div class="oc-cards">
+          <div class="oc-card">
+            <div class="oc-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8"/></svg></div>
+            <div>
+              <h3>Desítky roztříštěných portálů</h3>
+              <p>Nabídky rozházené na deseti místech, každé s vlastním účtem a vlastními pravidly.</p>
+            </div>
+          </div>
+          <div class="oc-card">
+            <div class="oc-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg></div>
+            <div>
+              <h3>Dlouhé životopisy a formuláře</h3>
+              <p>Půl hodiny vyplňování kvůli víkendové brigádě, na kterou stačí umět přijít včas.</p>
+            </div>
+          </div>
+          <div class="oc-card">
+            <div class="oc-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+            <div>
+              <h3>Týdny čekání v nejistotě</h3>
+              <p>Odešleš přihlášku a nevíš, jestli ji vůbec někdo otevřel. Odpověď často nepřijde nikdy.</p>
+            </div>
+          </div>
+          <div class="oc-card">
+            <div class="oc-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg></div>
+            <div>
+              <h3>Firmy platí desetitisíce za inzerci</h3>
+              <p>A stejně skončí u hromady nerelevantních životopisů, které musí někdo pročíst.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Kam směřujeme -->
-    <section class="on-sec">
-      <div class="on-wrap on-narrow">
-        <span class="on-kick">Kam směřujeme</span>
-        <h2 class="on-h2">Na čem pracujeme dál</h2>
-        <ul class="on-list on-list--next">
-          <li>Inzerát předvyplněný AI</li>
-          <li>Podepisování smluv přímo v platformě</li>
-          <li>Vlastní HR software pro správu náboru</li>
-          <li>Bezpečný převod peněz přes prostředníka</li>
-          <li>Expanze do celé ČR</li>
-        </ul>
-        <div class="on-next-more">
-          <p>Jak nám to jde, hlásíme průběžně — novinky z appky, články i to, co zrovna chystáme.</p>
-          <a href="/blog" class="on-btn on-btn--ghost">
-            Podívej se na naše novinky
-            <iconify-icon icon="solar:arrow-right-bold" width="16"></iconify-icon>
+    <!-- ═══════════ ČEMU VĚŘÍME ═══════════ -->
+    <section class="oc-quote">
+      <div class="oc-quote-in">
+        <div>
+          <h2>Tak snadné jako objednat si Bolta</h2>
+          <p>Tohle je jediná věta, podle které se rozhodujeme, co do Makeje přidat a co ne.</p>
+        </div>
+        <div class="oc-shot">
+          <img src="/ikona-makej.svg" alt="Ikona aplikace Makej" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ NA ČEM PRACUJEME DÁL ═══════════ -->
+    <section class="oc-sec">
+      <div class="oc-in">
+        <h2 class="oc-h2">Na čem pracujeme <span class="b">dál</span></h2>
+        <p class="oc-sub">Jak nám to jde, hlásíme průběžně — novinky z appky, články i to, co zrovna chystáme.</p>
+        <div class="oc-grid">
+          <div class="oc-cell">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><path d="M4 4h11l5 5v11H4z"/><path d="M8 13h6M8 17h4"/></svg>
+            <h3>Inzerát předvyplněný AI</h3>
+            <p>Firma napíše, koho shání, a zbytek nabídky se doplní sám.</p>
+          </div>
+          <div class="oc-cell">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M9 16l1.8 1.8L15 13.5"/></svg>
+            <h3>Smlouvy přímo v appce</h3>
+            <p>Dohoda podepsaná v telefonu, než dorazíš na první směnu.</p>
+          </div>
+          <div class="oc-cell">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+            <h3>Vlastní HR software</h3>
+            <p>Správa náboru pro firmy na jednom místě, bez tabulek a e-mailů.</p>
+          </div>
+          <div class="oc-cell">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            <h3>Expanze do celé ČR</h3>
+            <p>Začínáme v Brně a Jihomoravském kraji, dál chceme všude.</p>
+          </div>
+          <div class="oc-cell">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 6V4h8v2M16 13h2"/></svg>
+            <h3>Bezpečné peníze</h3>
+            <p>Odměna přes prostředníka, ať se obě strany nemusí bát.</p>
+          </div>
+          <div class="oc-cell">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 21h16"/></svg>
+            <h3>Aplikace brzy vychází</h3>
+            <p>Makej finišuje a už brzy ho stáhneš do telefonu.</p>
+          </div>
+        </div>
+        <div class="oc-cta">
+          <a href="/blog">Podívej se na naše novinky
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
           </a>
         </div>
       </div>
     </section>
 
-    <!-- Tým -->
-    <section class="on-sec">
-      <div class="on-wrap on-narrow">
-        <span class="on-kick">Náš tým</span>
-        <h2 class="on-h2">Lidé, kteří stojí za Makej</h2>
-        <div class="on-team">
-          <div class="on-person"><span class="on-person__av">JW</span><span class="on-person__n">Jan Weber</span></div>
-          <div class="on-person"><span class="on-person__av">SP</span><span class="on-person__n">Samuel Pšeja</span></div>
-          <div class="on-person"><span class="on-person__av">YB</span><span class="on-person__n">Yasin Benmerzouk</span></div>
+    <!-- ═══════════ KDO STOJÍ ZA MAKEJ ═══════════ -->
+    <section class="oc-sec oc-band">
+      <div class="oc-in">
+        <div class="oc-team-head">
+          <h2 class="oc-h2">Kdo stojí za Makej</h2>
+          <p>Tři spolužáci z vysoké školy, kteří si sami hledali brigády a naráželi na stejné problémy. Nejsme korporace s oddělením na výzkum trhu — jsme součástí té samé skupiny lidí, pro kterou Makej stavíme.</p>
+        </div>
+        <div class="oc-team">
+          <div class="oc-person">
+            <h3>Jan Weber</h3><p>Spoluzakladatel</p>
+          </div>
+          <div class="oc-person">
+            <h3>Samuel Pšeja</h3><p>Spoluzakladatel</p>
+          </div>
+          <div class="oc-person">
+            <h3>Yasin Benmerzouk</h3><p>Spoluzakladatel</p>
+          </div>
         </div>
       </div>
     </section>
@@ -269,7 +400,7 @@
   </section>
 
   <!-- ═══════════ FOOTER ═══════════ -->
-  <footer id="footer">
+  <footer id="footer" data-nav-blue>
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
@@ -484,7 +615,7 @@
   <script>
   (function () {
     if (!('IntersectionObserver' in window)) return;
-    var sel = '.on-kick, .on-h2, .on-lead, .on-quote, .on-list li, .on-next-more, .on-person, .dl-stage';
+    var sel = '.dl-stage';
     var els = Array.prototype.slice.call(document.querySelectorAll(sel));
     if (!els.length) return;
     // Stagger: postupné zpoždění pro sourozence ve stejném gridu

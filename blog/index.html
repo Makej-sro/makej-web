@@ -35,11 +35,12 @@
   <link rel="icon" type="image/png" href="/favicon.png?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=League+Spartan:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="/iconify-icons.js"></script>
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
-  <link rel="stylesheet" href="/style.css?v=70" />
+  <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/style.css?v=83" />
   <style>
     /* ═══════════ BLOG — světlá stránka ═══════════ */
     body { background: #ffffff; }
@@ -341,7 +342,7 @@
             <div class="ba-grid">
             <article class="ba-card">
               <a href="/blog/proc-jsme-zalozili-makej">
-                <div class="ba-media"><img src="/blog-img/art-proc-jsme-zalozili-makej.svg" alt="Stoh nabídek práce, vrchní se swipuje doprava" loading="lazy" /></div>
+                <div class="ba-media"><img src="/blog-img/art-proc-jsme-zalozili-makej.jpg" alt="Tři lidé u stolu v coworkingu se smějí nad rozdělanou prací" loading="lazy" /></div>
                 <div class="ba-body">
                   <div class="ba-meta"><span class="blog-chip is-new">Nové</span><span class="ba-cat">O Makej</span></div>
                   <h3>Proč jsme založili Makej: příběh tří spolužáků</h3>
@@ -351,7 +352,7 @@
             </article>
             <article class="ba-card is-soon">
               <div class="ba-soon-inner">
-                <div class="ba-media"><img src="/blog-img/art-brigada-bez-smlouvy.svg" alt="Podepsaná dohoda s razítkem" loading="lazy" /></div>
+                <div class="ba-media"><img src="/blog-img/art-brigada-bez-smlouvy.jpg" alt="Peníze v obálce na prázdném papíře, dva lidé u dílenského stolu" loading="lazy" /></div>
                 <div class="ba-body">
                   <div class="ba-meta"><span class="blog-chip is-soon">Připravujeme</span><span class="ba-cat">Návod</span></div>
                   <h3>Brigáda bez smlouvy: co na to zákon a na co si dát pozor</h3>
