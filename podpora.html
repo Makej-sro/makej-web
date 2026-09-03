@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=83" />
+  <link rel="stylesheet" href="/style.css?v=86" />
   <style>
     /* ── Podpora sekce ── */
     .sup-page { padding: 0; }
@@ -114,24 +114,11 @@
     /* Navbar: tlačítka vždy viditelná, Podpora aktivní */
     #navbar .nav-actions { opacity: 1 !important; pointer-events: all !important; }
 
-    /* Světlý navbar nad bílou sekcí — připraveno */
+    /* Navbar se přebarvuje sdílenými pravidly nav-light-page ve style.css
+       (stejně jako /o-nas a blog) — tady zůstávají jen přechody. */
     #navbar { transition: background .35s, box-shadow .35s; }
     .nav-logo { transition: color .35s; }
     .nav-links a { transition: color .25s, border-bottom-color .25s, font-weight .2s !important; }
-    #navbar.navbar-light {
-      background: rgba(255,255,255,.15) !important;
-      box-shadow: 0 1px 0 rgba(0,32,246,.1) !important;
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
-    }
-    #navbar.navbar-light .nav-logo { -webkit-text-fill-color: #0020f6 !important; color: #0020f6 !important; }
-    #navbar.navbar-light .nav-links a { color: #0020f6 !important; }
-    #navbar.navbar-light .nav-links a.nav-active { color: #0020f6 !important; border-bottom-color: #0020f6 !important; }
-    #navbar.navbar-light .mobile-menu-btn { color: #1a1a3a; }
-    #navbar.navbar-light #nav-login-btn {
-      background: transparent; color: #0020f6; border-color: rgba(0,32,246,.3); font-weight: 600;
-    }
-    #navbar.navbar-light #nav-login-btn:hover { background: rgba(0,32,246,.06); border-color: #0020f6; }
 
     /* ── Bílé pozadí + modrý text (light theme override) ── */
     body { background: #fff; }
@@ -173,25 +160,6 @@
     .faq-a { color: #4a5070; }
     .faq-a a { color: #0020f6; }
     .faq-no-results { color: #6060a0; }
-    /* Navbar nad bílou sekcí */
-    #navbar.pnav-white { background: rgba(255,255,255,.15) !important; box-shadow: 0 1px 0 rgba(0,32,246,.1) !important; backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%); }
-    #navbar.pnav-white .nav-logo { -webkit-text-fill-color: #0020f6 !important; color: #0020f6 !important; }
-    #navbar.pnav-white .nav-links a { color: #0020f6 !important; }
-    #navbar.pnav-white .nav-links a.nav-active { color: #0020f6 !important; border-bottom-color: #0020f6 !important; }
-    #navbar.pnav-white .mobile-menu-btn { color: #0020f6; }
-    #navbar.pnav-white #nav-login-btn { background: transparent; color: #0020f6; border-color: rgba(0,32,246,.3); font-weight: 600; }
-    #navbar.pnav-white #nav-login-btn:hover { background: rgba(0,32,246,.06); border-color: #0020f6; }
-    #navbar.pnav-white #nav-register-btn { background: linear-gradient(135deg,#0020f6,#3a3a99) !important; color: #fff !important; }
-    /* Navbar nad modrou sekcí */
-    #navbar.pnav-blue { background: rgba(0,20,220,.55) !important; box-shadow: none !important; backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%); }
-    #navbar.pnav-blue .nav-logo { -webkit-text-fill-color: #fff !important; color: #fff !important; }
-    #navbar.pnav-blue .nav-links a { color: rgba(255,255,255,.85) !important; }
-    #navbar.pnav-blue .nav-links a:hover, #navbar.pnav-blue .nav-links a.nav-active { color: #fff !important; border-bottom-color: #fff !important; }
-    #navbar.pnav-blue .mobile-menu-btn { color: #fff; }
-    #navbar.pnav-blue #nav-login-btn { background: transparent; color: #fff; border-color: rgba(255,255,255,.4); font-weight: 600; }
-    #navbar.pnav-blue #nav-login-btn:hover { background: rgba(255,255,255,.12); border-color: #fff; }
-    #navbar.pnav-blue #nav-register-btn { background: rgba(255,255,255,.18) !important; color: #fff !important; border-color: rgba(255,255,255,.5) !important; }
-    #navbar.pnav-blue #nav-register-btn:hover { background: rgba(255,255,255,.28) !important; }
 
     /* FAQ split layout */
     .faq-split-section { display:flex; gap:40px; max-width:960px; margin:88px auto 80px; padding:20px 24px; align-items:flex-start; background:#f4f4fc; border:1px solid rgba(0,32,246,.12); border-radius:20px; }
@@ -558,7 +526,7 @@
 <body>
 
     <!-- ═══════════ NAVBAR ═══════════ -->
-  <nav id="navbar">
+  <nav id="navbar" class="nav-light-page">
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej</a>
       <div class="nav-links">
@@ -795,7 +763,7 @@
       </div><!-- /.sup-white-zone -->
 
       <!-- Contact cards -->
-      <div class="sup-cards-wrap">
+      <div class="sup-cards-wrap" data-nav-blue>
       <div style="text-align:center;margin-bottom:44px;">
         <h2 style="font-family:var(--font-heading);font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;line-height:1.25;color:#fff;margin:0;">Nenašel jsi svou odpověď?<br><span style="opacity:.75;">Zkus to tady</span></h2>
         <p style="color:rgba(255,255,255,.8);font-size:1.05rem;line-height:1.65;margin:20px auto 0;max-width:480px;">Pokud je tvůj dotaz složitější, neváhej nás kontaktovat emailem. Uděláme vše proto, abys dostal svou odpověď ještě ten stejný den.</p>
@@ -805,7 +773,7 @@
   </section>
 
     <!-- ═══════════ FOOTER ═══════════ -->
-  <footer id="footer">
+  <footer id="footer" data-nav-blue>
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
@@ -1644,18 +1612,4 @@
   })();
   </script>
 
-  <script>
-    (function() {
-      var navbar = document.getElementById('navbar');
-      var blueSection = document.querySelector('.sup-cards-wrap');
-      if (!navbar) return;
-      function updatePodrNav() {
-        var onBlue = blueSection && blueSection.getBoundingClientRect().top <= 70;
-        navbar.classList.toggle('pnav-blue', !!onBlue);
-        navbar.classList.toggle('pnav-white', !onBlue);
-      }
-      window.addEventListener('scroll', updatePodrNav, { passive: true });
-      updatePodrNav();
-    })();
-  </script>
 </body>

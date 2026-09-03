@@ -12,7 +12,17 @@
     gtag('js', new Date());
     gtag('config', 'G-25X9CMKGRD');
   </script>
-  <script>document.documentElement.classList.add('oc-intro');</script>
+  <script>
+    document.documentElement.classList.add('oc-intro');
+    /* Stránka začíná intro animací přes celou obrazovku — musí startovat úplně nahoře.
+       Prohlížeč jinak obnoví scroll z minulé návštěvy (po zvětšení stránky o nápis
+       „Makej“ to končilo uprostřed něj) nebo si sám ukotví pozici u velkého prvku. */
+    if (!location.hash) {
+      try { history.scrollRestoration = 'manual'; } catch (e) {}
+      addEventListener('load', function () { scrollTo(0, 0); });
+      scrollTo(0, 0);
+    }
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>O nás — kdo stojí za aplikací Makej</title>
@@ -41,7 +51,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=83" />
+  <link rel="stylesheet" href="/style.css?v=86" />
   <style>
     /* ═══════════ O NÁS — návrh z Claude Design, doplněný o náš navbar,
        sekci se stažením a patičku. Modrá sjednocena na značkovou #0020f6. ═══════════ */
@@ -49,7 +59,7 @@
     body::before { display: none !important; }
 
     .oc { --blue: #0020f6; --ink: #0A0A0F; --txt: #3C4053; --mut: #565B70;
-          --band: #F4F6FD; --line: #E4E7F7; --chip: #EFF1FF; --wm: #D9DDFF; }
+          --line: #E4E7F7; --wm: #D9DDFF; }
     .oc h1, .oc h2, .oc h3 { font-family: var(--font-heading); }
     .oc a { color: var(--blue); text-decoration: none; }
 
@@ -61,16 +71,31 @@
                         to   { clip-path: inset(-30% 0 -14% 0); transform: none } }
     @keyframes omWm   { from { opacity: 0; transform: translateY(90px) } to { opacity: 1; transform: none } }
     @media (prefers-reduced-motion: reduce) {
-      .oc-h1, .oc-h1 span, .oc-cols { animation: none !important; transform: none !important; }
+      .oc-h1, .oc-h1 span, .oc-cols, .oc-wm span { animation: none !important; transform: none !important; }
       .oc-intro #navbar, .oc-intro .wl-fab { animation: none !important; }
     }
 
     /* ── hero: jen nadpis a dva sloupce textu ── */
     /* hero na celou výšku obrazovky, obsah svisle na střed */
     .oc-hero { background: #fff; min-height: 100vh; min-height: 100svh;
-      display: flex; align-items: center; }
-    .oc-hero-txt { width: min(1280px, 92vw); margin: 0 auto;
+      display: flex; align-items: center; position: relative;
+      /* dole visí přes okraj nápis „Makej“ — spodní odsazení mu drží místo */
+      padding-bottom: clamp(64px, 12vw, 190px); }
+    .oc-hero-txt { width: min(1280px, 92vw); margin: 0 auto; position: relative; z-index: 1;
       padding: clamp(104px, 12vh, 150px) 0 clamp(48px, 6vw, 84px); }
+
+    /* ── Obří „Makej“ na spodní hraně hera: větší část je v heru, zbytek přetéká
+       do sekce „Proč vzniklo“ (translateY laděné okem, 50 % sedělo moc nízko).
+       Sekce nemá vlastní pozadí, takže nápis nepřekryje; text sekce je v toku
+       výš, takže se vykreslí nad ním. ── */
+    .oc-wm { position: absolute; left: 0; right: 0; bottom: 0; z-index: 0;
+      transform: translateY(40%); text-align: center; pointer-events: none;
+      user-select: none; overflow-anchor: none; }
+    .oc-wm span { display: block; font-family: var(--font-heading); font-weight: 900;
+      font-size: clamp(84px, 22vw, 340px); line-height: .82; letter-spacing: -.05em;
+      color: var(--wm); animation: omWm 1s cubic-bezier(.22,1,.36,1) .5s both; }
+    /* první sekce pod herem — víc místa nahoře, ať spodní půlka nápisu nekolidovala s nadpisem */
+    .oc-sec.oc-under-wm { padding-top: clamp(96px, 15vw, 210px); }
     .oc-h1 { margin: 0; font-weight: 900; font-size: clamp(56px, 9vw, 132px); line-height: 1;
       letter-spacing: -.05em; text-transform: uppercase; }
     .oc-h1 span { display: block; animation: omMask .9s cubic-bezier(.22,1,.36,1) both; }
@@ -103,27 +128,35 @@
        Kdyby se odkrýval až po zmenšení, celé zvětšení by proběhlo pod maskou. */
     .oc-intro .oc-h1 span { animation-delay: .15s; }
     .oc-intro .oc-h1 span:nth-child(2) { animation-delay: .3s; }
-    .oc-intro .oc-cols { animation-delay: 2.2s; }
+    .oc-intro .oc-cols, .oc-intro .oc-wm span { animation-delay: 2.2s; }
 
     /* ── společné pro sekce ── */
     .oc-sec { padding: clamp(64px, 9vw, 110px) 56px; }
-    .oc-band { background: var(--band); }
     .oc-in { max-width: 1280px; margin: 0 auto; }
     .oc-h2 { margin: 0; font-weight: 900; font-size: clamp(32px, 4.6vw, 56px); line-height: 1.02;
       letter-spacing: -.035em; text-transform: uppercase; text-wrap: balance; }
     .oc-h2 .b { color: var(--blue); }
 
-    /* ── problémy ── */
-    .oc-two { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(36px, 6vw, 88px); align-items: start; }
-    .oc-two p { margin: 28px 0 0; font-size: 17px; line-height: 1.65; color: var(--txt); text-wrap: pretty; }
-    .oc-cards { display: grid; gap: 16px; }
-    .oc-card { display: grid; grid-template-columns: 26px 1fr; gap: 18px; padding: 26px 28px;
-      background: #fff; border-radius: 18px; align-items: start; }
-    /* ikona bez podkladu — jen kresba */
-    .oc-ic { width: 26px; height: 26px; display: grid; place-items: center; margin-top: 2px; }
-    .oc-ic svg { width: 26px; height: 26px; }
-    .oc-card h3 { margin: 0 0 7px; font-weight: 700; font-size: 18px; letter-spacing: -.01em; }
-    .oc-card p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--mut); }
+    /* ── Editorial hlavička sekce: obří dvouřádkový nadpis vlevo, perex vpravo,
+       obojí zarovnané na spodní linku, pod tím vlasová čára. ── */
+    .oc-head { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(32px, 5vw, 72px);
+      align-items: end; padding-bottom: clamp(36px, 5vw, 64px); border-bottom: 1px solid var(--line); }
+    .oc-eh { margin: 0; font-weight: 900; font-size: clamp(48px, 8.2vw, 104px); line-height: .86;
+      letter-spacing: -.05em; text-transform: uppercase; }
+    .oc-head p { margin: 0 0 12px; max-width: 480px; font-size: clamp(16px, 1.5vw, 20px);
+      line-height: 1.55; color: var(--txt); text-wrap: pretty; }
+
+    /* ── problémy — číslované řádky oddělené linkami ── */
+    .oc-rows { list-style: none; margin: 0; padding: 0; }
+    .oc-rows li { display: grid; grid-template-columns: 92px 1fr 1fr; gap: clamp(24px, 4vw, 56px);
+      align-items: start; padding: clamp(30px, 3.6vw, 46px) 0; border-bottom: 1px solid var(--line); }
+    .oc-rows li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .oc-num { font-weight: 900; font-size: clamp(30px, 3.4vw, 44px); line-height: 1;
+      letter-spacing: -.04em; color: var(--wm); font-family: var(--font-heading); }
+    .oc-rows h3 { margin: 0; font-weight: 800; font-size: clamp(23px, 2.7vw, 34px); line-height: 1.1;
+      letter-spacing: -.03em; text-wrap: balance; }
+    .oc-rows p { margin: 6px 0 0; max-width: 440px; font-size: clamp(15.5px, 1.35vw, 18px);
+      line-height: 1.6; color: var(--mut); text-wrap: pretty; }
 
     /* ── modrý pás s citátem ── */
     .oc-quote { background: var(--blue); color: #fff; padding: clamp(60px, 7vw, 88px) 56px; }
@@ -137,45 +170,54 @@
     .oc-shot { justify-self: end; display: grid; place-items: center; }
     .oc-shot img { width: min(100%, 500px); height: auto; display: block; }
 
-    /* ── na čem pracujeme ── */
-    .oc-sec > .oc-in > p.oc-sub { margin: 12px 0 52px; max-width: 560px; font-size: 17px;
-      line-height: 1.6; color: var(--mut); }
-    .oc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .oc-cell { padding: 30px; border: 1px solid var(--line); border-radius: 20px;
-      transition: border-color .2s ease; }
-    .oc-cell:hover { border-color: var(--blue); }
-    .oc-cell svg { margin-bottom: 22px; }
-    .oc-cell h3 { margin: 0 0 8px; font-weight: 700; font-size: 19px; letter-spacing: -.01em; }
-    .oc-cell p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--mut); }
-    .oc-cta { display: flex; justify-content: center; margin-top: 44px; }
-    .oc-cta a { display: inline-flex; align-items: center; gap: 12px; padding: 15px 30px;
-      border-radius: 999px; color: #fff; font-size: 15px; font-weight: 700; background: var(--blue);
-      transition: transform .18s ease, box-shadow .2s ease; }
-    .oc-cta a:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -12px rgba(0,32,246,.55); color: #fff; }
+    /* ── na čem pracujeme — dva sloupce položek oddělených linkami ── */
+    .oc-list2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(32px, 5vw, 72px); }
+    .oc-list2 > div { padding: clamp(28px, 3vw, 40px) 0; border-bottom: 1px solid var(--line); }
+    /* poslední řádek mřížky (dvě položky) je bez linky — sekci ukončuje až odkaz pod ní */
+    .oc-list2 > div:nth-last-child(-n+2) { border-bottom: 0; }
+    .oc-list2 h3 { margin: 0 0 10px; font-weight: 800; font-size: clamp(21px, 2.4vw, 30px);
+      line-height: 1.1; letter-spacing: -.03em; text-wrap: balance; }
+    .oc-list2 p { margin: 0; max-width: 420px; font-size: clamp(15px, 1.3vw, 17px);
+      line-height: 1.6; color: var(--mut); text-wrap: pretty; }
+    /* textový odkaz s podtržítkem místo pilulky — drží editorial ráz sekce */
+    .oc-cta { margin-top: clamp(44px, 5vw, 72px); }
+    .oc-cta a { display: inline-flex; align-items: center; gap: 14px; font-family: var(--font-heading);
+      font-weight: 800; font-size: clamp(17px, 1.8vw, 22px); letter-spacing: -.02em; color: var(--blue);
+      padding-bottom: 10px; border-bottom: 2px solid var(--blue);
+      transition: color .2s ease, border-color .2s ease; }
+    .oc-cta a:hover { color: var(--ink); border-bottom-color: var(--ink); }
 
     /* ── tým ── */
-    .oc-team-head { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 88px);
-      align-items: end; margin-bottom: 56px; }
-    .oc-team-head p { margin: 0; font-size: 17px; line-height: 1.65; color: var(--txt); text-wrap: pretty; }
-    .oc-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-    .oc-person { background: #fff; border-radius: 22px; padding: 40px 32px 42px; }
-    .oc-person h3 { margin: 0 0 8px; font-weight: 800; font-size: 22px; letter-spacing: -.02em; }
-    .oc-person p { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .14em;
+    .oc-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(28px, 3vw, 40px);
+      padding-top: clamp(36px, 4.5vw, 56px); }
+    .oc-person { min-width: 0; }
+    .oc-person h3 { margin: 0 0 8px; font-weight: 900; font-size: clamp(24px, 2.7vw, 34px);
+      letter-spacing: -.03em; }
+    .oc-person p { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .16em;
       text-transform: uppercase; color: var(--blue); }
 
     /* ── responsive ── */
     @media (max-width: 1000px) {
       .oc-cols { gap: 26px; }
-      .oc-two, .oc-quote-in, .oc-team-head { grid-template-columns: 1fr; }
+      .oc-head, .oc-quote-in { grid-template-columns: 1fr; align-items: start; }
+      .oc-head p { margin-bottom: 0; }
       .oc-shot { justify-self: start; }
-      .oc-grid, .oc-team { grid-template-columns: 1fr 1fr; }
+      .oc-team { grid-template-columns: 1fr 1fr; }
+      /* v jednom sloupci má linku každá položka kromě poslední */
+      .oc-rows li { grid-template-columns: 68px 1fr; }
+      .oc-rows p { grid-column: 2; max-width: none; }
     }
     @media (max-width: 680px) {
       .oc-sec, .oc-quote { padding-left: 22px; padding-right: 22px; }
       .oc-hero { min-height: 92vh; min-height: 92svh; }
       .oc-hero-txt { padding: 108px 0 48px; }
       .oc-cols { grid-template-columns: 1fr; gap: 24px; }
-      .oc-grid, .oc-team { grid-template-columns: 1fr; }
+      .oc-team { grid-template-columns: 1fr; gap: 24px; }
+      .oc-list2 { grid-template-columns: 1fr; }
+      .oc-list2 > div:nth-last-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .oc-list2 > div:last-child { border-bottom: 0; }
+      .oc-rows li { grid-template-columns: 1fr; gap: 10px; }
+      .oc-rows p { grid-column: auto; }
       .oc-shot { justify-self: center; }
     }
   </style>
@@ -229,6 +271,7 @@
           </div>
         </div>
       </div>
+      <div class="oc-wm" aria-hidden="true"><span>Makej</span></div>
     </section>
 
     <script>
@@ -256,42 +299,34 @@
     </script>
 
     <!-- ═══════════ PROČ MAKEJ VZNIKLO ═══════════ -->
-    <section class="oc-sec oc-band">
-      <div class="oc-in oc-two">
-        <div>
-          <h2 class="oc-h2">Z neuspokojené potřeby vzniklo <span class="b">řešení</span></h2>
-          <p>Opakovaně jsme naráželi na stejný problém. Firmy nemohly najít spolehlivé lidi, zatímco spousta lidí — včetně nás — hledala práci nebo brigádu. Existující portály byly zdlouhavé, nepřehledné a rychlé spojení obou stran většinou vůbec neumožňovaly.</p>
+    <section class="oc-sec oc-under-wm">
+      <div class="oc-in">
+        <div class="oc-head">
+          <h2 class="oc-eh">Proč<br>vzniklo</h2>
+          <p>Opakovaně jsme naráželi na stejný problém. Firmy nemohly najít spolehlivé lidi, zatímco spousta lidí — včetně nás — hledala práci nebo brigádu. Existující portály byly zdlouhavé a rychlé spojení obou stran většinou vůbec neumožňovaly.</p>
         </div>
-        <div class="oc-cards">
-          <div class="oc-card">
-            <div class="oc-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8"/></svg></div>
-            <div>
-              <h3>Desítky roztříštěných portálů</h3>
-              <p>Nabídky rozházené na deseti místech, každé s vlastním účtem a vlastními pravidly.</p>
-            </div>
-          </div>
-          <div class="oc-card">
-            <div class="oc-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg></div>
-            <div>
-              <h3>Dlouhé životopisy a formuláře</h3>
-              <p>Půl hodiny vyplňování kvůli víkendové brigádě, na kterou stačí umět přijít včas.</p>
-            </div>
-          </div>
-          <div class="oc-card">
-            <div class="oc-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
-            <div>
-              <h3>Týdny čekání v nejistotě</h3>
-              <p>Odešleš přihlášku a nevíš, jestli ji vůbec někdo otevřel. Odpověď často nepřijde nikdy.</p>
-            </div>
-          </div>
-          <div class="oc-card">
-            <div class="oc-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg></div>
-            <div>
-              <h3>Firmy platí desetitisíce za inzerci</h3>
-              <p>A stejně skončí u hromady nerelevantních životopisů, které musí někdo pročíst.</p>
-            </div>
-          </div>
-        </div>
+        <ol class="oc-rows">
+          <li>
+            <span class="oc-num">01</span>
+            <h3>Desítky roztříštěných portálů</h3>
+            <p>Nabídky rozházené na deseti místech, každé s vlastním účtem a vlastními pravidly.</p>
+          </li>
+          <li>
+            <span class="oc-num">02</span>
+            <h3>Dlouhé životopisy a formuláře</h3>
+            <p>Půl hodiny vyplňování kvůli víkendové brigádě, na kterou stačí umět přijít včas.</p>
+          </li>
+          <li>
+            <span class="oc-num">03</span>
+            <h3>Týdny čekání v nejistotě</h3>
+            <p>Odešleš přihlášku a nevíš, jestli ji vůbec někdo otevřel. Odpověď často nepřijde nikdy.</p>
+          </li>
+          <li>
+            <span class="oc-num">04</span>
+            <h3>Firmy platí desetitisíce za inzerci</h3>
+            <p>A stejně skončí u hromady nerelevantních životopisů, které musí někdo pročíst.</p>
+          </li>
+        </ol>
       </div>
     </section>
 
@@ -311,53 +346,49 @@
     <!-- ═══════════ NA ČEM PRACUJEME DÁL ═══════════ -->
     <section class="oc-sec">
       <div class="oc-in">
-        <h2 class="oc-h2">Na čem pracujeme <span class="b">dál</span></h2>
-        <p class="oc-sub">Jak nám to jde, hlásíme průběžně — novinky z appky, články i to, co zrovna chystáme.</p>
-        <div class="oc-grid">
-          <div class="oc-cell">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><path d="M4 4h11l5 5v11H4z"/><path d="M8 13h6M8 17h4"/></svg>
+        <div class="oc-head">
+          <h2 class="oc-eh">Co<br>chystáme</h2>
+          <p>Jak nám to jde, hlásíme průběžně — novinky z appky, články i to, co zrovna stavíme.</p>
+        </div>
+        <div class="oc-list2">
+          <div>
             <h3>Inzerát předvyplněný AI</h3>
             <p>Firma napíše, koho shání, a zbytek nabídky se doplní sám.</p>
           </div>
-          <div class="oc-cell">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M9 16l1.8 1.8L15 13.5"/></svg>
+          <div>
             <h3>Smlouvy přímo v appce</h3>
             <p>Dohoda podepsaná v telefonu, než dorazíš na první směnu.</p>
           </div>
-          <div class="oc-cell">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          <div>
             <h3>Vlastní HR software</h3>
             <p>Správa náboru pro firmy na jednom místě, bez tabulek a e-mailů.</p>
           </div>
-          <div class="oc-cell">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <div>
             <h3>Expanze do celé ČR</h3>
             <p>Začínáme v Brně a Jihomoravském kraji, dál chceme všude.</p>
           </div>
-          <div class="oc-cell">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 6V4h8v2M16 13h2"/></svg>
+          <div>
             <h3>Bezpečné peníze</h3>
             <p>Odměna přes prostředníka, ať se obě strany nemusí bát.</p>
           </div>
-          <div class="oc-cell">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0020f6" stroke-width="2"><path d="M12 3v12M7 11l5 5 5-5M4 21h16"/></svg>
+          <div>
             <h3>Aplikace brzy vychází</h3>
             <p>Makej finišuje a už brzy ho stáhneš do telefonu.</p>
           </div>
         </div>
         <div class="oc-cta">
           <a href="/blog">Podívej se na naše novinky
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
           </a>
         </div>
       </div>
     </section>
 
     <!-- ═══════════ KDO STOJÍ ZA MAKEJ ═══════════ -->
-    <section class="oc-sec oc-band">
+    <section class="oc-sec">
       <div class="oc-in">
-        <div class="oc-team-head">
-          <h2 class="oc-h2">Kdo stojí za Makej</h2>
+        <div class="oc-head">
+          <h2 class="oc-eh">Kdo<br>za tím<br>stojí</h2>
           <p>Tři spolužáci z vysoké školy, kteří si sami hledali brigády a naráželi na stejné problémy. Nejsme korporace s oddělením na výzkum trhu — jsme součástí té samé skupiny lidí, pro kterou Makej stavíme.</p>
         </div>
         <div class="oc-team">

@@ -252,9 +252,44 @@ img { max-width: 100%; display: block; }
   background-size: 300% 300%;
   animation: hero-wash 14s ease infinite;
 } */
-/* fine dot texture */
-/* vinětace vypnutá — byla stavěná na celoplošně tmavé pozadí, na světlém spodku špiní */
-.hero-bg-particles::before { content: none; }
+/* Rozostřené světelné skvrny přes gradient — čistý linear-gradient je matematicky
+   hladký, takže „blur" musí přijít z něčeho, co má tvar. Vrstva je natažená za okraje
+   (inset -15 %), aby blur nevytvořil bledý lem u kraje; #hero má overflow:hidden.
+   Maska skvrny zháší dřív, než gradient přejde do světla — jinak by špinily bílý spodek
+   (ze stejného důvodu je vypnutá původní vinětace). */
+.hero-bg-particles::before {
+  content: ''; position: absolute; inset: -15%; pointer-events: none;
+  background:
+    radial-gradient(42% 34% at 16% 16%, rgba(0,14,180,.95) 0%, rgba(0,14,180,0) 70%),
+    radial-gradient(46% 36% at 84% 10%, rgba(96,126,255,.72) 0%, rgba(96,126,255,0) 72%),
+    radial-gradient(52% 40% at 70% 44%, rgba(150,172,255,.55) 0%, rgba(150,172,255,0) 70%),
+    radial-gradient(40% 32% at 28% 54%, rgba(0,32,246,.85) 0%, rgba(0,32,246,0) 72%);
+  filter: blur(90px) saturate(1.15);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 66%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 66%);
+}
+/* Skleněná deska nad rozostřenými skvrnami: šikmé odlesky, prosvětlení shora
+   a měkké svislé pruhy (lom světla v tlusté desce). Všechno jen bílá s nízkou
+   průhledností — barvu dodává vrstva pod tím, tahle jen tvaruje světlo.
+   Maska ji stahuje k nule dřív, než pozadí přejde do bílé, jinak by na světlém
+   spodku nebyla vidět a jen by ho zašedla. */
+.hero-bg-particles::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    /* hlavní široký odlesk přes desku */
+    linear-gradient(112deg, rgba(255,255,255,0) 16%, rgba(255,255,255,.17) 33%,
+                            rgba(255,255,255,.05) 43%, rgba(255,255,255,0) 55%),
+    /* druhý, užší a ostřejší — hrana skla */
+    linear-gradient(112deg, rgba(255,255,255,0) 57%, rgba(255,255,255,.11) 65%,
+                            rgba(255,255,255,0) 71%),
+    /* světlo dopadající shora */
+    radial-gradient(120% 72% at 50% -12%, rgba(255,255,255,.2) 0%, rgba(255,255,255,0) 62%),
+    /* svislé pruhy lomu — široké a slabé, ať nevzniknou viditelné hrany */
+    linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.055) 12%, rgba(255,255,255,0) 26%,
+                           rgba(255,255,255,0) 48%, rgba(255,255,255,.045) 61%, rgba(255,255,255,0) 78%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 44%, transparent 72%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 44%, transparent 72%);
+}
 @keyframes hero-wash {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
@@ -296,13 +331,20 @@ img { max-width: 100%; display: block; }
 .hero-line:nth-child(2) .hero-line-in { animation-delay: .22s; }
 .hero-line:nth-child(3) .hero-line-in { animation-delay: .36s; }
 @keyframes heroLineUp { from { transform: translateY(120%); } to { transform: translateY(0); } }
-/* Prostřední slovo „Matchuj" — jemný nekonečný lesk (gradient sweep) */
+/* Prostřední slovo „Matchuj" — bez gradientu, stejná bílá jako zbytek nadpisu.
+   .gradient-text v HTML zůstává, přebíjíme ho tady; sweep je zakomentovaný pod tím. */
+#hero .hero-grad {
+  background: none; -webkit-background-clip: border-box; background-clip: border-box;
+  -webkit-text-fill-color: currentColor; color: var(--fg);
+  animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) .22s both;
+}
+/* Původní gradient sweep:
 #hero .hero-grad {
   background: linear-gradient(100deg, #7c86ff 0%, #c7ceff 28%, #ffffff 50%, #c7ceff 72%, #7c86ff 100%);
   background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent; color: transparent;
   animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) .22s both, heroGradSweep 6s linear 1.3s infinite;
-}
+} */
 /* 200 % = přesně jedna šířka dlaždice → smyčka navazuje beze švu (dřív 220 % → skok) */
 @keyframes heroGradSweep { to { background-position: 200% center; } }
 @media (prefers-reduced-motion: reduce) {
@@ -1755,11 +1797,14 @@ html { scroll-padding-top: 92px; }
 #navbar.nav-light-page .nav-links a { color: #0020f6; }
 #navbar.nav-light-page .nav-links a:hover { color: #001bc8; }
 #navbar.nav-light-page .nav-links a.nav-active { color: #0020f6; border-bottom-color: #0020f6; }
+/* Bílá výplň jako na modrých stránkách tady nejde (bílá na bílé), takže obrys —
+   ale modrá i řez písma musí sedět se zbytkem webu. */
 #navbar.nav-light-page #nav-login-btn {
-  background: transparent; color: #0020f6; border-color: rgba(0,32,246,.3); font-weight: 600;
+  background: transparent; color: var(--primary); border-color: rgba(0,32,246,.3); font-weight: 700;
 }
-#navbar.nav-light-page #nav-login-btn:hover { background: rgba(0,32,246,.06); border-color: #0020f6; }
-#navbar.nav-light-page #nav-register-btn { background: linear-gradient(135deg,#0020f6,#3a3a99); color: #fff; }
+#navbar.nav-light-page #nav-login-btn:hover { background: rgba(0,32,246,.06); border-color: var(--primary); }
+/* „Vytvořit účet" si nechává značkový gradient z .btn-primary (primary → accent).
+   Dřív tu byl vlastní #0020f6 → #3a3a99, který byl proti ostatním navbarům kalný. */
 #navbar.nav-light-page .mobile-menu-btn {
   color: #0020f6; background: rgba(0,32,246,.06); border-color: rgba(0,32,246,.22);
 }
