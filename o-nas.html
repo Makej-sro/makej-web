@@ -673,14 +673,16 @@
     els.forEach(function (el) { io.observe(el); });
   })();
   </script>
-  <!-- Plovoucí tlačítko „Startujeme" — přejde na homepage s čekacím listem -->
-  <button class="wl-fab" type="button" aria-label="Startujeme – přidat se na waitlist">
+  <!-- Plovoucí tlačítko „Startujeme" — čekací list žije jen na homepage
+       (script.js celý blok přeskočí bez #wl-overlay), tady je to odkaz;
+       ?wl na homepage overlay rovnou otevře. -->
+  <a class="wl-fab" href="/?wl" aria-label="Startujeme – přidat se na waitlist">
     <span class="wl-fab__icon" aria-hidden="true">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
         <path d="M13.6 2 5.4 13.1c-.4.5 0 1.3.7 1.3h4.2l-1.4 7.4c-.1.8.9 1.2 1.4.6l8.3-11.1c.4-.5 0-1.3-.7-1.3h-4.2l1.4-7.4c.1-.8-.9-1.2-1.5-.6Z" fill="currentColor"/>
       </svg>
     </span>
     <span class="wl-fab__label">Startujeme</span>
-  </button>
+  </a>
 </body>
 </html>

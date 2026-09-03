@@ -100,15 +100,8 @@
     .faq-a a { color: #a78bfa; text-decoration: none; }
     .faq-a a:hover { text-decoration: underline; }
     .faq-item.open .faq-a { display: block; }
-    #makac-bubble { position: absolute; top: -130px; right: calc(50% + 72px); width: 188px; background: linear-gradient(135deg, #2e2e62 0%, #1a1a3a 100%); border: 1.5px solid rgba(167,139,250,.35); border-radius: 14px; padding: 11px 14px; box-shadow: 0 10px 28px rgba(0,0,30,.55); z-index: 10; animation: bubble-in .4s cubic-bezier(.2,.8,.2,1) .5s both; }
-    #makac-bubble p { color: #e0e0ff; font-size: .78rem; line-height: 1.55; margin: 0 0 10px; }
-    #makac-bubble strong { color: #fff; }
-    #makac-chat-btn { display: block; width: 100%; padding: 7px 0; background: linear-gradient(135deg, #292978, #3a3a99); border: none; border-radius: 8px; color: #fff; font-size: .75rem; font-weight: 700; font-family: var(--font-body); cursor: pointer; transition: opacity .15s; }
-    #makac-chat-btn:hover { opacity: .85; }
-    @keyframes bubble-in { from { opacity: 0; transform: scale(.85) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     @media (max-width: 700px) {
       .sup-cards { grid-template-columns: 1fr; max-width: 400px; }
-      #makac-bubble { right: auto; left: 50%; transform: translateX(-50%); top: -140px; }
     }
   
     /* Navbar: tlačítka vždy viditelná, Podpora aktivní */
@@ -970,7 +963,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="/script.js?v=31"></script>
-  <script src="/chat-widget.js"></script>
 
   <!-- ── Podpora: FAQ + typewriter ── -->
   <script>
