@@ -146,8 +146,10 @@
     /* Sekce „Proč si zvolíš Makej" — brandová modrá, na celou výšku obrazovky.
        Obsah zarovnaný nahoru (žádné vertikální centrování), aby po doskočení
        fontu nadpis nepřecentrovával celý blok = žádný skok při scrollu. */
-    #features { background: #fff; box-sizing: border-box;
-      padding-top: clamp(72px, 9vw, 120px); padding-bottom: clamp(80px, 10vw, 130px); }
+    #features { background: #eceef3; box-sizing: border-box;
+      padding-top: clamp(72px, 9vw, 118px); padding-bottom: clamp(40px, 5vw, 56px); }
+    /* panel jde přes celou šířku, ať se velké slovo v pozadí rozjede k okrajům */
+    #features .container { width: 100%; max-width: none; padding: 0; }
 
     /* ── Video ukázka aplikace (full-bleed přes celou šířku stránky) ── */
     #features .feat-video {
@@ -184,29 +186,69 @@
     #features .feature-card h3 { color: #0a0d2e; }
     #features .feature-card p { color: rgba(10,13,46,.55); }
 
-    /* ── Funkce: bílá plocha, nadpis a perex nahoře přes celou šířku, pod tím
-       tři sloupce položek. Bez ikon i bez dělicích linek — položky drží
-       jen mřížka a odstup. ── */
-    #features .bf2-title { margin: 0 0 12px; max-width: 900px; font-family: var(--font-nav);
-      font-weight: 800; font-size: clamp(38px, 5vw, 76px); line-height: .98;
-      letter-spacing: -.03em; color: var(--primary); text-wrap: balance; }
-    #features .bf2-sub { margin: 0 0 clamp(48px, 6vw, 76px); max-width: 560px;
-      font-size: 18px; line-height: 1.6; color: #3E4358; text-wrap: pretty; }
+    /* ── Funkce ve stejném jazyce jako galerie na /lide a recenze na hlavní straně:
+       velké slovo v pozadí, tři různě široké a výškově posunuté sloupce karet,
+       rohové poznámky. Všech šest funkcí je vidět naráz (nic se nestřídá). ── */
+    .fx-head { text-align: center; max-width: 720px; margin: 0 auto 54px; padding: 0 24px; }
+    #features .bf2-title { margin: 0; max-width: none; font-family: var(--font-heading);
+      font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, 4.4vw, 3rem);
+      letter-spacing: -.02em; line-height: 1.02; color: #0e1116; }
+    #features .bf2-sub { margin: 14px 0 0; max-width: none; font-size: 1.08rem;
+      line-height: 1.6; color: rgba(14,17,22,.55); text-wrap: pretty; }
 
-    #features .bf2-feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-      column-gap: clamp(32px, 4vw, 56px); row-gap: clamp(36px, 4vw, 56px); }
-    #features .bf2-feat { min-width: 0; }
-    #features .bf2-feat h3 { margin: 0 0 10px; font-family: var(--font-nav); font-weight: 700;
-      font-size: clamp(22px, 2.2vw, 27px); letter-spacing: -.01em; color: #14161C; }
-    #features .bf2-feat p { margin: 0; max-width: 300px; font-size: 16px; line-height: 1.6; color: #3E4358; }
+    .fx-panel { position: relative; display: flex; flex-direction: column;
+      padding: 20px clamp(28px, 6vw, 90px) 96px; overflow: hidden; }
 
-    @media (max-width: 860px) {
-      #features .bf2-feats { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 560px) {
-      #features .bf2-feats { grid-template-columns: 1fr; }
-      #features .bf2-feat p { max-width: none; }
-    }
+    .fx-word { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+      text-align: center; font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
+      font-size: clamp(4.5rem, 23vw, 24rem); letter-spacing: -.04em; line-height: 1;
+      color: rgba(14,17,22,.055); z-index: 0; pointer-events: none; white-space: nowrap; }
+    /* reveal (třídy .js-ref-* jsou globální ve style.css) — musí zachovat centrování */
+    .fx-word.js-ref-word { transform: translateY(calc(-50% + 70px)); }
+    .fx-word.js-ref-word.is-in { transform: translateY(-50%); }
+
+    .fx-side { position: absolute; z-index: 3; max-width: 250px; font-size: .9rem;
+      line-height: 1.5; color: rgba(14,17,22,.55); margin: 0; }
+    .fx-side b { color: #0e1116; font-weight: 800; }
+    .fx-side.bl { bottom: 42px; left: 44px; }
+    .fx-side.tr { top: 42px; right: 44px; text-align: right; }
+
+    .fx-cols { position: relative; z-index: 2; order: 2; display: flex;
+      justify-content: center; align-items: flex-start; gap: clamp(22px, 5.5vw, 84px); }
+    .fx-col { flex: 0 0 auto; display: flex; flex-direction: column; gap: clamp(20px, 2.2vw, 28px); }
+    .fx-col.a { margin-top: 40px;  width: clamp(248px, 22vw, 330px); }
+    .fx-col.b { margin-top: 0;     width: clamp(266px, 25vw, 374px); }
+    .fx-col.c { margin-top: 116px; width: clamp(238px, 21vw, 312px); }
+
+    .fx-card { background: #fff; border-radius: 20px; border: 1px solid rgba(14,17,22,.07);
+      box-shadow: 0 34px 64px -32px rgba(14,17,22,.45); padding: 26px 28px 28px; }
+    .fx-col.b .fx-card { padding: 32px 34px 34px; }
+    #features .fx-card h3 { margin: 0; font-family: var(--font-heading); font-weight: 800;
+      text-transform: uppercase; font-size: 1rem; letter-spacing: -.01em; color: #0e1116; }
+    #features .fx-card p { margin: 8px 0 0; max-width: none; font-size: .92rem;
+      line-height: 1.55; color: rgba(14,17,22,.55); text-wrap: pretty; }
+
+    /* prostřední sloupec „popne", boční přijedou zespoda — stejná kaskáda jako v galerii */
+    .fx-col.b.js-ref-pop { transition-delay: .1s; }
+    .fx-col.a.js-ref-up  { transition-delay: .3s; }
+    .fx-col.c.js-ref-up  { transition-delay: .52s; }
+
+    @media (max-width: 900px) {
+      #features { padding-top: 72px; padding-bottom: 56px; }
+      .fx-head { margin-bottom: 34px; padding: 0 6px; }
+      /* slovo zůstává vodoznakem i na mobilu — vycentrované přes stoh karet,
+         širší než ony, takže prosvítá po stranách a v mezerách mezi kartami */
+      .fx-panel { padding: 0 22px; }
+      /* 24vw: poměr šířka/font je u „FUNKCE“ 3,91 → slovo zabere ~94 % okna a vejde se celé */
+      .fx-word { top: 50%; font-size: clamp(3.4rem, 24vw, 11rem); }
+      .fx-word.js-ref-word { transform: translateY(calc(-50% + 46px)); }
+      .fx-word.js-ref-word.is-in { transform: translateY(-50%); }
+      .fx-side { position: static; max-width: none; text-align: center; }
+      .fx-side.bl { order: 1; margin-bottom: 28px; }
+      .fx-side.tr { order: 3; text-align: center; margin-top: 26px; }
+      .fx-cols { flex-direction: column; align-items: center; }
+      .fx-col.a, .fx-col.b, .fx-col.c { margin-top: 0; width: min(330px, 82vw); }
+      .fx-col.b .fx-card { padding: 26px 28px 28px; }
     }
 
     /* Demo telefon na bílé sekci */
@@ -574,35 +616,51 @@
       </div>
     </section>
 
-    <!-- ═══════════ FEATURES — nadpis a perex nahoře, tři sloupce položek pod tím ═══════════ -->
+    <!-- ═══════════ FEATURES — galerie ve stylu /lide, všech šest funkcí naráz ═══════════ -->
     <section id="features" class="nav-light">
       <div class="container">
-        <h2 class="bf2-title">Proč si zvolíš Makej</h2>
-        <p class="bf2-sub">Šest důvodů, proč se ti vyplatí hledat brigádu tady a ne v inzerátech.</p>
-        <div class="bf2-feats">
-          <div class="bf2-feat">
-            <h3>Zdarma</h3>
-            <p>Žádné poplatky ani provize z výdělku.</p>
+        <div class="fx-head js-ref-up">
+          <h2 class="bf2-title">Proč si zvolíš Makej</h2>
+          <p class="bf2-sub">Šest důvodů, proč se ti vyplatí hledat brigádu tady a ne v inzerátech.</p>
+        </div>
+
+        <div class="fx-panel">
+          <div class="fx-word js-ref-word" aria-hidden="true">FUNKCE</div>
+
+          <p class="fx-side bl"><b>Bez háčků.</b> Co vidíš v nabídce, to dostaneš.</p>
+          <p class="fx-side tr">Všechno, co na běžných inzerátech chybí.</p>
+
+          <div class="fx-cols">
+          <div class="fx-col a js-ref-up">
+            <article class="fx-card">
+              <h3>Zdarma</h3>
+              <p>Žádné poplatky ani provize z výdělku.</p>
+            </article>
+            <article class="fx-card">
+              <h3>Hodinovka u nabídky</h3>
+              <p>Kolik dostaneš, vidíš rovnou v inzerátu. Žádné „mzda dle dohody“.</p>
+            </article>
           </div>
-          <div class="bf2-feat">
-            <h3>Hodinovka u nabídky</h3>
-            <p>Kolik dostaneš, vidíš rovnou v inzerátu. Žádné „mzda dle dohody".</p>
+          <div class="fx-col b js-ref-pop">
+            <article class="fx-card">
+              <h3>Ověřené firmy</h3>
+              <p>Jen prověřené nabídky (IČO i provozovna).</p>
+            </article>
+            <article class="fx-card">
+              <h3>Gamifikace</h3>
+              <p>Sbírej XP, leveluj a odemykej odměny.</p>
+            </article>
           </div>
-          <div class="bf2-feat">
-            <h3>Ověřené firmy</h3>
-            <p>Jen prověřené nabídky (IČO i provozovna).</p>
+          <div class="fx-col c js-ref-up">
+            <article class="fx-card">
+              <h3>Recenze</h3>
+              <p>Buduj si reputaci, získávej lepší nabídky.</p>
+            </article>
+            <article class="fx-card">
+              <h3>Blízko tebe</h3>
+              <p>Práce pár minut od domova nebo školy.</p>
+            </article>
           </div>
-          <div class="bf2-feat">
-            <h3>Gamifikace</h3>
-            <p>Sbírej XP, leveluj a odemykej odměny.</p>
-          </div>
-          <div class="bf2-feat">
-            <h3>Recenze</h3>
-            <p>Buduj si reputaci, získávej lepší nabídky.</p>
-          </div>
-          <div class="bf2-feat">
-            <h3>Blízko tebe</h3>
-            <p>Práce pár minut od domova nebo školy.</p>
           </div>
         </div>
       </div>

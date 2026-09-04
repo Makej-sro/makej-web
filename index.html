@@ -207,7 +207,7 @@
   <!-- ═══════════ HERO ═══════════ -->
   <section id="hero">
     <div class="hero-main">
-      <h1 class="hero-h1"><span>Práce na jeden swajp.</span></h1>
+      <h1 class="hero-h1"><span>Práce na jeden <span class="hero-typer" id="hero-typer"><span class="typer-word" id="typer-word">swajp</span></span>.</span></h1>
 
       <!-- hero-cta-auth: odhlášený; hero-cta-loggedin přepíná script.js -->
       <div class="hero-cta" id="hero-cta-auth">
@@ -234,23 +234,52 @@
   <!-- ═══════════ REFERENCE ═══════════ -->
   <section id="makaci">
     <div class="container">
-      <div class="ref-grid">
-        <div class="ref-left">
-          <h2 class="ref-title">Co říkají brigádníci,<br>kteří si přes Makej našli práci</h2>
-          <p class="ref-hint">Ohlasy brigádníků, kteří si přes Makej našli brigádu.</p>
-        </div>
-        <div class="ref-right">
-          <div class="ref-deck" aria-hidden="true">
-            <span class="ref-deck-card c3"></span>
-            <span class="ref-deck-card c2"></span>
-            <span class="ref-deck-card c1"></span>
-          </div>
-          <div class="ref-stack" id="ref-stack"></div>
+      <div class="ref-head js-ref-up">
+        <h2>Co říkají makači.</h2>
+        <p>Ohlasy našich budoucích Makačů</p>
+      </div>
+
+      <div class="ref-panel">
+        <div class="ref-word js-ref-word" aria-hidden="true">RECENZE</div>
+
+        <p class="ref-side bl"><b>Bez filtrů.</b> Co nám lidi napsali, to tu je — nic jsme nepřepisovali.</p>
+        <p class="ref-side tr">Reálné reakce z prvních týdnů. Žádné placené recenze, žádní herci.</p>
+
+        <div class="ref-cards" id="ref-cards">
+          <blockquote class="ref-card c1 js-ref-up">
+            <div class="ref-quote">
+              <div class="ref-stars" role="img" aria-label="Hodnocení 5 z 5"><i></i><i></i><i></i><i></i><i></i></div>
+              <p class="ref-text">Těším se, až to vyjde!</p>
+              <footer class="ref-cap">
+                <span class="ref-name">Šimon V.</span>
+                <span class="ref-meta">29. 7. 2026</span>
+              </footer>
+            </div>
+          </blockquote>
+          <blockquote class="ref-card c2 js-ref-pop">
+            <div class="ref-quote">
+              <div class="ref-stars" role="img" aria-label="Hodnocení 5 z 5"><i></i><i></i><i></i><i></i><i></i></div>
+              <p class="ref-text">Moc se těším, až si na Makej najdu brigádu.</p>
+              <footer class="ref-cap">
+                <span class="ref-name">David V.</span>
+                <span class="ref-meta">27. 7. 2026</span>
+              </footer>
+            </div>
+          </blockquote>
+          <blockquote class="ref-card c3 js-ref-up">
+            <div class="ref-quote">
+              <div class="ref-stars" role="img" aria-label="Hodnocení 5 z 5"><i></i><i></i><i></i><i></i><i></i></div>
+              <p class="ref-text">Vypadá to suprově!</p>
+              <footer class="ref-cap">
+                <span class="ref-name">Samuel P.</span>
+                <span class="ref-meta">24. 7. 2026</span>
+              </footer>
+            </div>
+          </blockquote>
         </div>
       </div>
     </div>
   </section>
-
   <!-- ═══════════ DOWNLOAD CTA ═══════════ -->
   <section id="download">
     <div class="container">

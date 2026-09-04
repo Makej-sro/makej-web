@@ -174,7 +174,7 @@ function setupReveal() {
   const SEL = [
     '.step-card', '.feature-card', '.testimonial-card', '.download-card',
     '.section-header', '.cn-plan', '.yp-head',
-    '.ref-grid', '.bolt-head', '.bolt-text',
+    '.bolt-head', '.bolt-text',
     '.ab-lead', '.ab-col', '.ab-team-block', '.ab-person', '.ab-quote', '.ab-cta',
     '.emp-faq-item', '.faq-item',
   ].join(', ');
@@ -1371,75 +1371,117 @@ function showToast(msg) {
 })();
 
 
-/* ═══════════ REFERENCE — kroužkový sešit s listováním (z Yasin/recenze) ═══════════ */
+/* ═══════════ REFERENCE — galerie recenzí (styl sekce Lidé) ═══════════ */
 (function () {
+  var wrap = document.getElementById('ref-cards');
+  if (!wrap) return;
+
   var reviews = [
-    { text: 'Těším se, až to vyjde!', name: 'Šimon V.', role: '', date: '29. 7. 2026', photo: '' },
-    { text: 'Moc se těším, až si na Makej najdu brigádu.', name: 'David V.', role: '', date: '27. 7. 2026', photo: '' },
-    { text: 'Vypadá to suprově!', name: 'Samuel P.', role: '', date: '24. 7. 2026', photo: '' },
-    { text: 'Posílám nezaměstnaným kamarádům.', name: 'Jan W.', role: '', date: '21. 7. 2026', photo: '' },
-    { text: 'Budu konečně makat ve stylu!', name: 'Yasin B.', role: '', date: '18. 7. 2026', photo: '' },
+    { text: 'Těším se, až to vyjde!', name: 'Šimon V.', date: '29. 7. 2026', stars: 5 },
+    { text: 'Moc se těším, až si na Makej najdu brigádu.', name: 'David V.', date: '27. 7. 2026', stars: 5 },
+    { text: 'Vypadá to suprově!', name: 'Samuel P.', date: '24. 7. 2026', stars: 5 },
+    { text: 'Posílám nezaměstnaným kamarádům.', name: 'Jan W.', date: '21. 7. 2026', stars: 5 },
+    { text: 'Budu konečně makat ve stylu!', name: 'Yasin B.', date: '18. 7. 2026', stars: 5 },
   ];
 
-  var stack = document.getElementById('ref-stack');
-  if (!stack) return;
+  var cards = Array.prototype.slice.call(wrap.querySelectorAll('.ref-card'));
+  if (!cards.length || reviews.length <= cards.length) return;
 
-  function fill(cardEl, r) {
-    cardEl.querySelector('.ref-name').textContent = r.name;
-    cardEl.querySelector('.ref-meta').textContent = r.role ? r.role + ' · ' + r.date : r.date;
-    cardEl.querySelector('.ref-text').textContent = r.text;
+  function fill(card, r) {
+    var st = card.querySelector('.ref-stars');
+    st.innerHTML = new Array(r.stars + 1).join('<i></i>');
+    st.setAttribute('aria-label', 'Hodnocení ' + r.stars + ' z 5');
+    card.querySelector('.ref-text').textContent = r.text;
+    card.querySelector('.ref-name').textContent = r.name;
+    card.querySelector('.ref-meta').textContent = r.date;
   }
 
-  var VISIBLE = Math.min(3, reviews.length);
-  var nodes = [];
-  for (var k = 0; k < VISIBLE; k++) {
-    var c = document.createElement('div');
-    c.className = 'rs-card';
-    c.dataset.slot = k;
-    c.innerHTML = '<div class="ref-name"></div><div class="ref-meta"></div><p class="ref-text"></p>';
-    fill(c, reviews[k]);
-    nodes.push(c);
-    stack.appendChild(c);
-  }
+  // V HTML jsou napevno první tři recenze (kvůli SEO a běhu bez JS). `shown` drží,
+  // která recenze je v které kartě — odvodí se z DOM, takže to sedí i po přepsání HTML.
+  var shown = cards.map(function (card, i) {
+    var t = (card.querySelector('.ref-text').textContent || '').trim();
+    for (var k = 0; k < reviews.length; k++) if (reviews[k].text === t) return k;
+    return i % reviews.length;
+  });
 
-  var nextRev = VISIBLE % reviews.length;
-  var busy = false, timer, paused = false;
+  var next = 0, turn = 0, timer = null, visible = false, hovered = null;
 
-  function nodeAtSlot(s) {
-    for (var n = 0; n < nodes.length; n++) if (+nodes[n].dataset.slot === s) return nodes[n];
-    return null;
-  }
-
-  function advance() {
-    if (busy || reviews.length <= 1) return;
-    busy = true;
-    clearInterval(timer);
-
-    var leaving = nodeAtSlot(0);
-    for (var s = 1; s < VISIBLE; s++) {
-      var nd = nodeAtSlot(s);
-      if (nd) nd.dataset.slot = s - 1;
+  // Vybere první nezobrazenou recenzi od `next` dál → nikdy nemůžou být dvě stejné
+  // vedle sebe (ani ta samá znovu v té stejné kartě). Recenzí je víc než karet,
+  // takže se vždycky nějaká volná najde.
+  function pickReview() {
+    for (var step = 0; step < reviews.length; step++) {
+      var idx = (next + step) % reviews.length;
+      if (shown.indexOf(idx) === -1) { next = (idx + 1) % reviews.length; return idx; }
     }
-    leaving.classList.add('leaving');
-
-    setTimeout(function () {
-      fill(leaving, reviews[nextRev]);
-      nextRev = (nextRev + 1) % reviews.length;
-      leaving.dataset.slot = VISIBLE - 1;
-      leaving.classList.remove('leaving');
-      setTimeout(function () { busy = false; startTimer(); }, 720);
-    }, 540);
+    return -1;
   }
 
-  function startTimer() { clearInterval(timer); if (!paused) timer = setInterval(advance, 3500); }
+  // Karta odletí nahoru (jako odswajpnutá), nová recenze přiletí zespoda.
+  function swap() {
+    // Přeskoč kartu, na které zrovna leží kurzor — ať se text nemění pod rukama.
+    var ci = -1;
+    for (var i = 0; i < cards.length; i++) {
+      var c = turn++ % cards.length;
+      if (cards[c] !== hovered) { ci = c; break; }
+    }
+    if (ci < 0) return;
 
-  // Najetí myší (bez kliku) pozastaví listování, odjetí ho zase spustí.
-  stack.addEventListener('mouseenter', function () { paused = true; clearInterval(timer); });
-  stack.addEventListener('mouseleave', function () { paused = false; startTimer(); });
-  // Klik = posun na další + pokračuj dál (i když na kartě zůstane kurzor).
-  stack.addEventListener('click', function () { if (!busy) { paused = false; advance(); } });
+    var idx = pickReview();
+    if (idx < 0) return;
 
-  startTimer();
+    var card = cards[ci], r = reviews[idx];
+    shown[ci] = idx;
+
+    card.classList.add('swapping');
+    setTimeout(function () {
+      fill(card, r);
+      card.classList.remove('swapping');
+      card.classList.add('swap-in');
+      setTimeout(function () { card.classList.remove('swap-in'); }, 620);
+    }, 340);
+  }
+
+  function start() {
+    if (timer || !visible) return;
+    // První výměna přijde brzy po najetí sekce — ať je hned vidět, že se recenze střídají.
+    timer = setTimeout(function () {
+      swap();
+      timer = setInterval(swap, 3000);
+    }, 1500);
+  }
+  function stop() { clearTimeout(timer); clearInterval(timer); timer = null; }
+
+  cards.forEach(function (c) {
+    c.addEventListener('mouseenter', function () { hovered = c; });
+    c.addEventListener('mouseleave', function () { if (hovered === c) hovered = null; });
+  });
+
+  // Střídá se jen když je sekce na obrazovce.
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (en) {
+      visible = en[0].isIntersecting;
+      if (visible) start(); else stop();
+    }, { threshold: 0.15 }).observe(wrap);
+  } else {
+    visible = true; start();
+  }
+})();
+
+/* Scroll-reveal galerie recenzí — boční karty přijedou zespoda, prostřední „popne" */
+(function () {
+  var els = document.querySelectorAll('.js-ref-up, .js-ref-pop, .js-ref-word');
+  if (!els.length) return;
+  if (!('IntersectionObserver' in window)) {
+    Array.prototype.forEach.call(els, function (e) { e.classList.add('is-in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+  Array.prototype.forEach.call(els, function (e) { io.observe(e); });
 })();
 
 /* ═══════════ Scroll-driven kreslení spojnice „jak to funguje" (bolt-path) ═══════════ */
@@ -1479,4 +1521,114 @@ function showToast(msg) {
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', update);
   update();
+})();
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO — poslední slovo se přepisuje (swajp → klik → dotek)
+
+   Přepis nejde po písmenech jako psaní na stroji, ale výměnou: stará písmena
+   po řadě vyblednou a odletí nahoru, nová přiletí zdola. Kontejner k tomu
+   plynule přejíždí na šířku nového slova — tu měříme neviditelnou kopií
+   dopředu, protože při výměně už v DOM žádné celé slovo není. Tečka sedí až
+   za kontejnerem, takže se veze na jeho šířce a jen se posune za slovem.
+
+   Slovo se nikdy nesmí rozlomit ani spadnout pod řádek: proto nowrap a proto
+   měříme až po `document.fonts.ready` (v náhradním fontu vyjdou jiná čísla).
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function heroTyper() {
+  const box  = document.getElementById('hero-typer');
+  const slot = document.getElementById('typer-word');
+  if (!box || !slot) return;
+
+  const SLOVA   = ['swajp', 'klik', 'dotek'];   // tečka je v HTML za boxem, nevyměňuje se
+  const KROK    = 28;    // ms mezi písmeny (vlnka)
+  const ODCHOD  = 260;   // ms než staré písmeno zmizí — drží se .typer-char v CSS
+  const PRICHOD = 420;   // ms než nové doletí — taky z CSS
+  const DRZENI  = 2000;  // jak dlouho slovo stojí, než se vymění (celý cyklus ≈ 2,5 s)
+  const START   = 1000;  // nechat dojet odhalení nadpisu (mkMask, hotová v 1,1 s od loadu)
+
+  const h1 = box.closest('.hero-h1');
+  const bezPohybu = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Odhalovací maska nadpisu (mkMask) dojede v 1,1 s. Sundat ji musíme hned pak:
+  // písmena vylétávající nahoru přesahují nad výšku řádku a do té doby by je
+  // overflow:hidden / clip-path ořezával.
+  if (h1) setTimeout(() => h1.classList.add('mk-hotovo'), 1200);
+
+  // Měřicí kopie: neviditelná, mimo tok, takže nic neposouvá.
+  const merak = document.createElement('span');
+  merak.className = 'typer-measure';
+  merak.setAttribute('aria-hidden', 'true');
+  box.appendChild(merak);
+
+  let i = 0;
+
+  // Měřák skládá slovo ze stejných boxů jako ostrá verze. Kdyby měřil slovo
+  // jako jeden text, započítal by kerning mezi dvojicemi písmen — ten se ale
+  // rozpadem na samostatné spany ztrácí a šířka by vyšla o kus jinak.
+  function sirka(text) {
+    merak.textContent = '';
+    const radka = document.createElement('span');
+    radka.className = 'typer-word';
+    [...text].forEach(znak => {
+      const s = document.createElement('span');
+      s.className = 'typer-char';
+      s.textContent = znak;
+      radka.appendChild(s);
+    });
+    merak.appendChild(radka);
+    box.style.width = radka.getBoundingClientRect().width + 'px';
+  }
+
+  function vykresli(text, animovat) {
+    slot.textContent = '';
+    [...text].forEach((znak, idx) => {
+      const s = document.createElement('span');
+      s.className = 'typer-char' + (animovat ? ' je-prichod' : '');
+      s.textContent = znak;
+      s.style.transitionDelay = animovat ? idx * KROK + 'ms' : '0ms';
+      slot.appendChild(s);
+    });
+    // Dva rámce: první nechá prohlížeč uložit počáteční stav, druhý ho pustí.
+    // Bez toho by se třída sundala dřív, než vznikne co animovat.
+    if (animovat) requestAnimationFrame(() => requestAnimationFrame(() => {
+      slot.querySelectorAll('.typer-char').forEach(s => s.classList.remove('je-prichod'));
+    }));
+  }
+
+  function vymen(dalsi) {
+    const znaky = [...slot.querySelectorAll('.typer-char')];
+    znaky.forEach((s, idx) => {
+      s.style.transitionDelay = idx * KROK + 'ms';
+      s.classList.add('je-odchod');
+    });
+    sirka(dalsi);          // šířka jede souběžně s odchodem, ne až po něm
+    const az = ODCHOD + znaky.length * KROK * 0.5;
+    setTimeout(() => vykresli(dalsi, true), az);
+    return az;
+  }
+
+  function cyklus() {
+    setTimeout(() => {
+      i = (i + 1) % SLOVA.length;
+      const az = vymen(SLOVA[i]);
+      setTimeout(cyklus, az + PRICHOD * 0.4);
+    }, DRZENI);
+  }
+
+  function spust() {
+    sirka(SLOVA[0]);
+    vykresli(SLOVA[0], false);
+    let t;
+    window.addEventListener('resize', () => {
+      clearTimeout(t);
+      t = setTimeout(() => sirka(SLOVA[i]), 150);
+    });
+    if (!bezPohybu) cyklus();
+  }
+
+  const pripraveno = (document.fonts && document.fonts.ready)
+    ? document.fonts.ready.catch(() => {})
+    : Promise.resolve();
+  pripraveno.then(() => setTimeout(spust, START));
 })();

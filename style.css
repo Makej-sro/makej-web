@@ -275,6 +275,54 @@ img { max-width: 100%; display: block; }
   to   { opacity: 1; transform: none; }
 }
 
+/* ── Poslední slovo v hero se přepisuje (swajp → klik → dotek) ──────────────
+   Vše je <span>, ne <i>: League Spartan má v @font-face jen `font-style: normal`,
+   takže kurzívu (kterou <i> dědí) prohlížeč nemá a spadl by na náhradní font.
+
+   Přepis jde po písmenech (fade + blur + posun), kontejner k tomu plynule mění
+   šířku — proto ta neviditelná měřicí kopie slova. `white-space: nowrap` drží
+   slovo pohromadě: nikdy se nesmí rozlomit ani spadnout pod řádek.
+   Tečka je v HTML až za boxem: nevyměňuje se se slovem, jen se veze na jeho
+   šířce, takže při delším slově plynule odjede doprava a zase zpátky.
+
+   `.hero-h1 span` má na sobě odhalovací masku (mkMask); u vnořených ji proto
+   ručně vypínáme, jinak by se spustila i na slově. Po dojetí masky JS přidá
+   .mk-hotovo, aby clip-path neuřezával písmena vylétávající nahoru. */
+.hero-h1 .hero-typer,
+.hero-h1 .hero-typer span { animation: none; }
+.hero-h1.mk-hotovo { overflow: visible; }
+.hero-h1.mk-hotovo > span { animation: none; clip-path: none; }
+
+/* Pozor na specificitu: `.hero-h1 span` (0,1,1) přebíjí holé třídy (0,1,0) a
+   vnutilo by všem display:inline-block. Proto je tu všude předřazené .hero-h1. */
+.hero-h1 .hero-typer {
+  font: inherit; position: relative;
+  display: inline-flex; align-items: baseline; vertical-align: baseline;
+  white-space: nowrap;
+  transition: width .48s cubic-bezier(.22,1,.36,1);
+  will-change: width;
+}
+.hero-h1 .typer-measure {
+  position: absolute; left: 0; top: 0;
+  visibility: hidden; pointer-events: none; white-space: nowrap;
+}
+.hero-h1 .typer-word { font: inherit; display: flex; white-space: nowrap; }
+.hero-h1 .typer-char {
+  display: block;
+  transition: opacity .42s ease, filter .42s ease,
+              transform .42s cubic-bezier(.22,1,.36,1);
+  will-change: opacity, filter, transform;
+}
+.hero-h1 .typer-char.je-prichod { opacity: 0; filter: blur(8px); transform: translateY(.42em); }
+.hero-h1 .typer-char.je-odchod {
+  opacity: 0; filter: blur(8px); transform: translateY(-.42em);
+  transition-duration: .26s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-h1 .hero-typer { transition: none; }
+  .hero-h1 .typer-char { transition: none; }
+}
+
 .hero-cta {
   margin-top: clamp(40px, 6vh, 72px); display: flex; gap: 18px; flex-wrap: wrap;
   justify-content: center;
@@ -571,67 +619,112 @@ img { max-width: 100%; display: block; }
   .testimonials-grid { grid-template-columns: 1fr; }
 }
 
-/* ═══════════ REFERENCE (štos karet) ═══════════ */
-#makaci { padding: 120px 0; background: #fff; overflow: hidden; }
-.ref-grid {
-  display: grid; grid-template-columns: 1fr 1.05fr; gap: 60px;
-  align-items: center; max-width: 1200px; margin: 0 auto;
-}
-.ref-title {
-  font-family: var(--font-heading); font-size: clamp(2rem, 3.4vw, 2.9rem);
-  font-weight: 800; line-height: 1.1; letter-spacing: -.02em;
-  color: #0a0d2e; margin: 0 0 20px;
-}
-.ref-hint { font-size: .95rem; color: rgba(10,13,46,.5); margin: 0; }
+/* ═══════════ REFERENCE — galerie recenzí (stejný jazyk jako galerie na /lide) ═══════════ */
+#makaci { padding: 118px 0 44px; background: #eceef3; overflow: hidden; }
+/* panel jde přes celou šířku, aby se velké slovo v pozadí mohlo rozjet až k okrajům */
+#makaci .container { width: 100%; max-width: none; padding: 0; }
+/* nadpis sekce — stejné hodnoty jako .vx-sec-head / .vx-h2 na /lide */
+.ref-head { text-align: center; max-width: 700px; margin: 0 auto 54px; padding: 0 24px; }
+.ref-head h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.02; color: #0e1116; margin: 0; }
+.ref-head p { color: rgba(14,17,22,.55); font-size: 1.08rem; line-height: 1.6; margin: 14px 0 0; }
 
-.ref-right { position: relative; display: flex; justify-content: center; align-items: center; min-height: 440px; }
-/* Swipovací balíček — 3 karty ve fanu, barevná paleta v brandové rodině */
-.ref-deck { position: absolute; inset: 0; z-index: 0; }
-.ref-deck-card {
-  position: absolute; top: 50%; left: 50%;
-  width: 84%; aspect-ratio: 1.2 / 1; border-radius: 34px;
-  box-shadow: 0 34px 80px rgba(0,32,246,.24);
-}
-.ref-deck-card.c1 {
-  z-index: 3;
-  background:
-    radial-gradient(130% 120% at 18% 12%, rgba(255,255,255,.16), transparent 46%),
-    linear-gradient(150deg, #0020f6 0%, #1a35ff 70%, #3a4bff 100%);
-  transform: translate(-50%, -50%) rotate(-7deg);
-}
-.ref-deck-card.c2 {
-  z-index: 2;
-  background: linear-gradient(150deg, #4353ff, #6470ff);
-  transform: translate(-50%, -50%) rotate(4deg) translate(5%, 2%);
-}
-.ref-deck-card.c3 {
-  z-index: 1;
-  background: linear-gradient(150deg, #8b97ff, #aab3ff);
-  transform: translate(-50%, -50%) rotate(14deg) translate(9%, 5%);
-}
-.ref-stack { position: relative; width: min(520px, 100%); min-height: 250px; z-index: 1; }
-/* Cyklický balíček bílých karet — přední odjede nahoru a zařadí se dozadu */
-.rs-card {
-  position: absolute; top: 0; left: 0; width: 100%;
-  background: #fff; border-radius: 20px; padding: 40px 42px; cursor: pointer;
-  transition: transform .7s cubic-bezier(.33,0,.2,1), opacity .7s cubic-bezier(.33,0,.2,1);
-  will-change: transform, opacity;
-}
-.rs-card[data-slot="0"] { transform: translate(0, 0) scale(1); z-index: 3; box-shadow: 0 24px 60px rgba(10,20,90,.18); }
-.rs-card[data-slot="1"] { transform: translate(16px, 22px) scale(.965); z-index: 2; box-shadow: 0 20px 46px rgba(10,20,90,.14); }
-.rs-card[data-slot="2"] { transform: translate(32px, 44px) scale(.93); z-index: 1; box-shadow: 0 18px 40px rgba(10,20,90,.10); }
-.rs-card.leaving { transform: translateY(-78px) scale(.9); opacity: 0; z-index: 5; }
-.ref-name { font-family: var(--font-heading); font-weight: 800; font-size: 1.08rem; color: #0a0d2e; }
-.ref-meta { font-size: .9rem; color: rgba(10,13,46,.5); margin-top: 3px; }
-.ref-text { font-size: 1.12rem; line-height: 1.65; color: #2a2f52; margin: 18px 0 0; }
+.ref-panel { position: relative; display: flex; flex-direction: column; padding: 20px clamp(28px, 6vw, 90px) 124px; overflow: hidden; }
 
-@media (max-width: 860px) {
-  #makaci { padding: 80px 0; }
-  .ref-grid { grid-template-columns: 1fr; gap: 32px; }
-  .ref-right { min-height: 300px; }
-  .rs-card { padding: 30px 26px; }
-  .ref-text { font-size: 1rem; }
-  .rs-card[data-slot="2"] { display: none; }
+/* velké slovo v pozadí */
+.ref-word {
+  position: absolute; left: 0; right: 0; top: 56%; transform: translateY(-50%);
+  text-align: center; font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
+  font-size: clamp(4.2rem, 17.5vw, 19rem); letter-spacing: -.04em; line-height: 1;
+  color: rgba(14,17,22,.055); z-index: 0; pointer-events: none; white-space: nowrap;
+}
+
+/* rohové texty (vlevo dole = nadpis sekce, vpravo nahoře = doplněk) */
+.ref-side { position: absolute; z-index: 3; max-width: 250px; font-size: .9rem; line-height: 1.5; color: rgba(14,17,22,.55); margin: 0; }
+.ref-side b { color: #0e1116; font-weight: 800; }
+.ref-side.bl { bottom: 42px; left: 44px; }
+.ref-side.tr { top: 42px; right: 44px; text-align: right; }
+
+/* karty — tři různé velikosti, výškově odsazené */
+.ref-cards { position: relative; z-index: 2; order: 2; display: flex; justify-content: center; align-items: flex-start; gap: clamp(24px, 5vw, 72px); }
+.ref-card { flex: 0 0 auto; margin: 0; }
+.ref-card.c1 { margin-top: 44px;  width: clamp(272px, 24vw, 355px); }
+.ref-card.c2 { margin-top: 0;     width: clamp(292px, 27vw, 415px); }
+.ref-card.c3 { margin-top: 132px; width: clamp(250px, 21vw, 320px); }
+
+.ref-quote {
+  position: relative; background: #fff; border-radius: 20px;
+  border: 1px solid rgba(14,17,22,.07);
+  box-shadow: 0 34px 64px -32px rgba(14,17,22,.45);
+  padding: 30px 30px 32px;
+}
+.ref-card.c2 .ref-quote { padding: 38px 36px 40px; }
+/* hvězdičky: PNG (ico-star.png) jako maska → tvar zůstane, barvu dá naše modrá */
+.ref-stars { display: flex; gap: 4px; line-height: 0; }
+.ref-stars i {
+  width: 15px; height: 15px; display: block; flex: 0 0 auto;
+  background: var(--primary);
+  -webkit-mask: url('/ico-star.png') no-repeat center / contain;
+          mask: url('/ico-star.png') no-repeat center / contain;
+}
+.ref-card.c2 .ref-stars i { width: 16px; height: 16px; }
+/* prohlížeč bez masky by ukázal modrý čtverec — radši původní obrázek */
+@supports not ((-webkit-mask-image: url('/ico-star.png')) or (mask-image: url('/ico-star.png'))) {
+  .ref-stars i { background: url('/ico-star.png') no-repeat center / contain; }
+}
+/* min-height netřeba: při výměně je celá karta odfadovaná, změna výšky není vidět */
+.ref-text { margin: 14px 0 0; font-size: 1.02rem; line-height: 1.55; color: #14161c; text-wrap: pretty; }
+.ref-card.c2 .ref-text { font-size: 1.18rem; }
+.ref-card.c3 .ref-text { font-size: .96rem; }
+
+/* podpis uvnitř karty — oddělený linkou, jméno vlevo / datum vpravo */
+.ref-cap { margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(14,17,22,.08); display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.ref-name { font-family: var(--font-heading); font-weight: 800; text-transform: uppercase; font-size: .88rem; letter-spacing: -.01em; color: #0e1116; }
+.ref-meta { color: rgba(14,17,22,.45); font-size: .8rem; white-space: nowrap; }
+
+/* Výměna recenze (JS přepíná .swapping → .swap-in): stará odletí nahoru jako
+   odswajpnutá karta, nová přiletí zespoda. Animuje se celá karta, ne jen text,
+   aby bylo na první pohled vidět, že se recenze střídají. */
+.ref-quote { transition: opacity .32s ease, transform .32s cubic-bezier(.4,0,.7,.4); }
+.ref-card.swapping .ref-quote { opacity: 0; transform: translateY(-26px) scale(.97) rotate(-1.4deg); }
+.ref-card.swap-in .ref-quote { animation: refSwapIn .58s cubic-bezier(.2,.85,.28,1) both; }
+@keyframes refSwapIn {
+  from { opacity: 0; transform: translateY(30px) scale(.97) rotate(1.2deg); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Scroll-reveal: prostřední karta se „načte" (pop), boční přijedou zespoda, slovo taky */
+.js-ref-up { opacity: 0; transform: translateY(80px); transition: opacity 1.1s cubic-bezier(.2,.8,.25,1), transform 1.1s cubic-bezier(.2,.8,.25,1); will-change: transform, opacity; }
+.js-ref-pop { opacity: 0; transform: scale(.9); transition: opacity 1s ease, transform 1.1s cubic-bezier(.2,.8,.25,1); will-change: transform, opacity; }
+.js-ref-up.is-in, .js-ref-pop.is-in { opacity: 1; transform: none; }
+.ref-card.c2.js-ref-pop { transition-delay: .1s; }
+.ref-card.c1.js-ref-up { transition-delay: .34s; }
+.ref-card.c3.js-ref-up { transition-delay: .58s; }
+/* slovo je centrované přes translateY(-50%) — reveal to musí zachovat */
+.js-ref-word { opacity: 0; transform: translateY(calc(-50% + 70px)); transition: opacity 1.2s cubic-bezier(.2,.8,.25,1), transform 1.2s cubic-bezier(.2,.8,.25,1); will-change: transform, opacity; }
+.js-ref-word.is-in { opacity: 1; transform: translateY(-50%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .js-ref-up, .js-ref-pop, .js-ref-word { opacity: 1 !important; transition: none !important; }
+  .js-ref-up, .js-ref-pop { transform: none !important; }
+  .js-ref-word { transform: translateY(-50%) !important; }
+  .ref-quote { transition: none !important; animation: none !important; }
+}
+
+@media (max-width: 900px) {
+  #makaci { padding: 76px 0 84px; }
+  /* slovo nahoru nad text, karty pod sebe, rohové texty do proudu */
+  .ref-head { margin-bottom: 34px; padding: 0 6px; }
+  .ref-panel { padding: 88px 22px 0; }
+  .ref-word { top: 8px; font-size: 3.4rem; transform: none; }
+  .js-ref-word { transform: translateY(46px); }
+  .js-ref-word.is-in { transform: none; }
+  .ref-side { position: static; max-width: none; text-align: center; }
+  .ref-side.bl { order: 1; margin-bottom: 30px; }
+  .ref-side.tr { order: 3; text-align: center; margin-top: 26px; }
+  .ref-cards { flex-direction: column; align-items: center; gap: 34px; }
+  .ref-card.c1, .ref-card.c2, .ref-card.c3 { margin-top: 0; width: min(360px, 88vw); }
+  .ref-card.c2 .ref-quote { padding: 30px 30px 32px; }
+  .ref-card.c2 .ref-text { font-size: 1.06rem; }
 }
 
 /* ═══════════ DOWNLOAD ═══════════ */

@@ -121,10 +121,10 @@
        32px rámeček, contain, barva z currentColor. Díky tomu mají zaručeně stejnou
        velikost i výšku — dopočítávat metriky Solar ikon se neosvědčilo. */
     .bz-step2-ic .bz-ico { display: block; width: 32px; height: 32px; background: currentColor; }
-    .bz-ico-verified { -webkit-mask: url(/ico-verified.png) center / contain no-repeat; mask: url(/ico-verified.png) center / contain no-repeat; }
-    .bz-ico-chart    { -webkit-mask: url(/ico-chart.png)    center / contain no-repeat; mask: url(/ico-chart.png)    center / contain no-repeat; }
-    .bz-ico-chat     { -webkit-mask: url(/ico-chat.png)     center / contain no-repeat; mask: url(/ico-chat.png)     center / contain no-repeat; }
-    .bz-ico-wallet   { -webkit-mask: url(/ico-wallet.png)   center / contain no-repeat; mask: url(/ico-wallet.png)   center / contain no-repeat; }
+    .bz-ico-verified { -webkit-mask: url(/ico-verified.svg)  center / contain no-repeat; mask: url(/ico-verified.svg)  center / contain no-repeat; }
+    .bz-ico-chart    { -webkit-mask: url(/ico-chart.svg)      center / contain no-repeat; mask: url(/ico-chart.svg)      center / contain no-repeat; }
+    .bz-ico-chat     { -webkit-mask: url(/ico-chat.svg)       center / contain no-repeat; mask: url(/ico-chat.svg)       center / contain no-repeat; }
+    .bz-ico-wallet   { -webkit-mask: url(/ico-wallet.png?v=2) center / contain no-repeat; mask: url(/ico-wallet.png?v=2) center / contain no-repeat; }
     .bz-step2 h4, .bz-why2-item h4 { font-family: var(--font-heading); font-size: .98rem; font-weight: 700; margin: 0 0 4px; color: #fff; }
     .bz-step2 p, .bz-why2-item p { color: rgba(208,208,255,.5); font-size: .83rem; line-height: 1.5; margin: 0; }
     .bz-why2 { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 20px; }
@@ -224,6 +224,43 @@
       .emp-gal-cards { grid-template-columns: 1fr; gap: 34px; }
       .emp-gal-card:nth-child(2), .emp-gal-card:nth-child(4) { margin-top: 0; }
       .emp-gal-word { font-size: clamp(3rem, 22vw, 7rem); }
+    }
+    /* ── „Proč Makej": kompaktní varianta téže galerie — jedna řada čtyř karet,
+       za nimi velké slovo. Držena co nejnižší, sekce je jen mezikrok k ceníku. ── */
+    .emp-why { position: relative; max-width: 1080px; margin: 0 auto; padding: 4px 24px 78px; overflow: hidden; }
+    .emp-why-title { position: relative; z-index: 2; text-align: center; font-family: var(--font-heading);
+      font-weight: 900; text-transform: uppercase; font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+      letter-spacing: -.02em; line-height: 1.05; color: #0a0d2e; margin: 0 0 clamp(24px, 3vw, 36px); }
+    /* Ukotveno odspodu. Účaří leží 0,135 em nad spodní hranou textového boxu
+       (změřeno nulovým inline-blockem), takže -.12em ho posadí těsně NAD hranu
+       panelu — písmena se neuseknou a viditelný pruh pod kartami je co největší.
+       V em, aby to sedělo při každé velikosti písma i po zalomení sloupců. */
+    .emp-why-word { position: absolute; left: 0; right: 0; bottom: -.12em; text-align: center;
+      font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
+      font-size: clamp(4rem, 19.2vw, 17.25rem); letter-spacing: -.04em; color: rgba(10,13,46,.05);
+      line-height: 1; z-index: 0; pointer-events: none; white-space: nowrap; }
+    .emp-why-cards { position: relative; z-index: 2; max-width: 940px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: clamp(16px, 2.4vw, 30px); align-items: start; }
+    .emp-why-card { background: #fff; border-radius: 18px; border: 1px solid rgba(10,13,46,.07);
+      box-shadow: 0 34px 64px -32px rgba(10,13,46,.45); padding: 22px 22px 24px; }
+    .emp-why-card:nth-child(2), .emp-why-card:nth-child(4) { margin-top: clamp(18px, 2.6vw, 34px); }
+    .emp-why-card:nth-child(2) { transition-delay: .1s; }
+    .emp-why-card:nth-child(3) { transition-delay: .2s; }
+    .emp-why-card:nth-child(4) { transition-delay: .3s; }
+    .emp-why-card .bz-ico { display: block; width: 28px; height: 28px; background: var(--primary); }
+    .emp-why-card h3 { font-family: var(--font-heading); font-weight: 800; text-transform: uppercase;
+      font-size: .95rem; letter-spacing: -.01em; margin: 14px 0 0; color: #0a0d2e; }
+    .emp-why-card p { color: rgba(10,13,46,.6); font-size: .88rem; line-height: 1.5; margin: 6px 0 0; }
+    @media (max-width: 900px) {
+      .emp-why { padding-bottom: 60px; }
+      .emp-why-cards { grid-template-columns: 1fr 1fr; max-width: none; }
+      .emp-why-card:nth-child(n) { margin-top: 0; }
+      .emp-why-word { font-size: clamp(3rem, 25vw, 12rem); }
+    }
+    @media (max-width: 560px) {
+      .emp-why { padding-bottom: 46px; }
+      .emp-why-cards { grid-template-columns: 1fr; gap: 16px; }
     }
     .bolt-journey { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
     .bolt-cta { display: flex; justify-content: center; margin-top: 60px; position: relative; z-index: 1; }
@@ -573,28 +610,29 @@
         </div>
       </div>
 
-      <div class="bz-wrap" style="margin-top:96px;">
-        <!-- PROČ MAKEJ -->
-        <h2 style="padding-bottom: 15px;">Proč <span class="gradient-text">Makej</span></h2>
-        <div class="bz-grid bz-stats">
-          <div class="bz-card bz-stat accent bz-why2-item">
-            <div class="bz-step2-ic"><span class="bz-ico bz-ico-verified"></span></div>
-            <h4>Ověřené profily</h4>
+      <!-- PROČ MAKEJ — kompaktní galerie (stejný jazyk jako kroky výš) -->
+      <div class="emp-why" style="margin-top:72px;">
+        <h2 class="emp-why-title">Proč Makej</h2>
+        <div class="emp-why-word" aria-hidden="true">FUNKCE</div>
+        <div class="emp-why-cards">
+          <div class="emp-why-card js-reveal-up">
+            <span class="bz-ico bz-ico-verified"></span>
+            <h3>Ověřené profily</h3>
             <p>Viditelné hodnocení, historie brigád a úroveň. Víte, koho přijímáte.</p>
           </div>
-          <div class="bz-card bz-stat accent bz-why2-item">
-            <div class="bz-step2-ic"><span class="bz-ico bz-ico-chart"></span></div>
-            <h4>Analytika v reálném čase</h4>
+          <div class="emp-why-card js-reveal-up">
+            <span class="bz-ico bz-ico-chart"></span>
+            <h3>Analytika v reálném čase</h3>
             <p>Kolik lidí vidělo inzerát, kolik swajplo, kolik matchovalo.</p>
           </div>
-          <div class="bz-card bz-stat accent bz-why2-item">
-            <div class="bz-step2-ic"><span class="bz-ico bz-ico-chat"></span></div>
-            <h4>Chat místo emailů</h4>
+          <div class="emp-why-card js-reveal-up">
+            <span class="bz-ico bz-ico-chat"></span>
+            <h3>Chat místo emailů</h3>
             <p>Napíšete zprávu, brigádník odpoví do minut. Vše na jednom místě.</p>
           </div>
-          <div class="bz-card bz-stat accent bz-why2-item">
-            <div class="bz-step2-ic"><span class="bz-ico bz-ico-wallet"></span></div>
-            <h4>Zdarma pro začátek</h4>
+          <div class="emp-why-card js-reveal-up">
+            <span class="bz-ico bz-ico-wallet"></span>
+            <h3>Zdarma pro začátek</h3>
             <p>Základní plán bez poplatků. Platíte, až když chcete víc.</p>
           </div>
         </div>
