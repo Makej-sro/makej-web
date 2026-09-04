@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=86" />
+  <link rel="stylesheet" href="style.css?v=99" />
   <style>
     /* ═══════════ BENTO DESIGN (pro zaměstnavatele) ═══════════ */
     #employers { padding: 0; }
@@ -306,6 +306,27 @@
       #pricing .cn-plan.popular { margin-top: 0; }
     }
 
+    /* ── Modrý závěrečný pruh před FAQ — přenesené z /lide (tam .vx-sec.vx-close).
+       Zanořené pod .vx-close: stránka má z vx systému jen .vx-nav a .vx-intro,
+       globální .vx-sec / .vx-wrap / .vx-h2 by přebývaly. ── */
+    .vx-close { background: linear-gradient(150deg,#2a45ff,#0020f6 60%,#0018c8);
+      padding: 96px 0; text-align: center; }
+    .vx-close .vx-wrap { width: min(1120px, 90vw); margin: 0 auto; }
+    .vx-close .vx-sec-head { max-width: 640px; margin: 0 auto; }
+    .vx-close .vx-h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
+      font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.02;
+      margin: 12px 0 0; color: #fff; text-wrap: balance; }
+    .vx-close .vx-sec-head p { color: rgba(255,255,255,.85); max-width: 640px;
+      margin: 16px auto 0; font-size: 1.08rem; line-height: 1.6; }
+    .vx-close .vx-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 30px;
+      font-family: var(--font-heading); font-weight: 800; font-size: .92rem; letter-spacing: .01em;
+      padding: 14px 26px; border-radius: 999px; cursor: pointer;
+      background: #fff; color: #0020f6; box-shadow: 0 14px 30px -12px rgba(0,10,80,.5);
+      transition: background .25s ease, color .25s ease, transform .2s ease, box-shadow .25s ease; }
+    .vx-close .vx-btn:hover { background: #0020f6; color: #fff; transform: translateY(-2px);
+      box-shadow: 0 20px 40px -12px rgba(0,10,80,.6); }
+    @media (max-width: 700px) { .vx-close { padding: 68px 0; } }
+
     /* FAQ (zaměstnavatelé) */
     .emp-faq { max-width: 760px; margin: 0 auto; padding: 0 24px; }
     .emp-faq-list { border-top: 1px solid var(--border); }
@@ -345,13 +366,13 @@
     .vx-nav.scrolled .vx-nav-actions a.vx-signin { background: #0020f6; color: #fff; box-shadow: 0 8px 20px -8px rgba(0,32,246,.5); }
     .vx-nav-links { position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 32px; height: 44px; pointer-events: none; }
     .vx-nav-links a { pointer-events: all; }
-    .vx-nav-links a.vx-active { opacity: 1; font-weight: 700; border-bottom: 2px solid currentColor; padding-bottom: 2px; }
-    .vx-nav-links a { font-family: var(--font-heading); font-weight: 600; font-size: .89rem; letter-spacing: .01em; color: #fff; text-decoration: none; opacity: .88; transition: opacity .2s; }
+    .vx-nav-links a.vx-active { opacity: 1; font-weight: 900; border-bottom: 2px solid currentColor; padding-bottom: 2px; }
+    .vx-nav-links a { font-family: var(--font-heading); font-weight: 800; font-size: .89rem; letter-spacing: .01em; color: #fff; text-decoration: none; opacity: .88; transition: opacity .2s; }
     .vx-nav-links a:hover { opacity: 1; }
     .vx-nav-actions { display: flex; align-items: center; gap: 10px; height: 44px; }
     .vx-nav-actions a.vx-signin { font-family: var(--font-heading); font-weight: 700; font-size: .95rem; letter-spacing: .01em; color:#0020f6; opacity:1; background:#fff; border:none; border-radius:999px; padding:11px 20px; cursor:pointer; text-decoration:none; transition:transform .18s, box-shadow .2s; white-space:nowrap; box-shadow:0 8px 20px -8px rgba(0,0,0,.35); }
     .vx-nav-actions a.vx-signin:hover { transform: translateY(-1px); box-shadow:0 12px 26px -8px rgba(0,0,0,.45); }
-    .vx-logo { font-family: var(--font-nav); font-weight: 900; font-size: 1.8rem; color: #fff; text-decoration: none; line-height: 1; }
+    .vx-logo { font-family: var(--font-nav); font-weight: 900; font-size: 2.2rem; color: #fff; text-decoration: none; line-height: 1; }
     @media (max-width: 900px) {
       /* Mobil: odkazy i CTA schované pod hamburger (panel #mobile-menu ve skrytém #navbar) */
       .vx-nav-links, .vx-nav-actions { display: none; }
@@ -739,6 +760,19 @@
       </div>
     </div>
   </section>
+  <!-- ═══════════ ZÁVĚR — modrý pruh (stejný jako na /lide) ═══════════ -->
+  <section class="vx-close">
+    <div class="vx-wrap">
+      <div class="vx-sec-head">
+        <h2 class="vx-h2">Najděte lidi na příští směnu</h2>
+        <p>Žádné hromady životopisů ani týdny čekání. Vypište nabídku, vyberte si z kandidátů, kteří o ni sami projevili zájem, a domluvte se s nimi v chatu.</p>
+      </div>
+      <div>
+        <a href="#" class="vx-btn employer-cta-register">Vytvořit účet zdarma</a>
+      </div>
+    </div>
+  </section>
+
   <section id="faq" style="padding:40px 0 110px; background:#fff;">
     <style>
       #faq .section-header h2{color:#0f1222;}
@@ -1028,7 +1062,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=31"></script>
+  <script src="script.js?v=32"></script>
   <script>
     // FAQ accordion
     function toggleFaq(el) {

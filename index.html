@@ -40,9 +40,38 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=86" />
-  <!-- Intro animace hera: bez JS se neaplikuje a stránka vypadá jako dřív -->
-  <script>document.documentElement.classList.add('hero-intro');</script>
+  <link rel="stylesheet" href="style.css?v=99" />
+
+  <!-- ═══════════ ÚVODNÍ OBRAZOVKA ═══════════
+       Modrá plocha s ikonou, dokud se stránka nenačte. Třídu nasazuje skript
+       níž — bez JS se nenasadí a stránka se chová jako dřív (loader by jinak
+       zůstal viset přes obsah). Modrá je natvrdo: platí i než dojede style.css. -->
+  <style>
+    #page-loader {
+      position: fixed; inset: 0; z-index: 10000;
+      display: none; place-items: center;
+      background: #0020f6; transition: opacity .45s ease;
+    }
+    .page-loading { overflow: hidden; }
+    .page-loading #page-loader { display: grid; }
+    .page-loading.page-loaded #page-loader { opacity: 0; pointer-events: none; }
+    #page-loader svg { width: clamp(84px, 16vw, 132px); height: auto; }
+    #page-loader svg path { animation: loaderPulse 1.6s ease-in-out infinite; transform-origin: 50% 50%; }
+    @keyframes loaderPulse {
+      0%, 100% { opacity: .82; transform: scale(1); }
+      50%      { opacity: 1;   transform: scale(1.06); }
+    }
+    /* nájezd hera čeká, až loader zmizí — jinak by odběhl schovaný pod ním */
+    .page-loading:not(.page-loaded) .hero-h1 span,
+    .page-loading:not(.page-loaded) .hero-cta,
+    .page-loading:not(.page-loaded) .hero-foot { animation-play-state: paused; }
+    @media (prefers-reduced-motion: reduce) {
+      #page-loader { transition: none; }
+      #page-loader svg path { animation: none; }
+    }
+  </style>
+  <script>document.documentElement.classList.add('page-loading');</script>
+
   <!-- Structured data -->
   <script type="application/ld+json">
   {
@@ -112,8 +141,38 @@
 </head>
 <body>
 
+  <!-- Ikona je inline (ne <img>), aby na úvodní obrazovce nezáleželo na síti.
+       Modrý čtverec ikony je vynechaný — splynul by s pozadím, zbylo by z něj
+       stejně jen bílé „M". -->
+  <div id="page-loader" aria-hidden="true">
+    <svg viewBox="0 0 512 512" role="img" aria-label="Makej">
+      <path fill="#ffffff" d="M137 128 L198 128 L255 276 L313 128 L375 128 L397 384 L341 384 L328 231 L272 383 L239 383 L183 231 L170 384 L114 384 Z"/>
+    </svg>
+  </div>
+  <script>
+  (function () {
+    var root = document.documentElement, MIN = 450, start = Date.now(), done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      root.classList.add('page-loaded');                              // spustí prolnutí
+      setTimeout(function () { root.classList.remove('page-loading'); }, 500);
+    }
+    // Čekáme na rozparsované DOM i na fonty — nadpis v League Spartan by se
+    // jinak po dotažení fontu přeskládal až pod odkrytým herem.
+    var pending = 2;
+    function tick() { if (--pending) return;
+      setTimeout(finish, Math.max(0, MIN - (Date.now() - start)));    // ať to na rychlém načtení jen neproblikne
+    }
+    if (document.readyState === 'loading') addEventListener('DOMContentLoaded', tick, { once: true });
+    else tick();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(tick); else tick();
+    setTimeout(finish, 4000);                                          // pojistka, ať loader nikdy nezůstane viset
+  })();
+  </script>
+
   <!-- ═══════════ NAVBAR ═══════════ -->
-  <nav id="navbar">
+  <nav id="navbar" class="nav-light-page nav-single-action">
     <div class="nav-inner">
       <a href="#" class="nav-logo">Makej</a>
       <div class="nav-links">
@@ -123,9 +182,9 @@
         <a href="#download">Stáhnout</a>
         <a href="/podpora">Podpora</a>
       </div>
-      <div class="nav-actions" id="nav-actions">
+      <!-- Jen přihlášení; registraci na téhle stránce obstarává „Vytvořit profil" v heru -->
+      <div class="nav-actions nav-actions-always" id="nav-actions">
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
-        <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       </div>
       <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" aria-expanded="false">
         <span></span><span></span>
@@ -147,68 +206,37 @@
 
   <!-- ═══════════ HERO ═══════════ -->
   <section id="hero">
-    <div class="hero-bg-particles" id="particles"></div>
-    <div class="hero-content">
-      <div class="hero-text">
-        <h1>
-          <span class="hero-line"><span class="hero-line-in">Swajpuj</span></span>
-          <span class="hero-line"><span class="hero-line-in gradient-text hero-grad">Matchuj</span></span>
-          <span class="hero-line"><span class="hero-line-in">Pracuj</span></span>
-        </h1>
-        <p class="hero-subtitle">Najdi si brigádu za pár sekund. Swajpni doprava, matchni se s&nbsp;firmou a začni vydělávat ještě dnes.</p>
-        <!-- hero-cta-auth: shown when logged out; hidden when logged in -->
-        <div class="hero-cta" id="hero-cta-auth">
-          <a href="javascript:void(0)" class="btn-primary btn-lg" id="hero-register-btn">
-            Vytvořit účet zdarma
-          </a>
-          <a href="javascript:void(0)" class="btn-ghost btn-lg" id="hero-login-btn">
-            Přihlásit se
-          </a>
-        </div>
-        <!-- hero-cta-loggedin: shown when logged in -->
-        <div class="hero-cta" id="hero-cta-loggedin" style="display:none;">
-          <a href="/employer/" class="btn-primary btn-lg" id="hero-dashboard-btn" style="display:none;">
-            <iconify-icon icon="solar:chart-square-bold" width="20"></iconify-icon>
-            Dashboard
-          </a>
-          <a href="/worker/" class="btn-primary btn-lg" id="hero-worker-btn" style="display:none;">
-            <iconify-icon icon="solar:case-round-bold" width="20"></iconify-icon>
-            Moje brigády
-          </a>
-        </div>
+    <div class="hero-main">
+      <h1 class="hero-h1"><span>Práce na jeden swajp.</span></h1>
+
+      <!-- hero-cta-auth: odhlášený; hero-cta-loggedin přepíná script.js -->
+      <div class="hero-cta" id="hero-cta-auth">
+        <a href="#download" class="hero-btn hero-btn-soft">Stáhnout si apku</a>
+        <a href="javascript:void(0)" class="hero-btn hero-btn-primary" id="hero-register-btn">Vytvořit profil</a>
       </div>
+      <div class="hero-cta" id="hero-cta-loggedin" style="display:none;">
+        <a href="/employer/" class="hero-btn hero-btn-primary" id="hero-dashboard-btn" style="display:none;">
+          <iconify-icon icon="solar:chart-square-bold" width="20"></iconify-icon>
+          Dashboard
+        </a>
+        <a href="/worker/" class="hero-btn hero-btn-primary" id="hero-worker-btn" style="display:none;">
+          <iconify-icon icon="solar:case-round-bold" width="20"></iconify-icon>
+          Moje brigády
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-foot">
+      <p>Někdo ve tvém okolí právě hledá pomoc na směnu.<br><a href="/hledam-si-praci" class="hero-foot-link">Zjisti kdo</a></p>
     </div>
   </section>
 
-  <script>
-  /* Kolik se nadpis musí zvětšit, aby vyplnil skoro celou obrazovku, a o kolik posunout,
-     aby byl při zvětšení uprostřed viewportu (normálně sedí výš — pod ním je podnadpis a CTA). */
-  (function () {
-    var root = document.documentElement;
-    if (!root.classList.contains('hero-intro')) return;
-    var h1 = document.querySelector('#hero .hero-text h1');
-    if (!h1) return;
-    function fit() {
-      h1.style.animation = 'none';           // vypnout, ať měříme nezvětšený nadpis
-      var r = h1.getBoundingClientRect();
-      h1.style.animation = '';               // zpět (animace se rozjede znovu od nuly)
-      if (!r.width || !r.height) return;
-      var z = Math.min(window.innerWidth * 0.94 / r.width, window.innerHeight * 0.86 / r.height);
-      root.style.setProperty('--hero-zoom', Math.max(1, Math.min(z, 7)).toFixed(3));
-      root.style.setProperty('--hero-shift', (window.innerHeight / 2 - (r.top + r.height / 2)).toFixed(1) + 'px');
-    }
-    fit();
-    // Písmo se načítá s font-display:swap — po dotažení fontu se šířka nadpisu změní, přeměřit.
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-  })();
-  </script>
-
   <!-- ═══════════ REFERENCE ═══════════ -->
-  <section id="makaci" class="nav-light">
+  <section id="makaci">
     <div class="container">
       <div class="ref-grid">
         <div class="ref-left">
-          <h2 class="ref-title">Reference našich<br>uživatelů mluví za vše.</h2>
+          <h2 class="ref-title">Co říkají brigádníci,<br>kteří si přes Makej našli práci</h2>
           <p class="ref-hint">Ohlasy brigádníků, kteří si přes Makej našli brigádu.</p>
         </div>
         <div class="ref-right">
@@ -247,7 +275,7 @@
   </section>
 
   <!-- ═══════════ FOOTER ═══════════ -->
-  <footer id="footer">
+  <footer id="footer" data-nav-blue>
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
@@ -318,7 +346,7 @@
       </div>
       <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej</div>
-      <h2 class="modal-title">Přihlásit se</h2>
+      <p class="modal-title">Přihlásit se</p>
       <p class="modal-subtitle">Vítej zpět! Přihlaš se ke svému účtu.</p>
       <div class="modal-error" id="login-error"></div>
       <form id="login-form" novalidate>
@@ -357,7 +385,7 @@
 
       <!-- Krok 1: výběr role -->
       <div id="reg-step-1">
-        <h2 class="modal-title">Vytvořit účet</h2>
+        <p class="modal-title">Vytvořit účet</p>
         <p class="modal-subtitle">Kdo jsi?</p>
         <div class="role-cards">
           <button type="button" class="role-card" data-role="worker">
@@ -379,7 +407,7 @@
           <iconify-icon icon="solar:arrow-left-bold" width="16"></iconify-icon>
           Zpět
         </button>
-        <h2 class="modal-title">Tvoje údaje</h2>
+        <p class="modal-title">Tvoje údaje</p>
         <p class="modal-subtitle" id="reg-role-subtitle">Brigádník</p>
         <div class="modal-error" id="register-error"></div>
         <form id="register-form" novalidate>
@@ -473,7 +501,7 @@
     <div class="wl-fs-inner">
       <!-- VERZE 1 – minimalisticky: vše v jednom panelu + přepínač -->
       <div class="wl-card">
-        <h2 class="wl-fs-title">Buď u toho od začátku</h2>
+        <p class="wl-fs-title">Buď u toho od začátku</p>
 
         <div class="wl-countdown" id="wl-countdown" aria-label="Odpočet do spuštění">
           <div class="wl-cd-unit"><span class="wl-cd-num" id="wl-cd-d">–</span><i class="wl-cd-track"><b id="wl-cd-bar-d"></b></i></div>
@@ -539,7 +567,7 @@
 
         <div id="wl-form-wrap">
           <div class="modal-logo">Makej</div>
-          <h2 class="wl-form-title" id="wl-form-title">Zapiš se na čekací list</h2>
+          <p class="wl-form-title" id="wl-form-title">Zapiš se na čekací list</p>
           <p class="wl-form-sub" id="wl-form-sub">Ozveme se ti na e-mail, jakmile 1. 10. spustíme.</p>
           <div class="modal-error" id="wl-error"></div>
           <form id="wl-form" novalidate>
@@ -568,7 +596,7 @@
           <div class="wl-done-ic" aria-hidden="true">
             <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 12.5 9.5 17 19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <h2 class="wl-form-title">Jsi na seznamu! 🎉</h2>
+          <p class="wl-form-title">Jsi na seznamu! 🎉</p>
           <p class="wl-form-sub">Díky! Ozveme se ti na e-mail, jakmile 1. 10. spustíme naostro. Zatím sleduj náš progres na Instagramu.</p>
           <a class="wl-ig wl-ig--done" href="https://instagram.com/makej.eu" target="_blank" rel="noopener">
             Sleduj náš progres, ať ti nic neuteče
@@ -606,6 +634,6 @@
   </button>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=31"></script>
+  <script src="script.js?v=32"></script>
 </body>
 </html>

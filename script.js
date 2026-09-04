@@ -493,9 +493,12 @@ function initAuth() {
       if (heroDashBtn)   heroDashBtn.style.display   = role === 'employer' ? 'inline-flex' : 'none';
       if (heroWorkerBtn) heroWorkerBtn.style.display = role !== 'employer' ? 'inline-flex' : 'none';
     } else {
+      // Lišta s jedinou akcí (hlavní stránka) registraci nemá — tu tam obstarává
+      // „Vytvořit profil" v heru. Bez téhle větve by ji tenhle přepis vrátil zpět.
+      const soloLogin = !!document.querySelector('#navbar.nav-single-action');
       navActions.innerHTML = `
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
-        <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
+        ${soloLogin ? '' : '<a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>'}
       `;
       mobileActions.innerHTML = `
         <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>

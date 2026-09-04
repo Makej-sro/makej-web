@@ -42,7 +42,7 @@
   <link rel="preload" as="image" href="/krok-1.png?v=3" />
   <link rel="preload" as="image" href="/krok-2.png?v=2" />
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=86" />
+  <link rel="stylesheet" href="style.css?v=99" />
   <style>
     /* Bolt-style střídavé kroky (foto + text) */
     .bolt-journey { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
@@ -146,8 +146,8 @@
     /* Sekce „Proč si zvolíš Makej" — brandová modrá, na celou výšku obrazovky.
        Obsah zarovnaný nahoru (žádné vertikální centrování), aby po doskočení
        fontu nadpis nepřecentrovával celý blok = žádný skok při scrollu. */
-    #features { background: linear-gradient(150deg, #2a45ff 0%, #0020f6 58%, #0018c8 100%); box-sizing: border-box;
-      padding-top: 88px; padding-bottom: 88px; }
+    #features { background: #fff; box-sizing: border-box;
+      padding-top: clamp(72px, 9vw, 120px); padding-bottom: clamp(80px, 10vw, 130px); }
 
     /* ── Video ukázka aplikace (full-bleed přes celou šířku stránky) ── */
     #features .feat-video {
@@ -184,34 +184,29 @@
     #features .feature-card h3 { color: #0a0d2e; }
     #features .feature-card p { color: rgba(10,13,46,.55); }
 
-    /* ── Funkce — text vlevo + mřížka s target ikonami vpravo (brandová modrá) ── */
-    #features .bf2 { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: 64px; align-items: start; }
-    #features .bf2-kicker { display: inline-block; font-family: var(--font-heading); font-weight: 800; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--secondary); margin-bottom: 20px; }
-    #features .bf2-left h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2.6rem, 6vw, 4.4rem); line-height: 1.04; letter-spacing: -.02em; color: #fff; margin: 0 0 24px; text-wrap: balance; }
-    #features .bf2-left h2 .grad { color: var(--secondary); }
-    #features .bf2-left p { color: rgba(255,255,255,.74); font-size: 1.22rem; line-height: 1.6; max-width: 40ch; margin: 0 0 40px; }
-    #features .bf2-cta { display: inline-flex; align-items: center; gap: 10px; padding: 18px 40px; border-radius: 100px; background: #fff; color: #0a0d2e; font-weight: 700; font-size: 1.08rem; transition: transform .2s ease, box-shadow .2s ease; }
-    #features .bf2-cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(0,0,20,.3); }
+    /* ── Funkce: bílá plocha, nadpis a perex nahoře přes celou šířku, pod tím
+       tři sloupce položek. Bez ikon i bez dělicích linek — položky drží
+       jen mřížka a odstup. ── */
+    #features .bf2-title { margin: 0 0 12px; max-width: 900px; font-family: var(--font-nav);
+      font-weight: 800; font-size: clamp(38px, 5vw, 76px); line-height: .98;
+      letter-spacing: -.03em; color: var(--primary); text-wrap: balance; }
+    #features .bf2-sub { margin: 0 0 clamp(48px, 6vw, 76px); max-width: 560px;
+      font-size: 18px; line-height: 1.6; color: #3E4358; text-wrap: pretty; }
 
-    #features .bf2-feats { display: grid; grid-template-columns: 1fr 1fr; gap: 56px 40px; }
-    /* Pevná výška ikonového boxu — ať pozdní načtení ikon (async) nehne řadami */
-    #features .bf2-feat-ic { color: #fff; height: 50px; display: flex; align-items: center; margin-bottom: 18px; transition: transform .25s cubic-bezier(.2,.8,.2,1); }
-    #features .bf2-feat-ic iconify-icon { font-size: 46px; }
-    /* Vlastní swipe ikona (SVG) přebarvená na bílo přes mask */
-    #features .bf2-feat-ic .bf2-swipe { display: block; width: 50px; height: 50px; background: #fff;
-      -webkit-mask: url(/swipe-to-right.svg) center / contain no-repeat; mask: url(/swipe-to-right.svg) center / contain no-repeat; }
-    /* Vlastní ikona gamifikace — stejný princip: tvar dělá alfa kanál, barvu background */
-    #features .bf2-feat-ic .bf2-gamif { display: block; width: 58px; height: 44px; background: #fff;
-      -webkit-mask: url(/gamifikace-ikona.png) center / contain no-repeat; mask: url(/gamifikace-ikona.png) center / contain no-repeat; }
-    #features .bf2-feat:hover .bf2-feat-ic { transform: none; }
-    #features .bf2-feat h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1.3rem; color: #fff; margin: 0 0 8px; }
-    #features .bf2-feat p { font-size: 1rem; line-height: 1.55; color: rgba(255,255,255,.72); margin: 0; min-height: 3.1em; }
+    #features .bf2-feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: clamp(32px, 4vw, 56px); row-gap: clamp(36px, 4vw, 56px); }
+    #features .bf2-feat { min-width: 0; }
+    #features .bf2-feat h3 { margin: 0 0 10px; font-family: var(--font-nav); font-weight: 700;
+      font-size: clamp(22px, 2.2vw, 27px); letter-spacing: -.01em; color: #14161C; }
+    #features .bf2-feat p { margin: 0; max-width: 300px; font-size: 16px; line-height: 1.6; color: #3E4358; }
 
     @media (max-width: 860px) {
-      #features .bf2 { grid-template-columns: 1fr; gap: 34px; }
+      #features .bf2-feats { grid-template-columns: 1fr 1fr; }
     }
-    @media (max-width: 480px) {
-      #features .bf2-feats { grid-template-columns: 1fr; gap: 28px; }
+    @media (max-width: 560px) {
+      #features .bf2-feats { grid-template-columns: 1fr; }
+      #features .bf2-feat p { max-width: none; }
+    }
     }
 
     /* Demo telefon na bílé sekci */
@@ -327,6 +322,27 @@
       .emp-hero-blue { padding-top: 112px; }
     }
 
+    /* ── Modrý závěrečný pruh před FAQ — přenesené z /lide (tam .vx-sec.vx-close).
+       Tady je všechno zanořené pod .vx-close: stránka má z vx systému jen
+       .vx-nav a .vx-intro, globální .vx-sec / .vx-wrap / .vx-h2 by přebývaly. ── */
+    .vx-close { background: linear-gradient(150deg,#2a45ff,#0020f6 60%,#0018c8);
+      padding: 96px 0; text-align: center; }
+    .vx-close .vx-wrap { width: min(1120px, 90vw); margin: 0 auto; }
+    .vx-close .vx-sec-head { max-width: 640px; margin: 0 auto; }
+    .vx-close .vx-h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
+      font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.02;
+      margin: 12px 0 0; color: #fff; text-wrap: balance; }
+    .vx-close .vx-sec-head p { color: rgba(255,255,255,.85); max-width: 640px;
+      margin: 16px auto 0; font-size: 1.08rem; line-height: 1.6; }
+    .vx-close .vx-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 30px;
+      font-family: var(--font-heading); font-weight: 800; font-size: .92rem; letter-spacing: .01em;
+      padding: 14px 26px; border-radius: 999px; cursor: pointer;
+      background: #fff; color: #0020f6; box-shadow: 0 14px 30px -12px rgba(0,10,80,.5);
+      transition: background .25s ease, color .25s ease, transform .2s ease, box-shadow .25s ease; }
+    .vx-close .vx-btn:hover { background: #0020f6; color: #fff; transform: translateY(-2px);
+      box-shadow: 0 20px 40px -12px rgba(0,10,80,.6); }
+    @media (max-width: 700px) { .vx-close { padding: 68px 0; } }
+
     /* ── FAQ (brigádníci) — světlá sekce ── */
     .emp-faq { max-width: 760px; margin: 0 auto; padding: 0 24px; }
     .emp-faq-list { border-top: 1px solid rgba(15,18,40,.1); }
@@ -369,13 +385,13 @@
     .vx-nav.scrolled .vx-nav-actions a.vx-signin { background: #0020f6; color: #fff; box-shadow: 0 8px 20px -8px rgba(0,32,246,.5); }
     .vx-nav-links { position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 32px; height: 44px; pointer-events: none; }
     .vx-nav-links a { pointer-events: all; }
-    .vx-nav-links a.vx-active { opacity: 1; font-weight: 700; border-bottom: 2px solid currentColor; padding-bottom: 2px; }
-    .vx-nav-links a { font-family: var(--font-heading); font-weight: 600; font-size: .89rem; letter-spacing: .01em; color: #fff; text-decoration: none; opacity: .88; transition: opacity .2s; }
+    .vx-nav-links a.vx-active { opacity: 1; font-weight: 900; border-bottom: 2px solid currentColor; padding-bottom: 2px; }
+    .vx-nav-links a { font-family: var(--font-heading); font-weight: 800; font-size: .89rem; letter-spacing: .01em; color: #fff; text-decoration: none; opacity: .88; transition: opacity .2s; }
     .vx-nav-links a:hover { opacity: 1; }
     .vx-nav-actions { display: flex; align-items: center; gap: 10px; height: 44px; }
     .vx-nav-actions a.vx-signin { font-family: var(--font-heading); font-weight: 700; font-size: .95rem; letter-spacing: .01em; color:#0020f6; opacity:1; background:#fff; border:none; border-radius:999px; padding:11px 20px; cursor:pointer; text-decoration:none; transition:transform .18s, box-shadow .2s; white-space:nowrap; box-shadow:0 8px 20px -8px rgba(0,0,0,.35); }
     .vx-nav-actions a.vx-signin:hover { transform: translateY(-1px); box-shadow:0 12px 26px -8px rgba(0,0,0,.45); }
-    .vx-logo { font-family: var(--font-nav); font-weight: 900; font-size: 1.8rem; color: #fff; text-decoration: none; line-height: 1; }
+    .vx-logo { font-family: var(--font-nav); font-weight: 900; font-size: 2.2rem; color: #fff; text-decoration: none; line-height: 1; }
     @media (max-width: 900px) {
       /* Mobil: odkazy i CTA schované pod hamburger (panel #mobile-menu ve skrytém #navbar) */
       .vx-nav-links, .vx-nav-actions { display: none; }
@@ -558,47 +574,49 @@
       </div>
     </section>
 
-    <!-- ═══════════ FEATURES — text vlevo + funkce vpravo ═══════════ -->
-    <section id="features">
+    <!-- ═══════════ FEATURES — nadpis a perex nahoře, tři sloupce položek pod tím ═══════════ -->
+    <section id="features" class="nav-light">
       <div class="container">
-        <div class="bf2">
-          <div class="bf2-left">
-            <h2>Proč si zvolíš <span class="grad">Makej</span></h2>
-            <p>Všechno, co při hledání brigády potřebuješ, na jednom místě — swajpuj, matchuj a začni makat.</p>
-            <a href="#" class="bf2-cta worker-cta-register">Vytvořit účet <span style="font-size:18px;line-height:1;">→</span></a>
+        <h2 class="bf2-title">Proč si zvolíš Makej</h2>
+        <p class="bf2-sub">Šest důvodů, proč se ti vyplatí hledat brigádu tady a ne v inzerátech.</p>
+        <div class="bf2-feats">
+          <div class="bf2-feat">
+            <h3>Zdarma</h3>
+            <p>Žádné poplatky ani provize z výdělku.</p>
           </div>
-          <div class="bf2-feats">
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><span class="bf2-swipe"></span></div>
-              <h3>Swajp rozhraní</h3>
-              <p>Prohlížej nabídky jako karty.</p>
-            </div>
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon></div>
-              <h3>Real-time chat</h3>
-              <p>Piš si přímo s firmou po matchi.</p>
-            </div>
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:verified-check-bold"></iconify-icon></div>
-              <h3>Ověřené firmy</h3>
-              <p>Jen prověřené nabídky (IČO i provozovna).</p>
-            </div>
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><span class="bf2-gamif"></span></div>
-              <h3>Gamifikace</h3>
-              <p>Sbírej XP, leveluj a odemykej odměny.</p>
-            </div>
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:star-bold"></iconify-icon></div>
-              <h3>Recenze</h3>
-              <p>Buduj si reputaci, získávej lepší nabídky.</p>
-            </div>
-            <div class="bf2-feat">
-              <div class="bf2-feat-ic" aria-hidden="true"><iconify-icon icon="solar:map-point-bold"></iconify-icon></div>
-              <h3>Blízko tebe</h3>
-              <p>Práce pár minut od domova nebo školy.</p>
-            </div>
+          <div class="bf2-feat">
+            <h3>Hodinovka u nabídky</h3>
+            <p>Kolik dostaneš, vidíš rovnou v inzerátu. Žádné „mzda dle dohody".</p>
           </div>
+          <div class="bf2-feat">
+            <h3>Ověřené firmy</h3>
+            <p>Jen prověřené nabídky (IČO i provozovna).</p>
+          </div>
+          <div class="bf2-feat">
+            <h3>Gamifikace</h3>
+            <p>Sbírej XP, leveluj a odemykej odměny.</p>
+          </div>
+          <div class="bf2-feat">
+            <h3>Recenze</h3>
+            <p>Buduj si reputaci, získávej lepší nabídky.</p>
+          </div>
+          <div class="bf2-feat">
+            <h3>Blízko tebe</h3>
+            <p>Práce pár minut od domova nebo školy.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ ZÁVĚR — modrý pruh (stejný jako na /lide) ═══════════ -->
+    <section class="vx-close">
+      <div class="vx-wrap">
+        <div class="vx-sec-head">
+          <h2 class="vx-h2">Najdi si brigádu ještě dnes</h2>
+          <p>Žádné životopisy ani zdlouhavé formuláře. Vytvoř si profil, swajpni nabídku a zbytek doladíš s firmou přímo v chatu.</p>
+        </div>
+        <div>
+          <a href="#" class="vx-btn worker-cta-register">Vytvořit účet zdarma</a>
         </div>
       </div>
     </section>
@@ -895,7 +913,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=31"></script>
+  <script src="script.js?v=32"></script>
   <!-- Lazy-play ukázkového videa: stáhne a přehraje až ve viewportu (šetří data + LCP) -->
   <script>
   (function () {
