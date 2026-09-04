@@ -1790,19 +1790,15 @@ html { scroll-padding-top: 92px; }
    Stejné chování jako na /podpora: nad bílým obsahem modrý text na skle,
    nad modrou patičkou bílý. Zapíná se třídou nav-light-page na #navbar,
    stav nad modrou přepíná script.js podle prvku [data-nav-blue]. */
-/* Modrý opar, který se dolů vytrácí do stránky — místo pilulky s ostrou
-   spodní linkou. Alfa značkové modré přes bílou dá levandulovou; poslední
-   stopa je nula, takže navbar nikde nekončí hranou.
-   Padding navbaru je součástí boxu, takže se přechod stihne uvnitř. */
+/* Navbar na světlé stránce je průhledný — drží ho jen text. Dřív tu byl modrý
+   opar (gradient značkové modré vytrácející se dolů) plus backdrop-filter;
+   odstraněno oboje najednou: samotné rozostření bez podbarvení by na spodní
+   hraně dělalo viditelný předěl, což je přesně ta „pilulka s ostrou linkou",
+   které se ten opar vyhýbal. Nad modrou patičkou se podklad vrací
+   přes .nav-over-blue níž. */
 #navbar.nav-light-page {
-  background: linear-gradient(180deg,
-    rgba(0,32,246,.26) 0%,
-    rgba(0,32,246,.13) 42%,
-    rgba(0,32,246,.04) 76%,
-    rgba(0,32,246,0)   100%);
+  background: transparent;
   box-shadow: none;
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
 }
 #navbar.nav-light-page .nav-logo { color: #0020f6; -webkit-text-fill-color: #0020f6; }
 /* Odkazy jsou černé, ne značkově modré: na světlých stránkách dělá modrá
