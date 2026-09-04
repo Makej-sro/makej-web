@@ -72,7 +72,7 @@
     @keyframes omWm   { from { opacity: 0; transform: translateY(90px) } to { opacity: 1; transform: none } }
     @media (prefers-reduced-motion: reduce) {
       .oc-h1, .oc-h1 span, .oc-cols, .oc-wm span { animation: none !important; transform: none !important; }
-      .oc-intro #navbar, .oc-intro .wl-fab { animation: none !important; }
+      .oc-intro #navbar { animation: none !important; }
     }
 
     /* ── hero: jen nadpis a dva sloupce textu ── */
@@ -122,8 +122,7 @@
     }
     @keyframes ocIntroFade { from { opacity: 0; } to { opacity: 1; } }
     /* dokud nápis nedojede, je stránka prázdná */
-    .oc-intro #navbar,
-    .oc-intro .wl-fab { animation: ocIntroFade .7s ease-out 2.15s both; }
+    .oc-intro #navbar { animation: ocIntroFade .7s ease-out 2.15s both; }
     /* nadpis se odkryje hned na začátku — zvětšený uprostřed obrazovky.
        Kdyby se odkrýval až po zmenšení, celé zvětšení by proběhlo pod maskou. */
     .oc-intro .oc-h1 span { animation-delay: .15s; }
@@ -673,16 +672,5 @@
     els.forEach(function (el) { io.observe(el); });
   })();
   </script>
-  <!-- Plovoucí tlačítko „Startujeme" — čekací list žije jen na homepage
-       (script.js celý blok přeskočí bez #wl-overlay), tady je to odkaz;
-       ?wl na homepage overlay rovnou otevře. -->
-  <a class="wl-fab" href="/?wl" aria-label="Startujeme – přidat se na waitlist">
-    <span class="wl-fab__icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-        <path d="M13.6 2 5.4 13.1c-.4.5 0 1.3.7 1.3h4.2l-1.4 7.4c-.1.8.9 1.2 1.4.6l8.3-11.1c.4-.5 0-1.3-.7-1.3h-4.2l1.4-7.4c.1-.8-.9-1.2-1.5-.6Z" fill="currentColor"/>
-      </svg>
-    </span>
-    <span class="wl-fab__label">Startujeme</span>
-  </a>
 </body>
 </html>

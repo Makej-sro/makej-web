@@ -173,7 +173,7 @@ function setupReveal() {
   // s kreslenou spojnicí), aby se transform nepřebil.
   const SEL = [
     '.step-card', '.feature-card', '.testimonial-card', '.download-card',
-    '.section-header', '.cn-plan', '.yp-head',
+    '.section-header', '.cn-plan', '.yp-head', '.soon-card',
     '.bolt-head', '.bolt-text',
     '.ab-lead', '.ab-col', '.ab-team-block', '.ab-person', '.ab-quote', '.ab-cta',
     '.emp-faq-item', '.faq-item',
@@ -358,9 +358,6 @@ function initAuth() {
   const loginModal   = document.getElementById('login-modal');
   const registerModal = document.getElementById('register-modal');
   let selectedRole = 'worker';
-  // true = registrace otevřena z waitlistu → „Zpět" vede zpět na waitlist,
-  // ne na rozcestník. Resetuje se při každém otevření modálu (wlGoRegister ho pak nastaví).
-  let regFromWaitlist = false;
   // true = po signUp NEpřesměrovávat (když je v Supabase vypnuté potvrzování e-mailu,
   // signUp uživatele rovnou přihlásí — nechceme ho hodit do dashboardu). Viz register-form.
   let skipAutoRedirect = false;
@@ -380,7 +377,6 @@ function initAuth() {
 
   // ─── Modal open/close ───
   function openModal(type, role) {
-    regFromWaitlist = false;
     overlay.classList.add('active');
     if (type === 'login') {
       loginModal.classList.add('active');
@@ -512,7 +508,10 @@ function initAuth() {
         ['mobile-register-btn','register'],
       ].forEach(([id, type]) => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('click', e => { e.preventDefault(); type === 'register' ? goWaitlist() : openModal(type); });
+        if (el) el.addEventListener('click', e => {
+          e.preventDefault();
+          type === 'register' ? goToEmailSignup() : openModal(type);
+        });
       });
 
       // Hero CTA: show auth buttons, hide dashboard/worker
@@ -521,30 +520,30 @@ function initAuth() {
     }
   }
 
-  // „Registrovat se / Vytvořit účet" → nejdřív na čekací list (předregistrace).
-  // Na index.html (kde je overlay) otevře čekací list rovnou; z ostatních stránek
-  // přesměruje na /?wl (index čekací list po načtení sám otevře).
-  function goWaitlist(role) {
-    if (document.getElementById('wl-overlay') && typeof openWaitlist === 'function') {
-      openWaitlist();
-      if (role && window.wlSetTab) window.wlSetTab(role);
-    } else {
-      window.location.href = '/?wl=1' + (role ? '&role=' + role : '');
-    }
+  // Appka ještě neběží, takže „Vytvořit účet" nevede na registraci, ale na sběr
+  // e-mailů v sekci #brzy. Na hlavní stránce doscrolluje a zaostří pole,
+  // odjinud přesměruje na /#brzy (sekce je jen na homepage).
+  function goToEmailSignup() {
+    closeModals();
+    const sec = document.getElementById('brzy');
+    if (!sec) { window.location.href = '/#brzy'; return; }
+    sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const input = sec.querySelector('.soon-input');
+    if (input) setTimeout(() => input.focus({ preventScroll: true }), 650);
   }
 
   // ─── Statická tlačítka (nejsou nikdy přepisována) — bindujeme jen jednou ───
   document.querySelectorAll('.employer-cta-register').forEach(btn => {
-    btn.addEventListener('click', e => { e.preventDefault(); goWaitlist('employer'); });
+    btn.addEventListener('click', e => { e.preventDefault(); goToEmailSignup(); });
   });
   document.querySelectorAll('.worker-cta-register').forEach(btn => {
-    btn.addEventListener('click', e => { e.preventDefault(); goWaitlist('worker'); });
+    btn.addEventListener('click', e => { e.preventDefault(); goToEmailSignup(); });
   });
 
   // Hero CTA buttons (Vytvořit účet zdarma / Přihlásit se)
   const heroRegisterBtn = document.getElementById('hero-register-btn');
   const heroLoginBtn    = document.getElementById('hero-login-btn');
-  if (heroRegisterBtn) heroRegisterBtn.addEventListener('click', e => { e.preventDefault(); goWaitlist(); });
+  if (heroRegisterBtn) heroRegisterBtn.addEventListener('click', e => { e.preventDefault(); goToEmailSignup(); });
   if (heroLoginBtn)    heroLoginBtn.addEventListener('click',    e => { e.preventDefault(); openModal('login'); });
 
   // Escape key zavře modál
@@ -556,12 +555,11 @@ function initAuth() {
   overlay.addEventListener('click', e => { if (e.target === overlay) closeModals(); });
   document.getElementById('login-close').addEventListener('click', closeModals);
   document.getElementById('register-close').addEventListener('click', closeModals);
-  document.getElementById('switch-to-register').addEventListener('click', e => { e.preventDefault(); openModal('register'); });
+  document.getElementById('switch-to-register').addEventListener('click', e => { e.preventDefault(); goToEmailSignup(); });
   document.getElementById('switch-to-login').addEventListener('click', e => { e.preventDefault(); openModal('login'); });
   const regBackBtn = document.getElementById('reg-back');
   if (regBackBtn) regBackBtn.addEventListener('click', () => {
-    if (regFromWaitlist) { closeModals(); openWaitlist(); }   // přišel z waitlistu → zpět na waitlist
-    else showRegStep(1);
+    showRegStep(1);
   });
 
   document.querySelectorAll('.role-card').forEach(card => {
@@ -747,375 +745,6 @@ function initAuth() {
     }
   });
 
-  // ═══════════ ČEKACÍ LIST (WAITLIST) — přeneseno z Makej-sro/Yasin ═══════════
-  // Běží jen na stránce s overlayem (index.html); jinak se přeskočí.
-  if (document.getElementById('wl-overlay')) {
-  const wlOverlay   = document.getElementById('wl-overlay');
-  const wlPanel     = document.getElementById('wl-panel');
-  const wlCompanyGr = document.getElementById('wl-company-group');
-  const wlPhoneGr   = document.getElementById('wl-phone-group');
-  let   wlRole      = 'worker';
-  let   wlDotBg     = null;   // canvasové tečkované pozadí (nastaví se níž)
-
-  function openWaitlist() {
-    if (!wlOverlay) return;
-    document.body.style.overflow = 'hidden';
-    wlOverlay.classList.add('active');
-    wlOverlay.setAttribute('aria-hidden', 'false');
-    if (wlDotBg) wlDotBg.start();
-  }
-  function closeWaitlist(dismissed) {
-    if (!wlOverlay) return;
-    wlOverlay.classList.remove('active');
-    wlPanel.classList.remove('active');
-    wlOverlay.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    if (wlDotBg) wlDotBg.stop();
-    if (dismissed) { try { sessionStorage.setItem('wl-dismissed', '1'); } catch (e) {} }
-  }
-  function openWlForm(role) {
-    wlRole = role;
-    wlCompanyGr.style.display = role === 'employer' ? 'block' : 'none';
-    wlPhoneGr.style.display   = role === 'employer' ? 'block' : 'none';
-    document.getElementById('wl-form-title').textContent = 'Zapiš se na čekací list';
-    document.getElementById('wl-form-sub').textContent =
-      role === 'employer'
-        ? 'Ozveme se vám na e-mail, jakmile 1. 10. spustíme.'
-        : 'Ozveme se ti na e-mail, jakmile 1. 10. spustíme.';
-    document.getElementById('wl-error').style.display = 'none';
-    document.getElementById('wl-form-wrap').style.display = 'block';
-    document.getElementById('wl-done').style.display = 'none';
-    wlPanel.classList.add('active');
-    setTimeout(() => { const n = document.getElementById('wl-name'); if (n) n.focus(); }, 60);
-  }
-
-  document.getElementById('wl-close').addEventListener('click', () => closeWaitlist(true));
-  document.getElementById('wl-done-close').addEventListener('click', () => closeWaitlist(false));
-  // Plovoucí tlačítko „Startujeme" (.wl-fab) — otevře čekací list i po zavření křížkem
-  const wlFab = document.querySelector('.wl-fab');
-  if (wlFab) {
-    wlFab.addEventListener('click', () => openWaitlist());
-    if (window.matchMedia('(max-width: 640px)').matches) {
-      setTimeout(() => wlFab.classList.add('is-open'), 2000);
-      setTimeout(() => wlFab.classList.remove('is-open'), 6000);
-    }
-  }
-  document.getElementById('wl-back').addEventListener('click', () => wlPanel.classList.remove('active'));
-  wlPanel.addEventListener('click', e => { if (e.target === wlPanel) wlPanel.classList.remove('active'); });
-  document.addEventListener('keydown', e => {
-    if (e.key !== 'Escape') return;
-    if (wlPanel.classList.contains('active')) wlPanel.classList.remove('active');
-    else if (wlOverlay.classList.contains('active')) closeWaitlist(true);
-  });
-
-  // CTA na každé straně → zavři čekací list a otevři NORMÁLNÍ registraci
-  // s danou rolí (brigádník / zaměstnavatel). Žádná separátní waitlist tabulka —
-  // rovnou se zakládá reálný účet přes sb.auth.signUp (viz register-form výš).
-  function wlGoRegister(role) {
-    // Klikl na CTA → bereme to jako „viděl waitlist", ať ho popup příště neotravuje.
-    try { localStorage.setItem('wl-joined', '1'); } catch (e) {}
-    closeWaitlist(false);                      // zavři čekací list (bez „dismissed")
-    openModal('register', role || 'worker');   // otevři registraci rovnou na kroku 2 s rolí
-    regFromWaitlist = true;                     // „Zpět" pak vede na waitlist, ne na rozcestník
-  }
-  document.querySelectorAll('.wl-cta, .wl-cta-flip').forEach(btn => {
-    btn.addEventListener('click', () => wlGoRegister(btn.dataset.wlRole));
-    btn.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); wlGoRegister(btn.dataset.wlRole); }
-    });
-  });
-
-  // Tečkované pozadí (flow field) — PŘESNĚ podle staženého standalone exportu
-  // z Claude designu (flow-field-background.html). Neviditelný proud ohýbá mřížku,
-  // tečky modrají tam, kde běží nejrychleji; kurzor rozsvítí tečky ve svém kruhu.
-  // Spouští se jen když je waitlist otevřený (šetří výkon), jinak 1:1.
-  // Repel efekt kurzoru (dodaný kód) — tečky u kurzoru se plynule odsunou pryč a vrátí.
-  var repel = (function () {
-    var CFG = { radius: 50, maxOffset: 14, ease: 0.16 };
-    var ox = new Float32Array(0), oy = new Float32Array(0);
-    var mx = -9999, my = -9999, out = { dx: 0, dy: 0, heat: 0 };
-
-    function resize(count) { ox = new Float32Array(count); oy = new Float32Array(count); }
-
-    function attach() {
-      window.addEventListener('mousemove', function (e) { mx = e.clientX; my = e.clientY; }, { passive: true });
-      window.addEventListener('mouseleave', function () { mx = -9999; my = -9999; });
-    }
-
-    // idx = index tečky, x/y = její domácí pozice
-    function sample(idx, x, y) {
-      var R = CFG.radius * 1.35, tx = 0, ty = 0, push = 0;
-      if (mx > -9000) {
-        var ddx = x - mx, ddy = y - my;
-        var d = Math.sqrt(ddx * ddx + ddy * ddy);
-        if (d < R) {
-          var f = 1 - d / R;
-          f = f * f * (3 - 2 * f);            // smoothstep — plynulé, neodskočí
-          push = f;
-          var inv = d > 1 ? 1 / d : 1;
-          tx = ddx * inv * f * CFG.maxOffset;
-          ty = ddy * inv * f * CFG.maxOffset;
-        }
-      }
-      ox[idx] += (tx - ox[idx]) * CFG.ease;   // odjede
-      oy[idx] += (ty - oy[idx]) * CFG.ease;   // a stejně plynule zpět
-      var off = Math.sqrt(ox[idx] * ox[idx] + oy[idx] * oy[idx]);
-      out.dx = ox[idx]; out.dy = oy[idx];
-      out.heat = Math.max(push, Math.min(1, off / CFG.maxOffset));
-      return out;
-    }
-
-    return { config: CFG, resize: resize, attach: attach, sample: sample };
-  })();
-
-  wlDotBg = (function () {
-    var canvas = document.getElementById('wl-dotbg');
-    if (!canvas || !wlOverlay) return null;
-    var CONFIG = {
-      dotColor:    '#FFFFFF',
-      accentColor: '#FFFFFF',
-      spacing:     14,   // px mezi tečkami
-      dotSize:     1.1,  // základní poloměr tečky v px
-      speed:       1     // ambient flow: 1 = normál
-    };
-
-    var ctx = canvas.getContext('2d');
-    var W = 0, H = 0, dots = [], t0 = performance.now();
-    var raf = null, running = false;
-
-    function hexToRgb(h) {
-      var v = parseInt(String(h).replace('#', ''), 16);
-      return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
-    }
-    var DOT = hexToRgb(CONFIG.dotColor), ACC = hexToRgb(CONFIG.accentColor);
-
-    var LEV = 10, COLORS = [];
-    for (var l = 0; l < LEV; l++) {
-      var k = l / (LEV - 1);
-      COLORS.push('rgb(' + Math.round(DOT[0] + (ACC[0] - DOT[0]) * k) + ',' +
-                           Math.round(DOT[1] + (ACC[1] - DOT[1]) * k) + ',' +
-                           Math.round(DOT[2] + (ACC[2] - DOT[2]) * k) + ')');
-    }
-
-    function drawBuckets(bk, cols, aBoost) {
-      aBoost = aBoost || 1;
-      for (var lv = 0; lv < LEV; lv++) {
-        var b = bk[lv];
-        if (!b.length) continue;
-        var kk = lv / (LEV - 1);
-        var r = CONFIG.dotSize * (1 + kk * 0.7);
-        ctx.fillStyle = cols[lv];
-        ctx.globalAlpha = Math.min(1, (0.55 + kk * 0.45) * aBoost);
-        ctx.beginPath();
-        for (var n = 0; n < b.length; n += 2) {
-          ctx.moveTo(b[n] + r, b[n + 1]);
-          ctx.arc(b[n], b[n + 1], r, 0, Math.PI * 2);
-        }
-        ctx.fill();
-      }
-    }
-
-    function buildGrid() {
-      var s = CONFIG.spacing;
-      var cols = Math.ceil(W / s) + 1, rows = Math.ceil(H / s) + 1;
-      var ox = (W - (cols - 1) * s) / 2, oy = (H - (rows - 1) * s) / 2;
-      dots = [];
-      for (var j = 0; j < rows; j++)
-        for (var i = 0; i < cols; i++) dots.push(ox + i * s, oy + j * s);
-      repel.resize(dots.length / 2);   // jeden offset na tečku
-    }
-
-    function resize() {
-      var dpr = Math.min(2, window.devicePixelRatio || 1);
-      W = window.innerWidth; H = window.innerHeight;
-      canvas.width = Math.round(W * dpr);
-      canvas.height = Math.round(H * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      buildGrid();
-    }
-
-    function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-
-    function draw() {
-      var t = ((performance.now() - t0) / 1000) * CONFIG.speed;
-      ctx.clearRect(0, 0, W, H);
-
-      var buckets = [];
-      for (var l = 0; l < LEV; l++) buckets.push([]);
-
-      for (var i = 0; i < dots.length; i += 2) {
-        var x = dots[i], y = dots[i + 1];
-
-        // jemný ambient flow field (šum pozadí)
-        var ang = Math.sin(x * 0.0048 + t * 0.28) * 1.7 + Math.cos(y * 0.0056 - t * 0.22) * 1.7;
-        var mag = 7 + 6 * Math.sin(x * 0.003 + y * 0.0038 + t * 0.55);
-        var e = clamp(0.5 + 0.5 * Math.sin(ang * 1.6 + t * 0.4) - 0.12);
-        e = e * e;
-
-        // repel u kurzoru — tečka uhne a heat ji zvýrazní
-        var rp = repel.sample(i >> 1, x, y);
-
-        var px = x + Math.cos(ang) * mag + rp.dx;
-        var py = y + Math.sin(ang) * mag + rp.dy;
-
-        buckets[Math.round(clamp(Math.max(e, rp.heat)) * (LEV - 1))].push(px, py);
-      }
-
-      drawBuckets(buckets, COLORS, 1.2);
-      ctx.globalAlpha = 1;
-      raf = requestAnimationFrame(draw);
-    }
-
-    repel.attach();   // myš sleduje repel modul (jednou)
-
-    return {
-      start: function () {
-        if (running) return;
-        running = true;
-        t0 = performance.now();
-        resize();
-        window.addEventListener('resize', resize);
-        raf = requestAnimationFrame(draw);
-      },
-      stop: function () {
-        if (!running) return;
-        running = false;
-        if (raf) { cancelAnimationFrame(raf); raf = null; }
-        window.removeEventListener('resize', resize);
-      }
-    };
-  })();
-
-  // Přepínač brigádník / zaměstnavatel (jedna karta, segmented switch)
-  (function () {
-    const toggle = document.querySelector('.wl-toggle');
-    if (!toggle) return;
-    const opts = toggle.querySelectorAll('.wl-toggle-opt');
-    const panels = document.querySelectorAll('[data-wl-panel]');
-    function setTab(tab) {
-      opts.forEach(o => o.classList.toggle('is-active', o.dataset.wlTab === tab));
-      panels.forEach(p => { p.classList.toggle('is-off', p.dataset.wlPanel !== tab); });
-      toggle.classList.toggle('is-employer', tab === 'employer');
-      if (window.wlSetSocialRole) window.wlSetSocialRole(tab);
-    }
-    opts.forEach(o => o.addEventListener('click', () => setTab(o.dataset.wlTab)));
-    window.wlSetTab = setTab;   // ať jde předvybrat roli při otevření z registračních tlačítek
-  })();
-
-  // Odpočet do spuštění (1. 10. 2026) — modrý pás s ubývajícími linkami
-  (function () {
-    const cdD = document.getElementById('wl-cd-d');
-    if (!cdD) return;
-    const TARGET = new Date('2026-10-01T09:00:00+02:00').getTime();
-    const TOTAL_DAYS = 61;   // délka odpočtu ve dnech (jak plná je první linka)
-    const pad = n => String(n).padStart(2, '0');
-    const num = { h: document.getElementById('wl-cd-h'), m: document.getElementById('wl-cd-m'), s: document.getElementById('wl-cd-s') };
-    const bar = { d: document.getElementById('wl-cd-bar-d'), h: document.getElementById('wl-cd-bar-h'), m: document.getElementById('wl-cd-bar-m'), s: document.getElementById('wl-cd-bar-s') };
-    function tick() {
-      const t = Math.max(0, Math.floor((TARGET - Date.now()) / 1000));
-      const d = Math.floor(t / 86400);
-      const h = Math.floor(t / 3600) % 24;
-      const m = Math.floor(t / 60) % 60;
-      const s = t % 60;
-      cdD.textContent = d;
-      num.h.textContent = pad(h);
-      num.m.textContent = pad(m);
-      num.s.textContent = pad(s);
-      // linky: žádná transition — plynulost dělá častý přepočet (250 ms)
-      if (bar.d) bar.d.style.width = (100 * d) / Math.max(1, TOTAL_DAYS) + '%';
-      if (bar.h) bar.h.style.width = (100 * h) / 24 + '%';
-      if (bar.m) bar.m.style.width = (100 * m) / 60 + '%';
-      if (bar.s) bar.s.style.width = (100 * s) / 60 + '%';
-    }
-    tick();
-    setInterval(tick, 250);
-  })();
-
-  // Sociální důkaz „Už se přihlásilo XX brigádníků / zaměstnavatelů".
-  // POCTIVĚ: reálný počet účtů z DB podle role (žádný fejk). Řádka se ukáže,
-  // až je registrací aspoň WL_SOCIAL_PRAH — do té doby se nechlubíme (schová se).
-  (function () {
-    const WL_SOCIAL_PRAH = 20;   // od kolika registrací řádku ukázat
-    const wrapEl = document.querySelector('.wl-social');
-    const numEl  = document.getElementById('wl-social-num');
-    const nounEl = document.getElementById('wl-social-noun');
-    if (!numEl || !wrapEl) return;
-
-    const cache = {};            // role → počet (dotaz jen jednou za návštěvu)
-    let current = 'worker';
-
-    async function pocet(role) {
-      if (cache[role] != null) return cache[role];
-      try {
-        const { count, error } = await sb
-          .from('profiles').select('id', { count: 'exact', head: true }).eq('role', role);
-        cache[role] = error ? 0 : (count || 0);
-      } catch (e) { cache[role] = 0; }
-      return cache[role];
-    }
-
-    async function render() {
-      const role = current;
-      const n = await pocet(role);
-      if (role !== current) return;          // mezitím přepnul roli
-      if (n >= WL_SOCIAL_PRAH) {
-        numEl.textContent = n;
-        if (nounEl) nounEl.textContent = role === 'employer' ? 'zaměstnavatelů' : 'brigádníků';
-        wrapEl.style.display = '';
-      } else {
-        wrapEl.style.display = 'none';        // málo → radši nic než chabé číslo
-      }
-    }
-
-    window.wlSetSocialRole = function (r) { current = r; render(); };
-    wrapEl.style.display = 'none';            // schovej, než dojede dotaz (žádné bliknutí)
-    render();
-  })();
-
-  // POZN.: Starý „čekací list" formulář (jméno + e-mail → tabulka `waitlist`) je
-  // zrušený. CTA „Chci být u toho" teď vede rovnou na normální registraci
-  // (viz wlGoRegister výš) → zakládá se reálný účet, žádná separátní waitlist
-  // tabulka. Pojistka: kdyby se ten formulář v markupu přece jen odeslal,
-  // přesměruj na registraci místo zápisu do DB.
-  const _wlFormEl = document.getElementById('wl-form');
-  if (_wlFormEl) {
-    _wlFormEl.addEventListener('submit', e => {
-      e.preventDefault();
-      wlGoRegister(wlRole);
-    });
-  }
-
-  // PRODUKCE: popup vyskočí reálným uživatelům jen jednou (viz větev níž).
-  //   Na testování se dá vynutit vždy přes ?wl v adrese (…/index.html?wl).
-  //   Na vývoj se dá dočasně přepnout na true (popup po každém refreshi).
-  const WL_DEV_ALWAYS = false;
-
-  // Auto-otevření po načtení — ne když už je zapsán/zavřel to, nebo je přihlášený
-  const wlForce  = (() => { try { return new URLSearchParams(location.search).has('wl'); } catch (e) { return false; } })();
-  const wlSeen   = (() => { try { return localStorage.getItem('wl-joined') || sessionStorage.getItem('wl-dismissed'); } catch (e) { return null; } })();
-  const wlLogged = (() => { try { return !!localStorage.getItem('makej-auth'); } catch (e) { return false; } })();
-  if (WL_DEV_ALWAYS || wlForce) {
-    setTimeout(() => {                          // dev / ?wl v adrese = vždy ukázat
-      openWaitlist();
-      try { const r = new URLSearchParams(location.search).get('role'); if (r && window.wlSetTab) window.wlSetTab(r); } catch (e) {}
-    }, 300);
-  } else if (!wlSeen && !wlLogged) {
-    // Nevyskakovat hned po načtení — ať si návštěvník stránku nejdřív prohlédne.
-    // Popup přijde, až projeví zájem: doscrolluje pod hero, nebo po 25 s na stránce.
-    // Pořád platí, že se ukáže jen jednou (wl-joined / wl-dismissed výš).
-    let wlFired = false;
-    const wlOpenOnce = () => {
-      if (wlFired) return;
-      wlFired = true;
-      window.removeEventListener('scroll', wlOnScroll);
-      clearTimeout(wlTimer);
-      openWaitlist();
-    };
-    const wlOnScroll = () => { if (window.scrollY > window.innerHeight * 0.6) wlOpenOnce(); };
-    const wlTimer = setTimeout(wlOpenOnce, 25000);
-    window.addEventListener('scroll', wlOnScroll, { passive: true });
-  }
-  }
 }
 
 function translateAuthError(msg) {
@@ -1631,4 +1260,63 @@ function showToast(msg) {
     ? document.fonts.ready.catch(() => {})
     : Promise.resolve();
   pripraveno.then(() => setTimeout(spust, START));
+})();
+
+/* ═══════════ BRZY SPOUŠTÍME — sběr e-mailů ═══════════
+   Nahrazuje zrušený dvourolový čekací list. Ukládá se jen e-mail, a to přes RPC
+   join_launch_list (SECURITY DEFINER) — tabulka launch_emails nemá žádnou RLS
+   policy, takže z webu z ní nejde nic přečíst ani vyjmenovat. Opakované
+   přihlášení stejné adresy projde tiše (on conflict do nothing v DB).
+   Voláno přes fetch, ne přes supabase.createClient: druhý klient se stejným
+   storageKey hlásí konflikt instancí GoTrue a pro jedno RPC ho není potřeba. */
+(function launchEmails() {
+  const form = document.querySelector('.soon-form');
+  if (!form) return;
+  const input = form.querySelector('.soon-input');
+  const btn   = form.querySelector('.soon-btn');
+  const msg   = document.getElementById('soon-msg');
+  if (!input || !btn) return;
+
+  function stav(text, druh) {
+    if (!msg) return;
+    msg.textContent = text;
+    msg.className = 'soon-msg' + (druh ? ' is-' + druh : '');
+  }
+
+  async function odesli() {
+    const email = (input.value || '').trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      stav('Zkontroluj prosím tvar e-mailu.', 'err');
+      input.focus();
+      return;
+    }
+
+    btn.disabled = true;
+    stav('Odesílám…', '');
+
+    try {
+      const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/join_launch_list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: 'Bearer ' + SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ p_email: email, p_source: 'landing' })
+      });
+      if (!r.ok) throw new Error(await r.text());
+
+      input.value = '';
+      stav('Hotovo! Ozveme se ti na e-mail, jakmile spustíme.', 'ok');
+    } catch (e) {
+      console.error('[launch-emails]', e);
+      stav('Nepovedlo se odeslat. Zkus to prosím za chvíli znovu.', 'err');
+    } finally {
+      btn.disabled = false;   // text nepřepisujeme — smazalo by to i SVG šipku uvnitř
+    }
+  }
+
+  btn.addEventListener('click', odesli);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); odesli(); } });
+  input.addEventListener('input', () => { if (msg && msg.textContent) stav('', ''); });
 })();
