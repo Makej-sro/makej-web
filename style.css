@@ -253,6 +253,7 @@ img { max-width: 100%; display: block; }
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: clamp(96px, 12vh, 128px) 40px 0; text-align: center;
+  position: relative; z-index: 1;   /* nad aurorou (positioned, z-index 0) */
 }
 /* overflow:hidden dělá masku, pod kterou nadpis vyjíždí; padding-bottom
    nechává dole místo pro dotažnice, jinak by je maska uřízla */
@@ -605,74 +606,311 @@ img { max-width: 100%; display: block; }
   .testimonials-grid { grid-template-columns: 1fr; }
 }
 
-/* ═══════════ BRZY SPOUŠTÍME ═══════════
-   Levandulová karta mezi herem a recenzemi. Fonty i modrá jsou naše proměnné,
-   ne hodnoty z návrhu (ten sahal po DM Sans a #1F2DFF) — kvůli jednomu bloku
-   nemá smysl tahat další webfont a mít vedle sebe dvě skoro stejné modré. */
-#brzy { background: #fff; padding: clamp(28px, 4vw, 56px) 0 clamp(40px, 5vw, 72px); }
-.soon-card {
-  border-radius: 28px; background: #E7E9FF; text-align: center;
-  padding: clamp(56px, 8vw, 110px) clamp(24px, 4vw, 48px) clamp(48px, 7vw, 96px);
+/* ═══════════ ČEKACÍ LIST ═══════════
+   Tři kroky (zápis → díky → účet) v jedné sekci. Z návrhu beru rozvržení,
+   ne hodnoty: fonty i modrá jdou z proměnných webu, ať vedle sebe nestojí
+   dvě skoro stejné modré a netahá se kvůli jednomu bloku další webfont. */
+/* ── Vyjetí do popředí ────────────────────────────────────────────────────
+   Hero se při scrollu přilepí a rozmaže, čekací list přes něj vyjede jako
+   karta v popředí. `--p` (0..1) nastavuje JS podle uraženého scrollu.
+   Přilepení potřebuje společný obal: končí totiž až s ním, takže bez `.uvod`
+   by hero viselo vzadu i pod recenzemi. */
+.uvod { position: relative; }
+#hero {
+  position: sticky; top: 0;
+  height: 100vh; height: 100svh; min-height: 0;
 }
-.soon-kicker {
-  margin: 0 0 clamp(30px, 4vw, 54px);
-  font-size: 14px; font-weight: 500; letter-spacing: .24em;
-  text-transform: uppercase; color: #4A5070;
+.hero-main {
+  filter: blur(calc(var(--p, 0) * 16px));
+  transform: scale(calc(1 + var(--p, 0) * .06));
+  opacity: calc(1 - var(--p, 0) * .45);
+  will-change: filter, transform, opacity;
 }
-.soon-word {
-  font-family: var(--font-nav); font-weight: 900;
-  font-size: clamp(72px, 13vw, 190px); line-height: .82;
-  letter-spacing: -.045em; color: var(--primary);
-}
-.soon-lead {
-  margin: clamp(44px, 6vw, 76px) auto 0; max-width: 660px;
-  font-size: clamp(20px, 2.1vw, 27px); line-height: 1.4;
-  color: #14161C; text-wrap: pretty;
-}
-.soon-form {
-  margin: clamp(32px, 4vw, 52px) auto 0; max-width: 720px;
-  display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
-}
-.soon-input {
-  flex: 1 1 320px; min-width: 0; box-sizing: border-box;
-  padding: 20px 28px; border: 1px solid #CDD2F5; border-radius: 999px;
-  background: #F4F5FF; font-family: var(--font-sans); font-size: 18px;
-  color: #14161C; outline: none; transition: border-color .2s, background-color .2s;
-}
-.soon-input:focus { border-color: var(--primary); background: #fff; }
-.soon-btn {
-  display: inline-flex; align-items: center; gap: 12px;
-  padding: 20px 34px; border: 0; border-radius: 999px;
-  background: #0A0A0F; color: #fff;
-  font-family: var(--font-sans); font-size: 18px; font-weight: 700;
-  white-space: nowrap; cursor: pointer;
-  transition: background-color .2s ease, transform .18s ease;
-}
-.soon-btn:hover { background: var(--primary); }
-.soon-btn:active { transform: scale(.98); }
-.soon-msg {
-  margin: 18px 0 0; min-height: 1.4em;
-  font-size: 15px; line-height: 1.4; color: #4A5070;
-}
-.soon-msg.is-ok  { color: #1a7f4b; font-weight: 700; }
-.soon-msg.is-err { color: #c02b3a; font-weight: 700; }
-.soon-btn:disabled { opacity: .6; cursor: default; }
+/* Rozmazané odkazy zůstávají klikatelné — než se do nich někdo trefí naslepo,
+   radši je vypneme. Práh přepíná JS, v CSS se na proměnnou podmínit nedá. */
+.uvod[data-vzadu] .hero-main { pointer-events: none; }
 
-@media (max-width: 560px) {
-  .soon-form { flex-direction: column; }
-  /* ve svislém flexu by se flex-basis: 320px vzal jako VÝŠKA — pole by se
-     nafouklo do 320px a border-radius: 999px z něj udělal elipsu */
-  .soon-input { flex: 0 0 auto; width: 100%; }
-  /* nowrap by tlačítko drželo na 339 px a přeteklo přes okraj karty (342 px);
-     na úzkých displejích proto radši zalomit popisek než přetéct */
-  .soon-btn {
-    width: 100%; justify-content: center; text-align: center;
-    white-space: normal; padding: 18px 24px; font-size: 16px;
-  }
+#brzy {
+  position: relative; z-index: 2; background: transparent;
+  /* Dráha: první obrazovka karta vyjíždí, zbytek zůstane stát v popředí. */
+  padding: 0; min-height: 185vh;
+}
+.wl-slot {
+  position: sticky; top: 0;
+  min-height: 100vh; min-height: 100svh;
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(80px, 11vh, 118px) clamp(16px, 4vw, 24px) 28px;
+}
+/* Žádná karta: čekací list stojí přímo v popředí přes rozmazané hero, takže
+   může být velký jako celá obrazovka. Bílý obdélník by ho naopak zmenšil na
+   výřez a celý efekt „přenese se dopředu" by z toho zmizel. */
+.wl-panel {
+  width: min(760px, 100%);
+  transform: translateY(calc((1 - var(--p, 0)) * 7vh));
+  will-change: transform;
+}
+
+.wl-krok {
+  width: 100%;
+  display: flex; flex-direction: column; align-items: center; gap: clamp(22px, 3vh, 30px);
+  animation: wlUp .36s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes wlUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.wl-krok[hidden] { display: none !important; }
+
+.wl-mark {
+  margin: 0; font-family: var(--font-nav); font-weight: 800;
+  font-size: clamp(44px, 8.4vw, 84px); line-height: 1.0;
+  letter-spacing: -.042em; color: #14162b; text-align: center;
+}
+.wl-mark b { color: var(--primary); font-weight: 800; }
+.wl-h2 {
+  margin: 0; font-family: var(--font-nav); font-weight: 800;
+  font-size: clamp(34px, 6vw, 58px); line-height: 1.04;
+  letter-spacing: -.042em; color: #14162b; text-align: center;
+}
+.wl-lead {
+  margin: 0; max-width: 560px; text-align: center;
+  font-size: clamp(17px, 2.4vw, 22px); line-height: 1.55; color: #4E5680;
+}
+.wl-lead b { color: var(--primary); font-weight: 700; }
+.wl-blok { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+
+/* ── Krok 1: e-mail ── */
+.wl-form { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.wl-row { width: 100%; max-width: 520px; margin: 0 auto; display: flex; gap: 11px; }
+.wl-in {
+  flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 16.5px; font-weight: 500;
+  color: #14162b; background: #fff; border: 1px solid #dfe4f2; border-radius: 999px;
+  padding: 19px 24px; outline: none; box-shadow: 0 6px 20px -12px rgba(0,8,60,.35);
+  transition: border-color .18s;
+}
+.wl-in::placeholder { color: #5B6488; }
+.wl-in:focus { border-color: var(--primary); }
+.wl-in[aria-invalid="true"] { border-color: #E2564A; }
+.wl-go {
+  flex: none; font-family: var(--font-sans); font-size: 16px; font-weight: 700; color: #fff;
+  background: var(--primary); border: 0; border-radius: 999px; padding: 19px 30px;
+  cursor: pointer; white-space: nowrap; transition: background-color .18s, opacity .18s;
+  box-shadow: 0 10px 26px -12px rgba(0,32,246,.7);
+}
+.wl-go:hover { background: #0014A3; }
+.wl-go:disabled { opacity: .6; cursor: default; }
+.wl-err  { font-size: 13px; font-weight: 600; color: #E2564A; text-align: center; }
+.wl-jiny {
+  font-family: var(--font-sans); font-size: 13.5px; font-weight: 700; color: #4E5680;
+  background: none; border: 0; padding: 0; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 4px;
+}
+.wl-jiny:hover { color: var(--primary); }
+.wl-jiny[hidden] { display: none !important; }
+
+/* ── Sociální důkaz — číslo je skutečné, nebo tu není vůbec ── */
+.wl-foot { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.wl-foot[hidden] { display: none !important; }
+.wl-faces { display: flex; }
+.wl-face {
+  width: 34px; height: 34px; border-radius: 999px; border: 3px solid #fff;
+  overflow: hidden;   /* postavička vyplní kolečko a hrany se oříznou */
+  display: flex; align-items: center; justify-content: center;
+}
+.wl-face svg { width: 100%; height: 100%; display: block; }
+.wl-face-t { fill: #fff; }                    /* tělo a hlava */
+.wl-face-v { fill: #2E3457; }                 /* vlasy — plná tmavá, průsvitná by se na třech různých pozadích chovala pokaždé jinak */
+/* Tři odlišné odstíny, jinak stoh splyne v jednu skvrnu. První nahoře —
+   při opačném pořadí každý překryje předchozí a stoh vypadá sekaný. */
+/* Barvu pozadí nese samotný obrázek (mění se s postavičkou), kolečko drží
+   jen pořadí — první nahoře, jinak každý překryje předchozí a stoh vypadá
+   sekaný. Barvy tady zůstávají jako záloha, kdyby JS nedoběhl. */
+.wl-face:nth-child(1) { z-index: 3; background: var(--primary); }
+.wl-face:nth-child(2) { z-index: 2; background: #F5B301; }
+.wl-face:nth-child(3) { z-index: 1; background: #E2564A; }
+.wl-face + .wl-face { margin-left: -11px; }
+.wl-foot-t { font-size: 14px; color: #5B6488; }
+.wl-foot-t b { font-weight: 700; color: #14162b; }
+
+/* ── Krok 2 a 3 ── */
+.wl-ok {
+  width: 78px; height: 78px; border-radius: 999px; background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+}
+.wl-pos {
+  display: flex; align-items: baseline; gap: 8px; background: #fff;
+  border: 1px solid #edf0f7; border-radius: 999px; padding: 10px 18px;
+}
+.wl-pos[hidden] { display: none !important; }
+.wl-pos-v { font-size: 19px; font-weight: 900; color: var(--primary); letter-spacing: -.03em; }
+.wl-pos-k { font-size: 13.5px; font-weight: 600; color: #5B6488; }
+
+/* ── Psací stroj v nadpisu kroku 2 a 3 ────────────────────────────────────
+   Text se dopisuje v JS; kurzor bliká za ním. Blikání dělá `steps(1)`, ne
+   plynulý přechod — plynule stmívaný kurzor vypadá jako chyba vykreslování. */
+.wl-cur {
+  display: inline-block; width: .055em; height: .74em; margin-left: .04em;
+  background: var(--primary); vertical-align: -.04em;
+  animation: wlBlik 1.04s steps(1) infinite;
+}
+.wl-cur[hidden] { display: none !important; }
+@keyframes wlBlik { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+/* Obsah kroku nastupuje po částech, ne naráz. Zpoždění nese inline style
+   u každého prvku, ať se pořadí dá měnit v šabloně a ne v CSS. */
+.wl-rise { animation: wlUp .42s cubic-bezier(.4,0,.2,1) both; }
+
+/* ── Dělič „nebo" ── */
+.wl-or { display: flex; align-items: center; gap: 14px; width: 100%; max-width: 480px; }
+.wl-or::before, .wl-or::after { content: ""; flex: 1; height: 1px; background: #dfe4f2; }
+.wl-or-t {
+  font-size: 12px; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: #5B6488;
+}
+
+/* ── Účet: nejdřív jen tlačítko, formulář se rozbalí pod ním ── */
+.wl-acc { width: 100%; max-width: 480px; }
+.wl-prize {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: var(--font-sans); font-size: 16.5px; font-weight: 700; color: #fff;
+  background: var(--primary); border: 0; border-radius: 999px; padding: 18px 26px;
+  cursor: pointer; transition: background-color .18s, transform .18s;
+  box-shadow: 0 12px 28px -12px rgba(0,32,246,.7);
+}
+.wl-prize:hover { background: #0014A3; transform: translateY(-1px); }
+/* Po rozbalení tlačítko mizí — jinak by nad formulářem zůstala výzva k něčemu,
+   co už je otevřené, a nebylo by jasné, co je hlavní akce. */
+.wl-acc[data-open] .wl-prize { display: none; }
+
+/* max-height místo height: obsah nemá předem známou výšku, tak se animuje proti
+   naměřené hodnotě a po dojetí se uvolní, ať se vejdou i chybové hlášky. */
+.wl-acc-bd { overflow: hidden; max-height: 0; transition: max-height .34s cubic-bezier(.4,0,.2,1); }
+.wl-acc[data-open] .wl-acc-bd {
+  background: #fff; border: 1px solid #e4e8f5; border-radius: 22px;
+  box-shadow: 0 14px 40px -22px rgba(0,8,60,.45);
+}
+.wl-acc-pd { padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+
+/* Přepínač typu účtu. Dva popisky vedle sebe, vybraný se podloží bílou —
+   radio je schované pod nimi, ať jde ovládat klávesnicí i čtečkou. */
+.wl-seg {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  background: #eceffb; padding: 4px; border-radius: 999px;
+}
+.wl-seg label { display: block; position: relative; }
+.wl-seg input { position: absolute; opacity: 0; width: 0; height: 0; }
+.wl-seg span {
+  display: block; text-align: center; padding: 11px 8px; border-radius: 999px;
+  font-family: var(--font-sans); font-size: 13.5px; font-weight: 600; color: #4E5680;
+  cursor: pointer; transition: background-color .18s, color .18s;
+}
+.wl-seg input:checked + span { background: #fff; color: #14162b; box-shadow: 0 2px 9px rgba(10,16,40,.13); }
+.wl-seg input:focus-visible + span { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.wl-f  { display: flex; flex-direction: column; gap: 13px; }
+.wl-lb[hidden] { display: none !important; }
+
+/* Pole na IČO nevyskakuje, ale vyjede. Výška se animovat přímo nedá (obsah ji
+   nemá předem známou), proto přechod mřížky z 0fr na 1fr — ten výšku dopočítá
+   sám. Záporný horní okraj v zavřeném stavu ruší mezeru formuláře: prvek
+   nulové výšky by ji jinak zdvojil a nad heslem by zůstalo 13 px navíc. */
+.wl-ico-box {
+  display: grid; grid-template-rows: 0fr; opacity: 0; margin-top: -13px;
+  transition: grid-template-rows .34s cubic-bezier(.4,0,.2,1),
+              opacity .22s ease,
+              margin-top .34s cubic-bezier(.4,0,.2,1);
+}
+.wl-ico-in { overflow: hidden; display: flex; flex-direction: column; gap: 7px; }
+.wl-ico-box[data-open] { grid-template-rows: 1fr; opacity: 1; margin-top: 0; }
+.wl-ico-box[hidden] { display: none !important; }
+.wl-lb { display: flex; flex-direction: column; gap: 7px; }
+/* Pole si vpravo drží místo na přepínač hesla, jinak by text lezl pod něj. */
+.wl-pole { position: relative; display: flex; align-items: center; }
+.wl-fi {
+  width: 100%; font-family: var(--font-sans); font-size: 16px; font-weight: 500; color: #14162b;
+  background: #f7f8fc; border: 1.5px solid #e4e8f5; border-radius: 14px; padding: 15px 16px;
+  outline: none; transition: border-color .2s, background-color .2s;
+}
+.wl-fi--pw { padding-right: 84px; }
+.wl-fi::placeholder { color: #5B6488; }
+.wl-fi:focus { border-color: var(--primary); background: #fff; }
+/* Zelený obrys až když je pole opravdu v pořádku — ne po prvním znaku. */
+.wl-fi[data-ok] { border-color: #0B7B4B; background: #fff; }
+.wl-fi[aria-invalid="true"] { border-color: #E2564A; background: #fff; }
+.wl-err2 { font-size: 12.5px; font-weight: 600; color: #E2564A; }
+
+.wl-peek {
+  position: absolute; right: 14px; font-family: var(--font-sans); font-size: 12.5px;
+  font-weight: 700; color: var(--primary); background: none; border: 0;
+  padding: 4px 2px; cursor: pointer;
+}
+.wl-peek:hover { color: #0014A3; }
+
+/* E-mail je potvrzený z prvního kroku, proto zelený obrys hned. */
+.wl-mail {
+  font-size: 14px; font-weight: 700; color: #14162b; background: #fff;
+  border: 1.5px solid #0B7B4B; border-radius: 14px; padding: 14px 16px; word-break: break-all;
+}
+.wl-sub {
+  width: 100%; font-family: var(--font-sans); font-size: 16.5px; font-weight: 800; color: #fff;
+  background: var(--primary); border: 0; border-radius: 15px; padding: 17px; cursor: pointer;
+  transition: background-color .18s, opacity .18s;
+}
+.wl-sub:hover { background: #0014A3; }
+.wl-sub:disabled { opacity: .6; cursor: default; }
+
+/* ── Potvrzení v kroku 3: kroužek se obtáhne, výplň naskočí, fajfka se dokreslí ── */
+.wl-ok {
+  position: relative; width: 78px; height: 78px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.wl-ok-halo {
+  position: absolute; inset: 0; border-radius: 999px; background: var(--primary);
+  animation: wlHalo 1.1s cubic-bezier(.2,.7,.3,1) .5s both;
+}
+.wl-ok svg { position: relative; }
+.wl-ok-fill { fill: var(--primary); transform-origin: 39px 39px; animation: wlFill .5s cubic-bezier(.34,1.3,.5,1) .42s both; }
+.wl-ok-ring {
+  stroke: var(--primary); transform: rotate(-90deg); transform-origin: 39px 39px;
+  stroke-dasharray: 217; stroke-dashoffset: 217;
+  animation: wlRing .62s cubic-bezier(.3,0,.2,1) both;
+}
+.wl-ok-chk { stroke-dasharray: 46; stroke-dashoffset: 46; animation: wlChk .38s cubic-bezier(.4,0,.2,1) .72s forwards; }
+@keyframes wlRing { to { stroke-dashoffset: 0; } }
+@keyframes wlChk  { to { stroke-dashoffset: 0; } }
+@keyframes wlFill {
+  0% { transform: scale(.2); opacity: 0; }
+  55% { opacity: 1; }
+  70% { transform: scale(1.06); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes wlHalo {
+  0% { transform: scale(.9); opacity: 0; }
+  45% { opacity: .3; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+@media (max-width: 620px) {
+  .wl-row { flex-direction: column; }
+  .wl-go { text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wl-krok { animation: none; }
+  .wl-acc-bd, .wl-ico-box { transition: none; }
+  /* Psací stroj i dokreslování fajfky se citlivému uživateli ukážou hotové. */
+  .wl-cur { animation: none; opacity: 0; }
+  .wl-rise, .wl-ok-halo, .wl-ok-fill, .wl-ok-ring, .wl-ok-chk { animation: none; }
+  .wl-ok-ring, .wl-ok-chk { stroke-dashoffset: 0; }
+  /* Rozmazání necháme napevno — bez něj by karta stála na plném nadpisu
+     a nešlo by ji přečíst — ale nesmí se hýbat se scrollem. */
+  .hero-main { filter: blur(10px); opacity: .5; transform: none; }
+  .wl-panel { transform: none; }
+}
+/* Nízké displeje: přilepená karta se musí vejít i s klávesnicí. */
+@media (max-height: 720px) {
+  .wl-krok { gap: 16px; }
+  .wl-mark { font-size: clamp(36px, 7vw, 54px); }
 }
 
 /* ═══════════ REFERENCE — galerie recenzí (stejný jazyk jako galerie na /lide) ═══════════ */
-#makaci { padding: 118px 0 44px; background: #eceef3; overflow: hidden; }
+#makaci { padding: 118px 0 44px; background: var(--pl-canvas); overflow: hidden; }
 /* panel jde přes celou šířku, aby se velké slovo v pozadí mohlo rozjet až k okrajům */
 #makaci .container { width: 100%; max-width: none; padding: 0; }
 /* nadpis sekce — stejné hodnoty jako .vx-sec-head / .vx-h2 na /lide */
@@ -780,7 +1018,7 @@ img { max-width: 100%; display: block; }
 }
 
 /* ═══════════ DOWNLOAD ═══════════ */
-#download { padding: 64px 0; background: #eef1fb; }
+#download { padding: 64px 0; background: var(--pl-canvas); }
 .download-stage { position: relative; max-width: 900px; margin: 0 auto; }
 .download-hero-img { display: block; width: 100%; max-width: 1120px; height: auto; margin: 0 auto; }
 
@@ -855,33 +1093,7 @@ img { max-width: 100%; display: block; }
 .store-btn strong { display: block; font-size: 1rem; text-align: left; color: #0f1222; }
 .store-btn--soon { opacity: .55; cursor: not-allowed; pointer-events: none; }
 
-/* ═══════════ COOKIE BANNER ═══════════ */
-#cookie-banner {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
-  background: rgba(22,22,59,.97);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(208,208,255,.12);
-  padding: 20px 24px;
-  transform: translateY(100%);
-  transition: transform 400ms cubic-bezier(0.23,1,0.32,1);
-}
-#cookie-banner.visible { transform: translateY(0); }
-.cookie-inner {
-  max-width: 1200px; margin: 0 auto;
-  display: flex; align-items: center; gap: 24px;
-  flex-wrap: wrap;
-}
-.cookie-text { flex: 1; min-width: 260px; font-size: .875rem; color: rgba(255,255,255,.75); line-height: 1.6; }
-.cookie-text a { color: var(--secondary); }
-.cookie-actions { display: flex; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
-.cookie-btn {
-  padding: 9px 20px; border-radius: 10px; font-size: .875rem; font-weight: 600;
-  cursor: pointer; border: none; font-family: var(--font-sans);
-  transition: opacity .15s, transform .15s;
-}
-.cookie-btn:hover { opacity: .85; }
-.cookie-btn-accept { background: linear-gradient(135deg,var(--primary),var(--accent)); color: #fff; }
-.cookie-btn-reject { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.8); }
+/* Lišta cookies: consent.css + consent.js (hlavička každé stránky). */
 .download-note { color: #8a93a8; font-size: .85rem; font-weight: 600; }
 
 /* ═══════════ FOOTER ═══════════ */
@@ -2111,3 +2323,97 @@ iconify-icon[width="22"] { width: 22px; height: 22px; }
 iconify-icon[width="26"] { width: 26px; height: 26px; }
 iconify-icon[width="32"] { width: 32px; height: 32px; }
 iconify-icon[width="56"] { width: 56px; height: 56px; }
+
+/* ═══════════ POZADÍ — JEDNO PLÁTNO (2026) ═══════════
+   Jeden systém pozadí pro celý web: bílé hero se „zářící aurorou" (tři pomalu
+   plující modré skvrny), sekce střídají bílou a jediné plátno --pl-canvas,
+   na stránku jeden plochý modrý blok a modrá patička. Žádné pruhové přechody
+   modrá→bílá. Všechny dřívější šedé (#eceef3, #f6f7fb, #eef1fb, #f4f5fb,
+   #f4f4fc) jsou sjednocené na --pl-canvas — kdo přidává sekci, bere tuhle. */
+:root { --pl-canvas: #F5F6FA; }
+
+/* Aurora: tři měkké skvrny. Měkkost dělá sám radiální přechod (dojede do
+   nuly přesně na hraně boxu), žádný filter: blur — Chrome u vrstvy s blur
+   a border-radius ořezává rozmazaný okraj až po rozmazání a kolem skvrny
+   zůstal ostrý kruh. Bez filtru je to i levné: animuje se jen transform.
+   Rodič musí být position: relative a jeho obsah positioned (z-index ≥ 1),
+   jinak by skončil pod ní — aurora je positioned s z-index 0. */
+.aurora { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+.aurora i { position: absolute; display: block; will-change: transform; }
+.aurora i:nth-child(1) {
+  width: max(620px, 64vw); height: max(500px, 50vw); left: -16vw; top: -20vw;
+  background: radial-gradient(closest-side, rgba(0,32,246,.26) 0%, rgba(0,32,246,.15) 34%, rgba(0,32,246,.05) 68%, rgba(0,32,246,0) 100%);
+  animation: plPluj1 26s ease-in-out infinite alternate;
+}
+.aurora i:nth-child(2) {
+  width: max(560px, 58vw); height: max(620px, 62vw); right: -18vw; top: -4vh;
+  background: radial-gradient(closest-side, rgba(124,141,255,.30) 0%, rgba(124,141,255,.17) 34%, rgba(124,141,255,.06) 68%, rgba(124,141,255,0) 100%);
+  animation: plPluj2 34s ease-in-out infinite alternate;
+}
+.aurora i:nth-child(3) {
+  width: max(520px, 54vw); height: max(360px, 36vw); left: 28vw; bottom: -18vw;
+  background: radial-gradient(closest-side, rgba(0,32,246,.16) 0%, rgba(0,32,246,.09) 34%, rgba(0,32,246,.03) 68%, rgba(0,32,246,0) 100%);
+  animation: plPluj3 40s ease-in-out infinite alternate;
+}
+@keyframes plPluj1 { to { transform: translate3d(16vw, 12vh, 0) scale(1.15); } }
+@keyframes plPluj2 { to { transform: translate3d(-14vw, 18vh, 0) scale(.9); } }
+@keyframes plPluj3 { to { transform: translate3d(-18vw, -10vh, 0) scale(1.2); } }
+@media (max-width: 700px) {
+  .aurora i:nth-child(3) { display: none; }
+}
+
+/* ── Vyjetí obsahu do popředí přes přilepené hero ────────────────────────
+   Stejná mechanika jako čekací list na hlavní straně: hero se přilepí,
+   rozmaže a zesvětlí (--p řídí popredi() ve script.js), první sekce přes něj
+   vyjede jako list se zaoblenou hranou. Na /lide, /hledam-si-praci a
+   /pro-zamestnavatele je .uvod obal hera + prvních sekcí; ty musí mít
+   neprůhledné pozadí, jinak by skrz ně hero prosvítalo. */
+.uvod > :not(:first-child) { position: relative; z-index: 5; }   /* nad notebookem (.mkj-visual má 3) */
+.uvod > .vx-shell, .uvod > .emp-hero-blue {
+  position: sticky; top: calc(-1 * var(--uvod-presah, 0px));
+  height: 100vh; height: var(--hero-h, 100vh); min-height: 0;
+}
+/* Hero vyšší než okno (/pro-zamestnavatele — notebook musí být celý vidět):
+   roste s obsahem. popredi() ve script.js změří, o kolik přesahuje okno
+   (--uvod-presah); o tolik se stránka nejdřív odroluje a teprve pak se hero
+   přilepí (záporný top nahoře) a začne rozmazávat. */
+#employers > .emp-hero-blue { height: auto; min-height: var(--hero-h, 100vh); }
+#employers .mkj-visual { padding-bottom: 56px; }   /* místo pro stín pod notebookem */
+.uvod > .vx-shell > .vx-frame { height: 100%; min-height: 0; }
+.uvod .vx-hero, .uvod .eh-head, .uvod .mkj-visual {
+  filter: blur(calc(var(--p, 0) * 16px));
+  opacity: calc(1 - var(--p, 0) * .45);
+  will-change: filter, opacity;
+}
+.uvod .vx-hero { transform: scale(calc(1 + var(--p, 0) * .06)); }
+.uvod[data-vzadu] .vx-hero, .uvod[data-vzadu] .eh-head { pointer-events: none; }
+.uvod > .vx-intro {
+  background: #fff;
+  border-radius: 32px 32px 0 0;
+  box-shadow: 0 -22px 60px -22px rgba(10,13,46,.22);
+}
+@media (max-width: 700px) { .uvod > .vx-intro { border-radius: 22px 22px 0 0; } }
+
+/* ── Plochý modrý blok ──────────────────────────────────────────────────
+   Jedna barva a měkké světlo shora místo šikmého přechodu. Sdílí to závěr
+   produktových stránek, citát na /o-nas i kontakt na /podpora. */
+.vx-close, .oc-quote, .sup-cards-wrap { position: relative; overflow: hidden; isolation: isolate; }
+.vx-close::before, .oc-quote::before, .sup-cards-wrap::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(60% 70% at 50% -12%, rgba(150,168,255,.42), rgba(150,168,255,0) 62%);
+}
+
+/* ── Navigace produktových stránek na bílém heru ────────────────────────
+   Barvy jako po odscrollování (.scrolled): modré logo, inkoustové odkazy,
+   hamburger tmavý. Když je menu otevřené, je pod ním tmavý panel → bílá. */
+.vx-nav .vx-burger { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.22); }
+.vx-nav .vx-burger span { background: #0a0d2e; }
+.vx-nav .vx-burger.open { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.34); }
+.vx-nav .vx-burger.open span { background: #fff; }
+.vx-nav:has(.vx-burger.open) .vx-logo { color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora i { animation: none; }
+  /* Sekce hero stejně zakryjí — bez pohybu není co rozmazávat. */
+  .uvod .vx-hero, .uvod .eh-head, .uvod .mkj-visual { filter: none; opacity: 1; transform: none; }
+}

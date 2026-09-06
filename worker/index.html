@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-25X9CMKGRD"></script>
+  <!-- Souhlas s cookies (consent.js). Výchozí stav Google Consent Mode v2 = vše
+       odepřeno a MUSÍ být první skript v hlavičce. Google Analytics se načítá až
+       po souhlasu z consent.js — bez něj na Google neodejde jediný požadavek. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-25X9CMKGRD');
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
+    gtag('set', 'ads_data_redaction', true);
   </script>
+  <link rel="stylesheet" href="/consent.css?v=2" />
+  <script src="/consent.js?v=4" defer></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>makej. — najdi brigádu</title>
@@ -226,9 +229,9 @@
 <script type="text/babel" src="../employer/app.jsx?v=2"></script>
 <script type="text/babel" src="worker-theme.jsx?v=1"></script>
 <script type="text/babel" src="worker-supabase.jsx?v=17"></script>
-<script type="text/babel" src="worker-swipe.jsx?v=17"></script>
+<script type="text/babel" src="worker-swipe.jsx?v=18"></script>
 <script type="text/babel" src="worker-messages.jsx?v=12"></script>
-<script type="text/babel" src="worker-profile.jsx?v=11"></script>
+<script type="text/babel" src="worker-profile.jsx?v=12"></script>
 <script type="text/babel" src="worker-history.jsx?v=8"></script>
 <script type="text/babel" src="worker-main.jsx?v=10"></script>
 </body>

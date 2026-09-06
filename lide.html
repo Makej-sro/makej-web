@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-25X9CMKGRD"></script>
+  <!-- Souhlas s cookies (consent.js). Výchozí stav Google Consent Mode v2 = vše
+       odepřeno a MUSÍ být první skript v hlavičce. Google Analytics se načítá až
+       po souhlasu z consent.js — bez něj na Google neodejde jediný požadavek. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    // GDPR: výchozí souhlas odepřen (žádné analytické cookies), dokud uživatel nepřijme cookie lištu.
-    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500 });
-    try { if (localStorage.getItem('makej-cookie-consent') === 'accepted') gtag('consent', 'update', { analytics_storage: 'granted' }); } catch (e) {}
-    gtag('js', new Date());
-    gtag('config', 'G-25X9CMKGRD');
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
+    gtag('set', 'ads_data_redaction', true);
   </script>
+  <link rel="stylesheet" href="/consent.css?v=2" />
+  <script src="/consent.js?v=4" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lidé — výpomoc, řemeslo a doučování v okolí | Makej</title>
@@ -42,7 +42,7 @@
   <link rel="preload" as="image" href="/krok-1.png" />
   <link rel="preload" as="image" href="/krok-2.png" />
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=99" />
+  <link rel="stylesheet" href="style.css?v=125" />
   <style>
     /* Bolt-style střídavé kroky (foto + text) */
     .bolt-head { text-align: center; max-width: 1080px; margin: 0 auto 56px; padding: 0 24px; }
@@ -188,12 +188,8 @@
     .eh-line:nth-child(1) .eh-line-in { animation-delay: .1s; }
     .eh-line:nth-child(2) .eh-line-in { animation-delay: .26s; }
     .emp-hero-blue .eh-grad {
-      background: linear-gradient(100deg, #aab2ff 0%, #d8ddff 30%, #ffffff 50%, #d8ddff 70%, #aab2ff 100%);
-      background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent; color: transparent;
-      /* Safari: -webkit-background-clip:text ořezává dotažení písmen (j/y) — dolní rezerva to vyřeší, záporný margin drží layout */
-      padding-bottom: .2em; margin-bottom: -.2em;
-      animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) .26s both, heroGradSweep 6s linear 1.4s infinite;
+      color: #0020f6; -webkit-text-fill-color: #0020f6;
+      animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) .26s both;
     }
     .eh-sub { animation: fadeInUp .7s ease-out .5s both; }
     .eh-btn { animation: fadeInUp .7s ease-out .62s both; }
@@ -202,7 +198,7 @@
       .eh-line-in, .emp-hero-blue .eh-grad, .eh-sub, .eh-btn, .mkj-visual { animation: none !important; transform: none !important; }
     }
     .eh-sub { color: rgba(255,255,255,.85); font-size: clamp(1.02rem, 1.6vw, 1.3rem); line-height: 1.5; max-width: 640px; margin: 0 auto 34px; }
-    .eh-btn { display: inline-block; background: #eef6f0; color: #0a0d2e; font-family: var(--font-sans); font-weight: 700; font-size: 1.02rem; padding: 16px 32px; border-radius: 16px; text-decoration: none; cursor: pointer; transition: background .2s, transform .2s; }
+    .eh-btn { display: inline-block; background: #191919; color: #fff; font-family: var(--font-sans); font-weight: 700; font-size: 1.02rem; padding: 16px 32px; border-radius: 16px; text-decoration: none; cursor: pointer; transition: background .2s, transform .2s; }
     .eh-btn:hover { background: #fff; transform: translateY(-2px); }
 
     .mkj-visual { position: relative; height: 600px; margin: -110px auto 0; max-width: 1100px; overflow: hidden; pointer-events: none; }
@@ -279,10 +275,11 @@
     #navbar { background: none !important; box-shadow: none !important; pointer-events: none; }
     #navbar .nav-inner { display: none !important; }
     #navbar .mobile-menu { pointer-events: auto; }
-    body { background: var(--vx-bg); }
+    body { background: #fff; }
+    body::before { display: none !important; }
 
     .vx {
-      --vx-bg:#c2cdd8; --vx-frame:#e9edf3; --vx-frame2:#f6f8fc;
+      --vx-bg:#fff; --vx-frame:#fff; --vx-frame2:var(--pl-canvas);
       --ink:#0e1116; --muted:#6b7280; --blue:#0020f6; --blue-deep:#0018c8;
       --line:rgba(14,17,22,.10); --surface:#fff;
       font-family: var(--font-sans); color: var(--ink);
@@ -294,7 +291,7 @@
     .vx-shell { background: #ffffff; padding: 0; }
     .vx-frame {
       position: relative; border-radius: 0; overflow: hidden;
-      background: linear-gradient(180deg, #0020f6 0%, #1a37ff 12%, #5875ff 30%, #aebcff 46%, #ffffff 60%);
+      background: #fff;
       min-height: 100vh; min-height: var(--hero-h, 100vh); display: flex; flex-direction: column;
     }
 
@@ -311,32 +308,27 @@
     .vx-nav-links { position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 32px; height: 44px; pointer-events: none; }
     .vx-nav-links a { pointer-events: all; }
     .vx-nav-links a.vx-active { opacity: 1; font-weight: 900; border-bottom: 2px solid currentColor; padding-bottom: 2px; }
-    .vx-nav-links a { font-family: var(--font-heading); font-weight: 800; font-size: .89rem; letter-spacing: .01em; color: #fff; text-decoration: none; opacity: .88; transition: opacity .2s; }
+    .vx-nav-links a { font-family: var(--font-heading); font-weight: 800; font-size: .89rem; letter-spacing: .01em; color: #0a0d2e; text-decoration: none; opacity: .88; transition: opacity .2s; }
     .vx-nav-links a:hover, .vx-nav-links a.on { opacity: 1; }
     .vx-nav-actions { display: flex; align-items: center; gap: 10px; height: 44px; }
-    .vx-nav-actions a.vx-signin { font-family: var(--font-heading); font-weight: 700; font-size: .95rem; letter-spacing: .01em; color:var(--blue); opacity:1; background: #fff; border:none; border-radius: 999px; padding: 11px 20px; cursor:pointer; text-decoration:none; transition: transform .18s, box-shadow .2s; white-space:nowrap; box-shadow:0 8px 20px -8px rgba(0,0,0,.35); }
+    .vx-nav-actions a.vx-signin { font-family: var(--font-heading); font-weight: 700; font-size: .95rem; letter-spacing: .01em; color:#fff; opacity:1; background: var(--blue); border:none; border-radius: 999px; padding: 11px 20px; cursor:pointer; text-decoration:none; transition: transform .18s, box-shadow .2s; white-space:nowrap; box-shadow:0 8px 20px -8px rgba(0,0,0,.35); }
     .vx-nav-actions a.vx-signin:hover { transform: translateY(-1px); box-shadow:0 12px 26px -8px rgba(0,0,0,.45); }
     .vx-icon-btn { width: 40px; height: 40px; border-radius: 999px; background: #fff; color:var(--blue); border:none; display:grid; place-items:center; cursor:pointer; flex-shrink:0; }
     /* zářez: vyvýšený střed s logem + konkávní rohy po stranách */
-    .vx-logo { font-family: var(--font-nav); font-weight: 900; font-size: 2.2rem; color: #fff; text-decoration: none; line-height: 1; }
+    .vx-logo { font-family: var(--font-nav); font-weight: 900; font-size: 2.2rem; color: #0020f6; text-decoration: none; line-height: 1; }
 
     /* ── HERO ── */
     .vx-hero { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; align-items: center; padding: clamp(96px, 13vh, 130px) 24px 0; text-align: center; }
     /* Typografie stejná jako hero na /pro-zamestnavatele a /hledam-si-praci (.eh-head h1) */
     /* .vx-heroimg-wrap má z-index 1, nadpis a tlačítka měly auto (0) → obrázek je překrýval */
     .vx-h1, .vx-sub-btns { position: relative; z-index: 2; }
-    .vx-h1 { font-family: var(--font-heading); font-weight: 800; letter-spacing: -.025em; line-height: 1.02; font-size: clamp(2.7rem, 7vw, 5.4rem); color: #fff; margin: 0; display: flex; flex-direction: column; align-items: center; text-shadow: 0 6px 30px rgba(0,10,80,.25); }
+    .vx-h1 { font-family: var(--font-heading); font-weight: 800; letter-spacing: -.025em; line-height: 1.02; font-size: clamp(2.7rem, 7vw, 5.4rem); color: #0a0d2e; margin: 0; display: flex; flex-direction: column; align-items: center; }
     .vx-line { display: block; overflow: hidden; padding-bottom: .3em; margin-bottom: -.3em; }
     .vx-line-in { display: inline-block; transform: translateY(120%); will-change: transform; }
     .vx-h1 .vx-glitch {
       font-family: inherit; font-weight: inherit; letter-spacing: inherit;
-      background: linear-gradient(100deg, #aab2ff 0%, #d8ddff 30%, #ffffff 50%, #d8ddff 70%, #aab2ff 100%);
-      background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent; color: transparent;
-      /* Safari: -webkit-background-clip:text ořezává dotažení písmen (j/y) — dolní rezerva to vyřeší, záporný margin drží layout */
-      display: inline-block; padding-bottom: .2em; margin-bottom: -.2em;
-      text-shadow: none; /* zděděný stín z .vx-h1 by prosvítal skrz průhledně vyplněné glyfy */
-      animation: heroGradSweep 6s linear 1.4s infinite;
+      color: var(--blue);   /* plná firemní modrá, žádný přejíždějící přechod */
+      text-shadow: none;
     }
     .vx-sub-btns { display: flex; gap: 12px; justify-content: center; margin-top: 26px; }
     .vx-btn { font-family: var(--font-heading); font-weight: 800; font-size: .92rem; letter-spacing:.01em; border-radius: 999px; padding: 14px 26px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: transform .18s, background .2s, box-shadow .25s; }
@@ -344,6 +336,12 @@
     .vx-btn-dark:hover { background: var(--blue); color: #fff; transform: translateY(-2px); box-shadow: 0 20px 40px -12px rgba(0,10,80,.6); }
     .vx-btn-light { background: rgba(255,255,255,.12); color: #fff; border: 1.5px solid rgba(255,255,255,.55); }
     .vx-btn-light:hover { background: rgba(255,255,255,.22); border-color: #fff; }
+    /* Na bílém heru: hlavní tlačítko inkoustové (jako na hlavní straně), vedlejší měkce šedé.
+       Jen v heru — v modrém závěru zůstává bílé tlačítko. */
+    .vx-hero .vx-btn-dark { background: #191919; color: #fff; box-shadow: 0 14px 30px -14px rgba(10,13,46,.35); }
+    .vx-hero .vx-btn-dark:hover { background: var(--blue); color: #fff; }
+    .vx-hero .vx-btn-light { background: #EEF0FA; color: var(--ink); border-color: transparent; }
+    .vx-hero .vx-btn-light:hover { background: #DFE3F7; border-color: transparent; }
 
     /* 3D portrét lidí — hlavní centerpiece */
     /* Zdrojová fotka měla po stranách ~55 % průhledné plochy — po ořezu odpovídá
@@ -442,7 +440,7 @@
     }
 
     /* ── DETAIL: marketplace vysvětlení ── */
-    .vx-intro { background: var(--vx-frame2); padding-bottom: 40px; }
+    .vx-intro { background: #fff; padding-bottom: 40px; }
     .vx-intro .vx-sec-head { max-width: 780px; margin-bottom: 0; }
     .vx-intro .vx-sec-head p { font-size: 1.16rem; }
     /* Dvě strany — bez karet: dva sloupce dělené linkou, kroky se šipkou */
@@ -466,7 +464,7 @@
     .vx-aud > .vx-aud-step:nth-child(3) { transition-delay: .16s; }
     .vx-aud > .vx-aud-step:nth-child(4) { transition-delay: .24s; }
     .vx-aud > .vx-aud-step:nth-child(5) { transition-delay: .32s; }
-    .vx-close { background: linear-gradient(150deg,#2a45ff,#0020f6 60%,#0018c8); text-align:center; }
+    .vx-close { background: var(--blue); text-align:center; }
     .vx-close .vx-sec-head { margin-bottom:0; }
     .vx-close .vx-kick { color:#aebcff; }
     .vx-close .vx-h2 { color:#fff; }
@@ -474,7 +472,7 @@
     .vx-close .vx-btn { margin-top: 30px; }
 
     /* ── GALERIE 3 KROKŮ (styl VEXO) ── */
-    .vx-gallery { background: #eceef3; }
+    .vx-gallery { background: var(--pl-canvas); }
     .vx-gallery .vx-wrap { width: 100%; max-width: none; }
     .vx-gal-panel { position:relative; background: transparent; border-radius:0; padding: 20px clamp(28px,6vw,90px) 10px; overflow:hidden; }
     .vx-gal-word { position:absolute; left:0; right:0; top:48%; transform:translateY(-50%); text-align:center; font-family:var(--font-heading); font-weight:900; text-transform:uppercase; font-size: clamp(4rem, 15vw, 14rem); letter-spacing:-.04em; color: rgba(14,17,22,.055); line-height:1; z-index:0; pointer-events:none; white-space:nowrap; }
@@ -601,10 +599,10 @@
   <main class="vx">
 
     <!-- ═══════════ RÁMOVANÉ HERO ═══════════ -->
-    <div class="vx-shell">
-      <div class="vx-frame">
 
-        <!-- NAV se zářezem -->
+    <!-- Navigace stojí MIMO .uvod: přilepené hero (position: sticky) je vlastní
+         vrstva a lišta uvnitř by při vyjetí listu zůstala pod ním. Je fixed,
+         takže na místě v DOMu nezáleží. -->
         <nav class="vx-nav">
           <div class="vx-nav-inner">
             <a href="/" class="vx-logo">Makej</a>
@@ -623,6 +621,11 @@
             </div>
           </div>
         </nav>
+    <div class="uvod">
+    <div class="vx-shell">
+      <div class="vx-frame">
+        <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
 
         <!-- HERO obsah -->
         <div class="vx-hero">
@@ -681,6 +684,7 @@
         </div>
       </div>
     </section>
+    </div><!-- /.uvod -->
 
     <!-- DVĚ STRANY — nabízíš / sháníš -->
     <section class="vx-sec vx-two">
@@ -796,7 +800,8 @@
           <h4>Právní</h4>
           <a href="/terms">Podmínky použití</a>
           <a href="/privacy">Ochrana soukromí</a>
-          <a href="/privacy#cookies">Cookies</a>
+          <a href="/zasady-cookies">Zásady cookies</a>
+          <a href="/zasady-cookies#nastaveni" data-cookie-nastaveni>Nastavení cookies</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -948,21 +953,9 @@
   </div>
 
   <!-- ═══════════ COOKIE BANNER ═══════════ -->
-  <div id="cookie-banner" role="dialog" aria-label="Souhlas s cookies" aria-live="polite">
-    <div class="cookie-inner">
-      <p class="cookie-text">
-        🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
-        Žádné reklamní trackery. Více informací v naší <a href="/privacy#cookies">Politice ochrany soukromí</a>.
-      </p>
-      <div class="cookie-actions">
-        <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
-        <button class="cookie-btn cookie-btn-accept" id="cookie-accept">Rozumím, souhlasím</button>
-      </div>
-    </div>
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=32"></script>
+  <script src="script.js?v=51"></script>
   <!-- Lazy-play ukázkového videa: stáhne a přehraje až ve viewportu (šetří data + LCP) -->
   <script>
   (function () {

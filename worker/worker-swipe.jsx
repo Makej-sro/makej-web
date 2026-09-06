@@ -36,7 +36,8 @@ function WSwipe({ tick }) {
 
   // Filtr krajů — ulož + přefiltruj feed
   useEffectW(() => {
-    try { localStorage.setItem('makej-worker-kraje', JSON.stringify(kraje)); } catch (e) {}
+    // Preferenční záznam — ukládá se jen se souhlasem s cookies (kategorie Preferenční, consent.js).
+    try { if (window.MakejConsent && MakejConsent.ma('preferences')) localStorage.setItem('makej-worker-kraje', JSON.stringify(kraje)); } catch (e) {}
     setJobs(_filterKraj(W_JOBS.map(jobToCard)));
     setTopIdx(0);
   }, [kraje]);

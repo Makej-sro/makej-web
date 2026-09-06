@@ -16,7 +16,8 @@ function WProfile({ tick, onSignOut }) {
   function toggleNotifs() {
     setNotifsOn(v => {
       const nv = !v;
-      try { localStorage.setItem('makej-notifs', nv ? 'on' : 'off'); } catch (e) {}
+      // Preferenční záznam — jen se souhlasem s cookies (consent.js).
+      try { if (window.MakejConsent && MakejConsent.ma('preferences')) localStorage.setItem('makej-notifs', nv ? 'on' : 'off'); } catch (e) {}
       return nv;
     });
   }

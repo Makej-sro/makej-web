@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-25X9CMKGRD"></script>
+  <!-- Souhlas s cookies (consent.js). Výchozí stav Google Consent Mode v2 = vše
+       odepřeno a MUSÍ být první skript v hlavičce. Google Analytics se načítá až
+       po souhlasu z consent.js — bez něj na Google neodejde jediný požadavek. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    // GDPR: výchozí souhlas odepřen (žádné analytické cookies), dokud uživatel nepřijme cookie lištu.
-    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500 });
-    try { if (localStorage.getItem('makej-cookie-consent') === 'accepted') gtag('consent', 'update', { analytics_storage: 'granted' }); } catch (e) {}
-    gtag('js', new Date());
-    gtag('config', 'G-25X9CMKGRD');
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
+    gtag('set', 'ads_data_redaction', true);
   </script>
+  <link rel="stylesheet" href="/consent.css?v=2" />
+  <script src="/consent.js?v=4" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Podpora a nápověda k aplikaci | Makej</title>
@@ -40,12 +40,13 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=99" />
+  <link rel="stylesheet" href="/style.css?v=125" />
   <style>
     /* ── Podpora sekce ── */
     .sup-page { padding: 0; }
-    .sup-white-zone { min-height: 100vh; padding: 100px 0 80px; box-sizing: border-box; }
+    .sup-white-zone { min-height: 100vh; padding: 100px 0 80px; box-sizing: border-box; position: relative; }
     .sup-hero {
+      position: relative; z-index: 1;
       text-align: center;
       max-width: 580px;
       margin: 0 auto 44px;
@@ -120,7 +121,7 @@
     .sup-hero h1 { color: #0020f6; }
     .sup-hero p { color: #4a5070; }
     .sup-search svg { color: #0020f6; }
-    .sup-search input { background: #f4f4fc; border-color: rgba(0,32,246,.2); color: #0d0d28; }
+    .sup-search input { background: var(--pl-canvas); border-color: rgba(0,32,246,.2); color: #0d0d28; }
     .sup-search input:focus { border-color: #0020f6; background: #fff; box-shadow: 0 0 0 3px rgba(0,32,246,.08); }
     .sup-search-ph { color: #6060a0; }
     .sup-search-ph .ph-cursor { background: #6060a0; }
@@ -155,7 +156,7 @@
     .faq-no-results { color: #6060a0; }
 
     /* FAQ split layout */
-    .faq-split-section { display:flex; gap:40px; max-width:960px; margin:88px auto 80px; padding:20px 24px; align-items:flex-start; background:#f4f4fc; border:1px solid rgba(0,32,246,.12); border-radius:20px; }
+    .faq-split-section { display:flex; gap:40px; max-width:960px; margin:88px auto 80px; padding:20px 24px; align-items:flex-start; background:var(--pl-canvas); border:1px solid rgba(0,32,246,.12); border-radius:20px; position:relative; z-index:1; }
     .faq-sidebar { flex:0 0 170px; display:flex; flex-direction:column; gap:14px; }
     .faq-sidebar-bubble { background:#0020f6; color:#fff; border-radius:100px; padding:10px 20px; font-weight:700; font-size:.88rem; text-align:center; margin-bottom:6px; }
     .faq-nav { display:block; width:100%; padding:10px 18px; border-radius:100px; border:1.5px solid rgba(0,32,246,.2); background:transparent; color:#0020f6; font-size:.88rem; font-weight:600; font-family:var(--font-body); text-align:center; cursor:pointer; transition:all .18s; box-sizing:border-box; }
@@ -556,6 +557,7 @@
     <div class="sup-page">
 
       <div class="sup-white-zone">
+      <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
       <!-- Hero -->
       <div class="sup-hero">
         <h1>Jak ti můžeme <span class="gradient-text">pomoci?</span></h1>
@@ -796,7 +798,8 @@
           <h4>Právní</h4>
           <a href="/terms">Podmínky použití</a>
           <a href="/privacy">Ochrana soukromí</a>
-          <a href="/privacy#cookies">Cookies</a>
+          <a href="/zasady-cookies">Zásady cookies</a>
+          <a href="/zasady-cookies#nastaveni" data-cookie-nastaveni>Nastavení cookies</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -948,21 +951,9 @@
   </div>
 
   <!-- ═══════════ COOKIE BANNER ═══════════ -->
-  <div id="cookie-banner" role="dialog" aria-label="Souhlas s cookies" aria-live="polite">
-    <div class="cookie-inner">
-      <p class="cookie-text">
-        🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
-        Žádné reklamní trackery. Více informací v naší <a href="/privacy#cookies">Politice ochrany soukromí</a>.
-      </p>
-      <div class="cookie-actions">
-        <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
-        <button class="cookie-btn cookie-btn-accept" id="cookie-accept">Rozumím, souhlasím</button>
-      </div>
-    </div>
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=32"></script>
+  <script src="/script.js?v=51"></script>
 
   <!-- ── Podpora: FAQ + typewriter ── -->
   <script>

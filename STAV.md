@@ -16,7 +16,7 @@
 
 JSX soubory ve `employer/` nemají build — validují se ručně parserem:
 ```bash
-node -e 'const p=require("/Users/samuelpseja/cursor/makej/node_modules/@babel/parser");
+node -e 'const p=require("/Users/samuelpseja/Makej-projekt/makej-interni-rozhrani/node_modules/@babel/parser");
 const fs=require("fs"); p.parse(fs.readFileSync("employer/employer-main.jsx","utf8"),
 {sourceType:"script",plugins:["jsx"]}); console.log("OK")'
 ```
@@ -32,6 +32,72 @@ Po změně JSX **vždy bumpni `?v=N`** u daného souboru v `employer/index.html`
 ---
 
 ## Hotovo naposledy
+
+- **Opakovaný e-mail na čekacím listu se přizná** (2026-09-06, migrace `join_launch_list_vraci_zda_pribylo`): ochrana proti duplicitám v DB byla od začátku (unikátní index na `lower(email)` + `on conflict do nothing`), jen o ní návštěvník nevěděl. Funkce vracela `void` → přepsána na `boolean` (`get diagnostics row_count`); návratový typ nejde měnit za běhu, takže `drop` + `create` a znovu `grant` pro `anon`. Formulář teď větví na **„Děkujeme za zaslání."** / **„Na seznamu už jsi."** — stejný psací stroj, stejná typografie. **Vedlejšek:** zvenčí jde nově zjistit, jestli je konkrétní adresa na seznamu; u čekacího listu vědomě přijato.
+
+- **Lišta cookies od Yasina (2 poslední commity + jejich základ)** (2026-09-06): Yasinovy poslední commity `e930359` a `221c881` jen ladí text a rozvržení lišty cookies — ta sama ale přišla o commit dřív (`84127ad`) a v tomhle repu **vůbec nebyla**, takže se převzal celý systém v cílové podobě.
+
+  **Nové soubory:** `consent.js` + `consent.css` (lišta, panel kategorií, Consent Mode v2), stránka `zasady-cookies.html` s tabulkou z inventáře, `supabase/migration_consent_log.sql`.
+
+  **Na každé stránce:** starý `<script async gtag.js>` v hlavičce nahrazen blokem Consent Mode v2 (vše `denied`, `ads_data_redaction`) + `consent.css?v=2` / `consent.js?v=4` — **musí to zůstat první skript v hlavičce**, jinak Google odejde požadavek dřív než souhlas. Google Analytics se načítá až z `consent.js` po souhlasu. V patičce „Cookies" → „Zásady cookies" + „Nastavení cookies" (`data-cookie-nastaveni`).
+
+  **Stará domácí lišta smazána** — `#cookie-banner` v HTML, její blok ve `style.css` a IIFE ve `script.js`. Bez toho by běžely dvě lišty vedle sebe.
+
+  **Appka:** `worker/` ukládá preferenční klíče (`makej-notifs`, `makej-worker-kraje`) jen když `MakejConsent.ma('preferences')`; mapa Google v dashboardu (`employer-pages3.jsx`) se načte až po kliknutí — vložený iframe posílá IP na Google. Bumpy `style.css?v=125`, `script.js?v=51`, `employer-pages3.jsx?v=40` (převzato od Yasina, čísla teď sedí v obou repech).
+
+  **Databáze:** migrace `consent_log` + RPC `log_consent` **už v Supabase byla** — Yasin ji pustil na stejný projekt `cxegfwfbgcgpwerfbvra`, sůl v `private.consent_salt` je vložená. Nespouštět znovu.
+
+  **Doplněno vzápětí — i zbytek `84127ad` (redesign pozadí a hera).** Jedno plátno `--pl-canvas` pro šedé sekce, bílé hero s aurorou místo modrého přechodu, přilepené hero, které se při scrollu rozmaže, plná firemní modrá ve zvýrazněných slovech místo přejíždějícího přechodu. Soubory bez vlastní práce (`style.css`, `lide.html`, `o-nas.html`, `podpora.html`, `hledam-si-praci.html`, `pro-zamestnavatele.html`) převzaty celé — Yasin má tvoji dřívější práci v sobě přes commit `eae914d`. `index.html` a `script.js` ručně: bílé plátno + `.aurora` do hera, `popredi()` nahrazen Yasinovou verzí, která měří `--uvod-presah` (hero vyšší než okno se přilepí, až je celé vidět).
+
+  **Co zůstává jinak než u Yasina — schválně:** univerzální předregistrace (`index.html`, `script.js`) bez přepínače fyzická / právnická a bez pole IČO, plus employer onboarding (`employer-onboarding.jsx`). Yasin má starší dvoucestnou verzi. Jinak je repo s jeho HEAD shodné.
+
+  **Nepřevzaté zbytky mimo commit:** `motion.css` + `motion.js` (mrtvé soubory, nikdo je nenačítá) a `supabase/migration_launch_pocet.sql` (počítadlo přihlášených, zatím nechceme).
+
+- **Nerozhodnutý = `role IS NULL` (oprava vlastního návrhu) + univerzální jméno** (2026-09-06, migrace `profiles_role_nullable`): dvě chyby z předchozího kroku.
+
+  **(1) Zástupná role.** Předchozí návrh ukládal nerozhodnutým `role = 'worker'` a pravdu držel v příznaku `role_chosen`. V databázi to vypadalo, že člověk JE brigádník — a hlavně: **tři RLS politiky větví na `profiles.role`** (`jobs` chce `employer`, `matches` a `rejections` chtějí `worker`), takže nerozhodnutý reálně dostal oprávnění brigádníka. Nebyla to kosmetika. Zdůvodnění, proč nejít přes NULL, bylo mylné — počítal jsem s třetí *textovou* hodnotou, jenže `CHECK (role = ANY(...))` na NULL **projde** (selhává jen na FALSE) a RLS podmínky `role = 'worker'` jsou při NULL NULL, tedy nepustí. Ověřeno dotazem. Proto: `role` je nově **nullable, bez defaultu**, `role_chosen` zrušen (pravda na dvou místech), trigger zapisuje `v_role` (NULL, když metadata roli nenesou). Stávající předregistrovaný účet přepsán na NULL.
+
+  **(2) Jméno.** Při sjednocování formuláře jsem tam nechal validaci fyzické osoby (min. 3 znaky **a mezera**), takže firmu jako „Lidl" nešlo zadat — přesně to uživatel narazil. Uvolněno na min. 2 znaky bez požadavku na mezeru, popisek pole je teď „Jméno a příjmení nebo název firmy".
+
+  **Ověřeno:** předregistrace se jménem „Lidl" projde a v `profiles` vznikne `role: null`; přepínač typu ani pole IČO ve formuláři nejsou; rozcestník po přihlášení zapisuje roli do metadat i do `profiles`. Testovací účty smazány.
+
+- **Univerzální předregistrace + rozcestník rolí na webu** (2026-09-06, migrace `profiles_role_chosen`): předregistrace se už neptá, jestli je člověk fyzická nebo právnická osoba — je jedna pro všechny (**e-mail, jméno a příjmení, heslo**). Z formuláře vypadl přepínač typu i pole IČO, z JS `typUctu()`, `icoOk()` a obsluha přepínače. Signup **schválně neposílá `role`** — chybějící role v `user_metadata` je pak signál „ještě si nevybral", takže se kvůli tomu nemusí sahat do databáze.
+
+  **DB:** `role` je `NOT NULL` s `CHECK` jen na `worker`/`employer`, takže třetí stav do ní uložit nejde. Drží ho nový příznak `profiles.role_chosen boolean default false`; rozšiřovat CHECK by znamenalo ošetřit třetí stav všude, kde se na roli větví. Stávajících 15 profilů dostalo `role_chosen = true`, ať je rozcestník neobtěžuje. Trigger `handle_new_user` příznak odvozuje od toho, jestli metadata roli opravdu nesla.
+
+  **Web:** po přihlášení bez role se ukáže rozcestník („Hledám práci" / „Nabízím práci"). Postavený **v JS, ne v markupu** — přihlásit se dá z 11 stránek a držet stejný blok ve všech je past; třídy `.modal`/`.role-card` jsou ve `style.css` globální, takže vypadá jako rozcestník v registraci. Po volbě se zapíše `role` do **metadat i do `profiles`** (+ `role_chosen = true`) a teprve pak přesměruje. Bump `script.js?v=36`.
+
+  **Ověřeno naostro:** předregistrace → `role_chosen: false`, metadata bez role; po přihlášení rozcestník naskočí; po kliknutí na „Nabízím práci" → `profiles.role = employer`, `role_chosen = true`, `metadata.role = employer`. Testovací účty smazány.
+
+  **ZBÝVÁ DODĚLAT V APPCE** (dohodnuto, že web teď a appka pak) — viz sekce níž.
+
+- **Doplněn chybějící efekt hera z Yasinovy verze** (2026-09-06): při přenosu čekacího listu jsem převzal sekci, ale **ne obal `<div class="uvod">` ani blok `popredi()`** — bez nich hero jen leželo nad čekacím listem místo toho, aby se přilepilo, rozmazalo a nechalo kartu vyjet do popředí. CSS už přitom bylo na místě (`style.css` byl s Yasinovým bajt po bajtu identický), takže se nemělo čeho chytit. Doplněno: obal kolem hera + čekacího listu v `index.html` (končí **před** sekcí recenzí, jinak by přilepení pokračovalo i pod ní) a IIFE `popredi()` ve `script.js`, které drží postup scrollu v CSS proměnné `--p` (0..1) a nad prahem 0,55 přidá `data-vzadu`, čímž vypne odkazy v rozmazaném heru. Bump `script.js?v=35`.
+
+  **Rozdíl vůči Yasinovi je teď jen jeden a záměrný:** naše `script.js` má navíc obsluhu `ICO_OBSAZENE` (hláška u pole IČO). Ověřeno strukturálně — `#hero` i `#brzy` uvnitř obalu, `#makaci` mimo, `--p` se inicializuje, hero má `position: sticky`, 0 JS chyb. **Samotný scrollovací efekt jsem neviděl** — v headless režimu scroll neúčinkuje (ověřeno dnes opakovaně), takže je potřeba ho proklikat v prohlížeči.
+
+- **Brána pro zaměstnavatele + oprava sloupce IČO** (2026-09-06): nový `employer/employer-onboarding.jsx` — `eOnboardingNeeded(p)` + komponenta `EOnboarding`. Protějšek brigádnického `wOnboardingNeeded`: firma z čekacího listu má jen název a IČO, takže dokud nedoplní **sídlo a obor**, nepustí ji to do dashboardu. Zapojeno jako předčasný návrat v `employer-main.jsx` **před obalem se sidebarem**, aby se nedalo proklikat jinam. Název a IČO se předvyplní z předregistrace, IČO je nepovinné. Skript přidán do `employer/index.html`, bump `employer-main?v=36`, `employer-onboarding?v=1`.
+
+  **Ověřeno:** JSX prošlo parserem; 9 případů logiky brány (načítání, brigádník, chybějící sídlo / obor / název, samé mezery, vše doplněno, IČO nepovinné) sedí; komponenta se vykreslí a validace i uložení fungují (prázdné sídlo → hláška a nic se neuloží; při vyplnění odejde `{company_name, address, industry, ic}` a zavolá se `onDone`).
+
+  **OPRAVA vlastní chyby z předchozí migrace** (`profiles_ico_oprava_na_ic`): migrace `profiles_ico` přidala sloupec `ico`, jenže tabulka **už sloupec `ic` měla** — čte ho `SettingsProfile` v dashboardu i profil firmy v appce. Vznikla duplicita a IČO z předregistrace by padalo do sloupce, který nikdo nečte — přesně ten problém, co se měl řešit. Příčina: kontroloval jsem existenci sloupce dotazem `column_name in (...)` na konkrétní názvy místo výpisu všech, takže `ic` mi uniklo. Oba sloupce byly prázdné, takže se nic nemigrovalo: `ico` i jeho index zrušeny, unikátní částečný index je teď na `ic`, trigger `handle_new_user` zapisuje do `ic`. **Pozor na nesoulad názvů, je záměrný:** metadata z formuláře nesou klíč `ico`, sloupec se jmenuje `ic`, most dělá trigger. Cestou sjednoceny 2 profily, které měly v `ic` prázdný řetězec, na NULL (jinak by si v unikátním indexu kolidovaly). Přetestováno přes reálný signup: firma s IČO → 200 a hodnota v `ic`; duplicitní IČO → 500 `ICO_OBSAZENE`; dva brigádníci bez IČO → oba 200.
+
+  **Pozn.:** cesta k Babel parseru výš v tomhle souboru byla zastaralá (`cursor/makej` už neexistuje) — opravena na `Makej-projekt/makej-interni-rozhrani/node_modules/@babel/parser`.
+
+- **IČO ve `profiles` + jedno IČO = jeden účet** (2026-09-06, migrace `profiles_ico`): IČO se z předregistrace dosud ukládalo jen do `auth.users.raw_user_meta_data`, kam se běžně nesahá — dashboard ani appka se k němu normální cestou nedostaly. Přidán sloupec `profiles.ico`, **částečný unikátní index** `profiles_ico_key on (ico) where ico is not null` (NULL u brigádníků se neindexují a nekolidují) a trigger `handle_new_user` rozšířen o `ico`. Trigger navíc duplicitu kontroluje explicitně a hlásí `ICO_OBSAZENE` (`errcode 23505`) — samotný index by vrátil jen syrovou chybu; index ale zůstává, protože jen on ochrání před souběhem dvou registrací naráz. Ve `script.js` je ta chyba odchycená a ukáže se **u pole IČO, ne u hesla**.
+
+  **Ověřeno přes reálný `/auth/v1/signup`:** firma s IČO → 200 a `ico` v `profiles`; jiná firma se stejným IČO → 500 `{"code":"23505","message":"ICO_OBSAZENE"}`; brigádník bez IČO → 200; druhý brigádník bez IČO → 200 (NULL nekolidují). V prohlížeči hláška „Na tohle IČO už účet existuje." sedí u IČO a krok 3 nenaběhne. Běžná registrace přes modál `ico` neposílá, takže se jí to nedotklo. Testovací data smazána.
+
+  **Pozn.:** rozlišení brigádník/zaměstnavatel **nerozhoduje podle vyplněného IČO**, ale podle přepínače fyzická/právnická osoba; IČO je pak u právnické povinné. `role` se přes trigger propisuje do `profiles.role`, takže appka i dashboard ji čtou běžnou cestou.
+
+- **Čekací list ve třech krocích (přeneseno od Yasina)** (2026-09-06): z `Makej-sro/Yasin` (commity „tři kroky + vyjetí do popředí přes rozmazané hero" a „psací stroj, odměna za účet, fyzická / právnická osoba") přenesena celá sekce `#brzy` — markup (17 → 129 ř.), CSS (68 → 304 ř.) i JS (bloky `avatary` + `cekaciList`, 40 → 389 ř.). Yasinova verze staví na mém pushi `6ea6138`, takže se to napojilo bez konfliktů.
+
+  **Tok:** 1) e-mail → RPC `join_launch_list` do `launch_emails` (beze změny). 2) rozbalovací nabídka účtu s přepínačem **fyzická / právnická osoba** — fyzická vyplní jméno a příjmení, právnická název firmy a **IČO včetně kontroly kontrolní číslice** (modulo 11, ne jen „osm číslic"); k tomu heslo dvakrát. 3) potvrzení s odznakem „Zakládající člen". Navíc psací stroj v nadpisech, panáčci, „Zapsat jiný e-mail" pro překlep a paměť v `localStorage`.
+
+  **Rozhodnutí (uživatel):** předregistrace **nejde do vlastní tabulky**, ale zakládá **skutečný Supabase účet** přes `/auth/v1/signup` (záměrně přes `fetch`, ne přes JS klienta — ten by založil session a `onAuthStateChange` by návštěvníka hodil do nedodělaného dashboardu). Role a IČO jdou do `user_metadata` (`role: worker|employer`, `zdroj: 'cekaci-list'`). Důvod: vlastní tabulka by znamenala držet si heslo, což nechceme; takhle ho řeší Supabase a zbytek údajů si člověk doplní až v appce, kterou stejně hlídá onboarding gate.
+
+  **Ověřeno naostro:** e-mail dorazil do `launch_emails`, účet vznikl v `auth.users` i s profilem přes trigger, metadata sedí (`role: worker`, `zdroj: cekaci-list`), krok 3 naběhl, nula JS chyb. Testovací data smazána (zůstaly dva reálné zápisy). Sjednoceny verze `?v=` na všech 11 stránkách (`script.js?v=34`, `style.css?v=100`) — byly rozejité (32 vs 33).
+
+  **Pozn.:** počítadlo zapsaných lidí se schová, dokud v DB nebude funkce `launch_list_pocet` — Yasin ji záměrně nedělal natvrdo. Stará tabulka `public.waitlist` je teď definitivně mrtvá, nic ji nepoužívá.
 
 - **Zrušen čekací list, místo něj sběr e-mailů** (2026-09-04): **Odstraněno úplně** — overlay `#wl-overlay` z `index.html` (−116 ř.), plovoucí tlačítko „Startujeme" z `index.html` i `o-nas.html` (+ 2 jeho pravidla v úvodní animaci na o-nas), blok `wl-*` ve `script.js` (−369 ř.) a `wl-*` CSS ve `style.css` (−651 ř.). Před mazáním ověřeno, že žádná z 57 tříd ani 13 `@keyframes` v tom bloku se jinde nepoužívá. **Registrační CTA:** `goWaitlist()` zrušen; CTA nejdřív vedla na `openModal('register', role)`, ale nakonec (na přání) vedou **na sběr e-mailů** — helper `goToEmailSignup()`: na homepage zavře modály, doscrolluje na `#brzy` a zaostří pole, odjinud přesměruje na `/#brzy`. Napojena všechna: `.worker-cta-register`, `.employer-cta-register`, `#hero-register-btn`, navbar i mobilní menu, a taky odkaz „Registrovat se" v přihlašovacím modálu. Registrační modál zůstal v kódu, jen na něj nevede žádné CTA — modál to už uměl (předvybraná role přeskočí rozcestník a skryje „Zpět"). Ověřeno, že seznam stránek s CTA a se `#register-modal` je **identický**, takže nikde nechybí; dřív se z podstránek přesměrovávalo na `/?wl`, teď se modál otevře na místě (otestováno na `/lide`).
 
@@ -99,3 +165,24 @@ Po změně JSX **vždy bumpni `?v=N`** u daného souboru v `employer/index.html`
 - `storageKey: 'makej-auth'` musí být stejný ve všech Supabase klientech (sdílená session web ↔ app).
 - Supabase anon/publishable key je veřejný — bezpečný ve frontend kódu.
 - Commit message končí: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`.
+
+---
+
+## TODO: rozcestník rolí v brigádnické appce
+
+Web už to umí; appka zatím ne. Předregistrovaný, který si stáhne appku dřív než navštíví web, v ní teď skončí v brigádnickém režimu bez ohledu na to, čím chce být.
+
+Co je potřeba (vše v `makej-aplikace/www/`):
+
+1. **`worker-supabase.jsx`** — do `fetchWorkerData` přitáhnout z `profiles` i sloupec `role` (dnes se nenačítá). Nerozhodnutý má `role = NULL`.
+2. **`worker-main.jsx`** — před stávající onboarding gate (`wOnboardingNeeded`, ~ř. 414) vložit dřívější kontrolu:
+   - `role == null` → ukázat rozcestník (stejné dvě volby jako na webu).
+   - `role === 'employer'` → appka pro něj nic nemá; ukázat obrazovku „pokračujte na webu" s odkazem na `/employer/`. Platí i pro firmy, které si appku stáhnou omylem.
+3. **Nová obrazovka rozcestníku** (např. `worker-role-pick.jsx`) — po volbě zapsat **na obě místa**, jinak se rozejde web s appkou:
+   - `sb.auth.updateUser({ data: { role } })` (podle metadat se řídí přesměrování na webu)
+   - `profiles`: `role`
+4. Po volbě „hledám práci" pokračovat rovnou do stávajícího onboardingu brigádníka.
+5. Bumpnout `?v=` u změněných souborů v `www/index.html` (jinak se načte stará verze z cache).
+
+Pozn.: `profiles.role` je nově **nullable** — „nezvoleno" = `NULL`. Nikdy tam nedávej zástupnou hodnotu: na `role` větví tři RLS politiky, takže by nerozhodnutý dostal cizí oprávnění.
+

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-25X9CMKGRD"></script>
+  <!-- Souhlas s cookies (consent.js). Výchozí stav Google Consent Mode v2 = vše
+       odepřeno a MUSÍ být první skript v hlavičce. Google Analytics se načítá až
+       po souhlasu z consent.js — bez něj na Google neodejde jediný požadavek. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    // GDPR: výchozí souhlas odepřen (žádné analytické cookies), dokud uživatel nepřijme cookie lištu.
-    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500 });
-    try { if (localStorage.getItem('makej-cookie-consent') === 'accepted') gtag('consent', 'update', { analytics_storage: 'granted' }); } catch (e) {}
-    gtag('js', new Date());
-    gtag('config', 'G-25X9CMKGRD');
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
+    gtag('set', 'ads_data_redaction', true);
   </script>
+  <link rel="stylesheet" href="/consent.css?v=2" />
+  <script src="/consent.js?v=4" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ceník inzerce brigád pro firmy | Makej</title>
@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=99" />
+  <link rel="stylesheet" href="/style.css?v=125" />
   <style>
     .cn-page { padding: 80px 0 100px; }
 
@@ -501,7 +501,8 @@
           <h4>Právní</h4>
           <a href="/terms">Podmínky použití</a>
           <a href="/privacy">Ochrana soukromí</a>
-          <a href="/privacy#cookies">Cookies</a>
+          <a href="/zasady-cookies">Zásady cookies</a>
+          <a href="/zasady-cookies#nastaveni" data-cookie-nastaveni>Nastavení cookies</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -632,6 +633,6 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=32"></script>
+  <script src="/script.js?v=51"></script>
 </body>
 </html>

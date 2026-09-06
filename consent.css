@@ -1,0 +1,148 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Makej — lišta a nastavení cookies (k consent.js)
+   Načítá ho každá stránka z hlavičky. Tokeny webu: modrá #0020F6, plocha
+   #f7f8fc, text #14162b, sekundární #5B6488. Bez závislosti na style.css,
+   protože /privacy, /terms a /zasady-cookies ho nenačítají.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.mk-ck,
+.mk-pf {
+  --mk-blue: #0020F6;
+  --mk-blue-dk: #0014A3;
+  --mk-tint: #e9edff;
+  --mk-ink: #14162b;
+  --mk-mut: #5B6488;
+  --mk-line: #edf0f7;
+  --mk-surf: #f7f8fc;
+  font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  text-align: left;
+}
+.mk-ck *, .mk-pf * { box-sizing: border-box; }
+
+/* Rezerva pod obsahem, aby lišta nepřekryla formuláře u spodní hrany.
+   Nastavuje ji consent.js podle skutečné výšky lišty. */
+body { padding-bottom: var(--mk-ck-h, 0); }
+
+/* ── První vrstva ──────────────────────────────────────────────────────── */
+.mk-ck {
+  position: fixed; left: 18px; right: 18px; bottom: 18px;
+  z-index: 2147483000;
+  max-width: 760px; margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--mk-line); border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,32,246,.06), 0 24px 60px -30px rgba(20,22,43,.35);
+  animation: mk-ck-up .34s cubic-bezier(.24,1,.32,1) both;
+}
+.mk-ck__body { padding: 18px 20px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.mk-ck__t { flex: 1 1 300px; min-width: 0; margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--mk-mut); }
+.mk-ck__t a { color: var(--mk-blue); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; border: 0; }
+.mk-ck__t a:hover { color: var(--mk-blue-dk); }
+.mk-ck__row { display: flex; gap: 8px; flex: none; }
+
+/* Odmítnout i Přijmout: stejná velikost, stejná váha, srovnatelný kontrast.
+   Odmítnutí NESMÍ být šedý text vedle barevného tlačítka. */
+.mk-ck__btn {
+  font-family: inherit; font-size: 14px; font-weight: 700; line-height: 1;
+  border-radius: 999px; padding: 13px 20px; cursor: pointer;
+  transition: background .18s, border-color .18s, color .18s;
+}
+.mk-ck__btn--reject { color: var(--mk-ink); background: #fff; border: 1.5px solid var(--mk-ink); }   /* 15,3 : 1 */
+.mk-ck__btn--reject:hover { background: var(--mk-surf); }
+.mk-ck__btn--accept { color: #fff; background: var(--mk-blue); border: 1.5px solid var(--mk-blue); } /* 8,1 : 1 */
+.mk-ck__btn--accept:hover { background: var(--mk-blue-dk); border-color: var(--mk-blue-dk); }
+
+.mk-ck__more, .mk-ck__link {
+  font-family: inherit; font-size: 13.5px; font-weight: 600; color: var(--mk-mut);
+  background: none; border: 0; padding: 0; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px; transition: color .18s;
+}
+.mk-ck__more:hover, .mk-ck__link:hover { color: var(--mk-ink); }
+/* Podrobné nastavení stojí ve větě hned za odkazem na zásady, stejná velikost jako text */
+.mk-ck__t .mk-ck__more { font-size: inherit; line-height: inherit; vertical-align: baseline; }
+.mk-ck :focus-visible, .mk-pf :focus-visible { outline: 2.5px solid var(--mk-blue); outline-offset: 2px; }
+
+@keyframes mk-ck-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ── Druhá vrstva ──────────────────────────────────────────────────────── */
+.mk-pf { position: fixed; inset: 0; z-index: 2147483001; display: flex; align-items: flex-end; justify-content: center; padding: 18px; }
+.mk-pf__scrim { position: absolute; inset: 0; background: rgba(20,22,43,.4); animation: mk-fade .2s ease both; }
+.mk-pf__box {
+  position: relative; width: 100%; max-width: 620px; max-height: min(84vh, 760px);
+  background: #fff; border: 1px solid var(--mk-line); border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0,32,246,.06);
+  display: flex; flex-direction: column; overflow: hidden;
+  animation: mk-ck-up .32s cubic-bezier(.24,1,.32,1) both;
+}
+.mk-pf__hd { flex: none; display: flex; align-items: flex-start; gap: 14px; padding: 22px 22px 16px; border-bottom: 1px solid var(--mk-line); }
+.mk-pf__title { margin: 0 0 5px; font-family: inherit; font-size: 20px; font-weight: 800; letter-spacing: -.025em; color: var(--mk-ink); }
+.mk-pf__sub { margin: 0; font-size: 13px; line-height: 1.55; color: var(--mk-mut); }
+.mk-pf__x { flex: none; width: 32px; height: 32px; border: 0; border-radius: 11px; background: var(--mk-surf); color: var(--mk-mut); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.mk-pf__list { flex: 1; min-height: 0; overflow-y: auto; padding: 6px 22px; }
+
+.mk-cat { padding: 16px 0; }
+.mk-cat + .mk-cat { border-top: 1px solid var(--mk-line); }
+.mk-cat__hd { display: flex; align-items: flex-start; gap: 16px; }
+.mk-cat__t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.mk-cat__name { font-size: 15px; font-weight: 700; color: var(--mk-ink); }
+.mk-cat__desc { font-size: 12.5px; line-height: 1.55; color: var(--mk-mut); }
+.mk-cat__lock { flex: none; font-size: 11.5px; font-weight: 700; color: var(--mk-blue); background: var(--mk-tint); border-radius: 999px; padding: 7px 12px; }
+.mk-cat__more { margin-top: 11px; font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--mk-mut); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.mk-cat__items { margin: 12px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.mk-cat__items[hidden] { display: none; }
+.mk-item { background: var(--mk-surf); border-radius: 12px; padding: 11px 13px; display: flex; flex-direction: column; gap: 3px; }
+.mk-item__n { font-size: 12.5px; font-weight: 700; color: var(--mk-ink); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.mk-item__p { font-size: 12.5px; line-height: 1.5; color: var(--mk-mut); }
+.mk-item__m { font-size: 11.5px; color: var(--mk-mut); }
+
+/* Přepínač: 44 px šířky je minimum pro prst */
+.mk-sw { flex: none; width: 46px; height: 27px; border: 0; border-radius: 999px; background: #d7dcea; position: relative; cursor: pointer; padding: 0; transition: background .2s; }
+.mk-sw--on { background: var(--mk-blue); }
+.mk-sw__k { position: absolute; top: 3px; left: 3px; width: 21px; height: 21px; border-radius: 999px; background: #fff; transition: transform .2s cubic-bezier(.4,0,.2,1); }
+.mk-sw--on .mk-sw__k { transform: translateX(19px); }
+
+.mk-pf__ft { flex: none; border-top: 1px solid var(--mk-line); padding: 16px 22px 20px; display: flex; flex-direction: column; gap: 10px; }
+.mk-pf__row { display: flex; gap: 8px; }
+.mk-pf__row .mk-ck__btn { flex: 1; }
+.mk-pf__save { font-family: inherit; font-size: 14px; font-weight: 700; color: var(--mk-blue); background: var(--mk-tint); border: 0; border-radius: 999px; padding: 13px 20px; cursor: pointer; transition: background .18s; }
+.mk-pf__save:hover { background: #dee4ff; }
+.mk-pf__fine { margin: 2px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--mk-mut); text-align: center; }
+.mk-pf__fine a { color: var(--mk-blue); font-weight: 600; border: 0; }
+
+@keyframes mk-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── Tabulka na /zasady-cookies (generuje consent.js) ──────────────────── */
+.mk-tab { width: 100%; table-layout: fixed; border-collapse: collapse; margin: 20px 0 28px; font-size: .84rem; line-height: 1.45; }
+.mk-tab th { text-align: left; padding: 10px 10px; background: rgba(0,32,246,.07); color: #0a0d2e; font-weight: 700; border-bottom: 1px solid rgba(10,13,46,.1); }
+.mk-tab td { padding: 10px 10px; border-bottom: 1px solid rgba(10,13,46,.1); color: #3a4260; vertical-align: top; }
+.mk-tab tr:last-child td { border-bottom: none; }
+/* šířky sloupců: účel dostane nejvíc, „localStorage" a „Analytické" se musí vejít na řádek */
+.mk-tab col:nth-child(1) { width: 19%; }
+.mk-tab col:nth-child(2) { width: 12%; }
+.mk-tab col:nth-child(3) { width: 13%; }
+.mk-tab col:nth-child(4) { width: 30%; }
+.mk-tab col:nth-child(5) { width: 11%; }
+.mk-tab col:nth-child(6) { width: 15%; }
+.mk-tab code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86em; color: #0a0d2e; overflow-wrap: anywhere; }
+.mk-tab-obal { overflow-x: auto; }
+@media (max-width: 640px) {
+  /* na mobilu se šest sloupců nevejde — tabulka se posouvá do strany */
+  .mk-tab { table-layout: auto; min-width: 640px; font-size: .8rem; }
+  .mk-tab th, .mk-tab td { padding: 8px 8px; }
+}
+
+/* ── Mobil ─────────────────────────────────────────────────────────────── */
+@media (max-width: 620px) {
+  .mk-ck { left: 12px; right: 12px; bottom: 12px; }
+  .mk-ck__body { flex-direction: column; align-items: stretch; gap: 14px; padding: 16px 17px; }
+  .mk-ck__t { flex: none; }     /* ve sloupci by flex-basis 300px udělal 300 px vysoký odstavec */
+  .mk-ck__row { flex-direction: column; }
+  .mk-ck__btn { width: 100%; padding: 15px 20px; }
+  .mk-pf { padding: 0; }
+  .mk-pf__box { max-width: none; max-height: 92vh; border-radius: 24px 24px 0 0; border-bottom: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-ck, .mk-pf__box, .mk-pf__scrim, .mk-sw__k { animation: none !important; transition: none !important; }
+}

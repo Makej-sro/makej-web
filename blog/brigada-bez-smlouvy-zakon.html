@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-25X9CMKGRD"></script>
+  <!-- Souhlas s cookies (consent.js). Výchozí stav Google Consent Mode v2 = vše
+       odepřeno a MUSÍ být první skript v hlavičce. Google Analytics se načítá až
+       po souhlasu z consent.js — bez něj na Google neodejde jediný požadavek. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    // GDPR: výchozí souhlas odepřen (žádné analytické cookies), dokud uživatel nepřijme cookie lištu.
-    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500 });
-    try { if (localStorage.getItem('makej-cookie-consent') === 'accepted') gtag('consent', 'update', { analytics_storage: 'granted' }); } catch (e) {}
-    gtag('js', new Date());
-    gtag('config', 'G-25X9CMKGRD');
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
+    gtag('set', 'ads_data_redaction', true);
   </script>
+  <link rel="stylesheet" href="/consent.css?v=2" />
+  <script src="/consent.js?v=4" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Brigáda bez smlouvy: co na to zákon a na co si dát pozor | Makej</title>
@@ -43,7 +43,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=99" />
+  <link rel="stylesheet" href="/style.css?v=125" />
   <style>
     /* ═══════════ ČLÁNEK — světlá stránka ═══════════ */
     body { background: #ffffff; }
@@ -222,7 +222,8 @@
           <h4>Právní</h4>
           <a href="/terms">Podmínky použití</a>
           <a href="/privacy">Ochrana soukromí</a>
-          <a href="/privacy#cookies">Cookies</a>
+          <a href="/zasady-cookies">Zásady cookies</a>
+          <a href="/zasady-cookies#nastaveni" data-cookie-nastaveni>Nastavení cookies</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -374,18 +375,6 @@
   </div>
 
   <!-- ═══════════ COOKIE BANNER ═══════════ -->
-  <div id="cookie-banner" role="dialog" aria-label="Souhlas s cookies" aria-live="polite">
-    <div class="cookie-inner">
-      <p class="cookie-text">
-        🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
-        Žádné reklamní trackery. Více informací v naší <a href="/privacy#cookies">Politice ochrany soukromí</a>.
-      </p>
-      <div class="cookie-actions">
-        <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
-        <button class="cookie-btn cookie-btn-accept" id="cookie-accept">Rozumím, souhlasím</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Postupné odkrývání karet -->
   <script>
@@ -403,6 +392,6 @@
     })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=32"></script>
+  <script src="/script.js?v=51"></script>
 </body>
 </html>

@@ -800,6 +800,7 @@ function SettingsProfile() {
   const [form, setForm]     = useStateE(initForm);
   const [saving, setSaving] = useStateE(false);
   const [toast, setToast]   = useStateE(null);
+  const [mapaZobrazena, setMapaZobrazena] = useStateE(false);   // mapa Google až po kliknutí
 
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
   const setSocial = k => e => setForm(f => ({ ...f, socials: { ...f.socials, [k]: e.target.value } }));
@@ -889,7 +890,15 @@ function SettingsProfile() {
               <Icon name="map-point-bold" size={13} color="#8AB4FF" /> Zobrazit na mapě
             </a>
           )}
-          {mapEmbed && (
+          {/* Vložená mapa Google posílá IP na Google a Google si přes ni ukládá vlastní
+              cookies — bez výslovné akce uživatele to nesmí (viz /zasady-cookies).
+              Proto se načte až po kliknutí. */}
+          {mapEmbed && !mapaZobrazena && (
+            <button type="button" onClick={() => setMapaZobrazena(true)} style={{ marginTop: 8, width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px dashed ' + T.border, background: 'transparent', color: T.cardMuted, fontFamily: T.fontUI, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+              Zobrazit náhled mapy (načte se z Google Maps)
+            </button>
+          )}
+          {mapEmbed && mapaZobrazena && (
             <div style={{ marginTop: 8, borderRadius: 10, overflow: 'hidden', border: '1px solid ' + T.border }}>
               <iframe title="mapa" src={mapEmbed} style={{ width: '100%', height: 150, border: 0, display: 'block', filter: 'grayscale(0.3) invert(0.9) hue-rotate(180deg)' }} loading="lazy"></iframe>
             </div>

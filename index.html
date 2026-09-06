@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-25X9CMKGRD"></script>
+  <!-- Souhlas s cookies (consent.js). Výchozí stav Google Consent Mode v2 = vše
+       odepřeno a MUSÍ být první skript v hlavičce. Google Analytics se načítá až
+       po souhlasu z consent.js — bez něj na Google neodejde jediný požadavek. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    // GDPR: výchozí souhlas odepřen (žádné analytické cookies), dokud uživatel nepřijme cookie lištu.
-    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500 });
-    try { if (localStorage.getItem('makej-cookie-consent') === 'accepted') gtag('consent', 'update', { analytics_storage: 'granted' }); } catch (e) {}
-    gtag('js', new Date());
-    gtag('config', 'G-25X9CMKGRD');
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
+    gtag('set', 'ads_data_redaction', true);
   </script>
+  <link rel="stylesheet" href="/consent.css?v=2" />
+  <script src="/consent.js?v=4" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Brigády a práce ve tvém okolí — bez životopisu | Makej</title>
@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=99" />
+  <link rel="stylesheet" href="style.css?v=125" />
 
   <!-- ═══════════ ÚVODNÍ OBRAZOVKA ═══════════
        Modrá plocha s ikonou, dokud se stránka nenačte. Třídu nasazuje skript
@@ -68,6 +68,10 @@
       #page-loader { transition: none; }
       #page-loader svg path { animation: none; }
     }
+    /* Celý web stojí na bílém plátně — tmavé body::before ze style.css by
+       prosvítalo jen při přetažení stránky na mobilu. */
+    body { background: #fff; }
+    body::before { display: none !important; }
   </style>
   <script>document.documentElement.classList.add('page-loading');</script>
 
@@ -203,8 +207,13 @@
     </div>
   </nav>
 
-  <!-- ═══════════ HERO ═══════════ -->
+  <!-- ═══════════ HERO + ČEKACÍ LIST ═══════════
+       Hero se při scrollu přilepí a rozmaže, čekací list přes něj vyjede do
+       popředí. Obal je nutný: přilepení končí až s ním, takže bez něj by hero
+       viselo vzadu i pod recenzemi. Animace nadpisu běží dál i rozmazaná. -->
+  <div class="uvod">
   <section id="hero">
+    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="hero-main">
       <h1 class="hero-h1"><span>Práce na jeden <span class="hero-typer" id="hero-typer"><span class="typer-word" id="typer-word">swajp</span></span>.</span></h1>
 
@@ -226,25 +235,118 @@
     </div>
   </section>
 
-  <!-- ═══════════ BRZY SPOUŠTÍME ═══════════ -->
-  <!-- E-mail jde přes RPC join_launch_list do tabulky launch_emails (viz script.js). -->
+  <!-- ═══════════ ČEKACÍ LIST ═══════════ -->
+  <!-- Tři kroky v jedné sekci: zápis e-mailu → poděkování (a volitelně účet) →
+       hotovo. E-mail jde přes RPC join_launch_list do tabulky launch_emails,
+       účet přes /auth/v1/signup (viz script.js). -->
   <section id="brzy">
-    <div class="container">
-      <div class="soon-card">
-        <p class="soon-kicker">Brzy spouštíme</p>
-        <div class="soon-word">Makej</div>
-        <p class="soon-lead">Platforma, co tě propojí se zaměstnavatelem jedním swajpem.</p>
-        <div class="soon-form">
-          <input type="email" class="soon-input" placeholder="vas@email.cz" aria-label="Tvůj e-mail">
-          <button type="button" class="soon-btn">
-            Dej mi vědět, až to spustíte!
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
+    <div class="wl-slot">
+      <div class="wl-panel">
+
+        <!-- 1 · zápis -->
+        <div class="wl-krok" id="wl-1">
+          <h2 class="wl-mark"><b>Makáme</b> na tom.</h2>
+          <p class="wl-lead">Hned jak budeme hotoví, dáme ti vědět.</p>
+
+          <form class="wl-form" id="wl-form1" novalidate>
+            <div class="wl-row">
+              <input class="wl-in" id="wl-email" type="email" inputmode="email" autocomplete="email"
+                     placeholder="tvuj@email.cz" aria-label="Tvůj e-mail" aria-describedby="wl-e1">
+              <button class="wl-go" type="submit" id="wl-go">Chci být u toho</button>
+            </div>
+            <span class="wl-err" id="wl-e1" role="alert" hidden></span>
+          </form>
+
+          <!-- Zůstává schované, dokud server nevrátí skutečné číslo. -->
+          <div class="wl-foot" id="wl-foot" hidden>
+            <!-- Kreslené postavičky, ne fotky: kolečka stojí vedle věty o počtu
+                 zapsaných, takže konkrétní tváře by vydávaly cizí lidi za naše
+                 uživatele. Vektor navíc drží ostrost i na 34 px a nepřidává
+                 žádný soubor ke stažení. -->
+            <span class="wl-faces" aria-hidden="true">
+              <span class="wl-face"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="wl-face-t" d="M2.8 24c0-5 4.1-7.6 9.2-7.6s9.2 2.6 9.2 7.6Z"/><circle class="wl-face-v" cx="12" cy="8.9" r="5.4"/><circle class="wl-face-t" cx="12" cy="10" r="4.6"/></svg></span>
+              <span class="wl-face"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="wl-face-t" d="M2.8 24c0-5 4.1-7.6 9.2-7.6s9.2 2.6 9.2 7.6Z"/><path class="wl-face-v" d="M6.6 9.9a5.4 5.4 0 0 1 10.8 0v8.1h-2.6V9.9a2.8 2.8 0 0 0-5.6 0V18H6.6Z"/><circle class="wl-face-t" cx="12" cy="10" r="4.6"/></svg></span>
+              <span class="wl-face"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="wl-face-t" d="M2.8 24c0-5 4.1-7.6 9.2-7.6s9.2 2.6 9.2 7.6Z"/><circle class="wl-face-v" cx="12" cy="3.7" r="2.1"/><circle class="wl-face-v" cx="12" cy="9.1" r="5.3"/><circle class="wl-face-t" cx="12" cy="10" r="4.6"/></svg></span>
+            </span>
+            </span>
+            </span>
+            <span class="wl-foot-t"><b id="wl-pocet">—</b> lidí už u nás je</span>
+          </div>
         </div>
-        <p class="soon-msg" id="soon-msg" role="status" aria-live="polite"></p>
+
+        <!-- 2 · díky + volitelný účet -->
+        <div class="wl-krok" id="wl-2" hidden>
+          <div class="wl-blok">
+            <h2 class="wl-h2"><span id="wl-typed"></span><span class="wl-cur" id="wl-cur2" aria-hidden="true"></span></h2>
+            <p class="wl-lead wl-rise" id="wl-lead2" style="animation-delay:1.5s">Dáme ti vědět, až appku spustíme.</p>
+          </div>
+
+          <div class="wl-or wl-rise" style="animation-delay:1.74s"><span class="wl-or-t">nebo</span></div>
+
+          <div class="wl-acc wl-rise" id="wl-acc" style="animation-delay:1.82s">
+            <button class="wl-prize" id="wl-acc-btn" type="button" aria-expanded="false" aria-controls="wl-acc-bd">
+              Založ si účet a získej odměnu
+            </button>
+            <div class="wl-acc-bd" id="wl-acc-bd" inert>
+              <div class="wl-acc-pd">
+                <form class="wl-f" id="wl-form2" novalidate>
+                  <!-- E-mail je potvrzený z prvního kroku, proto má zelený obrys hned -->
+                  <span class="wl-mail" id="wl-mail2">—</span>
+                  <div class="wl-lb">
+                    <span class="wl-pole">
+                      <input class="wl-fi" id="wl-name" type="text" autocomplete="name"
+                             placeholder="Jméno a příjmení nebo název firmy" aria-label="Jméno a příjmení nebo název firmy" aria-describedby="wl-e2">
+                    </span>
+                    <span class="wl-err2" id="wl-e2" role="alert" hidden></span>
+                  </div>
+                  <div class="wl-lb">
+                    <span class="wl-pole">
+                      <input class="wl-fi wl-fi--pw" id="wl-pw" type="password" autocomplete="new-password"
+                             placeholder="Heslo" aria-label="Heslo" aria-describedby="wl-e3">
+                      <button class="wl-peek" type="button" data-peek="wl-pw" aria-controls="wl-pw">Zobrazit</button>
+                    </span>
+                    <span class="wl-err2" id="wl-e3" role="alert" hidden></span>
+                  </div>
+                  <div class="wl-lb">
+                    <span class="wl-pole">
+                      <input class="wl-fi wl-fi--pw" id="wl-pw2" type="password" autocomplete="new-password"
+                             placeholder="Heslo znovu" aria-label="Heslo znovu" aria-describedby="wl-e4">
+                      <button class="wl-peek" type="button" data-peek="wl-pw2" aria-controls="wl-pw2">Zobrazit</button>
+                    </span>
+                    <span class="wl-err2" id="wl-e4" role="alert" hidden></span>
+                  </div>
+                  <button class="wl-sub" type="submit" id="wl-sub">Založit účet</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Únikovka pro překlep v adrese: bez ní by se člověk, který se zapsal
+               s chybou, do formuláře už nikdy nedostal. -->
+          <button class="wl-jiny" id="wl-jiny" type="button" hidden>Zapsat jiný e-mail</button>
+        </div>
+
+        <!-- 3 · účet hotov -->
+        <div class="wl-krok" id="wl-3" hidden>
+          <span class="wl-ok" aria-hidden="true">
+            <span class="wl-ok-halo"></span>
+            <svg width="78" height="78" viewBox="0 0 78 78">
+              <circle class="wl-ok-fill" cx="39" cy="39" r="34.5"/>
+              <circle class="wl-ok-ring" cx="39" cy="39" r="34.5" fill="none" stroke-width="4" stroke-linecap="round"/>
+              <path class="wl-ok-chk" d="M24 40.4 34 50 55 28.4" fill="none" stroke="#fff" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div class="wl-blok">
+            <h2 class="wl-h2"><span id="wl-typed3"></span><span class="wl-cur" id="wl-cur3" aria-hidden="true" hidden></span></h2>
+            <p class="wl-lead wl-rise" style="animation-delay:1.86s">Vítej, <b id="wl-hi">—</b>. Teď už máš všechno, víc se dozvíš v e-mailu.</p>
+            <span class="wl-pos wl-rise" style="animation-delay:1.98s"><span class="wl-pos-k">Zakládající člen</span></span>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
+  </div><!-- /.uvod -->
 
   <!-- ═══════════ REFERENCE ═══════════ -->
   <section id="makaci">
@@ -351,7 +453,8 @@
           <h4>Právní</h4>
           <a href="/terms">Podmínky použití</a>
           <a href="/privacy">Ochrana soukromí</a>
-          <a href="/privacy#cookies">Cookies</a>
+          <a href="/zasady-cookies">Zásady cookies</a>
+          <a href="/zasady-cookies#nastaveni" data-cookie-nastaveni>Nastavení cookies</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -536,20 +639,8 @@
   </div>
 
   <!-- ═══════════ COOKIE BANNER ═══════════ -->
-  <div id="cookie-banner" role="dialog" aria-label="Souhlas s cookies" aria-live="polite">
-    <div class="cookie-inner">
-      <p class="cookie-text">
-        🍪 Používáme pouze technicky nezbytné cookies a localStorage pro udržení přihlášení.
-        Žádné reklamní trackery. Více informací v naší <a href="/privacy#cookies">Politice ochrany soukromí</a>.
-      </p>
-      <div class="cookie-actions">
-        <button class="cookie-btn cookie-btn-reject" id="cookie-reject">Jen nezbytné</button>
-        <button class="cookie-btn cookie-btn-accept" id="cookie-accept">Rozumím, souhlasím</button>
-      </div>
-    </div>
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=33"></script>
+  <script src="script.js?v=51"></script>
 </body>
 </html>

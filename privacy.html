@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-25X9CMKGRD"></script>
+  <!-- Souhlas s cookies (consent.js). Výchozí stav Google Consent Mode v2 = vše
+       odepřeno a MUSÍ být první skript v hlavičce. Google Analytics se načítá až
+       po souhlasu z consent.js — bez něj na Google neodejde jediný požadavek. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    // GDPR: výchozí souhlas odepřen (žádné analytické cookies), dokud uživatel nepřijme cookie lištu.
-    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', wait_for_update: 500 });
-    try { if (localStorage.getItem('makej-cookie-consent') === 'accepted') gtag('consent', 'update', { analytics_storage: 'granted' }); } catch (e) {}
-    gtag('js', new Date());
-    gtag('config', 'G-25X9CMKGRD');
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
+    gtag('set', 'ads_data_redaction', true);
   </script>
+  <link rel="stylesheet" href="/consent.css?v=2" />
+  <script src="/consent.js?v=4" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zásady ochrany osobních údajů — Makej</title>
@@ -210,7 +210,7 @@
     <p>Tvé osobní údaje neprodáváme třetím stranám. Sdílíme je pouze s:</p>
     <ul>
       <li><strong>Supabase Inc.</strong> (USA) — databáze a autentizace. Data jsou uložena v regionu EU (eu-west-1, Irsko). Supabase je certifikován dle SOC 2 Type 2 a dodržuje standardní smluvní doložky EU.</li>
-      <li><strong>Google LLC</strong> — pouze pokud se přihlašuješ přes Google OAuth.</li>
+      <li><strong>Google LLC / Google Ireland Ltd.</strong> — přihlášení přes Google OAuth, a jen s tvým souhlasem s cookies také Google Analytics (souhrnná statistika návštěvnosti). Google je certifikován v rámci EU-U.S. Data Privacy Framework.</li>
       <li><strong>Poskytovatel e-mailových služeb</strong> — pro zasílání transakčních e-mailů (potvrzení registrace, reset hesla).</li>
     </ul>
     <p>Všichni zpracovatelé jsou smluvně zavázáni k ochraně tvých dat a nesmí je použít k jiným účelům.</p>
@@ -234,13 +234,15 @@
     </ul>
     <p>Žádosti vyřizujeme do 30 dnů. Kontaktuj nás na <a href="mailto:privacy@makej.eu">privacy@makej.eu</a>.</p>
 
-    <h2>7. Soubory cookies a lokální úložiště</h2>
-    <p>Naše webová stránka a aplikace používají:</p>
+    <h2 id="cookies">7. Soubory cookies a lokální úložiště</h2>
+    <p>Úplný přehled — tabulku všech cookies a záznamů v úložišti prohlížeče, které web i aplikace ukládají, a možnost souhlas kdykoli změnit nebo odvolat — najdeš v samostatných <a href="/zasady-cookies">Zásadách používání cookies</a>. Stručně:</p>
     <ul>
-      <li><strong>localStorage</strong> — ukládáme přihlašovací session pod klíčem <code>makej-auth</code>. Bez tohoto záznamu bys musel/a zadávat heslo při každém otevření aplikace. Jde o technicky nezbytné ukládání dat, které nevyžaduje souhlas.</li>
-      <li><strong>Google Fonts</strong> — načítáme písma z CDN Googlu (fonts.googleapis.com). Google může při tomto požadavku zpracovávat IP adresu. Nepoužíváme reklamní cookies Google.</li>
+      <li><strong>Nezbytné</strong> — přihlašovací session (<code>makej-auth</code>), tvá volba cookies, zápis do čekacího listu a rozpracované věci ve firemním dashboardu. Jde o technicky nezbytné ukládání, které souhlas nevyžaduje.</li>
+      <li><strong>Analytické</strong> — Google Analytics 4 (cookies <code>_ga</code>, <code>_ga_…</code>) spouštíme až po tvém souhlasu; do té doby se skript Googlu vůbec nenačte. Data vidíme jen v souhrnu, IP adresu Google Analytics 4 neukládá.</li>
+      <li><strong>Preferenční</strong> — nastavení ve webové verzi aplikace (vybrané kraje, upozornění), rovněž jen se souhlasem.</li>
+      <li><strong>Google Fonts</strong> — písma načítáme z fonts.googleapis.com; Google při tom může zpracovávat IP adresu, cookies ale neukládá.</li>
     </ul>
-    <p>Nepoužíváme reklamní cookies ani sledovací pixely třetích stran.</p>
+    <p>Marketingové cookies ani sledovací pixely třetích stran nepoužíváme. Volbu změníš odkazem <strong>Nastavení cookies</strong> v patičce každé stránky.</p>
 
     <h2>8. Bezpečnost</h2>
     <p>Data ukládáme v databázi s aktivním Row Level Security (RLS) — každý uživatel vidí pouze svá vlastní data. Komunikace probíhá výhradně přes HTTPS. Hesla ukládáme jako bcrypt hash, nikdy v čitelné podobě.</p>
@@ -262,7 +264,7 @@
   </main>
 
   <footer>
-    <p>© 2026 Makej &nbsp;·&nbsp; <a href="/privacy">Soukromí</a> &nbsp;·&nbsp; <a href="/terms">Podmínky</a> &nbsp;·&nbsp; <a href="/">Zpět na hlavní stránku</a></p>
+    <p>© 2026 Makej &nbsp;·&nbsp; <a href="/privacy">Soukromí</a> &nbsp;·&nbsp; <a href="/terms">Podmínky</a> &nbsp;·&nbsp; <a href="/zasady-cookies">Cookies</a> &nbsp;·&nbsp; <a href="/zasady-cookies#nastaveni" data-cookie-nastaveni>Nastavení cookies</a> &nbsp;·&nbsp; <a href="/">Zpět na hlavní stránku</a></p>
      <div class="foot-soc">
        <a href="https://www.instagram.com/makej.eu" target="_blank" rel="noopener" aria-label="Instagram"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1.1" fill="currentColor" stroke="none"/></svg></a>
        <a href="https://www.facebook.com/share/19Kq5N1R2u/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.9 3.78-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.78l-.44 2.9h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg></a>

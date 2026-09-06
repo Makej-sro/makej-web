@@ -825,6 +825,13 @@ function EmployerApp() {
     </div>
   );
 
+  // Firma z čekacího listu má vyplněný jen název a IČO. Dokud nedoplní sídlo
+  // a obor, nepustíme ji do dashboardu — obchází to celý obal včetně sidebaru,
+  // ať se nedá proklikat jinam. Protějšek brigádnického onboardingu v appce.
+  if (loaded && typeof eOnboardingNeeded === 'function' && eOnboardingNeeded(EPROFILE)) {
+    return <EOnboarding onDone={() => setTick(t => t + 1)} onSignOut={handleSignOut} />;
+  }
+
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%', background: T.bg, position: 'relative' }}>
       <div style={{
