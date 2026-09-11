@@ -1,13 +1,11 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- PODĚKOVÁNÍ ZA ZAPSÁNÍ NA ČEKACÍ LIST (launch_emails → Resend)
 -- ───────────────────────────────────────────────────────────────────────────
--- Obálku dodává `makej_email_html` — viz migration_email_sablona.sql.
+-- Obálku dodává `makej_email_html` (migration_email_sablona.sql),
+-- odeslání `makej_posli_email` (migration_posilani_emailu.sql).
 --
 -- JAK TO CHODÍ: web zavolá RPC join_launch_list → INSERT do launch_emails →
 -- AFTER INSERT trigger → net.http_post na api.resend.com → e-mail.
---
--- PROČ PŘÍMO Z DATABÁZE, ne přes Edge Function: je to jeden HTTP požadavek.
--- Edge Function by přidala další nasazovanou část a druhé místo pro tajemství.
 --
 -- DUPLICITY: opakovaná adresa končí v join_launch_list na `on conflict do
 -- nothing`, takže žádný INSERT → trigger se nespustí → druhý e-mail nechodí.
@@ -17,8 +15,8 @@
 -- e-mail, který nám před chvílí dal. Obsluha hashe je ve script.js — POZOR:
 -- při změně odkazu je potřeba nasadit OBOJÍ, migraci i web.
 --
--- KLÍČ: Supabase Vault, jméno `resend_api_key`, do repa NIKDY:
---   select vault.create_secret('re_…', 'resend_api_key', 'Resend');
+-- Posílá se jako hromadná pošta (List-Unsubscribe), na rozdíl od potvrzení
+-- registrace.
 --
 -- KONTROLA: select status_code, content from net._http_response
 --           order by created desc limit 10;
@@ -33,27 +31,21 @@ security definer
 set search_path = public, net, vault, extensions
 as $fn$
 declare
-  v_klic  text;
   v_odkaz text;
-  v_html  text;
 begin
-  select decrypted_secret into v_klic
-    from vault.decrypted_secrets where name = 'resend_api_key';
-  if v_klic is null or btrim(v_klic) = '' then
-    raise warning 'launch_email_podekovani: ve Vaultu chybí resend_api_key, e-mail pro % neodeslán', new.email;
-    return null;
-  end if;
-
   -- Procenta se kódují první, jinak by se zakódovala i ta právě vložená.
   v_odkaz := 'https://makej.eu/?e=' ||
     replace(replace(replace(replace(replace(replace(
       new.email, '%', '%25'), '+', '%2B'), '&', '%26'),
       '#', '%23'), '?', '%3F'), ' ', '%20') || '#predregistrace';
 
-  v_html := public.makej_email_html(
+  perform public.makej_posli_email(
+    new.email,
     'Seš na seznamu!',
-    'Až Makej spustíme, dáme ti vědět mezi prvními. Do té doby od nás nic nechodí.',
-    $telo$
+    replace(public.makej_email_html(
+      'Seš na seznamu!',
+      'Až Makej spustíme, dáme ti vědět mezi prvními. Do té doby od nás nic nechodí.',
+      $telo$
         <tr>
           <td style="padding:34px 40px 0;">
             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:2px dashed #b9c2ff;border-radius:14px;">
@@ -77,15 +69,8 @@ begin
             </p>
           </td>
         </tr>
-    $telo$);
-
-  v_html := replace(v_html, '{{ODKAZ}}', v_odkaz);
-
-  perform net.http_post(
-    url     := 'https://api.resend.com/emails',
-    headers := jsonb_build_object('Authorization', 'Bearer ' || v_klic, 'Content-Type', 'application/json'),
-    body    := jsonb_build_object('from', 'Makej <ahoj@makej.eu>', 'to', new.email,
-                                  'subject', 'Seš na seznamu!', 'html', v_html)
+      $telo$), '{{ODKAZ}}', v_odkaz),
+    true   -- hromadná pošta → List-Unsubscribe
   );
   return null;
 exception when others then

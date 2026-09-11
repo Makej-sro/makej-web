@@ -102,7 +102,7 @@ function ProGate({ feature, children }) {
           </button>
 
           <div style={{ marginTop: 12, fontSize: 12, color: T.mutedSoft, fontFamily: T.fontUI }}>
-            Otázky? <a href="mailto:support@makej.eu" style={{ color: '#8AB4FF', textDecoration: 'none' }}>support@makej.eu</a>
+            Otázky? <a href="mailto:podpora@makej.eu" style={{ color: '#8AB4FF', textDecoration: 'none' }}>podpora@makej.eu</a>
           </div>
         </div>
       </div>
@@ -537,7 +537,7 @@ const WAGE_PERCENTILES = [
 ];
 const WAGE_TOP10_KC_H = 220;
 const WAGE_BENCHMARK_UPDATED = '2026-04-01';
-const WAGE_BENCHMARK_EMAIL = 'data@makej.eu';
+const WAGE_BENCHMARK_EMAIL = 'podpora@makej.eu';
 
 // Jediné místo, které zná zdroj dat. Později stačí přepsat tělo těchto funkcí
 // (např. na fetch živých dat z platformy) — zbytek komponenty zůstane beze změny.

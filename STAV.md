@@ -33,6 +33,20 @@ Po změně JSX **vždy bumpni `?v=N`** u daného souboru v `employer/index.html`
 
 ## Hotovo naposledy
 
+- **Kontaktní adresa sjednocena na `podpora@makej.eu`** (2026-09-11): na webu bylo pět různých adres. `admin@` (30×, včetně obchodních podmínek a patiček), `privacy@` (16×), `support@`, `hello@`, `data@` → všechno `podpora@makej.eu`, celkem 65 výskytů v 16 souborech. Bump `employer-pages3.jsx?v=41`, `_premium/analytics.jsx?v=28`.
+
+  **Pozor u `privacy@`:** byla to adresa **správce osobních údajů** v `privacy.html` a `zasady-cookies.html`, kam podle GDPR chodí žádosti o výmaz a přístup (lhůta 30 dnů). Sloučení je legální, ale je to vědomé rozhodnutí — kdyby se to mělo vrátit, jsou to ty dva soubory.
+
+- **Proč e-maily padaly do spamu + `Reply-To` a `List-Unsubscribe`** (2026-09-11, migrace `makej_posli_email_reply_to_a_odhlaseni`, `triggery_pouzivaji_makej_posli_email`, soubor `supabase/migration_posilani_emailu.sql`):
+
+  **Diagnóza:** autentizace je v pořádku — DKIM podepisuje `makej.eu`, obálka (`send.makej.eu` přes CNAME na Resend) prochází SPF, DMARC tím pádem sedí přes DKIM. **Příčinou je stáří domény** — v Resendu ověřená 2026-09-09, nulová historie odesílání, a Seznam je na neznámé odesílatele přísný. Spraví to čas a to, že lidi e-maily otevírají. **Resend hlásí `delivered`, i když zpráva skončí ve spamu** — vidí jen, že ji server přijal, ne kam ji zařadil.
+
+  **Odesílání je teď v jedné funkci `makej_posli_email(to, subject, html, seznam)`** — dřív si každý trigger sám četl klíč z Vaultu a skládal volání, takže přidání jedné hlavičky znamenalo přepsat obě funkce. `Reply-To: podpora@makej.eu` u obou (odesílatel `ahoj@makej.eu` je schránka, kterou nikdo nečte). `List-Unsubscribe` **jen u hromadné pošty** — z potvrzení vlastního účtu se odhlásit nedá. Zatím `mailto:`, takže odhlášení musí někdo vyřídit ručně; `List-Unsubscribe-Post` schválně není, patří jen k HTTPS odkazu s POST.
+
+  **Ověřování hlaviček:** Resend je v `GET /emails/<id>` **nevrací** (nejsou ani mezi klíči odpovědi), takže přes API se odeslání `List-Unsubscribe` ověřit nedá — jen ve schránce. `reply_to` se vrací a ověřený je.
+
+  **Zbývá k domluvě:** hlášení DMARC (`rua=`) — jeden DNS TXT záznam u správce domény, zatím nenastaveno.
+
 - **E-mail po registraci + logo jako obrázek + společná šablona** (2026-09-10, migrace `makej_email_spolecna_sablona_a_logo`, `registrace_email_a_prechod_na_spolecnou_sablonu`; soubory `supabase/migration_email_sablona.sql`, `…_launch_welcome_email.sql`, `…_registrace_email.sql`):
 
   **Logo je teď obrázek `logo-makej.png`, ne text.** League Spartan je webový font a **poštovní klienti vlastní fonty zahazují** — nápis psaný textem dorazil vykreslený Arialem. Soubor je vyrenderovaný headless prohlížečem z `fonts/LeagueSpartan-Variable.woff2` (váha 900, `#0020f6`), takže sedí s navbarem; 390×130 px na zobrazení ve 130 px kvůli retině. **Musí ležet na veřejné adrese** (`makej.eu/logo-makej.png`) — `data:` URI Gmail v obrázcích blokuje.
@@ -194,7 +208,6 @@ Po změně JSX **vždy bumpni `?v=N`** u daného souboru v `employer/index.html`
 ## Rozdělané / ke zvážení (nedělat bez potvrzení)
 
 - Kompaktnější pohledy na mobilu zůstávají hutné: **týdenní kalendář směn** (grid 7 sloupců) a **grafy analytiky** — funkční, ale těsné. Případně doladit.
-- Sjednotit `hello@makej.eu` → `admin@makej.eu` i na ostatních stránkách (zatím jen pro-zamestnavatele).
 - Exportovat DB migrace (aplikované přes Supabase MCP) do `supabase/migrations/` — zatím nejsou v gitu.
 - `pro-zamestnavatele.html` má mrtvý CSS starého ceníku (`.cn-*` blok kolem ř. 258–290) — nepoužívá se.
 

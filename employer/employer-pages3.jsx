@@ -1611,7 +1611,7 @@ function EPricing({ onTab, onPlanChange }) {
 
                 <div style={{ marginTop: 'auto', paddingTop: 8 }}>
                   {plan.contact ? (
-                    <a href="mailto:hello@makej.eu" onClick={e => e.stopPropagation()} style={{
+                    <a href="mailto:podpora@makej.eu" onClick={e => e.stopPropagation()} style={{
                       display: 'block', width: '100%', padding: '11px 0', borderRadius: 12, textAlign: 'center',
                       background: '#fff', border: '1px solid ' + plan.color + '77',
                       color: '#374151', fontFamily: T.fontUI, fontSize: 13, fontWeight: 800,

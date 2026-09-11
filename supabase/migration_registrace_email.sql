@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- PODĚKOVÁNÍ ZA REGISTRACI (auth.users → Resend)
 -- ───────────────────────────────────────────────────────────────────────────
--- Migrace `registrace_email_a_prechod_na_spolecnou_sablonu` (2026-09-10).
--- Obálku dodává `makej_email_html` — viz migration_email_sablona.sql.
+-- Obálku dodává `makej_email_html` (migration_email_sablona.sql),
+-- odeslání `makej_posli_email` (migration_posilani_emailu.sql).
 --
 -- VLASTNÍ TRIGGER, ne přípis do handle_new_user: ta zakládá profil a výpadek
 -- Resendu nesmí rozhodovat o tom, jestli registrace projde. Odesílání je navíc
@@ -11,9 +11,11 @@
 -- JMÉNO OD UŽIVATELE jde do HTML přes `html_escape`. Bez toho by si kdokoli
 -- registrací pod jménem s „<" poslal do e-mailu vlastní značky.
 --
+-- BEZ List-Unsubscribe — je to potvrzení vlastního účtu, ne hromadná pošta;
+-- odhlásit se z něj nedá.
+--
 -- POZOR: kdo projde předregistrací, dostane e-maily dva — „Seš na seznamu!"
--- po zadání adresy a „Díky za registraci!" po založení účtu. Je to záměr,
--- každý mluví o něčem jiném.
+-- po zadání adresy a „Díky za registraci!" po založení účtu. Je to záměr.
 -- ═══════════════════════════════════════════════════════════════════════════
 
 create or replace function public.registrace_email_podekovani()
@@ -23,20 +25,11 @@ security definer
 set search_path = public, net, vault, extensions
 as $fn$
 declare
-  v_klic  text;
   v_jmeno text;
   v_pod   text;
-  v_html  text;
 begin
   if new.email is null or btrim(new.email) = '' then
     return null;   -- registrace bez e-mailu (telefon) — není kam psát
-  end if;
-
-  select decrypted_secret into v_klic
-    from vault.decrypted_secrets where name = 'resend_api_key';
-  if v_klic is null or btrim(v_klic) = '' then
-    raise warning 'registrace_email_podekovani: ve Vaultu chybí resend_api_key, e-mail pro % neodeslán', new.email;
-    return null;
   end if;
 
   v_jmeno := public.html_escape(nullif(btrim(coalesce(
@@ -48,8 +41,11 @@ begin
                 else 'Vítej, ' || v_jmeno || '. Účet máš založený a přihlásíš se jím, jakmile Makej spustíme.'
            end;
 
-  v_html := public.makej_email_html('Díky za registraci!', v_pod,
-    $telo$
+  perform public.makej_posli_email(
+    new.email,
+    'Díky za registraci!',
+    public.makej_email_html('Díky za registraci!', v_pod,
+      $telo$
         <tr>
           <td style="padding:34px 40px 0;">
             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:2px dashed #b9c2ff;border-radius:14px;">
@@ -73,13 +69,8 @@ begin
             </p>
           </td>
         </tr>
-    $telo$);
-
-  perform net.http_post(
-    url     := 'https://api.resend.com/emails',
-    headers := jsonb_build_object('Authorization', 'Bearer ' || v_klic, 'Content-Type', 'application/json'),
-    body    := jsonb_build_object('from', 'Makej <ahoj@makej.eu>', 'to', new.email,
-                                  'subject', 'Díky za registraci!', 'html', v_html)
+      $telo$),
+    false  -- potvrzení registrace není hromadná pošta
   );
   return null;
 exception when others then
