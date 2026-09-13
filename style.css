@@ -2454,8 +2454,16 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
   color: rgba(14,17,22,.6); margin: 10px 0 0; text-wrap: pretty;
 }
 @media (max-width: 700px) {
-  .proc-pruh { --proc-okraj: 20px; }
-  .proc-bod { flex-basis: 74vw; }
+  /* Na telefonu se pruh neposouvá do strany — položky stojí pod sebou.
+     Vodorovný scroll uvnitř svislého jde snadno přehlédnout a poslední
+     důvody by pak nikdo neviděl. Mřížková varianta si níž přebíjí počet
+     sloupců sama (pozdější pravidlo při stejné specificitě vyhrává). */
+  .proc-pruh {
+    display: grid; grid-template-columns: 1fr; gap: 44px;
+    overflow-x: visible; scroll-snap-type: none;
+    --proc-okraj: 20px;
+  }
+  .proc-bod { flex-basis: auto; scroll-snap-align: none; }
 }
 
 /* Varianta bez posouvání: když se položky vejdou na jednu řadu, ať stojí
