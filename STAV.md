@@ -33,6 +33,18 @@ Po změně JSX **vždy bumpni `?v=N`** u daného souboru v `employer/index.html`
 
 ## Hotovo naposledy
 
+- **Sekce „Proč" od Yasina + jazyk webu přestává být jen o brigádách** (2026-09-12/13):
+
+  **Sekce „Proč"** na `/hledam-si-praci` a `/pro-zamestnavatele` převzata z Yasinova commitu `079fc0c` — 3D ilustrace místo textových boxů (6 a 4 položky, sdílené `.proc-pruh` ve `style.css`, 10 souborů `.webp`, 456 kB). **Pozor na to, jak se to přebíralo:** nejdřív jsem vzal celé Yasinovy stránky a přišel s tím i jeho přepis sekce „jak to funguje" (odkazoval na `krok-*.jpg`, které nemáme → 404) a vyhlazené předěly mezi sekcemi. Obojí vráceno; nakonec aplikovány **jen vybrané hunky** (3,4,5 z 6 u hledam-si-praci; 2,3,4 z 5 u pro-zamestnavatele). Při dalším přebírání od Yasina takhle postupovat rovnou.
+
+  **Jazyk.** Web měl 246× „brigáda" a 190× „brigádník", ale produkt umí čtyři typy (`jobs.job_type`: `jednrazova_vypomoc`, `brigada`, `part_time`, `full_time`). **Full-time nabídek je ale zatím nula** — proto se rozsah ukazuje, ale full-time se netlačí jako hlavní sdělení. Přepsané `/pro-zamestnavatele` a `/cenik`: „Inzerce brigád" → „Najděte pracovníky za hodiny — brigády i stálá práce", „brigádníků" → „kandidátů"/„uchazečů" atd.
+
+  **Nadpisy jedou na „Makače"**: „Najdi si brigádu ještě dnes" → **„Staň se Makačem ještě dnes"**, „Najděte pracovníky" → **„Najděte Makače"**. Podnadpisy proto nesou konkrétní rozsah (brigáda, part-time, stálá práce) — nadpis dělá dojem, věta pod ním práci. **`<title>` zůstaly na „brigádách"** kvůli vyhledávání; na „Makače" nikdo nehledá.
+
+  **Chatbot `support-bot/` smazán** (9 souborů) — jmenoval se taky Makač a kolidoval s označením uchazečů. Na webu na něj nic neodkazovalo, AI chat byl z podpory odebraný dřív. V historii gitu zůstává.
+
+  **Nedořešená kolize:** „Makačka" je zároveň virtuální měna a přirozený ženský tvar od „makač". Bude to vadit hlavně uživatelkám. Zásah do ceníku i podpory, zatím odloženo.
+
 - **Kontaktní adresa sjednocena na `podpora@makej.eu`** (2026-09-11): na webu bylo pět různých adres. `admin@` (30×, včetně obchodních podmínek a patiček), `privacy@` (16×), `support@`, `hello@`, `data@` → všechno `podpora@makej.eu`, celkem 65 výskytů v 16 souborech. Bump `employer-pages3.jsx?v=41`, `_premium/analytics.jsx?v=28`.
 
   **Pozor u `privacy@`:** byla to adresa **správce osobních údajů** v `privacy.html` a `zasady-cookies.html`, kam podle GDPR chodí žádosti o výmaz a přístup (lhůta 30 dnů). Sloučení je legální, ale je to vědomé rozhodnutí — kdyby se to mělo vrátit, jsou to ty dva soubory.

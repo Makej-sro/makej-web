@@ -14,22 +14,22 @@
   <script src="/consent.js?v=4" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inzerce brigád — najděte brigádníka za hodiny | Makej</title>
-  <meta name="description" content="Hledáte brigádníka? Zadejte inzerát na brigádu za 60 sekund a vybírejte z lidí, kteří sami projevili zájem. Bez zdlouhavého náboru a životopisů." />
+  <title>Najděte pracovníky za hodiny — brigády i stálá práce | Makej</title>
+  <meta name="description" content="Hledáte pracovníky na brigádu, part-time i plný úvazek? Zadejte inzerát za 60 sekund a vybírejte z těch, kdo sami projevili zájem. Bez zdlouhavého náboru a životopisů." />
   <meta name="theme-color" content="#0020f6" />
   <link rel="canonical" href="https://makej.eu/pro-zamestnavatele" />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://makej.eu/pro-zamestnavatele" />
-  <meta property="og:title" content="Inzerce brigád — najděte brigádníka za hodiny | Makej" />
-  <meta property="og:description" content="Hledáte brigádníka? Zadejte inzerát na brigádu za 60 sekund a vybírejte z lidí, kteří sami projevili zájem. Bez zdlouhavého náboru a životopisů." />
+  <meta property="og:title" content="Najděte pracovníky za hodiny — brigády i stálá práce | Makej" />
+  <meta property="og:description" content="Hledáte pracovníky na brigádu, part-time i plný úvazek? Zadejte inzerát za 60 sekund a vybírejte z těch, kdo sami projevili zájem. Bez zdlouhavého náboru a životopisů." />
   <meta property="og:image" content="https://makej.eu/og-image.png" />
   <meta property="og:locale" content="cs_CZ" />
   <meta property="og:site_name" content="Makej" />
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Inzerce brigád — najděte brigádníka za hodiny | Makej" />
-  <meta name="twitter:description" content="Hledáte brigádníka? Zadejte inzerát na brigádu za 60 sekund a vybírejte z lidí, kteří sami projevili zájem. Bez zdlouhavého náboru a životopisů." />
+  <meta name="twitter:title" content="Najděte pracovníky za hodiny — brigády i stálá práce | Makej" />
+  <meta name="twitter:description" content="Hledáte pracovníky na brigádu, part-time i plný úvazek? Zadejte inzerát za 60 sekund a vybírejte z těch, kdo sami projevili zájem. Bez zdlouhavého náboru a životopisů." />
   <meta name="twitter:image" content="https://makej.eu/og-image.png" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="/favicon.png?v=3" />
@@ -121,7 +121,6 @@
        32px rámeček, contain, barva z currentColor. Díky tomu mají zaručeně stejnou
        velikost i výšku — dopočítávat metriky Solar ikon se neosvědčilo. */
     .bz-step2-ic .bz-ico { display: block; width: 32px; height: 32px; background: currentColor; }
-    .bz-ico-verified { -webkit-mask: url(/ico-verified.svg)  center / contain no-repeat; mask: url(/ico-verified.svg)  center / contain no-repeat; }
     .bz-ico-chart    { -webkit-mask: url(/ico-chart.svg)      center / contain no-repeat; mask: url(/ico-chart.svg)      center / contain no-repeat; }
     .bz-ico-chat     { -webkit-mask: url(/ico-chat.svg)       center / contain no-repeat; mask: url(/ico-chat.svg)       center / contain no-repeat; }
     .bz-ico-wallet   { -webkit-mask: url(/ico-wallet.png?v=2) center / contain no-repeat; mask: url(/ico-wallet.png?v=2) center / contain no-repeat; }
@@ -231,32 +230,12 @@
        (změřeno nulovým inline-blockem), takže -.12em ho posadí těsně NAD hranu
        panelu — písmena se neuseknou a viditelný pruh pod kartami je co největší.
        V em, aby to sedělo při každé velikosti písma i po zalomení sloupců. */
-    .emp-why-word { position: absolute; left: 0; right: 0; bottom: -.12em; text-align: center;
-      font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
-      font-size: clamp(4rem, 19.2vw, 17.25rem); letter-spacing: -.04em; color: rgba(10,13,46,.05);
-      line-height: 1; z-index: 0; pointer-events: none; white-space: nowrap; }
-    .emp-why-cards { position: relative; z-index: 2; max-width: 940px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: clamp(16px, 2.4vw, 30px); align-items: start; }
-    .emp-why-card { background: #fff; border-radius: 18px; border: 1px solid rgba(10,13,46,.07);
-      box-shadow: 0 34px 64px -32px rgba(10,13,46,.45); padding: 22px 22px 24px; }
-    .emp-why-card:nth-child(2), .emp-why-card:nth-child(4) { margin-top: clamp(18px, 2.6vw, 34px); }
-    .emp-why-card:nth-child(2) { transition-delay: .1s; }
-    .emp-why-card:nth-child(3) { transition-delay: .2s; }
-    .emp-why-card:nth-child(4) { transition-delay: .3s; }
-    .emp-why-card .bz-ico { display: block; width: 28px; height: 28px; background: var(--primary); }
-    .emp-why-card h3 { font-family: var(--font-heading); font-weight: 800; text-transform: uppercase;
-      font-size: .95rem; letter-spacing: -.01em; margin: 14px 0 0; color: #0a0d2e; }
-    .emp-why-card p { color: rgba(10,13,46,.6); font-size: .88rem; line-height: 1.5; margin: 6px 0 0; }
+    /* Karty „Proč Makej" nahradil posuvný pruh (.proc-pruh ve style.css). */
     @media (max-width: 900px) {
       .emp-why { padding-bottom: 60px; }
-      .emp-why-cards { grid-template-columns: 1fr 1fr; max-width: none; }
-      .emp-why-card:nth-child(n) { margin-top: 0; }
-      .emp-why-word { font-size: clamp(3rem, 25vw, 12rem); }
-    }
+      }
     @media (max-width: 560px) {
       .emp-why { padding-bottom: 46px; }
-      .emp-why-cards { grid-template-columns: 1fr; gap: 16px; }
     }
     .bolt-journey { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
     .bolt-cta { display: flex; justify-content: center; margin-top: 60px; position: relative; z-index: 1; }
@@ -517,10 +496,10 @@
         <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="eh-head">
           <h1>
-            <span class="eh-line"><span class="eh-line-in">Najděte brigádníky</span></span>
+            <span class="eh-line"><span class="eh-line-in">Najděte Makače</span></span>
             <span class="eh-line"><span class="eh-line-in eh-accent eh-grad">rychle a jednoduše</span></span>
           </h1>
-          <p class="eh-sub">Kandidáti si vás najdou sami. Stačí založit nabídku, opětovat zájem, propojit se a domluvit si podmínky.</p>
+          <p class="eh-sub">Na brigádu, part-time i plný úvazek. Kandidáti si vás najdou sami — stačí založit nabídku, opětovat zájem a domluvit se v chatu.</p>
           <a href="#" class="eh-btn employer-cta-register">Začít zdarma</a>
         </div>
 
@@ -535,8 +514,8 @@
       <!-- ═══════════ INTRO (styl Lidé) ═══════════ -->
       <section class="vx-intro">
         <div class="vx-wrap js-reveal-up">
-          <h2>Inzerce brigád, u které si vás kandidáti najdou sami</h2>
-          <p>Založíte nabídku a brigádníci ve vašem okolí vám začnou projevovat zájem. Žádné inzeráty do prázdna ani třídění stovek životopisů — jen oboustranný zájem, rychlé propojení a domluva přímo v chatu.</p>
+          <h2>Inzerce, u které si vás kandidáti najdou sami</h2>
+          <p>Založíte nabídku a lidé ve vašem okolí vám začnou projevovat zájem. Žádné inzeráty do prázdna ani třídění stovek životopisů — jen oboustranný zájem, rychlé propojení a domluva přímo v chatu.</p>
         </div>
       </section>
 
@@ -554,7 +533,7 @@
           </div>
           <div class="emp-gal-card js-reveal-up">
             <div class="emp-gal-ph"><img src="/emp-krok-2.jpg?v=2" alt="Kandidáti swajpují vaši nabídku" loading="lazy" decoding="async" /></div>
-            <div class="emp-gal-cap"><span class="n"></span><h3>Kandidáti swajpují</h3><p>Tisíce brigádníků uvidí vaši nabídku ve feedu. Ti co chtějí, swajpnou doprava — a vy je vidíte okamžitě.</p></div>
+            <div class="emp-gal-cap"><span class="n"></span><h3>Kandidáti swajpují</h3><p>Tisíce lidí uvidí vaši nabídku ve feedu. Ti co chtějí, swajpnou doprava — a vy je vidíte okamžitě.</p></div>
           </div>
           <div class="emp-gal-card js-reveal-up">
             <div class="emp-gal-ph"><img src="/emp-krok-3.jpg?v=2" alt="Výběr kandidátů" loading="lazy" decoding="async" /></div>
@@ -562,7 +541,7 @@
           </div>
           <div class="emp-gal-card js-reveal-up">
             <div class="emp-gal-ph"><img src="/emp-krok-4.jpg?v=2" alt="Domluva detailů přes chat" loading="lazy" decoding="async" /></div>
-            <div class="emp-gal-cap"><span class="n"></span><h3>Domluvíte detaily</h3><p>Po přijetí se otevře chat. Upřesněte čas, místo a co si vzít. Brigádník je připravený.</p></div>
+            <div class="emp-gal-cap"><span class="n"></span><h3>Domluvíte detaily</h3><p>Po přijetí se otevře chat. Upřesněte čas, místo a co si vzít. Kandidát je připravený.</p></div>
           </div>
           </div>
         </div>
@@ -616,29 +595,31 @@
       <!-- PROČ MAKEJ — kompaktní galerie (stejný jazyk jako kroky výš) -->
       <div class="emp-why" style="margin-top:72px;">
         <h2 class="emp-why-title">Proč Makej</h2>
-        <div class="emp-why-word" aria-hidden="true">FUNKCE</div>
-        <div class="emp-why-cards">
-          <div class="emp-why-card js-reveal-up">
-            <span class="bz-ico bz-ico-verified"></span>
+      </div>
+      <!-- Stejný pruh jako „Proč si zvolíš Makej" na /hledam-si-praci.
+           Stojí MIMO .emp-why, protože ta má max-width a overflow: hidden —
+           uvnitř by se pruh nemohl rozjet až k okraji obrazovky. -->
+      <div class="proc-pruh proc-pruh--mrizka" aria-label="Proč Makej">
+          <article class="proc-bod">
+            <img src="/emp-profily.webp?v=1" alt="Karta kandidáta s ověřovacím odznakem" width="760" height="620" loading="lazy" />
             <h3>Ověřené profily</h3>
-            <p>Viditelné hodnocení, historie brigád a úroveň. Víte, koho přijímáte.</p>
-          </div>
-          <div class="emp-why-card js-reveal-up">
-            <span class="bz-ico bz-ico-chart"></span>
+            <p>Viditelné hodnocení, historie odvedené práce a úroveň. Víte, koho přijímáte.</p>
+          </article>
+          <article class="proc-bod">
+            <img src="/emp-analytika.webp?v=1" alt="Přehled s grafy výkonu inzerátu" width="760" height="620" loading="lazy" />
             <h3>Analytika v reálném čase</h3>
             <p>Kolik lidí vidělo inzerát, kolik swajplo, kolik matchovalo.</p>
-          </div>
-          <div class="emp-why-card js-reveal-up">
-            <span class="bz-ico bz-ico-chat"></span>
+          </article>
+          <article class="proc-bod">
+            <img src="/emp-chat.webp?v=1" alt="Kandidát s otevřeným chatem s firmou" width="760" height="620" loading="lazy" />
             <h3>Chat místo emailů</h3>
-            <p>Napíšete zprávu, brigádník odpoví do minut. Vše na jednom místě.</p>
-          </div>
-          <div class="emp-why-card js-reveal-up">
-            <span class="bz-ico bz-ico-wallet"></span>
+            <p>Napíšete zprávu, kandidát odpoví do minut. Vše na jednom místě.</p>
+          </article>
+          <article class="proc-bod">
+            <img src="/emp-zdarma.webp?v=1" alt="Nula korun" width="760" height="620" loading="lazy" />
             <h3>Zdarma pro začátek</h3>
             <p>Základní plán bez poplatků. Platíte, až když chcete víc.</p>
-          </div>
-        </div>
+          </article>
       </div>
       </div>
 
@@ -720,7 +701,7 @@
             <div class="yp-period">navždy zdarma</div>
             <div class="yp-savew"></div>
             <div class="yp-hr"></div>
-            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">1 aktivní inzerát</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Oslovování brigádníků 1×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:close-circle-bold" width="15" style="color:#d1d5db"></iconify-icon><span style="color:#9ca3af">Topování inzerátu</span></div><div class="yp-feat"><iconify-icon icon="solar:close-circle-bold" width="15" style="color:#d1d5db"></iconify-icon><span style="color:#9ca3af">Ověřená firma</span></div></div>
+            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">1 aktivní inzerát</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Oslovování kandidátů 1×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:close-circle-bold" width="15" style="color:#d1d5db"></iconify-icon><span style="color:#9ca3af">Topování inzerátu</span></div><div class="yp-feat"><iconify-icon icon="solar:close-circle-bold" width="15" style="color:#d1d5db"></iconify-icon><span style="color:#9ca3af">Ověřená firma</span></div></div>
             <div class="yp-cta"><a class="yp-btn employer-cta-register" href="javascript:void(0)" style="border:1.5px solid #8AB4FF;color:#111827">Začít zdarma</a></div>
           </div>
           <div class="yp-card" style="background:rgba(91,107,255,.07);border:1.5px solid rgba(91,107,255,.30)">
@@ -730,7 +711,7 @@
             <div class="yp-period">za měsíc bez DPH</div>
             <div class="yp-savew"><span>ušetříš 900 Kč/rok</span></div>
             <div class="yp-hr"></div>
-            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">2 aktivní inzeráty</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Topování inzerátu 1×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Ověřená firma + branding</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Oslovování brigádníků 10×/měs</span></div></div>
+            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">2 aktivní inzeráty</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Topování inzerátu 1×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Ověřená firma + branding</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Oslovování kandidátů 10×/měs</span></div></div>
             <div class="yp-cta"><a class="yp-btn pop employer-cta-register" href="javascript:void(0)">Vybrat Výhodný</a></div>
           </div>
           <div class="yp-card" style="background:rgba(91,214,138,.07);border:1.5px solid rgba(91,214,138,.30)">
@@ -776,7 +757,7 @@
             <tr><td>Plánování inzerátu předem</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
             <tr><td>Šablony inzerátů</td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
             <tr class="yp-sec"><td colspan="6">Nábor a viditelnost</td></tr>
-            <tr><td>Oslovování brigádníků</td><td><span class="yp-cell-txt">1×/měs</span></td><td><span class="yp-cell-txt">10×/měs</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-txt">100×/měs</span></td><td><span class="yp-cell-txt">100×/měs</span></td></tr>
+            <tr><td>Oslovování kandidátů</td><td><span class="yp-cell-txt">1×/měs</span></td><td><span class="yp-cell-txt">10×/měs</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><span class="yp-cell-txt">100×/měs</span></td><td><span class="yp-cell-txt">100×/měs</span></td></tr>
             <tr><td>Ověřená firma + branding</td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
             <tr><td>Video na profilu</td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
             <tr><td>Prémiový badge</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-tbd">brzy</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
@@ -839,11 +820,11 @@
               <span>Kolik stojí zveřejnění inzerátu?</span>
               <span class="emp-faq-plus"></span>
             </div>
-            <div class="emp-faq-a">Plán Starter je zdarma a navždy — zveřejníte 1 aktivní inzerát. Placené plány začínají na 499 Kč/měsíc a přidávají víc aktivních inzerátů, topování, oslovování brigádníků a pokročilou analytiku.</div>
+            <div class="emp-faq-a">Plán Starter je zdarma a navždy — zveřejníte 1 aktivní inzerát. Placené plány začínají na 499 Kč/měsíc a přidávají víc aktivních inzerátů, topování, oslovování kandidátů a pokročilou analytiku.</div>
           </div>
           <div class="emp-faq-item">
             <div class="emp-faq-q" onclick="toggleFaq(this)">
-              <span>Jak rychle najdu brigádníka?</span>
+              <span>Jak rychle najdu člověka?</span>
               <span class="emp-faq-plus"></span>
             </div>
             <div class="emp-faq-a">První kandidát chodí v průměru do 2,4 hodiny a 94 % firem najme do 48 hodin. Rychlost závisí na oboru, lokalitě a atraktivitě nabídky — topování ji ještě zrychlí.</div>
@@ -853,7 +834,7 @@
               <span>Jak probíhá výběr kandidátů?</span>
               <span class="emp-faq-plus"></span>
             </div>
-            <div class="emp-faq-a">Brigádníci swajpují vaši nabídku ve feedu. U každého zájemce vidíte profil, hodnocení a historii brigád. Jedním tapem ho přijmete, nebo posunete dál — a po přijetí se otevře chat.</div>
+            <div class="emp-faq-a">Kandidáti swajpují vaši nabídku ve feedu. U každého zájemce vidíte profil, hodnocení a historii odvedené práce. Jedním tapem ho přijmete, nebo posunete dál — a po přijetí se otevře chat.</div>
           </div>
           <div class="emp-faq-item">
             <div class="emp-faq-q" onclick="toggleFaq(this)">

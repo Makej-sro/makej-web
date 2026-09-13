@@ -2417,3 +2417,60 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
   /* Sekce hero stejně zakryjí — bez pohybu není co rozmazávat. */
   .uvod .vx-hero, .uvod .eh-head, .uvod .mkj-visual { filter: none; opacity: 1; transform: none; }
 }
+
+/* ═══════════ POSUVNÝ PRUH DŮVODŮ (vzor bolt.eu) ═══════════
+   Ilustrace nahoře, pod ní vycentrovaný nadpis a popis. Žádné kartičky —
+   obrázky mají průhledné pozadí a stojí přímo na ploše sekce. Vodorovný
+   scroll s přichytáváním; poslední položka je u kraje schválně useknutá,
+   aby bylo poznat, že se dá jet dál.
+   Používá /hledam-si-praci i /pro-zamestnavatele. */
+.proc-pruh {
+  display: flex; gap: clamp(20px, 3vw, 48px);
+  overflow-x: auto; overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory; scroll-padding-left: var(--proc-okraj);
+  /* odsazení od kraje obrazovky řeší padding, ne container — jinak by pruh
+     nemohl vyjet až k hraně a useknutá položka by nebyla vidět */
+  --proc-okraj: max(24px, calc((100vw - 1080px) / 2));
+  padding: 0 var(--proc-okraj) 10px;
+  scrollbar-width: none;
+}
+.proc-pruh::-webkit-scrollbar { display: none; }
+.proc-bod {
+  flex: 0 0 clamp(240px, 27vw, 330px); scroll-snap-align: start;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+/* Ilustrace jsou předem vsazené do stejného plátna 760×620 a zvětšené tak,
+   aby zabíraly zhruba stejnou plochu (skript při exportu). Díky tomu stačí
+   prostá šířka — všechny se vykreslí stejně velké a dosedají na jednu linku.
+   Kdyby se nějaká vyměnila, musí projít stejným srovnáním, jinak bude v řadě
+   menší nebo větší než ostatní. */
+.proc-bod img { width: 100%; height: auto; display: block; }
+.proc-bod h3 {
+  font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  letter-spacing: -.02em; line-height: 1.1; color: #0e1116; margin: 18px 0 0;
+}
+.proc-bod p {
+  font-size: clamp(.9rem, 1vw, .98rem); line-height: 1.55;
+  color: rgba(14,17,22,.6); margin: 10px 0 0; text-wrap: pretty;
+}
+@media (max-width: 700px) {
+  .proc-pruh { --proc-okraj: 20px; }
+  .proc-bod { flex-basis: 74vw; }
+}
+
+/* Varianta bez posouvání: když se položky vejdou na jednu řadu, ať stojí
+   v pravidelné mřížce — stejně široké sloupce, nic neuteče za okraj.
+   Používá /pro-zamestnavatele (čtyři důvody). */
+.proc-pruh--mrizka {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  overflow: visible; scroll-snap-type: none;
+  width: min(1080px, 100% - 48px); margin-inline: auto;
+  padding: 0 0 10px;
+}
+.proc-pruh--mrizka .proc-bod { flex-basis: auto; scroll-snap-align: none; }
+/* „Analytika v reálném čase" se na šířku sloupce nevejde na jeden řádek.
+   Bez rezervy na dva řádky by se popis pod ním posunul níž než u ostatních
+   a mřížka by přestala být symetrická. */
+.proc-pruh--mrizka .proc-bod h3 { min-height: 2.2em; }
+@media (max-width: 900px) { .proc-pruh--mrizka { grid-template-columns: 1fr 1fr; gap: 40px 24px; } }
+@media (max-width: 520px) { .proc-pruh--mrizka { grid-template-columns: 1fr; } }
