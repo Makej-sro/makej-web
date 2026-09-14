@@ -33,6 +33,18 @@ Po změně JSX **vždy bumpni `?v=N`** u daného souboru v `employer/index.html`
 
 ## Hotovo naposledy
 
+- **Makačky pryč, odstoupení od smlouvy, jazyk na „makače", nové fotky** (2026-09-13/14):
+
+  **Makačky odstraněny z webu** (panel na ceníku i se záložkou, dvě položky FAQ, zmínka v dashboardu) včetně mrtvého CSS a funkce `showPanel`. Vrátí se později. Vedlejší efekt: tvrzení v podmínkách „pro brigádníky zdarma" je zase pravdivé. Položky FAQ, které pod kategorií „Makačky" jen seděly (hodnocení, účet), **přeřazeny do „ucet"** — jinak by po zrušení té záložky byly nedostupné.
+
+  **Podmínky:** nový článek 7 **Odstoupení od smlouvy** (kdo je spotřebitel — IČO = není; 14denní lhůta; zánik práva po poskytnutí služby; předplatné a jeho rušení), ostatní přečíslované. Opraven mrtvý odkaz `#pricing` → `/cenik`. **Vypuštěna povinnost uzavřít DPP/DPČ/HPP** — předepisovat formu vztahu posouvá platformu ze „nástěnky" do zprostředkování zaměstnání (zákon 435/2004 Sb.), což by chtělo povolení od ÚP. Konkurenční Fuška to řeší opačně: nabídky se znaky závislé práce **zakazuje**. Otevřená otázka k právníkovi.
+
+  **Jazyk ve FAQ:** brigádník → makač, brigáda → práce (69 řádků na třech stránkách, včetně JSON-LD `FAQPage` — ověřeno, že zůstal platný JSON, 39 otázek). Ponechána odpověď vyjmenovávající typy („brigády … vedle nich part-time a full-time"), kde brigáda není zástupné slovo.
+
+  **Fotky:** čtyři kroky u zaměstnavatelů a ilustrace `emp-chat.webp` převzaty od Yasina (`dec52f3`) — **u `emp-chat` zapomněl zvýšit `?v=`**, u nás je na `v=2`. Tři kroky na `/hledam-si-praci` nahrazeny vlastními fotkami, ořez 1100×513 jako u zaměstnavatelů, obal sekce 1080 → 1240 px. Staré `krok-*.png` (1,85 MB) smazány a `lide.html` opraveno — přednačítala cizí `krok-*.png`, které nezobrazuje.
+
+  **PAST PŘI TESTOVÁNÍ (naletěl jsem na ni):** sekce kroků na `/hledam-si-praci` má `id="how-it-works"` a ten blok CSS **přebíjí celé rozvržení** (`.bolt-row` na `display:block`, `.bolt-media` na `aspect-ratio:auto`). Vytrhnout sekci do testovací stránky bez toho id ukazuje dvousloupcovou variantu, která se na webu nepoužívá. **Testovací výřez musí nést i identifikátor sekce.** Obecná pravidla `.bolt-media` (ř. 54–64) jsou mrtvá, vždy přebitá.
+
 - **Sekce „Proč" od Yasina + jazyk webu přestává být jen o brigádách** (2026-09-12/13):
 
   **Sekce „Proč"** na `/hledam-si-praci` a `/pro-zamestnavatele` převzata z Yasinova commitu `079fc0c` — 3D ilustrace místo textových boxů (6 a 4 položky, sdílené `.proc-pruh` ve `style.css`, 10 souborů `.webp`, 456 kB). **Pozor na to, jak se to přebíralo:** nejdřív jsem vzal celé Yasinovy stránky a přišel s tím i jeho přepis sekce „jak to funguje" (odkazoval na `krok-*.jpg`, které nemáme → 404) a vyhlazené předěly mezi sekcemi. Obojí vráceno; nakonec aplikovány **jen vybrané hunky** (3,4,5 z 6 u hledam-si-praci; 2,3,4 z 5 u pro-zamestnavatele). Při dalším přebírání od Yasina takhle postupovat rovnou.

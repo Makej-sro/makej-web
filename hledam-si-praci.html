@@ -39,13 +39,13 @@
   <script src="/iconify-icons.js"></script>
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
-  <link rel="preload" as="image" href="/krok-1.png?v=3" />
-  <link rel="preload" as="image" href="/krok-2.png?v=2" />
+  <link rel="preload" as="image" href="/krok-1.jpg?v=6" />
+  <link rel="preload" as="image" href="/krok-2.jpg?v=5" />
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="style.css?v=135" />
   <style>
     /* Bolt-style střídavé kroky (foto + text) */
-    .bolt-journey { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    .bolt-journey { position: relative; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
     .bolt-steps { display: flex; flex-direction: column; gap: 88px; }
     .bolt-cta { display: flex; justify-content: center; margin-top: 60px; position: relative; z-index: 1; }
     .bolt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
@@ -509,7 +509,7 @@
     <!-- ═══════════ INTRO (styl Lidé) ═══════════ -->
     <section class="vx-intro">
       <div class="vx-wrap js-reveal-up">
-        <h2>Studentské brigády i přivýdělek za pár swajpů</h2>
+        <h2>Práce i přivýdělek za pár swajpů</h2>
         <p>Konec posílání životopisů a čekání na odpověď. Swajpni nabídku, matchni se s firmou a domluv se přímo v chatu. Brigády, part-time i full-time — jen pár minut od tebe a bez zdlouhavého hledání po inzerátech.</p>
       </div>
     </section>
@@ -522,7 +522,7 @@
           <div class="bolt-steps">
           <div class="bolt-row js-reveal-up">
             <div class="bolt-media">
-              <img src="/krok-1.png?v=3" alt="Brigádník ukazuje appku Makej na telefonu" />
+              <img src="/krok-1.jpg?v=6" alt="Makač ukazuje nabídku v appce Makej na telefonu" />
             </div>
             <div class="bolt-text">
               <h3>Swajpni nabídky</h3>
@@ -532,7 +532,7 @@
 
           <div class="bolt-row js-reveal-up">
             <div class="bolt-media">
-              <img src="/krok-2.png?v=2" alt="Match s firmou — podání rukou" />
+              <img src="/krok-2.jpg?v=5" alt="Podání rukou se zástupcem firmy po matchi" />
             </div>
             <div class="bolt-text">
               <h3>Matchni se s firmou</h3>
@@ -542,11 +542,11 @@
 
           <div class="bolt-row js-reveal-up">
             <div class="bolt-media">
-              <img src="/krok-3.png?v=2" alt="Výplata za odpracovanou brigádu" />
+              <img src="/krok-3.jpg?v=5" alt="Makač s vydělanými penězi po odvedené práci" />
             </div>
             <div class="bolt-text">
               <h3>Pracuj a vydělávej</h3>
-              <p>Přijď na směnu, odveď práci a vydělanej jdi domů. Žádné životopisy, žádné pohovory. Tak jednoduché to je.</p>
+              <p>Přijď na směnu, odveď práci a vydělanej jdi domů.</p>
             </div>
           </div>
           </div>
@@ -632,14 +632,14 @@
           <div class="emp-faq-list">
             <div class="emp-faq-item">
               <div class="emp-faq-q" onclick="toggleFaq(this)">
-                <span>Kolik stojí Makej pro brigádníky?</span>
+                <span>Kolik stojí Makej pro makače?</span>
                 <span class="emp-faq-plus"></span>
               </div>
-              <div class="emp-faq-a">Makej je pro brigádníky úplně zdarma. Žádné poplatky ani provize z výdělku — stáhneš, zaregistruješ se a swajpuješ.</div>
+              <div class="emp-faq-a">Makej je pro makače úplně zdarma. Žádné poplatky ani provize z výdělku — stáhneš, zaregistruješ se a swajpuješ.</div>
             </div>
             <div class="emp-faq-item">
               <div class="emp-faq-q" onclick="toggleFaq(this)">
-                <span>Jak si najdu brigádu?</span>
+                <span>Jak si najdu práci?</span>
                 <span class="emp-faq-plus"></span>
               </div>
               <div class="emp-faq-a">Swajpuješ nabídky ve svém okolí jako na Tinderu: doprava „mám zájem", doleva „přeskočit". Když firma projeví zájem taky, vznikne match a otevře se chat.</div>
@@ -667,24 +667,24 @@
             </div>
             <div class="emp-faq-item">
               <div class="emp-faq-q" onclick="toggleFaq(this)">
-                <span>Jaké typy brigád na Makej najdu?</span>
+                <span>Jaké typy práce na Makej najdu?</span>
                 <span class="emp-faq-plus"></span>
               </div>
               <div class="emp-faq-a">Jednorázové i opakované brigády, víkendové a letní brigády, noční směny i práci na zkrácený úvazek. Vedle klasických studentských brigád najdeš i part-time a full-time pozice — filtruješ si je podle toho, co zrovna hledáš.</div>
             </div>
             <div class="emp-faq-item">
               <div class="emp-faq-q" onclick="toggleFaq(this)">
-                <span>Na jakou smlouvu se brigády dělají?</span>
+                <span>Na jakou smlouvu se práce dělají?</span>
                 <span class="emp-faq-plus"></span>
               </div>
-              <div class="emp-faq-a">Krátkodobé brigády bývají na dohodu o provedení práce (DPP), delší spolupráce na dohodu o pracovní činnosti (DPČ). Konkrétní formu si domluvíš přímo s firmou v chatu ještě před nástupem.</div>
+              <div class="emp-faq-a">Krátkodobá spolupráce bývá na dohodu o provedení práce (DPP), delší spolupráce na dohodu o pracovní činnosti (DPČ). Konkrétní formu si domluvíš přímo s firmou v chatu ještě před nástupem.</div>
             </div>
             <div class="emp-faq-item">
               <div class="emp-faq-q" onclick="toggleFaq(this)">
                 <span>Od kolika let a kde Makej funguje?</span>
                 <span class="emp-faq-plus"></span>
               </div>
-              <div class="emp-faq-a">Brigády jsou zpravidla od 15 let (u některých pozic může být podmínka 18 let — vždy je to uvedené u nabídky). Nabídky filtruješ podle lokace, ať máš práci pár minut od domova nebo školy.</div>
+              <div class="emp-faq-a">Práce jsou zpravidla od 15 let (u některých pozic může být podmínka 18 let — vždy je to uvedené u nabídky). Nabídky filtruješ podle lokace, ať máš práci pár minut od domova nebo školy.</div>
             </div>
           </div>
         </div>
