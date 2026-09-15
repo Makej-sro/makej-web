@@ -95,7 +95,7 @@ src/
 ### Soubory
 ```
 index.html, style.css, script.js  — landing (+ další .html stránky: cenik, o-nas, podpora,
-                                     pruvodce, hledam-si-praci, pro-zamestnavatele, privacy, terms)
+                                     hledam-si-praci, pro-zamestnavatele, privacy, terms)
 STAV.md, REFERENCE.md, CLAUDE.md   — dokumentace
 employer/
 ├── index.html            — dashboard (auth gate + React app + globální mobilní CSS)
