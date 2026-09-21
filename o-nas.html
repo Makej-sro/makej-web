@@ -51,7 +51,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=135" />
+  <link rel="stylesheet" href="/style.css?v=138" />
   <style>
     /* ═══════════ O NÁS — návrh z Claude Design, doplněný o náš navbar,
        sekci se stažením a patičku. Modrá sjednocena na značkovou #0020f6. ═══════════ */
@@ -194,6 +194,33 @@
       letter-spacing: -.03em; }
     .oc-person p { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .16em;
       text-transform: uppercase; color: var(--blue); }
+    /* POZOR: .oc-in už na téhle stránce je — obaluje obsah každé sekce.
+       Odkaz proto .oc-li, ne .oc-in. */
+    .oc-li { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+      font-size: 12px; font-weight: 700; letter-spacing: .04em; text-decoration: none;
+      color: rgba(10,13,46,.55); transition: color .18s; }
+    .oc-li:hover { color: var(--blue); }
+    /* Musí být .oc-person .oc-role, ne jen .oc-role: pravidlo .oc-person p
+       má vyšší specificitu a přebilo by velikost, barvu i verzálky. */
+    .oc-person .oc-role { margin: 8px 0 0; font-size: 15px; font-weight: 400; line-height: 1.5;
+      letter-spacing: normal; text-transform: none; color: var(--mut); max-width: 260px; }
+
+    /* Kotva #kontakt — míří sem odkaz z patičky všech stránek. scroll-margin
+       drží nadpis pod přilepenou lištou, jinak by se pod ni schoval. */
+    .oc-kontakt { padding-top: clamp(36px, 4.5vw, 56px); scroll-margin-top: 96px; }
+    .oc-kontakt h3 { margin: 0 0 8px; font-size: 12px; font-weight: 700;
+      letter-spacing: .16em; text-transform: uppercase; color: var(--blue); }
+    .oc-kontakt a { font-weight: 800; font-size: clamp(20px, 2.2vw, 28px);
+      letter-spacing: -.02em; color: var(--ink); transition: color .2s ease; }
+    .oc-kontakt a:hover { color: var(--blue); }
+
+    /* Najetí na člena týmu obarví jeho jméno i nadpis sekce. Nadpis stojí
+       v jiné větvi DOMu, takže z karty na něj vede jen :has() přes společnou
+       sekci. Scope řeší samo — .oc-person je jen v téhle sekci, jinde se
+       pravidlo nemá čeho chytit, takže „Proč vzniklo" zůstane černé. */
+    .oc-person h3, .oc-eh { transition: color .2s ease; }
+    .oc-person:hover h3 { color: var(--blue); }
+    .oc-sec:has(.oc-person:hover) .oc-eh { color: var(--blue); }
 
     /* ── responsive ── */
     @media (max-width: 1000px) {
@@ -394,13 +421,27 @@
         <div class="oc-team">
           <div class="oc-person">
             <h3>Jan Weber</h3><p>Spoluzakladatel</p>
+            <p class="oc-role">Stará se o marketing.</p>
+            <a class="oc-li" href="https://www.linkedin.com/in/jan-weber-b22880303/" target="_blank" rel="noopener"
+               aria-label="Jan Weber na LinkedInu"><iconify-icon icon="mdi:linkedin" width="18"></iconify-icon>LinkedIn</a>
           </div>
           <div class="oc-person">
             <h3>Samuel Pšeja</h3><p>Spoluzakladatel</p>
+            <p class="oc-role">Postavil web Makej a spravuje ho.</p>
+            <a class="oc-li" href="https://www.linkedin.com/in/samuelpseja3/" target="_blank" rel="noopener"
+               aria-label="Samuel Pšeja na LinkedInu"><iconify-icon icon="mdi:linkedin" width="18"></iconify-icon>LinkedIn</a>
           </div>
           <div class="oc-person">
             <h3>Yasin Benmerzouk</h3><p>Spoluzakladatel</p>
+            <p class="oc-role">Vyvíjí aplikaci Makej.</p>
+            <a class="oc-li" href="https://www.linkedin.com/in/yasin-benmerzouk-025023419/" target="_blank" rel="noopener"
+               aria-label="Yasin Benmerzouk na LinkedInu"><iconify-icon icon="mdi:linkedin" width="18"></iconify-icon>LinkedIn</a>
           </div>
+        </div>
+
+        <div class="oc-kontakt" id="kontakt">
+          <h3>Kontakt</h3>
+          <a href="mailto:podpora@makej.eu">podpora@makej.eu</a>
         </div>
       </div>
     </section>
@@ -456,7 +497,7 @@
           <h4>Firma</h4>
           <a href="/blog">Blog</a>
           <a href="/podpora">Podpora</a>
-          <a href="mailto:podpora@makej.eu">Kontakt</a>
+          <a href="/o-nas#kontakt">Kontakt</a>
           <a href="/o-nas">O nás</a>
         </div>
         <div class="footer-col">
@@ -643,7 +684,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=53"></script>
+  <script src="/script.js?v=55"></script>
   <!-- Odhalování sekcí při scrollu — stejný efekt jako na ostatních stránkách (generická třída .reveal) -->
   <script>
   (function () {

@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     /* League Spartan — vlastní hosting (tahle stránka nenačítá style.css) */
     @font-face {
@@ -66,7 +66,9 @@
       --primary-soft: rgba(0,32,246,.07);
       --border: rgba(10,13,46,.10);
       --font-sans: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', sans-serif;
-      --font-heading: 'Bricolage Grotesque', 'Bricolage Grotesque Fallback', 'Plus Jakarta Sans', sans-serif;
+      /* Stejné písmo nadpisů jako zbytek webu (style.css). Dřív tu stál
+         Bricolage Grotesque, takže právní stránky vypadaly jinak než ostatní. */
+      --font-heading: 'Inter', 'Inter Fallback', 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
     }
     html { scroll-behavior: smooth; }
     body {

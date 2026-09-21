@@ -2435,6 +2435,24 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
   scrollbar-width: none;
 }
 .proc-pruh::-webkit-scrollbar { display: none; }
+
+/* ── Pruh jede sám, ale jde i chytit ──────────────────────────────────
+   Posouvá se skutečným scrollem (scrollLeft v script.js), ne transformem.
+   Jen tak jde do něj zároveň sáhnout myší, prstem nebo kolečkem — CSS
+   animace by proti ručnímu posunu stála a přebíjela ho.
+   Položky zdvojuje JS, smyčka se pozná podle poloviny šířky stopy. */
+.proc-pas {
+  overflow-x: auto; overscroll-behavior-x: contain;
+  scrollbar-width: none; -ms-overflow-style: none;
+  cursor: grab;
+}
+.proc-pas::-webkit-scrollbar { display: none; }
+.proc-pas:active { cursor: grabbing; }
+.proc-pas .proc-pruh {
+  width: max-content; overflow: visible;
+  scroll-snap-type: none; padding-left: 0; padding-right: 0;
+}
+
 .proc-bod {
   flex: 0 0 clamp(240px, 27vw, 330px); scroll-snap-align: start;
   display: flex; flex-direction: column; align-items: center; text-align: center;

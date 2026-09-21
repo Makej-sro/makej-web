@@ -33,6 +33,22 @@ Po změně JSX **vždy bumpni `?v=N`** u daného souboru v `employer/index.html`
 
 ## Hotovo naposledy
 
+- **Jezdící pruhy důvodů, tým na /o-nas, písmo právních stránek** (2026-09-21):
+
+  **Pruhy „Proč" jedou samy a jdou chytit.** Posouvá se `scrollLeft` z `script.js`, ne CSS transformem — **transform by ruční posun přebíjel a prohlížeč by v pruhu neměl co scrollovat**. Položky zdvojuje JS (ne HTML, aby se kopie nerozešla s originálem), smyčka se uzavírá odečtením poloviny šířky stopy. 60 px/s, po dotyku vteřina klidu, na mobilu se nic nehýbe (stojí pod sebou).
+
+  **/o-nas:** odkazy na LinkedIn u všech tří, hover obarví jméno **i nadpis sekce** (`:has()` na společné `.oc-sec` — nadpis je v jiné větvi DOMu), popisky rolí, blok **Kontakt** s kotvou `#kontakt`. Odkaz „Kontakt" v patičce **všech 10 stránek** přesměrován z `mailto:` na `/o-nas#kontakt`.
+
+  **Právní stránky měly jiné písmo než zbytek webu.** `terms`, `privacy` i `zasady-cookies` si v `:root` přebíjely `--font-heading` na Bricolage Grotesque a **Inter si vůbec nestahovaly**. Obojí srovnáno — samotná změna proměnné by nestačila.
+
+  **DVĚ CHYBY, KTERÉ JSEM UDĚLAL A STOJÍ ZA ZAPAMATOVÁNÍ:**
+
+  1. **Přepis CSS spolkl sousední pravidla.** Nahrazoval jsem blok „od komentáře po první prázdný řádek" a záběr sahal dál, než jsem čekal — zmizela pravidla `.proc-bod` i mobilní skládání a ilustrace se roztáhly na svých 760 px. **Po každém mazání v CSS si vypsat, která pravidla v souboru zůstala**, ne jen zkontrolovat závorky.
+
+  2. **Kolize názvu třídy.** Pro odkaz na LinkedIn jsem použil `.oc-in` — jenže ta na `/o-nas` už existuje jako obal obsahu **každé sekce** (6×). Z obalů se staly `inline-flex` o 12 px a celá stránka se sesypala. **Před novou třídou ji vygrepovat**, hlavně na stránkách s vlastním `<style>` plným `.oc-*`.
+
+  Související past: `.oc-person p` má vyšší specificitu než samotná třída, takže popisek role musel být `.oc-person .oc-role`, jinak by se vykreslil modrými verzálkami.
+
 - **Makačky pryč, odstoupení od smlouvy, jazyk na „makače", nové fotky** (2026-09-13/14):
 
   **Makačky odstraněny z webu** (panel na ceníku i se záložkou, dvě položky FAQ, zmínka v dashboardu) včetně mrtvého CSS a funkce `showPanel`. Vrátí se později. Vedlejší efekt: tvrzení v podmínkách „pro brigádníky zdarma" je zase pravdivé. Položky FAQ, které pod kategorií „Makačky" jen seděly (hodnocení, účet), **přeřazeny do „ucet"** — jinak by po zrušení té záložky byly nedostupné.

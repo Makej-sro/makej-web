@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=135" />
+  <link rel="stylesheet" href="style.css?v=138" />
   <style>
     /* ═══════════ BENTO DESIGN (pro zaměstnavatele) ═══════════ */
     #employers { padding: 0; }
@@ -599,7 +599,8 @@
       <!-- Stejný pruh jako „Proč si zvolíš Makej" na /hledam-si-praci.
            Stojí MIMO .emp-why, protože ta má max-width a overflow: hidden —
            uvnitř by se pruh nemohl rozjet až k okraji obrazovky. -->
-      <div class="proc-pruh proc-pruh--mrizka" aria-label="Proč Makej">
+      <div class="proc-pas">
+      <div class="proc-pruh" aria-label="Proč Makej">
           <article class="proc-bod">
             <img src="/emp-profily.webp?v=1" alt="Karta kandidáta s ověřovacím odznakem" width="760" height="620" loading="lazy" />
             <h3>Ověřené profily</h3>
@@ -621,6 +622,7 @@
             <p>Základní plán bez poplatků. Platíte, až když chcete víc.</p>
           </article>
       </div>
+      </div><!-- /.proc-pas -->
       </div>
 
     </section>
@@ -910,7 +912,7 @@
           <h4>Firma</h4>
           <a href="/blog">Blog</a>
           <a href="/podpora">Podpora</a>
-          <a href="mailto:podpora@makej.eu">Kontakt</a>
+          <a href="/o-nas#kontakt">Kontakt</a>
           <a href="/o-nas">O nás</a>
         </div>
         <div class="footer-col">
@@ -1074,7 +1076,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=53"></script>
+  <script src="script.js?v=55"></script>
   <script>
     // FAQ accordion
     function toggleFaq(el) {

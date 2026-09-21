@@ -1738,3 +1738,57 @@ function showToast(msg) {
     setTimeout(() => napis('Účet je založený.', 'wl-typed3', 'wl-cur3'), 900);
   });
 })();
+
+// ═══════════ PRUH DŮVODŮ JEDE SÁM (a jde chytit) ═══════════
+// Posouváme scrollLeft, ne transformem — jen tak lze do pruhu zároveň sáhnout
+// myší, prstem nebo kolečkem. CSS animace by ruční posun přebíjela.
+//
+// Položky zdvojujeme až tady, ne v HTML: obsah se pak upravuje na jednom místě
+// a kopie se nemůže rozejít s originálem. Klony jsou aria-hidden, ať je čtečka
+// nepředčítá dvakrát, a bez tabulátoru.
+//
+// Smyčka: jakmile scroll přejede polovinu stopy (tedy konec originálů), odečte
+// se půlka. Obsah je za ní totožný, takže to oko nepozná.
+(function pruhyJedou() {
+  const RYCHLOST = 60;          // px za vteřinu
+  const KLID     = 1200;        // jak dlouho po dotyku zůstat stát (ms)
+
+  document.querySelectorAll('.proc-pas').forEach(pas => {
+    const pruh = pas.querySelector('.proc-pruh');
+    if (!pruh || pruh.dataset.zdvojeno) return;
+
+    Array.from(pruh.children).forEach(b => {
+      const kopie = b.cloneNode(true);
+      kopie.setAttribute('aria-hidden', 'true');
+      kopie.querySelectorAll('a, button, input').forEach(p => p.setAttribute('tabindex', '-1'));
+      pruh.appendChild(kopie);
+    });
+    pruh.dataset.zdvojeno = '1';
+
+    // Na mobilu stojí položky pod sebou (grid) — tam není co posouvat.
+    if (pas.scrollWidth <= pas.clientWidth + 4) return;
+
+    const tiche = matchMedia('(prefers-reduced-motion: reduce)');
+    let stoji = 0;                                  // do kdy stojíme (timestamp)
+    const pozastav = () => { stoji = performance.now() + KLID; };
+
+    // Ruční posun kolečkem, prstem i tažením myši pruh na chvíli zastaví.
+    ['pointerdown', 'wheel', 'touchstart'].forEach(u =>
+      pas.addEventListener(u, pozastav, { passive: true }));
+    pas.addEventListener('pointerenter', () => { stoji = Infinity; });
+    pas.addEventListener('pointerleave', () => { stoji = 0; });
+    pas.addEventListener('focusin',  () => { stoji = Infinity; });
+    pas.addEventListener('focusout', () => { stoji = 0; });
+
+    let minule = performance.now();
+    (function krok(ted) {
+      const dt = Math.min(ted - minule, 100) / 1000;   // po návratu na záložku neskáče
+      minule = ted;
+      if (!tiche.matches && ted >= stoji) pas.scrollLeft += RYCHLOST * dt;
+      const pul = pruh.scrollWidth / 2;
+      if (pas.scrollLeft >= pul) pas.scrollLeft -= pul;
+      else if (pas.scrollLeft < 0) pas.scrollLeft += pul;
+      requestAnimationFrame(krok);
+    })(minule);
+  });
+})();
