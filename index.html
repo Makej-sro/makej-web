@@ -71,6 +71,19 @@
        prosvítalo jen při přetažení stránky na mobilu. */
     body { background: #fff; }
     body::before { display: none !important; }
+
+    /* Patička na úvodce stojí na bílé — modrý blok #download, který jí ve
+       style.css přepínal barvy (`#download + #footer`), už před ní není.
+       Základní styl počítá s tmavým podkladem, takže na bílé mizí: nadpisy
+       sloupců jsou bílé na bílé a odkaz zbělá při najetí. Přebarvíme do tmavé. */
+    #footer .footer-col h4 { color: #14161C; }
+    #footer .footer-col a:hover { color: #374151; }
+    @media (hover: hover) and (pointer: fine) {
+      #footer .footer-social a:hover { background: rgba(55,65,81,.10); color: #374151; }
+    }
+    /* Linky ze světlounké modré jsou na bílé taky neviditelné. */
+    #footer { border-top-color: rgba(20,22,28,.07); }
+    #footer .footer-bottom { border-top-color: rgba(20,22,28,.08); }
   </style>
   <script>
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
