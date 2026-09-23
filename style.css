@@ -249,6 +249,16 @@ img { max-width: 100%; display: block; }
   position: relative; z-index: 1;      /* překryje tmavý body::before */
   overflow: hidden;
 }
+/* Aurora se o `overflow: hidden` na heru ořízne do rovné čáry. Dokud je hero
+   přilepené, není to poznat — jenže na konci .uvod se jeho spodní hrana
+   odroluje doprostřed obrazovky a čára vyjede na světlo (nad patičkou).
+   Maska ji nechá k hraně vytratit, stejně jako u čekacího listu na
+   podstránkách. */
+#hero .aurora {
+  -webkit-mask-image: linear-gradient(180deg, #000 76%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 76%, transparent 100%);
+}
+
 .hero-main {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
