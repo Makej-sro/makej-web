@@ -909,114 +909,6 @@ img { max-width: 100%; display: block; }
   .wl-mark { font-size: clamp(36px, 7vw, 54px); }
 }
 
-/* ═══════════ REFERENCE — galerie recenzí (stejný jazyk jako galerie na /lide) ═══════════ */
-#makaci { padding: 118px 0 44px; background: var(--pl-canvas); overflow: hidden; }
-/* panel jde přes celou šířku, aby se velké slovo v pozadí mohlo rozjet až k okrajům */
-#makaci .container { width: 100%; max-width: none; padding: 0; }
-/* nadpis sekce — stejné hodnoty jako .vx-sec-head / .vx-h2 na /lide */
-.ref-head { text-align: center; max-width: 700px; margin: 0 auto 54px; padding: 0 24px; }
-.ref-head h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.02; color: #0e1116; margin: 0; }
-.ref-head p { color: rgba(14,17,22,.55); font-size: 1.08rem; line-height: 1.6; margin: 14px 0 0; }
-
-.ref-panel { position: relative; display: flex; flex-direction: column; padding: 20px clamp(28px, 6vw, 90px) 124px; overflow: hidden; }
-
-/* velké slovo v pozadí */
-.ref-word {
-  position: absolute; left: 0; right: 0; top: 56%; transform: translateY(-50%);
-  text-align: center; font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
-  font-size: clamp(4.2rem, 17.5vw, 19rem); letter-spacing: -.04em; line-height: 1;
-  color: rgba(14,17,22,.055); z-index: 0; pointer-events: none; white-space: nowrap;
-}
-
-/* rohové texty (vlevo dole = nadpis sekce, vpravo nahoře = doplněk) */
-.ref-side { position: absolute; z-index: 3; max-width: 250px; font-size: .9rem; line-height: 1.5; color: rgba(14,17,22,.55); margin: 0; }
-.ref-side b { color: #0e1116; font-weight: 800; }
-.ref-side.bl { bottom: 42px; left: 44px; }
-.ref-side.tr { top: 42px; right: 44px; text-align: right; }
-
-/* karty — tři různé velikosti, výškově odsazené */
-.ref-cards { position: relative; z-index: 2; order: 2; display: flex; justify-content: center; align-items: flex-start; gap: clamp(24px, 5vw, 72px); }
-.ref-card { flex: 0 0 auto; margin: 0; }
-.ref-card.c1 { margin-top: 44px;  width: clamp(272px, 24vw, 355px); }
-.ref-card.c2 { margin-top: 0;     width: clamp(292px, 27vw, 415px); }
-.ref-card.c3 { margin-top: 132px; width: clamp(250px, 21vw, 320px); }
-
-.ref-quote {
-  position: relative; background: #fff; border-radius: 20px;
-  border: 1px solid rgba(14,17,22,.07);
-  box-shadow: 0 34px 64px -32px rgba(14,17,22,.45);
-  padding: 30px 30px 32px;
-}
-.ref-card.c2 .ref-quote { padding: 38px 36px 40px; }
-/* hvězdičky: PNG (ico-star.png) jako maska → tvar zůstane, barvu dá naše modrá */
-.ref-stars { display: flex; gap: 4px; line-height: 0; }
-.ref-stars i {
-  width: 15px; height: 15px; display: block; flex: 0 0 auto;
-  background: var(--primary);
-  -webkit-mask: url('/ico-star.png') no-repeat center / contain;
-          mask: url('/ico-star.png') no-repeat center / contain;
-}
-.ref-card.c2 .ref-stars i { width: 16px; height: 16px; }
-/* prohlížeč bez masky by ukázal modrý čtverec — radši původní obrázek */
-@supports not ((-webkit-mask-image: url('/ico-star.png')) or (mask-image: url('/ico-star.png'))) {
-  .ref-stars i { background: url('/ico-star.png') no-repeat center / contain; }
-}
-/* min-height netřeba: při výměně je celá karta odfadovaná, změna výšky není vidět */
-.ref-text { margin: 14px 0 0; font-size: 1.02rem; line-height: 1.55; color: #14161c; text-wrap: pretty; }
-.ref-card.c2 .ref-text { font-size: 1.18rem; }
-.ref-card.c3 .ref-text { font-size: .96rem; }
-
-/* podpis uvnitř karty — oddělený linkou, jméno vlevo / datum vpravo */
-.ref-cap { margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(14,17,22,.08); display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.ref-name { font-family: var(--font-heading); font-weight: 800; text-transform: uppercase; font-size: .88rem; letter-spacing: -.01em; color: #0e1116; }
-.ref-meta { color: rgba(14,17,22,.45); font-size: .8rem; white-space: nowrap; }
-
-/* Výměna recenze (JS přepíná .swapping → .swap-in): stará odletí nahoru jako
-   odswajpnutá karta, nová přiletí zespoda. Animuje se celá karta, ne jen text,
-   aby bylo na první pohled vidět, že se recenze střídají. */
-.ref-quote { transition: opacity .32s ease, transform .32s cubic-bezier(.4,0,.7,.4); }
-.ref-card.swapping .ref-quote { opacity: 0; transform: translateY(-26px) scale(.97) rotate(-1.4deg); }
-.ref-card.swap-in .ref-quote { animation: refSwapIn .58s cubic-bezier(.2,.85,.28,1) both; }
-@keyframes refSwapIn {
-  from { opacity: 0; transform: translateY(30px) scale(.97) rotate(1.2deg); }
-  to   { opacity: 1; transform: none; }
-}
-
-/* Scroll-reveal: prostřední karta se „načte" (pop), boční přijedou zespoda, slovo taky */
-.js-ref-up { opacity: 0; transform: translateY(80px); transition: opacity 1.1s cubic-bezier(.2,.8,.25,1), transform 1.1s cubic-bezier(.2,.8,.25,1); will-change: transform, opacity; }
-.js-ref-pop { opacity: 0; transform: scale(.9); transition: opacity 1s ease, transform 1.1s cubic-bezier(.2,.8,.25,1); will-change: transform, opacity; }
-.js-ref-up.is-in, .js-ref-pop.is-in { opacity: 1; transform: none; }
-.ref-card.c2.js-ref-pop { transition-delay: .1s; }
-.ref-card.c1.js-ref-up { transition-delay: .34s; }
-.ref-card.c3.js-ref-up { transition-delay: .58s; }
-/* slovo je centrované přes translateY(-50%) — reveal to musí zachovat */
-.js-ref-word { opacity: 0; transform: translateY(calc(-50% + 70px)); transition: opacity 1.2s cubic-bezier(.2,.8,.25,1), transform 1.2s cubic-bezier(.2,.8,.25,1); will-change: transform, opacity; }
-.js-ref-word.is-in { opacity: 1; transform: translateY(-50%); }
-
-@media (prefers-reduced-motion: reduce) {
-  .js-ref-up, .js-ref-pop, .js-ref-word { opacity: 1 !important; transition: none !important; }
-  .js-ref-up, .js-ref-pop { transform: none !important; }
-  .js-ref-word { transform: translateY(-50%) !important; }
-  .ref-quote { transition: none !important; animation: none !important; }
-}
-
-@media (max-width: 900px) {
-  #makaci { padding: 76px 0 84px; }
-  /* slovo nahoru nad text, karty pod sebe, rohové texty do proudu */
-  .ref-head { margin-bottom: 34px; padding: 0 6px; }
-  .ref-panel { padding: 88px 22px 0; }
-  .ref-word { top: 8px; font-size: 3.4rem; transform: none; }
-  .js-ref-word { transform: translateY(46px); }
-  .js-ref-word.is-in { transform: none; }
-  .ref-side { position: static; max-width: none; text-align: center; }
-  .ref-side.bl { order: 1; margin-bottom: 30px; }
-  .ref-side.tr { order: 3; text-align: center; margin-top: 26px; }
-  .ref-cards { flex-direction: column; align-items: center; gap: 34px; }
-  .ref-card.c1, .ref-card.c2, .ref-card.c3 { margin-top: 0; width: min(360px, 88vw); }
-  .ref-card.c2 .ref-quote { padding: 30px 30px 32px; }
-  .ref-card.c2 .ref-text { font-size: 1.06rem; }
-}
-
 /* ═══════════ DOWNLOAD ═══════════ */
 #download { padding: 64px 0; background: var(--pl-canvas); }
 .download-stage { position: relative; max-width: 900px; margin: 0 auto; }
@@ -1095,6 +987,64 @@ img { max-width: 100%; display: block; }
 
 /* Lišta cookies: consent.css + consent.js (hlavička každé stránky). */
 .download-note { color: #8a93a8; font-size: .85rem; font-weight: 600; }
+
+/* ── Čekací list na podstránkách ──────────────────────────────────────────
+   Sběr e-mailů místo tlačítek do obchodů, dokud appka není venku. Vzhled
+   nadpisu i políčka sdílí s úvodkou (.wl-mark / .wl-lead / .wl-in / .wl-go),
+   aby se stejná věc nekreslila dvakrát jinak. Liší se jen rám: tady sekce
+   stojí v proudu stránky — žádné přilepování ani rozmazané hero za ní, to je
+   na úvodce svázané s výškou hera a jinde by nemělo co rozmazávat. */
+/* Pozadí: stejná aurora jako v hero (tři plující modré skvrny) a přes ni
+   mléčné sklo. Skrz sklo je vidět rozmazaná skvrna, takže panel opravdu
+   vypadá jako sklo položené na světle — na plochém plátně by `backdrop-filter`
+   neměl co rozmazat a zbyl by jen bílý obdélník.
+   overflow: hidden ořezává skvrny, ať nepřetečou do sousedních sekcí. */
+#download.cl-sekce { padding: clamp(78px, 9vw, 118px) 0; position: relative; overflow: hidden; }
+/* Kde nad sekcí stojí bílá (FAQ na /hledam-si-praci a /pro-zamestnavatele,
+   bílé tělo na /o-nas), by na hraně vznikla ostrá čára. Plátno proto naběhne
+   přechodem. Na /lide je nad sekcí plátno taky, tam se třída nedává — jinak
+   by se do plynulé plochy naopak vložil bílý pruh. */
+#download.cl-sekce--zbila { background: linear-gradient(180deg, #fff 0, var(--pl-canvas) 190px); }
+/* Aurora má z-index 0, obsah musí být nad ní — jinak by ho překryla. */
+.cl-slot { position: relative; z-index: 1; display: flex; justify-content: center; padding: 0 clamp(16px, 4vw, 24px); }
+/* .wl-panel se na úvodce posouvá podle scrollu přes --p. Tady --p nikdo
+   nenastavuje, takže by zůstal zaseknutý 7vh dole — proto posun rušíme.
+   (transform jiný než none by navíc `backdrop-filter` uvnitř rozbil.) */
+.cl-sekce .wl-panel {
+  width: min(760px, 100%); transform: none;
+  padding: clamp(40px, 5vw, 62px) clamp(22px, 4vw, 52px);
+  background: rgba(255, 255, 255, .55);
+  backdrop-filter: blur(26px) saturate(150%);
+  -webkit-backdrop-filter: blur(26px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, .75);
+  border-radius: 34px;
+  box-shadow: 0 32px 70px -34px rgba(16, 24, 64, .45), 0 2px 10px rgba(16, 24, 64, .05);
+}
+/* Prohlížeč bez backdrop-filter (starší Firefox s vypnutou vlajkou) by dostal
+   průsvitný panel na skvrnách = nečitelný text. Radši plná bílá. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cl-sekce .wl-panel { background: rgba(255, 255, 255, .92); }
+}
+/* Skvrny jsou rozměřené na hero přes celou obrazovku. V téhle sekci, která
+   je o dost nižší, by většina zůstala mimo záběr a pod sklem by nebylo co
+   rozmazat — proto je stahujeme k panelu. */
+/* Skvrna, která přesahuje horní okraj, se o `overflow: hidden` ořízne do
+   rovné čáry. Maska ji nechá do okraje vytratit, takže po ní žádná hrana
+   nezbude — a zároveň nic nekreslí přes hranici sekce. */
+.cl-sekce .aurora {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 24%);
+          mask-image: linear-gradient(180deg, transparent 0, #000 24%);
+}
+.cl-sekce .aurora i:nth-child(1) { width: max(480px, 44vw); height: max(380px, 32vw); left: -4vw; top: -16%; }
+.cl-sekce .aurora i:nth-child(2) { width: max(440px, 40vw); height: max(440px, 38vw); right: -6vw; top: 4%; }
+.cl-sekce .aurora i:nth-child(3) { width: max(420px, 38vw); height: max(320px, 26vw); left: 26vw; bottom: -20%; }
+@media (max-width: 700px) {
+  .cl-sekce .wl-panel { border-radius: 26px; padding: 34px 18px; }
+}
+/* Menší než na úvodce: tam nadpis drží celou obrazovku, tady je to sekce
+   mezi ostatními a v plné velikosti by přebil vlastní obsah stránky. */
+.cl-sekce .wl-mark { font-size: clamp(36px, 5.6vw, 62px); }
+.cl-sekce .wl-h2 { font-size: clamp(30px, 4.6vw, 48px); }
 
 /* ═══════════ FOOTER ═══════════ */
 #footer { padding: 80px 0 32px; border-top: 1px solid rgba(208,208,255,.06); }
@@ -2472,14 +2422,21 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
   color: rgba(14,17,22,.6); margin: 10px 0 0; text-wrap: pretty;
 }
 @media (max-width: 700px) {
-  /* Na telefonu se pruh neposouvá do strany — položky stojí pod sebou.
-     Vodorovný scroll uvnitř svislého jde snadno přehlédnout a poslední
-     důvody by pak nikdo neviděl. Mřížková varianta si níž přebíjí počet
-     sloupců sama (pozdější pravidlo při stejné specificitě vyhrává). */
+  /* Na telefonu se nic neposouvá ani nejede — položky stojí pod sebou jako
+     seznam. Vodorovný scroll uvnitř svislého jde na telefonu snadno
+     přehlédnout a poslední důvody by pak nikdo neviděl.
+
+     POZOR na specificitu: `.proc-pas .proc-pruh` výš má (0,2,0), takže
+     samotné `.proc-pruh` (0,1,0) by ho nepřebilo a na mobilu by zůstala
+     `width: max-content` — obrázek by přetekl přes celou obrazovku.
+     Proto se stejný selektor opakuje i tady. */
+  .proc-pas { overflow-x: visible; cursor: auto; }
+  .proc-pas .proc-pruh,
   .proc-pruh {
     display: grid; grid-template-columns: 1fr; gap: 44px;
-    overflow-x: visible; scroll-snap-type: none;
+    width: auto; overflow-x: visible; scroll-snap-type: none;
     --proc-okraj: 20px;
+    padding: 0 var(--proc-okraj) 10px;
   }
   .proc-bod { flex-basis: auto; scroll-snap-align: none; }
 }

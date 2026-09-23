@@ -1036,119 +1036,6 @@ function showToast(msg) {
 })();
 
 
-/* ═══════════ REFERENCE — galerie recenzí (styl sekce Lidé) ═══════════ */
-(function () {
-  var wrap = document.getElementById('ref-cards');
-  if (!wrap) return;
-
-  var reviews = [
-    { text: 'Těším se, až to vyjde!', name: 'Šimon V.', date: '29. 7. 2026', stars: 5 },
-    { text: 'Moc se těším, až si na Makej najdu brigádu.', name: 'David V.', date: '27. 7. 2026', stars: 5 },
-    { text: 'Vypadá to suprově!', name: 'Samuel P.', date: '24. 7. 2026', stars: 5 },
-    { text: 'Posílám nezaměstnaným kamarádům.', name: 'Jan W.', date: '21. 7. 2026', stars: 5 },
-    { text: 'Budu konečně makat ve stylu!', name: 'Yasin B.', date: '18. 7. 2026', stars: 5 },
-  ];
-
-  var cards = Array.prototype.slice.call(wrap.querySelectorAll('.ref-card'));
-  if (!cards.length || reviews.length <= cards.length) return;
-
-  function fill(card, r) {
-    var st = card.querySelector('.ref-stars');
-    st.innerHTML = new Array(r.stars + 1).join('<i></i>');
-    st.setAttribute('aria-label', 'Hodnocení ' + r.stars + ' z 5');
-    card.querySelector('.ref-text').textContent = r.text;
-    card.querySelector('.ref-name').textContent = r.name;
-    card.querySelector('.ref-meta').textContent = r.date;
-  }
-
-  // V HTML jsou napevno první tři recenze (kvůli SEO a běhu bez JS). `shown` drží,
-  // která recenze je v které kartě — odvodí se z DOM, takže to sedí i po přepsání HTML.
-  var shown = cards.map(function (card, i) {
-    var t = (card.querySelector('.ref-text').textContent || '').trim();
-    for (var k = 0; k < reviews.length; k++) if (reviews[k].text === t) return k;
-    return i % reviews.length;
-  });
-
-  var next = 0, turn = 0, timer = null, visible = false, hovered = null;
-
-  // Vybere první nezobrazenou recenzi od `next` dál → nikdy nemůžou být dvě stejné
-  // vedle sebe (ani ta samá znovu v té stejné kartě). Recenzí je víc než karet,
-  // takže se vždycky nějaká volná najde.
-  function pickReview() {
-    for (var step = 0; step < reviews.length; step++) {
-      var idx = (next + step) % reviews.length;
-      if (shown.indexOf(idx) === -1) { next = (idx + 1) % reviews.length; return idx; }
-    }
-    return -1;
-  }
-
-  // Karta odletí nahoru (jako odswajpnutá), nová recenze přiletí zespoda.
-  function swap() {
-    // Přeskoč kartu, na které zrovna leží kurzor — ať se text nemění pod rukama.
-    var ci = -1;
-    for (var i = 0; i < cards.length; i++) {
-      var c = turn++ % cards.length;
-      if (cards[c] !== hovered) { ci = c; break; }
-    }
-    if (ci < 0) return;
-
-    var idx = pickReview();
-    if (idx < 0) return;
-
-    var card = cards[ci], r = reviews[idx];
-    shown[ci] = idx;
-
-    card.classList.add('swapping');
-    setTimeout(function () {
-      fill(card, r);
-      card.classList.remove('swapping');
-      card.classList.add('swap-in');
-      setTimeout(function () { card.classList.remove('swap-in'); }, 620);
-    }, 340);
-  }
-
-  function start() {
-    if (timer || !visible) return;
-    // První výměna přijde brzy po najetí sekce — ať je hned vidět, že se recenze střídají.
-    timer = setTimeout(function () {
-      swap();
-      timer = setInterval(swap, 3000);
-    }, 1500);
-  }
-  function stop() { clearTimeout(timer); clearInterval(timer); timer = null; }
-
-  cards.forEach(function (c) {
-    c.addEventListener('mouseenter', function () { hovered = c; });
-    c.addEventListener('mouseleave', function () { if (hovered === c) hovered = null; });
-  });
-
-  // Střídá se jen když je sekce na obrazovce.
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (en) {
-      visible = en[0].isIntersecting;
-      if (visible) start(); else stop();
-    }, { threshold: 0.15 }).observe(wrap);
-  } else {
-    visible = true; start();
-  }
-})();
-
-/* Scroll-reveal galerie recenzí — boční karty přijedou zespoda, prostřední „popne" */
-(function () {
-  var els = document.querySelectorAll('.js-ref-up, .js-ref-pop, .js-ref-word');
-  if (!els.length) return;
-  if (!('IntersectionObserver' in window)) {
-    Array.prototype.forEach.call(els, function (e) { e.classList.add('is-in'); });
-    return;
-  }
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) {
-      if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
-    });
-  }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
-  Array.prototype.forEach.call(els, function (e) { io.observe(e); });
-})();
-
 /* ═══════════ Scroll-driven kreslení spojnice „jak to funguje" (bolt-path) ═══════════ */
 /* Čára se postupně prodlužuje podle toho, jak uživatel scrolluje sekcí — jde s ním
    a dovede ho až k „Vytvořit účet". Funguje na /hledam-si-praci i /pro-zamestnavatele. */
@@ -1281,9 +1168,9 @@ function showToast(msg) {
     }, DRZENI);
   }
 
-  function spust() {
+  function spust(animovat) {
     sirka(SLOVA[0]);
-    vykresli(SLOVA[0], false);
+    vykresli(SLOVA[0], animovat);
     let t;
     window.addEventListener('resize', () => {
       clearTimeout(t);
@@ -1295,7 +1182,18 @@ function showToast(msg) {
   const pripraveno = (document.fonts && document.fonts.ready)
     ? document.fonts.ready.catch(() => {})
     : Promise.resolve();
-  pripraveno.then(() => setTimeout(spust, START));
+
+  // Na hlavní stránce se nadpis nejdřív po písmenech napíše (skript v index.html)
+  // a teprve pak se dokreslí měnící se slovo — jinak by naskočilo doprostřed
+  // rozepsané věty. Jinde (a když psaní neběží) se jede po staru s odstupem.
+  let spusteno = false;
+  const jednou = animovat => { if (spusteno) return; spusteno = true; spust(animovat); };
+  if (document.documentElement.classList.contains('hero-uvod')) {
+    document.addEventListener('hero-napsano', () => jednou(true), { once: true });
+    setTimeout(() => jednou(false), 4000);                     // pojistka
+  } else {
+    pripraveno.then(() => setTimeout(() => jednou(false), START));
+  }
 })();
 
 /* ═══════════ VYJETÍ ČEKACÍHO LISTU DO POPŘEDÍ ═══════════
@@ -1454,14 +1352,17 @@ function showToast(msg) {
   }
   function zapomen() { try { localStorage.removeItem(PAMET); } catch (e) {} }
 
+  // Na úvodce je čekací list v sekci #brzy, na podstránkách v #download.
+  // Hledat ho přes formulář je spolehlivější než jmenovat obě id.
+  const sekceCL = document.getElementById('brzy') || form1.closest('section');
+
   const KROKY = ['wl-1', 'wl-2', 'wl-3'];
   function ukaz(id, bezScrollu) {
     KROKY.forEach(k => { const el = $(k); if (el) el.hidden = k !== id; });
     // Při obnovení stavu po návratu se scrollovat nesmí — návštěvník na stránku
     // teprve přišel a stránka by mu pod rukama sama ujela dolů.
     if (bezScrollu) return;
-    const sek = $('brzy');
-    if (sek) sek.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (sekceCL) sekceCL.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   // Chyba sedí u pole, ne v alertu — a zmizí, jakmile člověk začne psát.
@@ -1675,8 +1576,7 @@ function showToast(msg) {
         try { history.replaceState(null, '', location.pathname + '#predregistrace'); } catch (e) {}
       }
 
-      const sekce = document.getElementById('brzy');
-      if (sekce) sekce.scrollIntoView({ block: 'start' });
+      if (sekceCL) sekceCL.scrollIntoView({ block: 'start' });
       // Rozbalit jde jen krok 2. Kdo sem přijde bez adresy v odkazu i bez
       // paměti, uvidí pole na e-mail a nabídka účtu se ukáže až po odeslání.
       if (!$('wl-2').hidden && !acc.hidden) otevri();
@@ -1757,6 +1657,11 @@ function showToast(msg) {
     const pruh = pas.querySelector('.proc-pruh');
     if (!pruh || pruh.dataset.zdvojeno) return;
 
+    // Na mobilu stojí položky pod sebou jako seznam — nic se neposouvá.
+    // Kontrola MUSÍ být před zdvojením: jinak by se každý důvod na telefonu
+    // objevil dvakrát, protože klony se do seznamu přidají taky.
+    if (pas.scrollWidth <= pas.clientWidth + 4) return;
+
     Array.from(pruh.children).forEach(b => {
       const kopie = b.cloneNode(true);
       kopie.setAttribute('aria-hidden', 'true');
@@ -1764,9 +1669,6 @@ function showToast(msg) {
       pruh.appendChild(kopie);
     });
     pruh.dataset.zdvojeno = '1';
-
-    // Na mobilu stojí položky pod sebou (grid) — tam není co posouvat.
-    if (pas.scrollWidth <= pas.clientWidth + 4) return;
 
     const tiche = matchMedia('(prefers-reduced-motion: reduce)');
     let stoji = 0;                                  // do kdy stojíme (timestamp)

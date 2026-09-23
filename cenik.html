@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=138" />
+  <link rel="stylesheet" href="/style.css?v=148" />
   <style>
     .cn-page { padding: 80px 0 100px; }
 
@@ -136,7 +136,7 @@
         <a href="/hledam-si-praci">Hledám si práci</a>
         <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
         <a href="/lide">Lidé</a>
-        <a href="/#download">Stáhnout</a>
+        <a href="/#brzy">Stáhnout</a>
         <a href="/podpora">Podpora</a>
       </div>
       <div class="nav-actions nav-actions-visible" id="nav-actions">
@@ -151,7 +151,7 @@
       <a href="/hledam-si-praci">Hledám si práci</a>
       <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
       <a href="/lide">Lidé</a>
-      <a href="/#download">Stáhnout</a>
+      <a href="/#brzy">Stáhnout</a>
       <a href="/podpora">Podpora</a>
       <div class="mobile-menu-actions">
         <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
@@ -185,107 +185,115 @@
       <div class="cn-plans-wrap">
         <div class="cn-plans">
 
-          <!-- STARTER -->
+          <!-- ZÁKLADNÍ -->
           <div class="cn-plan">
-            <div class="cn-plan-name">Starter</div>
+            <div class="cn-plan-name">Základní</div>
             <div class="cn-plan-price free"><span class="num">Zdarma</span></div>
             <div class="cn-plan-period">navždy zdarma</div>
             <hr class="cn-plan-divider" />
             <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>1 aktivní inzerát</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>1 full-time inzerce</span></div>
             <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování kandidátů (1×/měs)</span></div>
             <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Základní statistiky</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Až 2 uživatelé na profilu</span></div>
             <div class="cn-feat-details">
               <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Topování inzerátu</span></div>
               <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Ověřená firma</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>SMS Urgent</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Video na profilu</span></div>
               <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Prémiový badge</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Export dat (CSV)</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Plné statistiky + CSV export</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Prioritní řešení podpory</span></div>
             </div>
             <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
             <div class="cn-plan-cta"><a href="javascript:void(0)" class="ghost" id="cenik-reg-starter">Začít zdarma</a></div>
           </div>
 
-          <!-- STANDARD -->
+          <!-- VÝHODNÝ -->
           <div class="cn-plan popular">
             <div class="cn-popular-badge"><iconify-icon icon="solar:star-bold" width="13"></iconify-icon>Nejoblíbenější</div>
-            <div class="cn-plan-name">Standard</div>
+            <div class="cn-plan-name">Výhodný</div>
             <div class="cn-plan-price"><span class="num" id="std-price">499</span><span class="kc"> Kč</span></div>
             <div class="cn-plan-period">za měsíc bez DPH</div>
             <hr class="cn-plan-divider" />
             <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>2 aktivní inzeráty</span></div>
             <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (1×/měs)</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Ověřená firma + branding</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování kandidátů (10×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Ověřená firma</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování kandidátů (3×/měs)</span></div>
             <div class="cn-feat-details">
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Plné statistiky + CSV export</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Šablony inzerátů</span></div>
               <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Video na profilu</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>SMS Urgent</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Základní statistiky</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Až 3 uživatelé na profilu</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Plné statistiky + CSV export</span></div>
               <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Prémiový badge</span></div>
-              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Branding</span></div>
             </div>
             <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
-            <div class="cn-plan-cta"><a href="javascript:void(0)" class="primary" id="cenik-reg-standard">Vybrat Standard</a></div>
+            <div class="cn-plan-cta"><a href="javascript:void(0)" class="primary" id="cenik-reg-standard">Vybrat Výhodný</a></div>
           </div>
 
-          <!-- BUSINESS -->
+          <!-- DYNAMICKÝ -->
           <div class="cn-plan">
-            <div class="cn-plan-name">Business</div>
+            <div class="cn-plan-name">Dynamický</div>
+            <div class="cn-plan-price"><span class="num">2 000</span><span class="kc"> Kč</span></div>
+            <div class="cn-plan-period">za měsíc bez DPH</div>
+            <hr class="cn-plan-divider" />
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>5 aktivních inzerátů</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (3×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Plné statistiky + CSV export</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Prioritní řešení podpory</span></div>
+            <div class="cn-feat-details">
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování kandidátů (10×/měs)</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Plánování inzerátu</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Custom šablona inzerátů</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Prémiový badge + branding</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Notifikace Urgent (1×)</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Zmínka na FB + IG Makej</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Až 5 uživatelů na profilu</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Rozdělení rolí v týmu</span></div>
+            </div>
+            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
+            <div class="cn-plan-cta"><a href="javascript:void(0)" class="ghost" id="cenik-reg-business">Vybrat Dynamický</a></div>
+          </div>
+
+          <!-- MAXIMÁLNÍ -->
+          <div class="cn-plan">
+            <div class="cn-plan-name">Maximální</div>
             <div class="cn-plan-price"><span class="num" id="biz-price">4 999</span><span class="kc"> Kč</span></div>
             <div class="cn-plan-period">za měsíc bez DPH</div>
             <hr class="cn-plan-divider" />
             <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>10 aktivních inzerátů</span></div>
             <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (5×/měs)</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>SMS Urgent + prémiový badge</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování kandidátů (100×/měs)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Prémiový badge + Urgent (2×)</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
             <div class="cn-feat-details">
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování kandidátů (20×/měs)</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Rozdělení rolí uživatelů v týmu</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Až 10 uživatelů na profilu</span></div>
               <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Zmínka na FB + IG Makej</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Role uživatelů</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Plánování inzerátu</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Možnost konzultace</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Branding</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Prioritní řešení podpory</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Vlastní reporting na míru</span></div>
+              <div class="cn-feat off"><iconify-icon icon="solar:close-circle-bold" width="15"></iconify-icon><span>Co-marketing s Makej</span></div>
             </div>
             <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
-            <div class="cn-plan-cta"><a href="javascript:void(0)" class="ghost" id="cenik-reg-business">Vybrat Business</a></div>
+            <div class="cn-plan-cta"><a href="javascript:void(0)" class="ghost" id="cenik-reg-maximalni">Vybrat Maximální</a></div>
           </div>
 
-          <!-- AGENCY -->
+          <!-- VLASTNÍ -->
           <div class="cn-plan">
-            <div class="cn-plan-name">Agency</div>
-            <div class="cn-plan-price"><span class="od">od </span><span class="num">4 999</span><span class="kc"> Kč</span></div>
-            <div class="cn-plan-period">za měsíc bez DPH</div>
-            <hr class="cn-plan-divider" />
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Neomezené inzeráty</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Inzerce jménem klienta</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (20×/měs)</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování kandidátů (100×/měs)</span></div>
-            <div class="cn-feat-details">
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Prémiový badge + SMS Urgent</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Pokročilá analytika + CSV</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Role uživatelů</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Zmínka na FB + IG Makej</span></div>
-            </div>
-            <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
-            <div class="cn-plan-cta"><a href="mailto:podpora@makej.eu" class="ghost">Kontaktovat nás</a></div>
-          </div>
-
-          <!-- ENTERPRISE -->
-          <div class="cn-plan">
-            <div class="cn-plan-name">Enterprise</div>
+            <div class="cn-plan-name">Vlastní</div>
             <div class="cn-plan-price"><span class="od">od </span><span class="num">9 999</span><span class="kc"> Kč</span></div>
             <div class="cn-plan-period">kalkulace na míru</div>
             <hr class="cn-plan-divider" />
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Vše z Business</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Custom integrace (HR systémy)</span></div>
-            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Co-marketing s Makej</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Vše z Maximální</span></div>
             <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Vlastní reporting na míru</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Co-marketing s Makej</span></div>
+            <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Až 20 uživatelů na profilu</span></div>
             <div class="cn-feat-details">
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Neomezení uživatelé v týmu</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Onboarding a školení týmu</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>SLA 99,99 % + prioritní podpora</span></div>
-              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Dedikovaný account manager</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>10+ aktivních inzerátů</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Oslovování kandidátů (20×/měs a víc)</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Notifikace Urgent (3×)</span></div>
+              <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>Topování inzerátu (5×/měs)</span></div>
             </div>
             <button class="cn-expand-btn" onclick="toggleExpand(this)">Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon></button>
             <div class="cn-plan-cta"><a href="mailto:podpora@makej.eu" class="ghost">Nezávazná poptávka</a></div>
@@ -326,8 +334,7 @@
           <li>Aktivní inzeráty = počet zveřejněných (viditelných uchazečům) zároveň. Po vyřešení inzerátu firma uvolní slot pro další.</li>
           <li>Drafty a neaktivní inzeráty si lze vytvořit libovolně — limit tarifu se vztahuje jen na zveřejněné.</li>
           <li>Každý inzerát má cyklus 30 dní. 5 dní před koncem chodí upozornění. Potvrzením relevance běží další cyklus bez omezení.</li>
-          <li>Agency tarif funguje jinak — inzeruje jménem svých klientů. Cena závisí na objemu a počtu klientů.</li>
-          <li>Enterprise tarif se kalkuluje individuálně. Sleva 5 % do 25 000 Kč/měs, sleva 10 % nad 25 001 Kč/měs.</li>
+          <li>Tarif Vlastní se kalkuluje individuálně — vychází z tarifu Maximální a doplňuje se podle potřeb firmy.</li>
           <li>Všechny ceny jsou bez DPH.</li>
         </ul>
       </div>
@@ -338,7 +345,7 @@
     <section class="cn-bottom-cta">
       <div class="container">
         <h2>Začni <span class="gradient-text">zdarma</span></h2>
-        <p>Starter tarif nic nestojí. Zaměstnavatelé platí až když chtějí víc.</p>
+        <p>Tarif Základní nic nestojí. Zaměstnavatelé platí až když chtějí víc.</p>
         <div class="cn-bottom-cta-btns">
           <a href="javascript:void(0)" class="btn-primary btn-lg" id="cenik-cta-register">Vytvořit účet zdarma</a>
           <a href="/hledam-si-praci" class="btn-ghost btn-lg">Jak to funguje</a>
@@ -367,7 +374,7 @@
           <a href="/hledam-si-praci">Hledám si práci</a>
           <a href="/pro-zamestnavatele">Pro zaměstnavatele</a>
           <a href="/lide">Lidé</a>
-          <a href="/#download">Stáhnout</a>
+          <a href="/#brzy">Stáhnout</a>
         </div>
         <div class="footer-col">
           <h4>Firma</h4>
@@ -498,7 +505,7 @@
 
     // CTA buttons → open register modal
     document.addEventListener('DOMContentLoaded', function() {
-      ['cenik-reg-starter','cenik-reg-standard','cenik-reg-business','cenik-cta-register',
+      ['cenik-reg-starter','cenik-reg-standard','cenik-reg-business','cenik-reg-maximalni','cenik-cta-register',
        'buy-100','buy-300','buy-750','buy-2000'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.addEventListener('click', function() { openModal('register'); });
@@ -507,6 +514,6 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=55"></script>
+  <script src="/script.js?v=60"></script>
 </body>
 </html>
