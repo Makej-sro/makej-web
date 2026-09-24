@@ -233,7 +233,7 @@
           <!-- DYNAMICKÝ -->
           <div class="cn-plan">
             <div class="cn-plan-name">Dynamický</div>
-            <div class="cn-plan-price"><span class="num">2 000</span><span class="kc"> Kč</span></div>
+            <div class="cn-plan-price"><span class="num" id="dyn-price">2 000</span><span class="kc"> Kč</span></div>
             <div class="cn-plan-period">za měsíc bez DPH</div>
             <hr class="cn-plan-divider" />
             <div class="cn-feat"><iconify-icon icon="solar:check-circle-bold" width="15"></iconify-icon><span>5 aktivních inzerátů</span></div>
@@ -467,6 +467,7 @@
     var annualOn = false;
     var prices = {
       std:    { monthly: 499,  annual: Math.round(499  * 12 * 0.85 / 12) },
+      dyn:    { monthly: 2000, annual: Math.round(2000 * 12 * 0.85 / 12) },
       biz:    { monthly: 4999, annual: Math.round(4999 * 12 * 0.85 / 12) },
     };
     // Count-up animace čísla (NumberFlow styl)
@@ -474,7 +475,10 @@
       var from = parseInt((el.textContent || '0').replace(/\s/g, ''), 10) || 0;
       var start = performance.now(), dur = 480;
       function step(now) {
-        var t = Math.min((now - start) / dur, 1);
+        // rAF dostává čas začátku snímku, který může být o kousek DŘÍV než
+        // `start` z performance.now() → bez spodního oříznutí vyjde t záporné
+        // a první snímek ukáže číslo mimo rozsah (přeblikne opačným směrem).
+        var t = Math.min(Math.max((now - start) / dur, 0), 1);
         var eased = 1 - Math.pow(1 - t, 3);
         el.textContent = Math.round(from + (to - from) * eased).toLocaleString('cs-CZ');
         if (t < 1) requestAnimationFrame(step);
@@ -499,6 +503,7 @@
       toggle.classList.toggle('on', annualOn);
       badge.textContent = annualOn ? 'aktivní — 15 % sleva' : 'ušetři 15 %';
       cnAnimateNumber(document.getElementById('std-price'), annualOn ? prices.std.annual : prices.std.monthly);
+      cnAnimateNumber(document.getElementById('dyn-price'), annualOn ? prices.dyn.annual : prices.dyn.monthly);
       cnAnimateNumber(document.getElementById('biz-price'), annualOn ? prices.biz.annual : prices.biz.monthly);
       if (annualOn) cnConfetti(toggle);
     }

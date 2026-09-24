@@ -719,9 +719,9 @@
           <div class="yp-card" style="background:rgba(91,214,138,.07);border:1.5px solid rgba(91,214,138,.30)">
             
             <div class="yp-name">Dynamický</div>
-            <div class="yp-price"><span class="yp-num">2 000</span><span class="kc"> Kč</span></div>
+            <div class="yp-price"><span class="yp-num" data-a="1" data-plan="dynamicky">2 000</span><span class="kc"> Kč</span></div>
             <div class="yp-period">za měsíc bez DPH</div>
-            <div class="yp-savew"></div>
+            <div class="yp-savew"><span>ušetříš 3 600 Kč/rok</span></div>
             <div class="yp-hr"></div>
             <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">5 aktivních inzerátů</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Topování inzerátu 3×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Plné statistiky + CSV export</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Prioritní řešení podpory</span></div></div>
             <div class="yp-cta"><a class="yp-btn employer-cta-register" href="javascript:void(0)" style="border:1.5px solid #5BD68A;color:#111827">Vybrat Dynamický</a></div>
@@ -1209,7 +1209,7 @@
     // Ceník: přepínač měsíčně/ročně + srovnání
     (function () {
       var annual = false;
-      var data = { vyhodny: { m: 499, a: 424 }, maximalni: { m: 4999, a: 4249 } };
+      var data = { vyhodny: { m: 499, a: 424 }, dynamicky: { m: 2000, a: 1700 }, maximalni: { m: 4999, a: 4249 } };
       function cz(n){ return n.toLocaleString('cs-CZ'); }
       function apply() {
         document.querySelectorAll('#pricing .yp-num[data-plan]').forEach(function (el) {
