@@ -1,0 +1,3 @@
+# Samostatná stránka /cenik zrušena — ceník je v sekci na /pro-zamestnavatele.
+# 301, ať odkazy zvenčí a výsledky z vyhledávání nekončí na 404.
+/cenik    /pro-zamestnavatele#pricing    301

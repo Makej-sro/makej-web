@@ -520,12 +520,15 @@ function initAuth() {
     }
   }
 
-  // Appka ještě neběží, takže „Vytvořit účet" nevede na registraci, ale na sběr
-  // e-mailů v sekci #brzy. Na hlavní stránce doscrolluje a zaostří pole,
-  // odjinud přesměruje na /#brzy (sekce je jen na homepage).
+  // Appka ještě neběží, takže „Vytvořit účet" ani „Vybrat tarif" nevedou na
+  // registraci, ale na sběr e-mailů. Čekací list je na úvodce v sekci #brzy,
+  // na podstránkách dole v #download — hledáme ho proto přes formulář, ne přes
+  // id sekce. Na úvodku posíláme jen z těch stránek, kde žádný není (podpora,
+  // právní stránky, blog).
   function goToEmailSignup() {
     closeModals();
-    const sec = document.getElementById('brzy');
+    const form = document.getElementById('wl-form1');
+    const sec  = form ? form.closest('section') : null;
     if (!sec) { window.location.href = '/#brzy'; return; }
     sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
     const input = sec.querySelector('.wl-in');
@@ -1650,8 +1653,10 @@ function showToast(msg) {
 // Smyčka: jakmile scroll přejede polovinu stopy (tedy konec originálů), odečte
 // se půlka. Obsah je za ní totožný, takže to oko nepozná.
 (function pruhyJedou() {
-  const RYCHLOST = 60;          // px za vteřinu
-  const KLID     = 1200;        // jak dlouho po dotyku zůstat stát (ms)
+  const RYCHLOST  = 60;         // px za vteřinu
+  const ZPOMALENI = 0.28;       // násobek rychlosti, když je kurzor nad pruhem
+  const NABEH     = 6;          // jak rychle se mezi plnou a zpomalenou rychlostí přechází
+  const KLID      = 1200;       // jak dlouho po dotyku zůstat stát (ms)
 
   document.querySelectorAll('.proc-pas').forEach(pas => {
     const pruh = pas.querySelector('.proc-pruh');
@@ -1672,13 +1677,17 @@ function showToast(msg) {
 
     const tiche = matchMedia('(prefers-reduced-motion: reduce)');
     let stoji = 0;                                  // do kdy stojíme (timestamp)
+    let cil = 1, faktor = 1;                        // cílový a právě platný násobek rychlosti
     const pozastav = () => { stoji = performance.now() + KLID; };
 
     // Ruční posun kolečkem, prstem i tažením myši pruh na chvíli zastaví.
     ['pointerdown', 'wheel', 'touchstart'].forEach(u =>
       pas.addEventListener(u, pozastav, { passive: true }));
-    pas.addEventListener('pointerenter', () => { stoji = Infinity; });
-    pas.addEventListener('pointerleave', () => { stoji = 0; });
+    // Kurzor nad pruhem ho jen zpomalí, nezastaví — stát zůstane jen při
+    // ručním posouvání (výš) a při zaostření klávesnicí, kde by se pod čtoucím
+    // člověkem pohybovat neměl vůbec.
+    pas.addEventListener('pointerenter', () => { cil = ZPOMALENI; });
+    pas.addEventListener('pointerleave', () => { cil = 1; });
     pas.addEventListener('focusin',  () => { stoji = Infinity; });
     pas.addEventListener('focusout', () => { stoji = 0; });
 
@@ -1686,7 +1695,10 @@ function showToast(msg) {
     (function krok(ted) {
       const dt = Math.min(ted - minule, 100) / 1000;   // po návratu na záložku neskáče
       minule = ted;
-      if (!tiche.matches && ted >= stoji) pas.scrollLeft += RYCHLOST * dt;
+      // Exponenciální náběh: přechod mezi plnou a zpomalenou rychlostí je
+      // plynulý, ať pruh pod kurzorem neseknou skokem.
+      faktor += (cil - faktor) * Math.min(dt * NABEH, 1);
+      if (!tiche.matches && ted >= stoji) pas.scrollLeft += RYCHLOST * faktor * dt;
       const pul = pruh.scrollWidth / 2;
       if (pas.scrollLeft >= pul) pas.scrollLeft -= pul;
       else if (pas.scrollLeft < 0) pas.scrollLeft += pul;

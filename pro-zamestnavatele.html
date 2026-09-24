@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=149" />
+  <link rel="stylesheet" href="style.css?v=150" />
   <style>
     /* ═══════════ BENTO DESIGN (pro zaměstnavatele) ═══════════ */
     #employers { padding: 0; }
@@ -288,35 +288,6 @@
     #pricing { background: #fff; }
     #pricing .section-header h2 { color: #0a0d2e; }
     #pricing .section-header p { color: rgba(10,13,46,.55); }
-    #pricing .cn-billing { color: rgba(10,13,46,.6); }
-    #pricing .cn-billing-toggle { background: rgba(10,13,46,.14); }
-    /* Karty na bílé + modrý hover */
-    #pricing .cn-plan { background: #fff; border-color: rgba(10,13,46,.1); box-shadow: 0 4px 18px rgba(10,13,46,.05); }
-    #pricing .cn-plan:hover { border-color: var(--primary); box-shadow: 0 22px 50px rgba(0,32,246,.22); }
-    #pricing .cn-plan.popular { background: linear-gradient(165deg, rgba(0,32,246,.06), #fff); border: 2px solid var(--primary); box-shadow: 0 0 0 1px rgba(0,32,246,.18), 0 26px 56px rgba(0,32,246,.16); }
-    #pricing .cn-plan.popular:hover { box-shadow: 0 0 0 1px rgba(0,32,246,.4), 0 30px 64px rgba(0,32,246,.28); }
-    #pricing .cn-plan-name { color: rgba(10,13,46,.45); }
-    #pricing .cn-plan-price { color: #0a0d2e; }
-    #pricing .cn-plan-price .od, #pricing .cn-plan-price .kc { color: rgba(10,13,46,.5); }
-    #pricing .cn-plan-period { color: rgba(10,13,46,.4); }
-    #pricing .cn-plan-divider { border-top-color: rgba(10,13,46,.1); }
-    #pricing .cn-feat { color: rgba(10,13,46,.72); }
-    #pricing .cn-feat iconify-icon { color: var(--primary); }
-    #pricing .cn-feat.off { color: rgba(10,13,46,.32); }
-    #pricing .cn-feat.off iconify-icon { color: rgba(10,13,46,.2); }
-    #pricing .cn-plan-cta a { border-color: rgba(10,13,46,.2); color: #0a0d2e; }
-    #pricing .cn-plan-cta a:hover { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary); }
-    #pricing .cn-plan-cta a.primary { color: #fff; }
-    #pricing .cn-plan-cta a.primary:hover { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary), 0 10px 28px rgba(0,32,246,.5); }
-    #pricing .cn-expand-btn { color: rgba(10,13,46,.45); border-color: rgba(10,13,46,.12); }
-    #pricing .cn-expand-btn:hover { color: var(--primary); border-color: var(--primary); }
-    /* Ceník na mobilu — tarify pod sebe (bez horizontálního scrollu) */
-    @media (max-width: 680px) {
-      #pricing .cn-plans-wrap { overflow-x: visible; padding-bottom: 20px; }
-      #pricing .cn-plans { grid-template-columns: 1fr; min-width: 0; gap: 16px; padding: 14px 0 4px; }
-      #pricing .cn-plan { margin-top: 0; }
-      #pricing .cn-plan.popular { margin-top: 0; }
-    }
 
     /* ── Modrý závěrečný pruh před FAQ — přenesené z /lide (tam .vx-sec.vx-close).
        Zanořené pod .vx-close: stránka má z vx systému jen .vx-nav a .vx-intro,
@@ -653,7 +624,7 @@
       #pricing .yp-name{font-size:12px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:1.4px;margin:10px 0 16px;}
       #pricing .yp-price{min-height:52px;display:flex;align-items:baseline;justify-content:center;gap:4px;flex-wrap:wrap;}
       #pricing .yp-price .free{font-family:var(--font-heading);font-size:40px;font-weight:800;color:#111827;line-height:1;}
-      #pricing .yp-price .yp-num{font-family:var(--font-heading);font-size:48px;font-weight:800;color:#111827;line-height:1;}
+      #pricing .yp-price .yp-num{font-family:var(--font-heading);font-size:48px;font-weight:800;color:#111827;line-height:1;white-space:nowrap;}
       #pricing .yp-price .pre{color:#9ca3af;font-size:15px;font-weight:600;}
       #pricing .yp-price .kc{color:#6b7280;font-size:17px;font-weight:600;}
       #pricing .yp-period{color:#9ca3af;font-size:12.5px;margin-top:5px;}
@@ -661,6 +632,28 @@
       #pricing .yp-savew span{opacity:0;transition:opacity .2s;background:rgba(0,198,55,.12);border:1px solid rgba(0,198,55,.3);color:#00a82f;font-size:10.5px;font-weight:800;border-radius:8px;padding:3px 9px;}
       #pricing .yp-savew.on span{opacity:1;}
       #pricing .yp-hr{border-top:1px solid rgba(0,0,0,.07);margin:4px 0 14px;}
+      /* ── Kalkulačka v tarifu Vlastní ──────────────────────────────────
+         Fialová je barva té kartičky, ne brandová modrá — jinak by posuvník
+         přetahoval pozornost od „Nejoblíbenější". */
+      #pricing .yp-kalk{display:flex;flex-direction:column;gap:9px;margin:-4px 0 14px;text-align:left;}
+      #pricing .yp-kalk-radek{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer;}
+      #pricing .yp-kalk-cislo{width:74px;height:32px;box-sizing:border-box;border:1.5px solid rgba(139,92,246,.35);border-radius:10px;background:#fff;font-family:inherit;font-size:14px;font-weight:800;color:#111827;text-align:center;outline:none;padding:0 4px;-moz-appearance:textfield;}
+      #pricing .yp-kalk-cislo::-webkit-outer-spin-button,
+      #pricing .yp-kalk-cislo::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+      #pricing .yp-kalk-cislo:focus{border-color:#8B5CF6;box-shadow:0 0 0 3px rgba(139,92,246,.15);}
+      #pricing .yp-kalk-drah{position:relative;height:24px;}
+      /* Tečky u hranic pásem — kde se láme množstevní sleva. */
+      #pricing .yp-kalk-znacky{position:absolute;inset:0;pointer-events:none;}
+      #pricing .yp-kalk-znacky i{position:absolute;top:9px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#C9B8E6;transition:background .2s;}
+      #pricing .yp-kalk-znacky i.je{background:rgba(255,255,255,.92);}
+      #pricing .yp-posuvnik{-webkit-appearance:none;appearance:none;position:absolute;left:0;top:6px;width:100%;height:12px;border-radius:99px;outline:none;margin:0;cursor:pointer;background:#E9E0F6;}
+      #pricing .yp-posuvnik::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #8B5CF6;box-sizing:border-box;box-shadow:0 2px 8px rgba(139,92,246,.35);cursor:grab;}
+      #pricing .yp-posuvnik::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #8B5CF6;box-sizing:border-box;box-shadow:0 2px 8px rgba(139,92,246,.35);cursor:grab;}
+      #pricing .yp-posuvnik:focus-visible{box-shadow:0 0 0 3px rgba(139,92,246,.25);}
+      #pricing .yp-kalk-meze{display:flex;justify-content:space-between;font-size:10.5px;color:#9ca3af;margin-top:-3px;}
+      /* Přebíjí `.yp-savew span{opacity:0}` — tahle plaketa na ročním
+         přepínači nevisí, řídí se počtem inzerátů. */
+      #pricing .yp-savew span.yp-kalk-sleva{opacity:1;background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.32);color:#6D3FD1;}
       #pricing .yp-feats{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;text-align:left;}
       #pricing .yp-feat{display:flex;align-items:flex-start;gap:9px;font-size:13px;font-weight:600;line-height:1.35;}
       #pricing .yp-feat iconify-icon{flex:0 0 auto;margin-top:1px;}
@@ -739,12 +732,29 @@
           <div class="yp-card" style="background:rgba(224,176,255,.07);border:1.5px solid rgba(224,176,255,.30)">
             
             <div class="yp-name">Vlastní</div>
-            <div class="yp-price"><span class="pre">od </span><span class="yp-num">9 999</span><span class="kc"> Kč</span></div>
-            <div class="yp-period">kalkulace na míru</div>
-            <div class="yp-savew"></div>
+            <div class="yp-price"><span class="yp-num" id="yp-kalk-cena">9 999</span><span class="kc"> Kč</span></div>
+            <div class="yp-period">za měsíc bez DPH</div>
+            <!-- Množstevní sleva má vlastní třídu: .yp-savew span je schované,
+                 dokud přepínač nezapne roční platbu, a tahle se řídí počtem
+                 inzerátů, ne fakturačním obdobím. -->
+            <div class="yp-savew"><span class="yp-kalk-sleva" id="yp-kalk-sleva" hidden></span></div>
             <div class="yp-hr"></div>
-            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Vše z Maximální</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Vlastní reporting na míru</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Co-marketing s Makej</span></div></div>
-            <div class="yp-cta"><a class="yp-btn" style="border:1px solid rgba(224,176,255,.47);color:#374151" href="mailto:podpora@makej.eu">Nezávazná poptávka</a></div>
+            <!-- Kalkulačka: počet aktivních inzerátů → měsíční cena. Obsluha je
+                 v kalkulackaVlastni() níž, tam je i sazebník. -->
+            <div class="yp-kalk">
+              <label class="yp-kalk-radek" for="yp-kalk-pocet">
+                <span>Aktivních inzerátů</span>
+                <input class="yp-kalk-cislo" id="yp-kalk-pocet" type="number" min="20" max="5000" step="1" value="20" inputmode="numeric">
+              </label>
+              <div class="yp-kalk-drah">
+                <input class="yp-posuvnik" id="yp-kalk-posuvnik" type="range" min="0" max="0" step="1" value="0" aria-label="Počet aktivních inzerátů">
+                <span class="yp-kalk-znacky" id="yp-kalk-znacky" aria-hidden="true"></span>
+              </div>
+              <div class="yp-kalk-meze"><span>20</span><span>5 000</span></div>
+            </div>
+            <div class="yp-hr"></div>
+            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Vše z Maximální</span></div></div>
+            <div class="yp-cta"><a class="yp-btn" id="yp-kalk-cta" style="border:1px solid rgba(224,176,255,.47);color:#374151" href="mailto:podpora@makej.eu">Nezávazná poptávka</a></div>
           </div>
       </div>
       <button class="yp-comparebtn" id="yp-comparebtn">Zobrazit srovnání funkcí</button>
@@ -753,7 +763,7 @@
           <thead><tr><th></th><th>Základní</th><th>Výhodný</th><th>Dynamický</th><th>Maximální</th><th>Vlastní</th></tr></thead>
           <tbody>
             <tr class="yp-sec"><td colspan="6">Inzeráty</td></tr>
-            <tr><td>Aktivní inzeráty</td><td><span class="yp-cell-txt">1</span></td><td><span class="yp-cell-txt">2</span></td><td><span class="yp-cell-txt">5</span></td><td><span class="yp-cell-txt">10</span></td><td><span class="yp-cell-txt">10+</span></td></tr>
+            <tr><td>Aktivní inzeráty</td><td><span class="yp-cell-txt">1</span></td><td><span class="yp-cell-txt">2</span></td><td><span class="yp-cell-txt">5</span></td><td><span class="yp-cell-txt">10</span></td><td><span class="yp-cell-txt">20–5 000</span></td></tr>
             <tr><td>Topování inzerátu</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-txt">1×/měs</span></td><td><span class="yp-cell-txt">3×/měs</span></td><td><span class="yp-cell-txt">5×/měs</span></td><td><span class="yp-cell-txt">5×/měs</span></td></tr>
             <tr><td>Plánování inzerátu</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
             <tr><td>Custom šablona inzerátů (pozadí)</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
@@ -769,8 +779,6 @@
             <tr><td>Základní statistiky</td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
             <tr><td>Plné statistiky + CSV export</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
             <tr><td>Pokročilá analytika</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr><td>Vlastní reporting na míru</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr><td>Co-marketing s Makej</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
             <tr class="yp-sec"><td colspan="6">Tým a podpora</td></tr>
             <tr><td>Rozdělení rolí uživatelů v týmu</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
             <tr><td>Uživatelé na profilu</td><td><span class="yp-cell-txt">až 2</span></td><td><span class="yp-cell-txt">až 3</span></td><td><span class="yp-cell-txt">až 5</span></td><td><span class="yp-cell-txt">až 10</span></td><td><span class="yp-cell-txt">až 20</span></td></tr>
@@ -1162,7 +1170,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=60"></script>
+  <script src="script.js?v=62"></script>
   <script>
     // FAQ accordion
     function toggleFaq(el) {
@@ -1172,48 +1180,125 @@
       if (!isOpen) item.classList.add('open');
     }
 
-    // Pricing: expand / collapse plan details
-    function toggleExpand(btn) {
-      var plan = btn.closest('.cn-plan');
-      var isExpanded = plan.classList.contains('expanded');
-      plan.classList.toggle('expanded', !isExpanded);
-      btn.innerHTML = isExpanded
-        ? 'Zobrazit více <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon>'
-        : 'Zobrazit méně <iconify-icon icon="solar:alt-arrow-down-bold" width="13"></iconify-icon>';
-    }
+    /* Kalkulačka u tarifu Vlastní: počet aktivních inzerátů → měsíční cena.
+       Sazebník je pásmový — prvních 20 inzerátů je v základu za 10 000 Kč a
+       každý další stojí podle pásma čím dál míň. Výsledek se zaokrouhlí na
+       tisíce a sníží o korunu, ať ceny končí na 999 jako zbytek ceníku.
+       Posuvník nejde po jednotkách: u tisíců inzerátů nemá smysl přebírat po
+       jednom, takže má pevné kroky (po 10 / 50 / 100 podle velikosti). */
+    (function kalkulackaVlastni() {
+      var cena   = document.getElementById('yp-kalk-cena');
+      var sleva  = document.getElementById('yp-kalk-sleva');
+      var pole   = document.getElementById('yp-kalk-pocet');
+      var posuv  = document.getElementById('yp-kalk-posuvnik');
+      var znacky = document.getElementById('yp-kalk-znacky');
+      var cta    = document.getElementById('yp-kalk-cta');
+      if (!cena || !pole || !posuv) return;
 
-    // Count-up animace čísla (NumberFlow styl)
-    function cnAnimateNumber(el, to) {
-      var from = parseInt((el.textContent || '0').replace(/\s/g, ''), 10) || 0;
-      var start = performance.now(), dur = 480;
-      function step(now) {
-        var t = Math.min((now - start) / dur, 1);
-        var eased = 1 - Math.pow(1 - t, 3);
-        el.textContent = Math.round(from + (to - from) * eased).toLocaleString('cs-CZ');
-        if (t < 1) requestAnimationFrame(step);
+      var ZAKLAD = 10000, OD = 20;
+      // [do kolika inzerátů, kolik stojí každý další v tomhle pásmu]
+      var PASMA = [[50,450],[100,350],[250,250],[500,180],[1000,120],[2500,80],[5000,50]];
+      var PRAHY = [50, 100, 250, 500, 1000, 2500];
+      var PALEC = 22;   // šířka puntíku posuvníku, viz .yp-posuvnik::-webkit-slider-thumb
+
+      var kroky = [], v;
+      for (v = 20;  v <= 100;  v += 10)  kroky.push(v);
+      for (v = 150; v <= 500;  v += 50)  kroky.push(v);
+      for (v = 600; v <= 5000; v += 100) kroky.push(v);
+      posuv.max = kroky.length - 1;
+
+      function cenaZa(n) {
+        var p = ZAKLAD, spodek = OD;
+        for (var i = 0; i < PASMA.length; i++) {
+          if (n <= spodek) break;
+          p += (Math.min(n, PASMA[i][0]) - spodek) * PASMA[i][1];
+          spodek = PASMA[i][0];
+        }
+        return Math.round(p / 1000) * 1000 - 1;
       }
-      requestAnimationFrame(step);
-    }
-    // Confetti v brandových barvách při přepnutí na roční
-    function cnConfetti(originEl) {
-      if (typeof confetti !== 'function' || !originEl) return;
-      var r = originEl.getBoundingClientRect();
-      confetti({
-        particleCount: 60, spread: 65,
-        origin: { x: (r.left + r.width / 2) / window.innerWidth, y: (r.top + r.height / 2) / window.innerHeight },
-        colors: ['#0020f6', '#1a35ff', '#a0b4ff', '#34d399'],
-        ticks: 200, gravity: 1.2, decay: 0.94, startVelocity: 30, shapes: ['circle']
+      function cz(n) { return n.toLocaleString('cs-CZ'); }
+      function nejblizsi(n) {
+        return kroky.reduce(function (a, b) { return Math.abs(b - n) < Math.abs(a - n) ? b : a; });
+      }
+      // Puntík se nepohybuje po celé šířce, ale mezi svými krajními polohami —
+      // tečky i vybarvení dráhy musí počítat se stejným odsazením, jinak se
+      // u krajů rozejdou.
+      function podil(i) { return i / (kroky.length - 1); }
+      function pozice(p) { return 'calc(' + (PALEC / 2) + 'px + (100% - ' + PALEC + 'px) * ' + p + ')'; }
+
+      znacky.innerHTML = PRAHY.map(function (b) {
+        return '<i data-prah="' + b + '" style="left:' + pozice(podil(kroky.indexOf(b))) + '"></i>';
+      }).join('');
+
+      function vykresli(i, prepsatPole) {
+        var n = kroky[i], c = cenaZa(n), p = podil(i);
+        cena.textContent = cz(c);
+        // Šestimístná cena se do kartičky v plné velikosti nevejde a „Kč" by
+        // spadlo na druhý řádek — kartička by pak byla vyšší než ostatní.
+        cena.style.fontSize = c >= 100000 ? '31px' : (c >= 10000 ? '39px' : '');
+        // Sleva proti orientační sazbě 500 Kč za inzerát.
+        var s = Math.round((1 - c / (n * 500)) * 100);
+        sleva.textContent = 'množstevní sleva ' + s + ' %';
+        sleva.hidden = s <= 0;
+        posuv.value = i;
+        posuv.style.background = 'linear-gradient(90deg,#8B5CF6 0,#8B5CF6 ' + pozice(p)
+          + ',#E9E0F6 ' + pozice(p) + ',#E9E0F6 100%)';
+        Array.prototype.forEach.call(znacky.children, function (t) {
+          t.classList.toggle('je', n >= +t.dataset.prah);
+        });
+        if (prepsatPole) pole.value = n;
+        if (cta) cta.href = 'mailto:podpora@makej.eu?subject='
+          + encodeURIComponent('Poptávka tarifu Vlastní — ' + cz(n) + ' inzerátů');
+      }
+
+      posuv.addEventListener('input', function () { vykresli(+posuv.value, true); });
+      // Psaní do políčka posouvá i jezdec, ale hodnotu v políčku nepřepisujeme,
+      // dokud se píše — jinak by se pod rukama měnilo rozepsané číslo.
+      pole.addEventListener('input', function () {
+        var n = parseInt(pole.value, 10);
+        if (!isNaN(n) && n >= OD && n <= 5000) vykresli(kroky.indexOf(nejblizsi(n)), false);
       });
-    }
+      // Až po dopsání číslo srovnáme na nejbližší krok.
+      pole.addEventListener('change', srovnej);
+      pole.addEventListener('blur', srovnej);
+      function srovnej() {
+        var n = parseInt(pole.value, 10);
+        if (isNaN(n)) n = kroky[+posuv.value];
+        vykresli(kroky.indexOf(nejblizsi(Math.max(OD, Math.min(5000, n)))), true);
+      }
+      pole.addEventListener('keydown', function (e) { if (e.key === 'Enter') pole.blur(); });
+
+      vykresli(0, true);
+    })();
 
     // Ceník: přepínač měsíčně/ročně + srovnání
     (function () {
       var annual = false;
       var data = { vyhodny: { m: 499, a: 424 }, dynamicky: { m: 2000, a: 1700 }, maximalni: { m: 4999, a: 4249 } };
       function cz(n){ return n.toLocaleString('cs-CZ'); }
+      // Cena se k nové hodnotě dopočítá, neskočí. Kdo má vypnuté animace,
+      // dostane číslo rovnou.
+      // Pozor na oříznutí zdola: rAF dostává čas začátku snímku, který může
+      // být o kousek dřív než `start`, a bez něj by první snímek ukázal číslo
+      // mimo rozsah (přeblikne opačným směrem).
+      var tiche = window.matchMedia('(prefers-reduced-motion: reduce)');
+      function napocitej(el, na) {
+        var z = parseInt((el.textContent || '0').replace(/[^\d]/g, ''), 10) || 0;
+        if (z === na) return;
+        if (tiche.matches) { el.textContent = cz(na); return; }
+        if (el._bezi) cancelAnimationFrame(el._bezi);
+        var start = performance.now(), dur = 480;
+        (function krok(ted) {
+          var t = Math.min(Math.max((ted - start) / dur, 0), 1);
+          var e = 1 - Math.pow(1 - t, 3);
+          el.textContent = cz(Math.round(z + (na - z) * e));
+          if (t < 1) el._bezi = requestAnimationFrame(krok);
+          else el._bezi = null;
+        })(start);
+      }
       function apply() {
         document.querySelectorAll('#pricing .yp-num[data-plan]').forEach(function (el) {
-          var d = data[el.getAttribute('data-plan')]; if (d) el.textContent = cz(annual ? d.a : d.m);
+          var d = data[el.getAttribute('data-plan')]; if (d) napocitej(el, annual ? d.a : d.m);
         });
         document.querySelectorAll('#pricing .yp-savew').forEach(function (w) { w.classList.toggle('on', annual); });
         var sw = document.getElementById('yp-sw'); if (sw) sw.classList.toggle('on', annual);
