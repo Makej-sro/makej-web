@@ -381,9 +381,6 @@ function initAuth() {
     if (type === 'login') {
       loginModal.classList.add('active');
       registerModal.classList.remove('active');
-      // Restart peeker animation
-      const p = document.getElementById('main-peeker');
-      if (p) { p.style.animation = 'none'; requestAnimationFrame(() => { p.style.animation = 'peekerIn 0.45s cubic-bezier(.2,.8,.2,1) both'; }); }
     } else {
       registerModal.classList.add('active');
       loginModal.classList.remove('active');
@@ -492,12 +489,15 @@ function initAuth() {
       // Lišta s jedinou akcí (hlavní stránka) registraci nemá — tu tam obstarává
       // „Vytvořit profil" v heru. Bez téhle větve by ji tenhle přepis vrátil zpět.
       const soloLogin = !!document.querySelector('#navbar.nav-single-action');
+      // Stránka může přihlášení z lišty vypnout (.nav-bez-prihlaseni na #navbar).
+      // Smazat tlačítko z HTML nestačí — tenhle přepis by ho vrátil zpět.
+      const bezLoginu = !!document.querySelector('#navbar.nav-bez-prihlaseni');
       navActions.innerHTML = `
-        <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
+        ${bezLoginu ? '' : '<a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>'}
         ${soloLogin ? '' : '<a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>'}
       `;
       mobileActions.innerHTML = `
-        <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
+        ${bezLoginu ? '' : '<a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>'}
         <a href="javascript:void(0)" class="btn-primary" id="mobile-register-btn">Vytvořit účet</a>
       `;
       // Bind jen čerstvě vytvořené nav prvky (employer btn se binduje zvlášť, jen jednou)
@@ -838,103 +838,6 @@ function showToast(msg) {
 // ═══════════ COOKIE CONSENT ═══════════
 // Lišta a nastavení cookies žijí v consent.js (načítá ho hlavička každé stránky).
 
-// ═══════════ PEEKER (cursor-tracking face in login modal) ═══════════
-(function() {
-  var peeker = document.getElementById('main-peeker');
-  var eyeL   = document.getElementById('main-eyeL');
-  var eyeR   = document.getElementById('main-eyeR');
-  var pupilL = document.getElementById('main-pupilL');
-  var pupilR = document.getElementById('main-pupilR');
-  var browL  = document.getElementById('main-browL');
-  var browR  = document.getElementById('main-browR');
-  var lidL   = document.getElementById('main-lidL');
-  var lidR   = document.getElementById('main-lidR');
-  if (!peeker) return;
-
-  var isPwd = false;
-  var blinkTimer = null;
-  var peekTimers = [];
-
-  function movePupil(pupilEl, eyeEl, mx, my) {
-    var rect = eyeEl.getBoundingClientRect();
-    if (!rect.width) return;
-    var cx = rect.left + rect.width  / 2;
-    var cy = rect.top  + rect.height / 2;
-    var dx = mx - cx, dy = my - cy;
-    var dist = Math.sqrt(dx * dx + dy * dy);
-    var r = 4.5;
-    var s = Math.min(dist, r) / Math.max(dist, 0.001);
-    pupilEl.style.transform = 'translate(' + (dx * s).toFixed(2) + 'px,' + (dy * s).toFixed(2) + 'px)';
-  }
-
-  document.addEventListener('mousemove', function(e) {
-    if (!peeker || peeker.offsetParent === null) return;
-    movePupil(pupilL, eyeL, e.clientX, e.clientY);
-    movePupil(pupilR, eyeR, e.clientX, e.clientY);
-  });
-
-  function setLid(speed) {
-    if (!lidL || !lidR) return;
-    lidL.style.transition = 'height ' + speed + ' ease';
-    lidR.style.transition = 'height ' + speed + ' ease';
-  }
-
-  function scheduleBlink() {
-    blinkTimer = setTimeout(function() {
-      if (isPwd) return;
-      setLid('0.08s');
-      lidL.style.height = '21px'; lidR.style.height = '21px';
-      setTimeout(function() {
-        lidL.style.height = '0'; lidR.style.height = '0';
-        setTimeout(function() { setLid('0.28s'); scheduleBlink(); }, 120);
-      }, 100);
-    }, 5000);
-  }
-
-  function clearPeekTimers() { peekTimers.forEach(clearTimeout); peekTimers = []; }
-
-  function schedulePeek() {
-    peekTimers.push(setTimeout(function() {
-      lidR.style.height = '11px';
-      peekTimers.push(setTimeout(function() {
-        lidR.style.height = '21px';
-        peekTimers.push(setTimeout(schedulePeek, 5000));
-      }, 1000));
-    }, 3000));
-  }
-
-  function peekAtPassword() {
-    isPwd = true;
-    peeker.style.animation = 'none';
-    clearTimeout(blinkTimer);
-    clearPeekTimers();
-    peeker.style.transform = 'translateX(-50%)';
-    setLid('0.28s');
-    lidL.style.height = '21px'; lidR.style.height = '21px';
-    browL.style.transform = 'translateY(5px)';
-    browR.style.transform = 'translateY(5px)';
-    schedulePeek();
-  }
-
-  function stopPeeking() {
-    isPwd = false;
-    clearPeekTimers();
-    peeker.style.animation = 'none';
-    peeker.style.transform = 'translateX(-50%)';
-    setLid('0.28s');
-    lidL.style.height = '0'; lidR.style.height = '0';
-    browL.style.transform = ''; browR.style.transform = '';
-    scheduleBlink();
-  }
-
-  var pwdField = document.getElementById('login-password');
-  if (pwdField) {
-    pwdField.addEventListener('focus', peekAtPassword);
-    pwdField.addEventListener('blur',  stopPeeking);
-  }
-
-  scheduleBlink();
-})();
 
 /* ── Showcase toggle: switch between the interactive phone and the feature grid ── */
 (function () {

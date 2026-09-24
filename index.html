@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=150" />
+  <link rel="stylesheet" href="style.css?v=152" />
 
     <!-- ═══════════ ÚVODNÍ NAPSÁNÍ NADPISU ═══════════
        Místo modré plochy s logem se na čisté stránce po písmenech napíše
@@ -84,6 +84,49 @@
     /* Linky ze světlounké modré jsou na bílé taky neviditelné. */
     #footer { border-top-color: rgba(20,22,28,.07); }
     #footer .footer-bottom { border-top-color: rgba(20,22,28,.08); }
+
+    /* ── Modrý pruh s telefonem (dřív závěr na /hledam-si-praci) ──
+       Nahradil celoobrazovkovou scénu .uk. Pravidla schválně zůstávají tady
+       na stránce, ne ve style.css: /lide má vlastní .vx-close a globální
+       .vx-close .vx-wrap / .vx-btn by se mu přimíchaly. Měkké světlo shora
+       (.vx-close::before) je sdílené ve style.css. ── */
+    .vx-close { background: #0020f6;
+      padding: 96px 0; text-align: center; }
+    .vx-close .vx-wrap { width: min(1120px, 90vw); margin: 0 auto; }
+    .vx-close .vx-sec-head { max-width: 640px; margin: 0 auto; }
+    .vx-close .vx-h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
+      font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.02;
+      margin: 12px 0 0; color: #fff; text-wrap: balance; }
+    .vx-close .vx-sec-head p { color: rgba(255,255,255,.85); max-width: 640px;
+      margin: 16px auto 0; font-size: 1.08rem; line-height: 1.6; }
+    .vx-close .vx-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 30px;
+      font-family: var(--font-heading); font-weight: 800; font-size: .92rem; letter-spacing: .01em;
+      padding: 14px 26px; border-radius: 999px; cursor: pointer;
+      background: #fff; color: #0020f6; box-shadow: 0 14px 30px -12px rgba(0,10,80,.5);
+      transition: background .25s ease, color .25s ease, transform .2s ease, box-shadow .25s ease; }
+    /* Na najetí jen lehce zesvětlá — dřív zmodralo a na modrém pruhu úplně zmizelo. */
+    .vx-close .vx-btn:hover { background: #F4F6FF; transform: translateY(-2px);
+      box-shadow: 0 20px 40px -12px rgba(0,10,80,.6); }
+    @media (max-width: 700px) { .vx-close { padding: 68px 0; } }
+
+    /* ── Varianta se snímkem appky ──
+       Text vlevo, telefon vpravo. Snímek má průhledné pozadí, takže splývá
+       s modrou — proto kolem něj není rámeček ani stín navíc. */
+    .vx-close--foto { text-align: left; padding: 84px 0; }
+    .vx-close--foto .vx-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.18fr);
+      align-items: center; gap: clamp(28px, 5vw, 64px); }
+    .vx-close--foto .vx-sec-head { max-width: 520px; margin: 0; }
+    .vx-close--foto .vx-sec-head p { margin-left: 0; margin-right: 0; }
+    .vx-close--foto .vxc-foto img { display: block; width: 100%; height: auto; }
+    /* Žádný přesah dolů: .vx-close má overflow:hidden kvůli světlu v pozadí,
+       takže by se telefon neprotáhl ven, ale uřízl v půlce těla. */
+    @media (max-width: 900px) {
+      .vx-close--foto { text-align: center; padding: 68px 0; }
+      .vx-close--foto .vx-wrap { grid-template-columns: 1fr; gap: 34px; }
+      .vx-close--foto .vx-sec-head { margin: 0 auto; }
+      .vx-close--foto .vx-sec-head p { margin-left: auto; margin-right: auto; }
+      .vx-close--foto .vxc-foto { margin-bottom: 0; }
+    }
   </style>
   <script>
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -401,13 +444,31 @@
   </section>
   </div><!-- /.uvod -->
 
+  <!-- ═══════════ MODRÝ PRUH S TELEFONEM ═══════════
+       Převzato od Yasina. Stejný kus je závěrem /hledam-si-praci; tady stojí
+       mezi čekacím listem a patičkou. -->
+  <section class="vx-close vx-close--foto">
+    <div class="vx-wrap">
+      <div class="vx-sec-head">
+        <h2 class="vx-h2">Staň se Makačem ještě dnes</h2>
+        <p>Žádné zdlouhavé formuláře. Vytvoř si profil, swajpni nabídku a zbytek doladíš s firmou přímo v chatu.</p>
+        <a href="#" class="vx-btn worker-cta-register">Vytvořit účet zdarma</a>
+      </div>
+      <!-- Snímek má vyříznuté pozadí, takže sedí přímo na modré bez hrany.
+           aria-hidden: obsah displeje je stejně napsaný v textu sekce. -->
+      <div class="vxc-foto" aria-hidden="true">
+        <img src="/hsp-mockup.webp" alt="" width="1240" height="732" loading="lazy" decoding="async" />
+      </div>
+    </div>
+  </section>
+
   <!-- ═══════════ FOOTER ═══════════ -->
   <footer id="footer" data-nav-blue>
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="/" class="footer-logo">Makej</a>
-          <p>Aplikace na brigády a práci ve tvém okolí. Swajpuj, matchuj a pracuj.</p>
+          <p>Vytváříme místo, kde najde práci každý.</p>
           <div class="footer-social">
             <a href="https://www.instagram.com/makej.eu" aria-label="Instagram" target="_blank" rel="noopener"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a>
             <a href="https://www.facebook.com/share/19Kq5N1R2u/?mibextid=wwXIfr" aria-label="Facebook" target="_blank" rel="noopener"><iconify-icon icon="mdi:facebook" width="22"></iconify-icon></a>
@@ -450,29 +511,6 @@
 
     <!-- LOGIN MODAL -->
     <div class="modal" id="login-modal" style="overflow:visible;">
-      <!-- Makač peeker -->
-      <div id="main-peeker" style="
-        position:absolute; top:-70px; left:50%; transform:translateX(-50%);
-        pointer-events:none; z-index:3;
-        filter: drop-shadow(0 14px 36px rgba(0,0,60,0.65));
-        transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
-        animation: peekerIn 0.45s cubic-bezier(.2,.8,.2,1) both;
-      ">
-        <div style="width:88px;height:76px;background:linear-gradient(160deg,#4848c4 0%,#1c1c7a 100%);border-radius:50% 50% 44% 44%;position:relative;box-shadow:0 14px 36px rgba(0,0,60,0.65),inset 0 1px 0 rgba(255,255,255,0.18);border:2px solid rgba(140,140,255,0.3);">
-          <div id="main-browL" style="position:absolute;left:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
-          <div id="main-browR" style="position:absolute;right:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
-          <div id="main-eyeL" style="position:absolute;left:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
-            <div id="main-pupilL" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
-            <div id="main-lidL" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
-          </div>
-          <div id="main-eyeR" style="position:absolute;right:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
-            <div id="main-pupilR" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
-            <div id="main-lidR" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
-          </div>
-          <div style="position:absolute;bottom:11px;left:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
-          <div style="position:absolute;bottom:11px;right:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
-        </div>
-      </div>
       <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej</div>
       <p class="modal-title">Přihlásit se</p>
@@ -623,6 +661,6 @@
   <!-- ═══════════ COOKIE BANNER ═══════════ -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=62"></script>
+  <script src="script.js?v=64"></script>
 </body>
 </html>

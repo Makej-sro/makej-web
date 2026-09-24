@@ -51,7 +51,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=150" />
+  <link rel="stylesheet" href="/style.css?v=152" />
   <style>
     /* ═══════════ O NÁS — návrh z Claude Design, doplněný o náš navbar,
        sekci se stažením a patičku. Modrá sjednocena na značkovou #0020f6. ═══════════ */
@@ -251,7 +251,9 @@
 <body>
 
   <!-- ═══════════ NAV ═══════════ -->
-  <nav id="navbar" class="nav-light-page">
+  <!-- .nav-bez-prihlaseni: lišta na téhle stránce nabízí jen registraci,
+       přihlášení ne (viz initAuth ve script.js, který obsah lišty přepisuje). -->
+  <nav id="navbar" class="nav-light-page nav-bez-prihlaseni">
     <div class="nav-inner">
       <a href="/" class="nav-logo">Makej</a>
       <div class="nav-links">
@@ -262,7 +264,6 @@
         <a href="/podpora">Podpora</a>
       </div>
       <div class="nav-actions nav-actions-visible" id="nav-actions">
-        <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
         <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       </div>
       <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" aria-expanded="false">
@@ -276,7 +277,6 @@
       <a href="#download">Stáhnout</a>
       <a href="/podpora">Podpora</a>
       <div class="mobile-menu-actions">
-        <a href="javascript:void(0)" class="btn-ghost" id="mobile-login-btn">Přihlásit se</a>
         <a href="javascript:void(0)" class="btn-primary" id="mobile-register-btn">Vytvořit účet</a>
       </div>
     </div>
@@ -567,7 +567,7 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="/" class="footer-logo">Makej</a>
-          <p>Aplikace na brigády a práci ve tvém okolí. Swajpuj, matchuj a pracuj.</p>
+          <p>Vytváříme místo, kde najde práci každý.</p>
           <div class="footer-social">
             <a href="https://www.instagram.com/makej.eu" aria-label="Instagram" target="_blank" rel="noopener"><iconify-icon icon="mdi:instagram" width="22"></iconify-icon></a>
             <a href="https://www.facebook.com/share/19Kq5N1R2u/?mibextid=wwXIfr" aria-label="Facebook" target="_blank" rel="noopener"><iconify-icon icon="mdi:facebook" width="22"></iconify-icon></a>
@@ -610,29 +610,6 @@
 
     <!-- LOGIN MODAL -->
     <div class="modal" id="login-modal" style="overflow:visible;">
-      <!-- Makač peeker -->
-      <div id="main-peeker" style="
-        position:absolute; top:-70px; left:50%; transform:translateX(-50%);
-        pointer-events:none; z-index:3;
-        filter: drop-shadow(0 14px 36px rgba(0,0,60,0.65));
-        transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
-        animation: peekerIn 0.45s cubic-bezier(.2,.8,.2,1) both;
-      ">
-        <div style="width:88px;height:76px;background:linear-gradient(160deg,#2a39ff 0%,#0a17d2 100%);border-radius:50% 50% 44% 44%;position:relative;box-shadow:0 14px 36px rgba(0,0,60,0.65),inset 0 1px 0 rgba(255,255,255,0.18);border:2px solid rgba(120,145,255,0.35);">
-          <div id="main-browL" style="position:absolute;left:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
-          <div id="main-browR" style="position:absolute;right:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
-          <div id="main-eyeL" style="position:absolute;left:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
-            <div id="main-pupilL" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
-            <div id="main-lidL" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#4358ff,#0f22cc);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
-          </div>
-          <div id="main-eyeR" style="position:absolute;right:15px;top:28px;width:21px;height:21px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12);">
-            <div id="main-pupilR" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;"><div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div></div>
-            <div id="main-lidR" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#4358ff,#0f22cc);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
-          </div>
-          <div style="position:absolute;bottom:11px;left:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
-          <div style="position:absolute;bottom:11px;right:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
-        </div>
-      </div>
       <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej</div>
       <!-- Krok 1: výběr role -->
@@ -774,7 +751,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=62"></script>
+  <script src="/script.js?v=64"></script>
   <!-- Odhalování sekcí při scrollu — stejný efekt jako na ostatních stránkách (generická třída .reveal) -->
   <script>
   (function () {

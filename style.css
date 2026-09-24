@@ -388,10 +388,6 @@ img { max-width: 100%; display: block; }
   0%,100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
-@keyframes peekerIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.8); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1); }
-}
 
 /* nízké displeje — ať se tlačítka i spodní řádek vejdou nad ohyb */
 @media (max-height: 760px) {
@@ -2254,7 +2250,7 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
   .uvod .vx-hero, .uvod .eh-head, .uvod .mkj-visual { filter: none; opacity: 1; transform: none; }
 }
 
-/* ═══════════ POSUVNÝ PRUH DŮVODŮ (vzor bolt.eu) ═══════════
+/* ═══════════ POSUVNÝ PRUH DŮVODŮ ═══════════
    Ilustrace nahoře, pod ní vycentrovaný nadpis a popis. Žádné kartičky —
    obrázky mají průhledné pozadí a stojí přímo na ploše sekce. Vodorovný
    scroll s přichytáváním; poslední položka je u kraje schválně useknutá,
