@@ -2090,9 +2090,12 @@ html { scroll-padding-top: 92px; }
   .art-lead { font-size: 1.12rem; line-height: 1.65; color: rgba(10,13,46,.66); margin: 0 0 34px; }
 
   /* náhledový obrázek článku */
+/* Zdrojové fotky článků jsou čtvercové (1200×1200). Při poměru 16/7 z nich
+   `cover` vyřízl úzký pruh přes střed a lidem na fotce uřízl hlavy — proto
+   mírnější 16/9 a těžiště výřezu nad středem, kde bývají obličeje. */
 .art-hero { margin: 0 0 38px; border-radius: 20px; overflow: hidden; background: #eef1fb;
-  aspect-ratio: 16/7; }
-.art-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  aspect-ratio: 16/9; }
+.art-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 40%; display: block; }
 
 /* tělo článku */
   .art-body h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.25rem, 2.4vw, 1.55rem);
