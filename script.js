@@ -368,7 +368,7 @@ function initAuth() {
   //   ⇒ ZMĚNIT KLÍČ = uprav ACCESS_KEY.  ⇒ NAOSTRO = dej ACCESS_KEY na '' (pustí všechny).
   const ACCESS_KEY = '8939';
   const ACCESS_LOCKED_MSG =
-    'Spouštíme 1. 10. — zrovna na tom makáme. 💪 Jakmile bude hotovo, dáme ti vědět e-mailem.';
+    'Spouštíme brzy — zrovna na tom makáme. Jakmile bude hotovo, dáme ti vědět e-mailem.';
   function accessKeyOk() {
     if (!ACCESS_KEY) return true;
     const el = document.getElementById('login-key');

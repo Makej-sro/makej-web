@@ -1301,21 +1301,21 @@ const PLANS = [
     cta: 'Začít zdarma',
   },
   {
-    id: 'vyhodny', name: 'Výhodný', price: 499, annualPrice: 424, save: 900, period: 'za měsíc',
+    id: 'vyhodny', name: 'Výhodný', price: 990, annualPrice: 990, save: 0, period: 'za měsíc',
     kdo: 'Občasný nábor', popis: 'Když jednou za čas hledáte nového kolegu.', uvod: 'Vše ze Základní, a navíc:',
     color: '#5B6BFF', rgb: '91,107,255',
     feats: [['2 aktivní inzeráty', true], ['Topování inzerátu 1×/měs', true], ['Oslovování kandidátů 3×/měs', true], ['Ověřená firma', true]],
     cta: 'Vybrat Výhodný',
   },
   {
-    id: 'dynamicky', name: 'Dynamický', price: 2000, annualPrice: 1700, save: 3600, period: 'za měsíc',
+    id: 'dynamicky', name: 'Dynamický', price: 3990, annualPrice: 3390, save: 7200, period: 'za měsíc',
     kdo: 'Aktivně hledám', popis: 'Pro firmy, které nabírají průběžně na více pozic.', uvod: 'Vše z Výhodný, a navíc:',
     color: '#5BD68A', rgb: '91,214,138', popular: true,
     feats: [['5 aktivních inzerátů', true], ['Topování inzerátu 3×/měs', true], ['Plné statistiky + CSV export', true], ['Prioritní řešení podpory', true]],
     cta: 'Vybrat Dynamický',
   },
   {
-    id: 'maximalni', name: 'Maximální', price: 4999, annualPrice: 4249, save: 9000, period: 'za měsíc',
+    id: 'maximalni', name: 'Maximální', price: 9990, annualPrice: 8490, save: 18000, period: 'za měsíc',
     kdo: 'Rostoucí tým', popis: 'Když potřebujete obsadit hodně míst rychle.', uvod: 'Vše z Dynamický, a navíc:',
     color: '#FFD166', rgb: '255,209,102',
     feats: [['10 aktivních inzerátů', true], ['Topování inzerátu 5×/měs', true], ['Prémiový badge + Urgent 2×', true]],
@@ -1422,8 +1422,8 @@ const _CENIK_CSS = `
 // Kalkulačka tarifu Vlastní — stejný sazebník jako na webu (kalkulackaVlastni()).
 // Základ 10 000 Kč za 20 inzerátů, každý další podle pásma; výsledek se
 // zaokrouhlí na tisíce a sníží o korunu (ceny končí na 999).
-const _KALK_ZAKLAD = 10000, _KALK_OD = 20;
-const _KALK_PASMA = [[50,450],[100,350],[250,250],[500,180],[1000,120],[2500,80],[5000,50]];
+const _KALK_ZAKLAD = 18000, _KALK_OD = 20;
+const _KALK_PASMA = [[50,810],[100,630],[250,450],[500,324],[1000,216],[2500,144],[5000,90]];
 const _KALK_KROKY = (() => {
   const k = []; let v;
   for (v = 20;  v <= 100;  v += 10)  k.push(v);
@@ -1438,7 +1438,7 @@ function _kalkCena(n) {
     p += (Math.min(n, do_) - spodek) * sazba;
     spodek = do_;
   }
-  return Math.round(p / 1000) * 1000 - 1;
+  return Math.round(p / 1000) * 1000 - 10;   // ceny končí na 990 jako zbytek ceníku
 }
 
 // Číslo ceny se k nové hodnotě dopočítá (jako na webu), neskočí.
@@ -1738,7 +1738,7 @@ function EPricing({ onTab, onPlanChange }) {
                     </div>
                     <div style={{ fontSize: 13.5, color: '#5B6178', lineHeight: 1.5 }}>
                       {annual
-                        ? <>Zaplatíte <b style={{ color: '#0B1033' }}>{f(mes * 12)} Kč</b> jednou za rok · <span style={{ color: '#15803D', fontWeight: 600 }}>ušetříte {f(p.save)} Kč</span></>
+                        ? <>Zaplatíte <b style={{ color: '#0B1033' }}>{f(mes * 12)} Kč</b> jednou za rok{p.save ? <> · <span style={{ color: '#15803D', fontWeight: 600 }}>ušetříte {f(p.save)} Kč</span></> : ''}</>
                         : <>Platí se každý měsíc, zrušit jde kdykoli.</>}
                     </div>
                   </div>
