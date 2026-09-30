@@ -104,6 +104,10 @@ const STATUS_META = {
 // Maximální počet současně aktivních inzerátů podle tarifu firmy (viz PLANS v employer-pages3.jsx).
 // Firma může mít libovolně mnoho předpřipravených (neaktivních) inzerátů, ale aktivních jen do limitu.
 const EMPLOYER_MAX_ACTIVE = { zakladni: 1, vyhodny: 2, dynamicky: 5, maximalni: 10, vlastni: Infinity };
+// Kolikrát za kalendářní měsíc smí firma topovat inzerát (ceník: řádek „Topování inzerátu").
+// Jedno topování = inzerát je E_TOP_HODIN hodin v appce mezi prvními kartami (employer-supabase.jsx).
+const EMPLOYER_TOP_MESICNE = { zakladni: 0, vyhodny: 1, dynamicky: 3, maximalni: 5, vlastni: 5 };
+const EMPLOYER_TARIF_NAZEV  = { zakladni: 'Základní', vyhodny: 'Výhodný', dynamicky: 'Dynamický', maximalni: 'Maximální', vlastni: 'Vlastní' };
 
 function _employerPlanTier() {
   const planName = ((typeof ECOMPANY !== 'undefined' && ECOMPANY.plan) || '').toLowerCase();

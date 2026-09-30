@@ -2,46 +2,43 @@
 
 const TITLES = {
   dash:       { title: 'Dashboard',   subtitle: 'Přehled výkonu náboru za 30 dní' },
-  analytics:  { title: 'Analytika',   subtitle: 'Pokročilé reporty a segmentace' },
+  analytics:  { title: 'Statistiky',  subtitle: 'Výkon inzerátů a zájem kandidátů' },
   jobs:       { title: 'Inzeráty',   subtitle: 'Správa a výkon vašich brigád' },
   candidates: { title: 'Kandidáti',  subtitle: '' },
   chat:       { title: 'Zprávy',     subtitle: 'Komunikace s kandidáty' },
   calendar:   { title: 'Plán směn',  subtitle: 'Kalendář obsazení a otevřené sloty' },
   reviews:    { title: 'Recenze',    subtitle: 'Všechna hodnocení od kandidátů' },
+  company:    { title: 'Profil firmy', subtitle: 'Jak vás vidí brigádníci' },
   settings:   { title: 'Nastavení',  subtitle: 'Firemní profil a nastavení' },
   pricing:    { title: 'Tarify',     subtitle: 'Správa předplatného a ceník' },
 };
 
+// Obě obrazovky stojí na SVĚTLÉ ploše obsahu, takže patří tokeny card*.
+// Holé T.text / T.muted / T.light jsou bílé pro text na modrém pozadí —
+// tady s nimi byl nápis bílý na světlé a skoro nešel přečíst.
+// Dřív tu byl modrý kroužek s „Načítám data…". Načítání ale celé kryje modrá
+// obrazovka s orbem (index.html → #auth-gate) a ta odchází až po načtení dat
+// (událost 'emp-data-nactena' níž). Druhá načítačka se nesmí ukázat nikdy —
+// proto jen prázdná plocha, kdyby se sem přece jen něco dostalo.
 function ELoadingSpinner() {
-  return (
-    <div style={{ flex: 1, display: 'grid', placeItems: 'center', minHeight: 0 }}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: 999,
-          border: '3px solid rgba(0,32,246,0.18)', borderTopColor: '#5B6BFF',
-          animation: 'empSpin .75s linear infinite', margin: '0 auto',
-        }} />
-        <div style={{ color: T.muted, fontFamily: T.fontUI, fontSize: 13, marginTop: 14 }}>Načítám data…</div>
-      </div>
-    </div>
-  );
+  return <div style={{ flex: 1, minHeight: 0 }} />;
 }
 
 function EEmptyState() {
   return (
     <div style={{ flex: 1, display: 'grid', placeItems: 'center' }}>
       <div style={{ textAlign: 'center', padding: 40, maxWidth: 400 }}>
-        <Icon name="document-add-bold" size={56} color={T.mutedSoft} />
-        <div style={{ marginTop: 18, fontSize: 20, color: T.text, fontWeight: 800, fontFamily: T.fontHead }}>
+        <Icon name="document-add-bold" size={56} color={T.cardMutedSoft} />
+        <div style={{ marginTop: 18, fontSize: 20, color: T.cardText, fontWeight: 800, fontFamily: T.fontHead }}>
           Zatím žádné inzeráty
         </div>
-        <div style={{ marginTop: 8, fontSize: 13, color: T.muted, fontFamily: T.fontUI, lineHeight: 1.6 }}>
+        <div style={{ marginTop: 8, fontSize: 13, color: T.cardMuted, fontFamily: T.fontUI, lineHeight: 1.6 }}>
           Vytvořte první inzerát v mobilní aplikaci Makej a kandidáti se začnou ozývat.
         </div>
         <div style={{
           marginTop: 20, padding: '12px 20px', borderRadius: 12,
           background: 'rgba(91,107,255,0.12)', border: '1px solid rgba(91,107,255,0.25)',
-          color: T.light, fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.5,
+          color: T.cardLight, fontFamily: T.fontUI, fontSize: 12, lineHeight: 1.5,
         }}>
           📱 Stáhněte aplikaci Makej a přidejte první brigádu
         </div>
@@ -447,9 +444,11 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
   const [p, setP]       = useStateE(fallback || null);
   const [reviews, setR] = useStateE(null);   // null = načítá se
   const [loading, setL] = useStateE(true);
+  const [trust, setTrust] = useStateE((fallback && fallback.trust) || null);   // dokončené / zrušené směny
 
   useEffectE(() => {
-    if (!workerId) return;
+    // Bez id (ukázkový kandidát) jen to, co přišlo s kartou — nic se nenačítá
+    if (!workerId) { setR([]); setL(false); return; }
     let alive = true;
     (async () => {
       const [profRes, revRes] = await Promise.all([
@@ -462,6 +461,10 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
       if (!alive) return;
       if (profRes.data) setP(profRes.data);
       setR(revRes.data || []);
+      if (!(fallback && fallback.trust) && typeof workerTrustE === 'function') {
+        const t = await workerTrustE(workerId);
+        if (alive && t) setTrust(t);
+      }
       setL(false);
     })();
     return () => { alive = false; };
@@ -500,8 +503,10 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
               {p?.verified && <Icon name="verified-check-bold" size={18} color="#5B6BFF" />}
             </div>
             <div style={{ color: T.cardMuted, fontFamily: T.fontUI, fontSize: 12.5, marginTop: 3 }}>
-              {[p?.address, p?.level ? 'Makač L' + p.level : null].filter(Boolean).join(' · ') || 'Brigádník'}
+              {p?.address || 'Brigádník'}
             </div>
+            {/* Stupeň důvěry jako v aplikaci (dřív „Makač L" z nevyplňovaného profiles.level) */}
+            {trust && <div style={{ marginTop: 7 }}><ETrustBadge stats={{ ...trust, hodnoceni: rating }} sm /></div>}
             {loading && <div style={{ color: T.cardMutedSoft, fontFamily: T.fontUI, fontSize: 11, marginTop: 4 }}>Načítám profil…</div>}
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: T.cardSoft, border: '1px solid ' + T.cardBorder, color: T.cardMuted, cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0, fontSize: 16 }}>✕</button>
@@ -510,19 +515,23 @@ function EWorkerProfileModal({ workerId, fallback, onClose }) {
         <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
 
           {/* ── Statistiky ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-            {[
+          {/* Jen skutečná čísla (28. 9.): dřív Brigád / Hodin / Vyděláno ze sloupců,
+              které appka neplní (a výdělek brigádníka firmě nepatří). */}
+          {(() => { const tt = trust ? eTrust({ ...trust, hodnoceni: rating }) : null; const polozky = [
               { l: 'Hodnocení', v: rating > 0 ? rating.toFixed(1) + '★' : '–', c: '#D97706', bg: '#FFFBEB', border: '#FDE68A' },
-              { l: 'Brigád',    v: p?.jobs_done || 0,                            c: '#4338CA', bg: '#EEF2FF', border: '#C7D2FE' },
-              { l: 'Hodin',     v: p?.hours_logged || 0,                         c: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
-              { l: 'Vyděláno',  v: (Number(p?.total_earned || 0)).toLocaleString('cs-CZ') + ' Kč', c: '#0020F6', bg: 'rgba(0,32,246,0.05)', border: 'rgba(0,32,246,0.15)' },
-            ].map((s, i) => (
+            ].concat(tt ? [
+              { l: 'Dokončené směny', v: tt.dokoncene, c: '#4338CA', bg: '#EEF2FF', border: '#C7D2FE' },
+              { l: 'Spolehlivost', v: tt.spolehlivost === null ? '–' : tt.spolehlivost + ' %', c: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
+            ] : []); return (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(' + polozky.length + ', 1fr)', gap: 8 }}>
+            {polozky.map((s, i) => (
               <div key={i} style={{ textAlign: 'center', padding: '12px 8px', borderRadius: 12, background: s.bg, border: '1px solid ' + s.border }}>
                 <div style={{ color: s.c, fontFamily: T.fontMono, fontSize: 17, fontWeight: 700, lineHeight: 1.2 }}>{s.v}</div>
                 <div style={{ color: T.cardMutedSoft, fontFamily: T.fontUI, fontSize: 9.5, marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 700 }}>{s.l}</div>
               </div>
             ))}
           </div>
+          ); })()}
 
           {/* ── O kandidátovi ── */}
           {p?.bio && (
@@ -633,8 +642,24 @@ function EPublishPill({ state }) {
   );
 }
 
+// ── Záložky v adrese (#inzeraty, #kandidati…) a šipka Zpět v prohlížeči ──
+// Každé přepnutí záložky je krok v historii prohlížeče. Šipka Zpět tak
+// přepne na předchozí záložku (bez načítání celé stránky), refresh nechá
+// člověka na té, kde byl. Dashboard je čistá adresa bez #.
+const _TAB_HASH = { dash: '', analytics: 'statistiky', jobs: 'inzeraty', candidates: 'kandidati', chat: 'zpravy', calendar: 'plan-smen', reviews: 'recenze', settings: 'nastaveni', company: 'profil-firmy', pricing: 'tarify' };
+// '#access_token=…' apod. patří přihlášení (Supabase) — na to nesahat.
+const _hashJeNas = () => !location.hash.includes('=');
+const _hashNaTab = () => {
+  if (!_hashJeNas()) return 'dash';
+  let h = decodeURIComponent(location.hash.slice(1)).split('/')[0];
+  if (h === 'analytika') h = 'statistiky';   // stará adresa (do 28. 9.)
+  return Object.keys(_TAB_HASH).find(k => _TAB_HASH[k] === h) || 'dash';
+};
+
 function EmployerApp() {
-  const [tab,       setTab]       = useStateE('dash');
+  const [tab,       setTab]       = useStateE(_hashNaTab);
+  const tabRef    = useRefE(tab);
+  const zHistorie = useRefE(false);   // záložka se změnila šipkou Zpět/Vpřed → nezapisovat znovu
   const [loaded,    setLoaded]    = useStateE(false);
   const [tick,      setTick]      = useStateE(0);
   const [unreadNudge, setUnreadNudge] = useStateE(0);   // překreslí sidebar/badge, aniž by se přemountoval chat
@@ -669,6 +694,12 @@ function EmployerApp() {
   if (typeof window !== 'undefined') window.empToast = addToast;
 
   // Publikace inzerátu s „pill" feedbackem: načítání → zelené Hotovo
+  // Obnovit data po změně z jiné záložky (např. úprava inzerátu)
+  React.useEffect(() => {
+    window.empObnovData = async () => { if (empId.current) { await fetchEmployerData(empId.current); setTick(t => t + 1); } };
+    return () => { window.empObnovData = null; };
+  }, []);
+
   async function handlePublish(fields) {
     setShowNewJob(false);
     setPublish('loading');
@@ -694,11 +725,38 @@ function EmployerApp() {
     }, Math.max(0, MIN_LOADING - (Date.now() - started)));
   }
 
-  // Theme toggle re-render
+  // Nová záložka vždy začíná nahoře — jinak zůstal posun z předchozí
+  // a stránka „odskočila" doprostřed.
+  const mainRef = useRefE(null);
+  // Při přepnutí záložky i zapomenout otevřený detail inzerátu (viz EJobs).
+  // (a filtr Kandidátů na jeden inzerát, ten jen když se ze Kandidátů odejde).
+  useEffectE(() => { if (mainRef.current) mainRef.current.scrollTop = 0; window.__empJobDetail = null; if (tab !== 'candidates') window.__empCandJob = null; }, [tab]);
+
+  // Záložka → adresa (nový krok v historii), šipka Zpět/Vpřed → záložka.
+  useEffectE(() => {
+    tabRef.current = tab;
+    if (zHistorie.current) { zHistorie.current = false; return; }
+    if (!_hashJeNas()) return;
+    const ted = decodeURIComponent(location.hash.slice(1)).split('/')[0];
+    const cil = _TAB_HASH[tab] || '';
+    if (ted === cil) return;
+    history.pushState(null, '', cil ? '#' + cil : location.pathname + location.search);
+  }, [tab]);
+  useEffectE(() => {
+    const onPop = () => {
+      const t = _hashNaTab();
+      if (t !== tabRef.current) { zHistorie.current = true; setTab(t); }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // Theme toggle re-render (+ po uložení profilu firmy — levé menu ukazuje logo a název)
   useEffectE(() => {
     const handler = () => setTick(t => t + 1);
     window.addEventListener('makej-theme-toggle', handler);
-    return () => window.removeEventListener('makej-theme-toggle', handler);
+    window.addEventListener('emp-profil-ulozen', handler);
+    return () => { window.removeEventListener('makej-theme-toggle', handler); window.removeEventListener('emp-profil-ulozen', handler); };
   }, []);
 
   // Initial data fetch on mount
@@ -720,6 +778,14 @@ function EmployerApp() {
     });
     return () => { try { sub.subscription.unsubscribe(); } catch (e) {} };
   }, []);
+
+  // Data jsou načtená a dashboard s nimi vykreslený → modrá obrazovka s orbem
+  // může odejít (index.html → hideGate). Efekt běží až po zápisu do DOM.
+  useEffectE(() => {
+    if (!loaded) return;
+    window.__empDataNactena = true;
+    window.dispatchEvent(new Event('emp-data-nactena'));
+  }, [loaded]);
 
   // Realtime: refresh data when matches or jobs change
   useEffectE(() => {
@@ -803,15 +869,16 @@ function EmployerApp() {
   let body;
   if (!loaded) {
     body = <ELoadingSpinner />;
-  } else if (noData && tab === 'dash') {
-    body = <EEmptyState />;
-  } else if (tab === 'dash')        body = <EDashboard key={tick + period} period={period} onTab={setTab} onNew={() => setShowNewJob(true)} onPeriod={setPeriod} />;
-  else if (tab === 'analytics')     body = <EAnalytics key={tick + period} period={period} onNew={() => setShowNewJob(true)} onTab={setTab} onPeriod={setPeriod} />;
+  // Období není v key: změna období jen překreslí (data se počítají z props),
+  // nepřipojí záložku znovu — jinak by se při výběru Od/Do zavřela roletka.
+  } else if (tab === 'dash')        body = <EDashboard key={tick} period={period} onTab={setTab} onNew={() => setShowNewJob(true)} onPeriod={setPeriod} />;
+  else if (tab === 'analytics')     body = <EAnalytics key={tick} period={period} onNew={() => setShowNewJob(true)} onTab={setTab} onPeriod={setPeriod} />;
   else if (tab === 'jobs')          body = <EJobs key={tick} onTab={setTab} onNew={() => setShowNewJob(true)} period={period} onPeriod={setPeriod} />;
   else if (tab === 'candidates')    body = <ECandidates key={tick} onOpenChat={openChat} onNew={() => setShowNewJob(true)} period={period} onPeriod={setPeriod} />;
   else if (tab === 'chat')          body = <EMessages key={tick + '-' + openThreadId} initialThreadId={openThreadId} period={period} onPeriod={setPeriod} onNew={() => setShowNewJob(true)} />;
   else if (tab === 'calendar')      body = <EShifts key={tick} period={period} onPeriod={setPeriod} onTab={setTab} onNew={() => setShowNewJob(true)} />;
   else if (tab === 'reviews')       body = <EReviews key={tick} period={period} onPeriod={setPeriod} onNew={() => setShowNewJob(true)} />;
+  else if (tab === 'company')       body = <ECompanyProfile key={tick} onTab={setTab} onSignOut={handleSignOut} />;
   else if (tab === 'settings')      body = <ESettings key={tick} onTab={setTab} onNew={() => setShowNewJob(true)} onSignOut={handleSignOut} />;
   else if (tab === 'pricing')       body = <EPricing onTab={setTab} onPlanChange={() => setTick(t => t + 1)} />;
   else body = (
@@ -833,7 +900,7 @@ function EmployerApp() {
   }
 
   return (
-    <div style={{ display: 'flex', width: '100%', height: '100%', background: T.bg, position: 'relative' }}>
+    <div style={{ display: 'flex', width: '100%', height: '100%', background: '#fff', position: 'relative' }}>
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.4,
         backgroundImage: 'radial-gradient(rgba(91,107,255,0.08) 1px, transparent 1px)',
@@ -869,8 +936,8 @@ function EmployerApp() {
         </button>
       )}
 
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, position: 'relative', overflowY: tab === 'dash' ? 'hidden' : 'auto', background: (tab === 'dash' || tab === 'reviews' || tab === 'calendar' || tab === 'chat' || tab === 'candidates' || tab === 'jobs' || tab === 'settings' || tab === 'analytics') ? '#F1F3FB' : 'transparent' }}>
-        {loaded && tab !== 'dash' && tab !== 'reviews' && tab !== 'calendar' && tab !== 'chat' && tab !== 'candidates' && tab !== 'jobs' && tab !== 'settings' && tab !== 'analytics' && <ETopbar title={meta.title} subtitle={meta.subtitle} onNew={() => setShowNewJob(true)} onSignOut={handleSignOut} period={period} onPeriod={setPeriod} />}
+      <main ref={mainRef} className="e-hlavni" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, position: 'relative', overflowY: tab === 'dash' ? 'hidden' : 'auto', background: '#fff' }}>
+        {loaded && tab !== 'dash' && tab !== 'reviews' && tab !== 'calendar' && tab !== 'chat' && tab !== 'candidates' && tab !== 'jobs' && tab !== 'settings' && tab !== 'analytics' && tab !== 'pricing' && tab !== 'company' && <ETopbar title={meta.title} subtitle={meta.subtitle} onNew={() => setShowNewJob(true)} onSignOut={handleSignOut} period={period} onPeriod={setPeriod} />}
         {body}
       </main>
 

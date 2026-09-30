@@ -51,7 +51,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=153" />
+  <link rel="stylesheet" href="/style.css?v=154" />
   <style>
     /* ═══════════ O NÁS — návrh z Claude Design, doplněný o náš navbar,
        sekci se stažením a patičku. Modrá sjednocena na značkovou #0020f6. ═══════════ */
@@ -207,7 +207,11 @@
 
     /* Kotva #kontakt — míří sem odkaz z patičky všech stránek. scroll-margin
        drží nadpis pod přilepenou lištou, jinak by se pod ni schoval. */
-    .oc-kontakt { padding-top: clamp(36px, 4.5vw, 56px); scroll-margin-top: 96px; }
+    .oc-kontakt { padding-top: clamp(36px, 4.5vw, 56px); }
+    /* Kotva #kontakt (z patičky všech stránek) sedí na bloku s lidmi, ne na
+       samotném kontaktu — ten je hned pod ním, takže se do okna vejde obojí.
+       Když mířila přímo na kontakt, tým zůstal nad horní hranou. */
+    .oc-team { scroll-margin-top: 20px; }
     .oc-kontakt h3 { margin: 0 0 8px; font-size: 12px; font-weight: 700;
       letter-spacing: .16em; text-transform: uppercase; color: var(--blue); }
     .oc-kontakt a { font-weight: 800; font-size: clamp(20px, 2.2vw, 28px);
@@ -418,7 +422,7 @@
           <h2 class="oc-eh">Kdo<br>za tím<br>stojí</h2>
           <p>Tři spolužáci z vysoké školy, kteří si sami hledali brigády a naráželi na stejné problémy. Nejsme korporace s oddělením na výzkum trhu — jsme součástí té samé skupiny lidí, pro kterou Makej stavíme.</p>
         </div>
-        <div class="oc-team">
+        <div class="oc-team" id="kontakt">
           <div class="oc-person">
             <h3>Jan Weber</h3><p>Spoluzakladatel</p>
             <p class="oc-role">Stará se o obchod, partnerství a marketing. Vyjednává spolupráce, buduje vztahy s partnery a řídí propagaci značky.</p>
@@ -439,7 +443,7 @@
           </div>
         </div>
 
-        <div class="oc-kontakt" id="kontakt">
+        <div class="oc-kontakt">
           <h3>Kontakt</h3>
           <a href="mailto:podpora@makej.eu">podpora@makej.eu</a>
         </div>
@@ -751,7 +755,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=64"></script>
+  <script src="/script.js?v=66"></script>
   <!-- Odhalování sekcí při scrollu — stejný efekt jako na ostatních stránkách (generická třída .reveal) -->
   <script>
   (function () {

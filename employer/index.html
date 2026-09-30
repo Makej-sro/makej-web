@@ -5,17 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Makej — dashboard pro zaměstnavatele</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="stylesheet" href="/nahravani.css?v=7" />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/LeagueSpartan-Variable.woff2" crossorigin />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Playfair+Display:ital,wght@1,600;1,700&family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <!-- Písma nesmí zdržet první vykreslení: načtou se bokem a naskočí, až dorazí. -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Playfair+Display:ital,wght@1,600;1,700&family=Poppins:wght@700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Playfair+Display:ital,wght@1,600;1,700&family=Poppins:wght@700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Playfair+Display:ital,wght@1,600;1,700&family=Poppins:wght@700&display=swap"></noscript>
 
-  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
-  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  <!-- Orb se stahuje hned, souběžně se vším ostatním (spouští ho skript pod zámkem). -->
+  <link rel="modulepreload" href="/vendor/thinking-orbs/orb.js?v=4" />
+  <link rel="modulepreload" href="/vendor/thinking-orbs/engine.es.js" />
+  <link rel="modulepreload" href="/vendor/thinking-orbs/index-B8WsUNf5.js" />
 
   <style>
     :root { color-scheme: dark; }
@@ -51,38 +54,14 @@
       100% { stroke-dashoffset: 0; }     /* dojede */
     }
 
-    /* Auth gate */
-    #auth-gate {
-      position: fixed; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      /* Modrý brandový nádech shora do skoro černé navy — místo fialové */
-      background: radial-gradient(130% 90% at 50% -10%, #0a1e8a 0%, #060a24 55%, #05071a 100%);
-      z-index: 9999;
-    }
+    /* Zámek = modrá obrazovka „Nahráváme vaše údaje" (vzhled v /nahravani.css,
+       sdílený s webem — přechod z přihlášení sem pak není vidět). */
     #auth-gate.hidden { display: none; }
-    .gate-card {
-      background: #0a0d2e;
-      border: 1px solid #1a2050;
-      border-radius: 1.5rem;
-      padding: 2.5rem;
-      width: min(420px, calc(100vw - 40px));
-      text-align: center;
-      box-shadow: 0 30px 70px rgba(0,10,60,0.5);
-    }
-    .gate-logo {
-      font-family: Inter, sans-serif;
-      font-size: 2.2rem; font-weight: 900;
-      color: #ffffff; letter-spacing: -0.5px;
-      margin-bottom: 1.75rem;
-    }
-    .gate-logo b { color: #4d63ff; font-weight: 900; }
-    .gate-desc { color: #8a90b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
-    .gate-spin {
-      width: 26px; height: 26px; margin: 0 auto;
-      border-radius: 999px;
-      border: 3px solid #1e2557; border-top-color: #0020f6;
-      animation: empSpin .7s linear infinite;
-    }
+    /* Dashboard se po odchodu modré jemně přiblíží dovnitř. `both` tu nevadí:
+       konečný snímek je transform:none, takže nic nezůstane zamčené. */
+    #root.nahr-dovnitr { animation: dashDovnitr .6s cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes dashDovnitr { from { opacity: 0; transform: scale(.975); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { #root.nahr-dovnitr { animation: none; } }
 
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -94,6 +73,267 @@
 
     /* Celý dashboard — font Inter (přebíjí inline League Spartan ze sdílených tokenů T.font*) */
     #root, #root * { font-family: "Inter", -apple-system, system-ui, sans-serif !important; }
+    /* Výjimka: logo Makej je všude (web, appka, dashboard) v League Spartan */
+    /* i vnořené části („M" + „akej" v levém menu) — jinak by je #root * přepnulo na Inter */
+    #root .e-logo, #root .e-logo * { font-family: 'League Spartan', "Inter", sans-serif !important; }
+
+    /* ── Jednotný rám záložek (krok 1 sjednocení, 25. 9.) ──
+       Každá záložka si dřív rám kreslila sama: jiný okraj (18/20 px), jiná
+       max. šířka (1180 px jen u Inzerátů, Nastavení, Analytiky), jinak vysoká
+       modrá hlavička (67–83 px). Při přepnutí proto obsah poskočil.
+       Záložky mají na kořeni třídu e-ram a na hlavičce e-hlav; tady se
+       jim vnutí stejné míry (!important přebíjí inline styly z JSX).
+       Posuvník: místo pro něj je rezervované vždy (scrollbar-gutter), jinak
+       se u dlouhých záložek objevil, obsah se zúžil a posunul o pár px.
+       Jen pro počítač — mobil má vlastní rozvržení a zůstává, jak byl. */
+    main { scrollbar-gutter: stable; }
+    /* Jedno čistě bílé pozadí na všech záložkách (26. 9.). Dřív měla stránka
+       #F1F3FB, rám záložky jiný odstín s vlastním obrysem a karty bílou —
+       tři různé bílé a dvě čáry vedle sebe. Rám teď splývá se stránkou,
+       zůstává jen modrá hlavička a karty obsahu. */
+    .e-ram > div { background: #fff !important; border-color: transparent !important; }
+    /* Hlavička záložky bez modré plochy (26. 9.) — jen název a akce vpravo
+       (komponenta ETabHlava v employer-shell.jsx). Stejná výška všude, ať
+       název při přepínání záložek neskáče. */
+    .e-hlav { padding: 10px 24px 18px; box-sizing: border-box; }
+    @media (min-width: 821px) {
+      .e-ram {
+        width: 100% !important; max-width: 1480px !important; margin: 0 auto !important;
+        padding: 20px !important; box-sizing: border-box !important;
+      }
+      .e-hlav { min-height: 70px; align-items: center !important; }
+      /* Pevná obrazovka na každé záložce (28. 9.): stránka sama nescrolluje.
+         Nadpis a pás čísel stojí, posouvá se jen obsah pod nimi (poslední
+         dítě karty). Seznamy s vlastním posuvníkem (Zprávy, Inzeráty) si
+         výšku berou z tohohle prostoru. Mobil zůstává, jak byl. */
+      main.e-hlavni:has(.e-ram) { overflow-y: hidden !important; scrollbar-gutter: auto; }
+      .e-ram { flex: 1 1 auto; min-height: 0; height: 100%; display: flex; flex-direction: column; }
+      .e-ram > div { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+      .e-ram > div > * { flex: none; }
+      .e-ram > div > :last-child { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: none; }
+      /* Kandidáti (29. 9.): rám bez okrajů — seznam až ke spodnímu kraji okna a řádky
+         karet do stran (vlevo až k čárce menu); odsazení obsahu drží komponenta */
+      .e-ram.e-ram-dolu { padding: 0 !important; max-width: none !important; }
+      .e-ram.e-ram-dolu > div { border-radius: 0 !important; }
+      /* Výjimka: Profil firmy se posouvá celý jako dřív (i s nadpisem) —
+         je to jeden dlouhý dokument, ne seznam. Třída e-volne na kořeni. */
+      main.e-hlavni:has(.e-ram.e-volne) { overflow-y: auto !important; scrollbar-gutter: stable; }
+      .e-ram.e-volne { flex: none; height: auto; display: block; }
+      .e-ram.e-volne > div { display: block; }
+      .e-ram.e-volne > div > :last-child { overflow: visible; }
+      /* Bez pružení (28. 9.): Mac při dotažení na konec nebo při točení
+         kolečkem mimo posuvnou část „odpruží" stránku a obsah poskočí.
+         Pevná obrazovka se nemá hýbat vůbec — posun ani pružení se nepřenáší
+         dál na stránku. Jen na posuvné prvky: na kartě s overflow:hidden by
+         „none" zablokovalo předání kolečka seznamu a ten by nešel posunout. */
+      html, body, main.e-hlavni, main.e-hlavni [style*="overflow-y: auto"], .e-jb-scroll { overscroll-behavior: none; }
+      /* Inzeráty: seznam vyplní zbytek karty pod filtry (místo odhadu 100vh − 358 px) */
+      main .e-jb-scroll { max-height: none; flex: 0 1 auto; min-height: 0; }
+    }
+    /* Klikací čísla v pásu: celé políčko je odkaz, při najetí se podbarví */
+    /* Klikací políčko v pásu čísel: při najetí zmodrá (barva Makej), text
+       zbělá — popisek a podtext jen lehce průhledné, číslo plně bílé. */
+    /* Bez přechodu (transition): barva pozadí a textu se prolínaly každá
+       zvlášť, takže uprostřed byl chvilku bílý text na bílém / šedý na
+       modrém — vypadalo to jako probliknutí. Teď se přepne naráz. */
+    .e-pruh-klik:hover { background: #0020F6; }
+    .e-pruh-klik:hover span { color: rgba(255,255,255,.78) !important; }
+    .e-pruh-klik:hover .e-pruh-v { color: #fff !important; }
+    /* Inzeráty: kompaktní seznam (řádek = jeden inzerát, klik otevře kartu) */
+    .e-jb-rad { display: grid; grid-template-columns: minmax(0,1fr) 104px 96px 96px 150px 20px; align-items: center; gap: 14px; padding: 12px 20px; border-top: 1px solid #F0F2FA; }
+    .e-jb-scroll { max-height: max(300px, calc(100vh - 358px)); overflow-y: auto; overscroll-behavior: contain; }
+    .e-jb-scroll .e-jb-hlav { position: sticky; top: 0; z-index: 1; }
+    .e-jb-hlav { border-top: none; padding: 11px 20px; font-size: 12px; font-weight: 600; color: #7A82A6; background: #FBFCFE; border-bottom: 1px solid #EEF0F6; }
+    .e-jb-skup { padding: 14px 20px 8px; font-size: 12px; font-weight: 700; color: #3A4266; border-top: 1px solid #F0F2FA; }
+    .e-jb-skup span { color: #A6ADCB; font-weight: 600; margin-left: 4px; }
+    .e-jb-hlav + .e-jb-skup { border-top: none; }
+    .e-jb-skup + .e-jb-rad { border-top: none; }
+    .e-jb-cis { text-align: center; font-variant-numeric: tabular-nums; }
+    .e-jb-klik .e-jb-cis { font-size: 14px; font-weight: 600; color: #0B1233; }
+    .e-jb-klik { cursor: pointer; transition: background .12s; }
+    .e-jb-klik:hover { background: #F6F7FC; }
+    .e-jb-klik:focus-visible { outline: 2px solid #0020F6; outline-offset: -2px; }
+    /* Levé menu: posuvník skrytý. Na nižší obrazovce se v úzkém pruhu (72 px)
+       objevil a ubral ~10 px — položky se zúžily, ikona přestala být uprostřed
+       modrého podbarvení vybrané položky. Rolovat jde dál kolečkem. */
+    .e-menu { scrollbar-width: none; }
+    .e-menu::-webkit-scrollbar { display: none; }
+    /* Úchyt menu (jako Stripe): svislá čárka vedle menu, při najetí šipka */
+    .e-uchyt { position: absolute; top: 50%; right: -22px; width: 24px; height: 44px; margin-top: -22px; padding: 0; border: none; background: transparent; cursor: pointer; z-index: 45; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .e-uchyt span { display: block; width: 4px; height: 12px; border-radius: 4px; background: #C9CEDD; transition: transform .22s cubic-bezier(.2,.8,.2,1), background .18s; }
+    /* v klidu šedá čárka, při najetí modrá šipka */
+    .e-uchyt:hover span, .e-uchyt:focus-visible span { background: #0020F6; }
+    .e-uchyt-tip { position: absolute; left: calc(100% + 2px); top: 50%; transform: translate(-4px, -50%); font-style: normal; white-space: nowrap; pointer-events: none;
+      background: #0020F6; color: #fff; font-size: 12.5px; font-weight: 600; line-height: 1; padding: 7px 10px; border-radius: 7px; box-shadow: 0 6px 16px -6px rgba(0,32,246,.45);
+      opacity: 0; transition: opacity .15s ease, transform .15s ease; }
+    .e-uchyt:hover .e-uchyt-tip, .e-uchyt:focus-visible .e-uchyt-tip { opacity: 1; transform: translate(0, -50%); transition-delay: .12s; }
+    .e-uchyt .e-uchyt-h { transform-origin: 50% 100%; margin-bottom: -1px; }
+    .e-uchyt .e-uchyt-d { transform-origin: 50% 0%; margin-top: -1px; }
+    /* otevřené menu → šipka doleva ‹ (sbalit), zavřené → doprava › (rozbalit) */
+    .e-uchyt:hover .e-uchyt-h, .e-uchyt:focus-visible .e-uchyt-h { transform: translateX(-2px) rotate(22deg); }
+    .e-uchyt:hover .e-uchyt-d, .e-uchyt:focus-visible .e-uchyt-d { transform: translateX(-2px) rotate(-22deg); }
+    .e-uchyt.zavreno:hover .e-uchyt-h, .e-uchyt.zavreno:focus-visible .e-uchyt-h { transform: translateX(2px) rotate(-22deg); }
+    .e-uchyt.zavreno:hover .e-uchyt-d, .e-uchyt.zavreno:focus-visible .e-uchyt-d { transform: translateX(2px) rotate(22deg); }
+    #root .e-uchyt:focus-visible { outline: none; }
+    /* Úchyt pásu čísel (EMetriky, 29. 9.) — jako úchyt menu, jen naležato: dvě čárky vedle
+       sebe = vodorovná linka pod pásem; při najetí šipka ^ (skrýt) / v (ukázat) */
+    .e-uchyt-v { position: absolute; left: 50%; bottom: -21px; width: 44px; height: 22px; margin-left: -22px; padding: 0; border: none; background: transparent; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; }
+    .e-uchyt-v > span { display: block; width: 12px; height: 4px; border-radius: 4px; background: #C9CEDD; transition: transform .22s cubic-bezier(.2,.8,.2,1), background .18s; }
+    .e-uchyt-v:hover > span, .e-uchyt-v:focus-visible > span { background: #0020F6; }
+    .e-uchyt-v .e-uchyt-l { transform-origin: 100% 50%; margin-right: -1px; }
+    .e-uchyt-v .e-uchyt-p { transform-origin: 0% 50%; margin-left: -1px; }
+    .e-uchyt-v:hover .e-uchyt-l, .e-uchyt-v:focus-visible .e-uchyt-l { transform: translateY(-2px) rotate(-22deg); }
+    .e-uchyt-v:hover .e-uchyt-p, .e-uchyt-v:focus-visible .e-uchyt-p { transform: translateY(-2px) rotate(22deg); }
+    .e-uchyt-v.zavreno:hover .e-uchyt-l, .e-uchyt-v.zavreno:focus-visible .e-uchyt-l { transform: translateY(2px) rotate(22deg); }
+    .e-uchyt-v.zavreno:hover .e-uchyt-p, .e-uchyt-v.zavreno:focus-visible .e-uchyt-p { transform: translateY(2px) rotate(-22deg); }
+    .e-uchyt-v:hover .e-uchyt-tip, .e-uchyt-v:focus-visible .e-uchyt-tip { opacity: 1; transform: translate(0, -50%); transition-delay: .12s; }
+    #root .e-uchyt-v:focus-visible { outline: none; }
+    .e-cal-den:not(:disabled):not(.kraj):hover { background: #EEF1FF !important; }
+    /* Položky roletky Období: při najetí ztmavnou (vybraná je modrá, při najetí o stupeň sytější) */
+    .e-obd-vol:hover { background: #F1F3F8 !important; }
+    .e-obd-vol[style*="238, 241, 255"]:hover { background: #E2E7FF !important; }
+    .e-stav-vol:hover { background: #F6F7FC !important; }
+    .e-jb-karta { transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease; }
+    .e-jb-karta:hover { box-shadow: 0 16px 36px -18px rgba(16,24,64,.35); transform: translateY(-2px); border-color: #D5DAF0 !important; }
+    /* Stav karty v seznamu inzerátů (29. 9.) — barvou jako štítek skupiny: urgentní fialový
+       rámeček, naplněné modrý rámeček a lehce ztlumené, neaktivní šedé (fotka i modrý podklad
+       bez barev). Při najetí se vrátí do plných barev, ať nepůsobí jako vypnuté tlačítko. */
+    .e-jb-karta[data-stav="asap"] { border-color: #C6A2FF !important; box-shadow: 0 0 0 3px rgba(139,61,255,.13); }
+    .e-jb-karta[data-stav="asap"]:hover { border-color: #A874FF !important; box-shadow: 0 0 0 3px rgba(139,61,255,.16), 0 16px 36px -18px rgba(16,24,64,.35); }
+    .e-jb-karta[data-stav="filled"] { border-color: #C3CBF6 !important; }
+    .e-jb-karta[data-stav="inactive"], .e-jb-karta[data-stav="filled"] { transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease, opacity .18s ease; }
+    .e-jb-karta[data-stav="inactive"] { opacity: .72; }
+    .e-jb-karta[data-stav="filled"] { opacity: .86; }
+    .e-jb-karta[data-stav="inactive"] > div:first-child { filter: grayscale(1); transition: filter .25s ease; }
+    .e-jb-karta[data-stav="inactive"]:hover, .e-jb-karta[data-stav="filled"]:hover { opacity: 1; }
+    .e-jb-karta[data-stav="inactive"]:hover > div:first-child { filter: none; }
+    /* Řádky mini profilů u Kandidátů — posouvají se do strany, posuvník schovaný */
+    .e-kand-radek::-webkit-scrollbar { display: none; }
+    .e-kand-jmeno:hover { color: #1B34F0 !important; text-decoration: underline; text-underline-offset: 3px; }
+    /* ── Odznáček stupně důvěry brigádníka — 1:1 z appky (www/index.html .wlvl). Při změně v appce zkopírovat znovu. */
+    .wlvl { position: relative; display: inline-flex; align-items: center; justify-content: center; font-family: inherit; vertical-align: middle; }
+    .wlvl__pill {
+      position: relative; overflow: hidden; display: inline-block;
+      padding: 5px 13px; border-radius: 999px;
+      font-size: 12px; font-weight: 800; letter-spacing: .2px; white-space: nowrap;
+      color: var(--lv-text); border: 1px solid var(--lv-edge);
+      background-image: var(--lv-metal); background-size: 260% 100%;
+      box-shadow: inset 0 1px 0 var(--lv-top-light), inset 0 -1px 0 var(--lv-bottom-dark), var(--lv-drop-shadow);
+      animation: var(--lv-anim, none);
+    }
+    .wlvl__sheen {
+      position: absolute; top: -40%; left: 0; width: var(--lv-sheen-width); height: 180%; pointer-events: none;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, var(--lv-sheen) 50%, rgba(255,255,255,0) 100%);
+      animation: wLvlSheen var(--lv-sheen-dur) var(--lv-sheen-ease) infinite; animation-delay: var(--lv-sheen-delay);
+    }
+    .wlvl__aura {
+      position: absolute; inset: -8px; border-radius: 999px; pointer-events: none;
+      background: radial-gradient(60% 70% at 50% 50%, var(--lv-aura) 0%, rgba(255,255,255,0) 72%);
+      animation: wLvlAura 7s ease-in-out infinite;
+    }
+    .wlvl--sm .wlvl__pill { padding: 4px 10px; font-size: 11px; }
+    .wlvl--sm .wlvl__aura { inset: -7px; }
+    .wlvl--lg .wlvl__pill { padding: 7px 16px; font-size: 13.5px; }
+    /* Zamčený (ještě nedosažený) stupeň — ztlumený, bez animací, ať je vidět jak vypadá */
+    .wlvl--locked { opacity: .48; filter: saturate(.8); }
+    .wlvl--locked .wlvl__pill { animation: none; }
+    .wlvl--locked .wlvl__sheen, .wlvl--locked .wlvl__aura { display: none; }
+
+    .wlvl[data-level="new"] {
+      --lv-metal: linear-gradient(105deg, #CFE2F5 0%, #E4F0FB 22%, #F6FBFF 42%, #BCD6EE 62%, #A8C7E4 82%, #DCEAF8 100%);
+      --lv-text: #173A5E; --lv-edge: #9DBBD8;
+      --lv-top-light: rgba(255,255,255,.9); --lv-bottom-dark: rgba(23,58,94,.2);
+      --lv-sheen: rgba(255,255,255,.95); --lv-drop-shadow: 0 1px 3px -1px rgba(60,95,135,.35);
+      --lv-anim: none; --lv-sheen-dur: 13s; --lv-sheen-ease: ease-in-out; --lv-sheen-delay: 0s; --lv-sheen-width: 22px;
+    }
+    .wlvl[data-level="reliable"] {
+      --lv-metal: linear-gradient(105deg, #0C6F62 0%, #128C7B 22%, #24B39B 42%, #0F7E6E 62%, #095B50 82%, #1AA08C 100%);
+      --lv-text: #FFFFFF; --lv-edge: #095B50;
+      --lv-top-light: rgba(196,244,232,.5); --lv-bottom-dark: rgba(3,40,34,.48);
+      --lv-sheen: rgba(238,255,250,.9); --lv-drop-shadow: 0 2px 7px -2px rgba(12,111,98,.55);
+      --lv-anim: wLvlMetal 12s ease-in-out infinite -1.4s; --lv-sheen-dur: 10s; --lv-sheen-ease: ease-in-out; --lv-sheen-delay: -1s; --lv-sheen-width: 28px;
+    }
+    .wlvl[data-level="verified"] {
+      --lv-metal: linear-gradient(105deg, #1878C4 0%, #2D93E0 22%, #58B4F0 42%, #2384D2 62%, #1466A8 82%, #3EA0E8 100%);
+      --lv-text: #FFFFFF; --lv-edge: #1466A8;
+      --lv-top-light: rgba(214,239,255,.55); --lv-bottom-dark: rgba(6,44,80,.45);
+      --lv-sheen: rgba(240,250,255,.92); --lv-drop-shadow: 0 3px 10px -3px rgba(24,120,196,.6);
+      --lv-anim: wLvlMetal 10s ease-in-out infinite -2.6s; --lv-sheen-dur: 8.5s; --lv-sheen-ease: cubic-bezier(.5,0,.3,1); --lv-sheen-delay: -2s; --lv-sheen-width: 30px;
+    }
+    .wlvl[data-level="top"] {
+      --lv-metal: linear-gradient(105deg, #08090C 0%, #2B2F38 16%, #6E7481 32%, #C9CEDA 46%, #8E93A4 60%, #33373F 76%, #101218 90%, #08090C 100%);
+      --lv-text: #F0CE72; --lv-edge: #0A0B0F;
+      --lv-top-light: rgba(226,232,244,.45); --lv-bottom-dark: rgba(0,0,0,.55);
+      --lv-sheen: rgba(245,249,255,.95); --lv-drop-shadow: 0 5px 15px -3px rgba(10,12,18,.65);
+      --lv-anim: wLvlMetal 8.5s ease-in-out infinite -3.4s, wLvlPearl 14s linear infinite;
+      --lv-sheen-dur: 7s; --lv-sheen-ease: cubic-bezier(.5,0,.3,1); --lv-sheen-delay: -1.6s; --lv-sheen-width: 34px; --lv-aura: rgba(200,208,225,.7);
+    }
+
+    @keyframes wLvlMetal { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    @keyframes wLvlSheen { 0%, 8% { transform: translateX(-200%) skewX(-22deg); } 46%, 100% { transform: translateX(900%) skewX(-22deg); } }
+    @keyframes wLvlPearl { 0%, 100% { filter: hue-rotate(-14deg) saturate(1.05); } 50% { filter: hue-rotate(14deg) saturate(1.2); } }
+    @keyframes wLvlAura  { 0%, 100% { opacity: .22; transform: scale(1); } 50% { opacity: .6; transform: scale(1.16); } }
+    @media (prefers-reduced-motion: reduce) {
+      .wlvl__pill, .wlvl__sheen, .wlvl__aura { animation: none; }
+      .wlvl__sheen, .wlvl__aura { display: none; }
+    }
+    /* Filtrační lišta v úsporném režimu (EFiltrLista, 28. 9.): řazení
+       i hledání jen jako ikonky; hledání se po kliknutí rozbalí doleva
+       přes lištu a po vymazání a odkliknutí se zase schová. */
+    .e-filtr-ikona { display: none; }
+    .e-filtr.kompakt .e-filtr-txt { display: none; }
+    .e-filtr.kompakt .e-filtr-ikona { display: block; }
+    .e-filtr.kompakt .e-filtr-razeni > button { width: 38px; padding: 0 !important; justify-content: center; }
+    .e-filtr.kompakt .e-filtr-menu { left: auto !important; right: 0; }
+    .e-filtr.kompakt .e-filtr-hledat { width: 38px; height: 38px; }
+    .e-filtr.kompakt .e-filtr-hledat input { position: absolute; right: 0; top: 0; z-index: 3; width: 38px !important; padding: 0 !important; background: #fff !important; cursor: pointer; transition: width .18s ease; }
+    .e-filtr.kompakt .e-filtr-hledat input:not(:focus):placeholder-shown::placeholder { color: transparent; }
+    .e-filtr.kompakt .e-filtr-hledat svg { left: auto !important; right: 11px; }
+    .e-filtr.kompakt .e-filtr-hledat input:focus,
+    .e-filtr.kompakt .e-filtr-hledat input:not(:placeholder-shown) { width: 260px !important; padding: 0 33px 0 12px !important; cursor: text; border-color: #1B34F0 !important; box-shadow: 0 6px 18px -8px rgba(16,24,64,.25); }
+    @keyframes eDotazIn { from { opacity: 0; } to { opacity: 1; } }
+    .e-btn-hl:hover:not(:disabled) { background: #0F27D9 !important; }
+    .e-btn-sek:hover:not(:disabled) { background: #F6F7FC !important; }
+    @media (max-width: 820px) {
+      .e-pruh { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+      .e-hlav { padding: 8px 16px 14px; }
+      .e-pruh-ram { padding: 0 16px !important; }
+    }
+
+    /* ── Přechod mezi záložkami ──
+       Data jsou načtená předem, takže se nic nenačítá — jde jen o to, aby
+       přepnutí nevypadalo jako tvrdé probliknutí. Rám a modrá hlavička stojí
+       (je na stejném místě na všech záložkách), obsah pod ní najede zdola
+       po částech: pás čísel → levý sloupec → pravý sloupec. Stejně na všech
+       záložkách. `backwards`, ne `both` — po doběhnutí nesmí zůstat transform
+       (rozbil by position:fixed u oken otevřených uvnitř záložky). */
+    @keyframes eObsahIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    /* Pás čísel (2. část) najede jako celek, tělo (3. část) po sloupcích.
+       Hlavička s názvem stojí. */
+    .e-ram > div > :nth-child(2):not(.e-hlav) > * { animation: eObsahIn .34s cubic-bezier(.2,.8,.2,1) .02s backwards; }
+    .e-ram > div > :nth-child(n+4):not(.e-hlav) { animation: eObsahIn .34s cubic-bezier(.2,.8,.2,1) .2s backwards; }
+    /* Sloupce těla (mřížka pod pásem čísel) jeden po druhém */
+    .e-ram > div > :nth-child(3) > * { animation: eObsahIn .34s cubic-bezier(.2,.8,.2,1) backwards; }
+    .e-ram > div > :nth-child(3) > :nth-child(1) { animation-delay: .07s; }
+    .e-ram > div > :nth-child(3) > :nth-child(2) { animation-delay: .13s; }
+    .e-ram > div > :nth-child(3) > :nth-child(n+3) { animation-delay: .18s; }
+    @media (prefers-reduced-motion: reduce) {
+      .e-ram > div > *, .e-ram > div > :nth-child(2) > *, .e-ram > div > :nth-child(3) > * { animation: none !important; }
+    }
+
+    /* Profil firmy — řádky údajů upravované na místě (employer-firma.jsx) */
+    .e-pf-inp { width: 100%; font-size: 14px; font-weight: 600; color: #0B1233; background: transparent;
+      border: 1px solid transparent; border-radius: 9px; padding: 8px 10px; outline: none; transition: background .15s, border-color .15s; }
+    .e-pf-inp:hover { background: #F6F7FC; }
+    .e-pf-inp:focus { background: #fff; border-color: #1B34F0; }
+    .e-pf-inp::placeholder { color: #1B34F0; opacity: .75; font-weight: 700; }
+    select.e-pf-inp { cursor: pointer; }
+
+    /* Menu karty firmy v levém menu */
+    @keyframes eKartaIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    /* Obrys po kliknutí myší (černý rámeček na připínáčku) — jen pro klávesnici */
+    #root button:focus:not(:focus-visible) { outline: none; }
+    #root button:focus-visible { outline: 2px solid #0020F6; outline-offset: 2px; }
 
     /* Kolečka výběru data (období „Vlastní") — schovaný scrollbar, snap zajišťuje JS */
     .e-wheel { scrollbar-width: none; -ms-overflow-style: none; }
@@ -110,12 +350,64 @@
     @keyframes dotSonar { 0% { box-shadow: 0 0 0 0 rgba(92,240,168,.55), 0 0 12px rgba(92,240,168,.5); } 70% { box-shadow: 0 0 0 11px rgba(92,240,168,0), 0 0 12px rgba(92,240,168,.5); } 100% { box-shadow: 0 0 0 0 rgba(92,240,168,0), 0 0 12px rgba(92,240,168,.5); } }
     @keyframes segFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-    /* Nový inzerát — modal, live tečka náhledu, roztřesení kroku s chybou */
+    /* Nový / upravit inzerát — najetí okna, přechod kroků, roztřesení kroku s chybou */
     @keyframes njModalIn { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
     @keyframes njFadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    /* Roletka v okně inzerátu (_NjRoletka) — seznam se rozbalí od pole */
+    @keyframes njRolIn { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
     @keyframes njShake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
-    @keyframes njLivePulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: .35; } 100% { transform: scale(1); opacity: 1; } }
-    @keyframes njLiveRing { 0% { transform: scale(.9); opacity: .55; } 70% { transform: scale(1.75); opacity: 0; } 100% { transform: scale(1.75); opacity: 0; } }
+    /* Odezva ovládacích prvků v okně inzerátu (28. 9.) — najetí změní barvu,
+       hlavní tlačítko se lehce zvedne, stisk prvek krátce zmáčkne (jako na webu).
+       data-on = vybraná volba (modrá). !important kvůli inline stylům. */
+    .nj-hl, .nj-sek, .nj-ghost, .nj-chip, .nj-typ, .nj-x, .nj-krok, .nj-plus, .nj-volba {
+      transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .18s ease, transform .18s cubic-bezier(.2,.8,.2,1);
+      -webkit-user-select: none; user-select: none; }
+    .nj-hl:hover { background: #0F27D9 !important; box-shadow: 0 8px 18px -8px rgba(27,52,240,.65); transform: translateY(-1px); }
+    .nj-sek:hover { background: #F6F7FC !important; border-color: #D5DAF0 !important; color: #0B1233 !important; }
+    .nj-ghost:hover { background: #F6F7FC !important; color: #0B1233 !important; }
+    .nj-chip:not([data-on]):hover { border-color: #B9C2F2 !important; background: #F8F9FF !important; color: #0B1233 !important; }
+    .nj-chip[data-on]:hover { background: #0F27D9 !important; border-color: #0F27D9 !important; }
+    .nj-typ:not([data-on]):hover { border-color: #B9C2F2 !important; background: #FAFBFF !important; }
+    .nj-volba:not([data-on]):hover { background: #F6F7FC !important; color: #0B1233 !important; }
+    .nj-x:hover { background: #EEF1FF !important; color: #1B34F0 !important; }
+    .nj-plus:hover { border-color: #B9C2F2 !important; color: #1B34F0 !important; }
+    .nj-krok:not([data-on]):hover > span:last-child { color: #0B1233 !important; }
+    /* Zlatý kov s tekoucím leskem — pilulka TOP, tlačítko Topovat a okno topování. 1:1 se zlatým
+       odznáčkem „Byl jsem u toho" z waitlistu (makej-web 6.7/style.css → .gold-badge; v appce
+       WGoldBadge / WTopBadge). Prvek potřebuje uvnitř <span class="e-zlato__lesk">. */
+    @keyframes eGoldFlow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    @keyframes eGoldSheen { 0%, 8% { transform: translateX(-160%) skewX(-22deg); } 46%, 100% { transform: translateX(420%) skewX(-22deg); } }
+    .e-zlato { position: relative; overflow: hidden; color: #221A05 !important; border: 1px solid #A5780C !important;
+      background: linear-gradient(105deg, #B8860B 0%, #E8C56A 22%, #FDF3C8 42%, #D9A93C 62%, #A9770A 82%, #E4C069 100%) !important;
+      background-size: 260% 100% !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.65), inset 0 -1px 0 rgba(90,60,0,.35), 0 2px 6px -2px rgba(140,96,10,.5);
+      animation: eGoldFlow 7s ease-in-out infinite; }
+    .e-zlato__lesk { position: absolute; top: -40%; left: 0; width: 34px; height: 180%; pointer-events: none;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.9) 50%, rgba(255,255,255,0) 100%);
+      animation: eGoldSheen 4.5s ease-in-out infinite; }
+    button.e-zlato { transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, filter .18s ease; }
+    button.e-zlato:hover { transform: translateY(-1px); filter: brightness(1.06) saturate(1.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -1px 0 rgba(90,60,0,.35), 0 10px 20px -10px rgba(140,96,10,.75); }
+    button.e-zlato:active { transform: scale(.97); transition-duration: .08s; }
+    @media (prefers-reduced-motion: reduce) { .e-zlato, .e-zlato__lesk { animation: none; } button.e-zlato:hover { transform: none; } }
+    /* Tlačítka v detailu inzerátu (Kandidáti, Statistiky, Upravit) — při najetí zmodrají */
+    .e-det-tl, .e-det-boost { transition: background-color .16s ease, border-color .16s ease, color .16s ease, transform .16s ease; }
+    .e-det-tl:hover { color: #1B34F0 !important; background: #EEF1FF !important; border-color: #B9C2F2 !important; }
+    .e-det-boost:hover { background: #F5B820 !important; border-color: #E0A50C !important; }
+    .e-det-tl:active, .e-det-boost:active { transform: scale(.97); }
+    .nj-odkaz { transition: color .16s; }
+    /* Fotky inzerátu: ovládání (✕, ‹ ›) až při najetí na fotku */
+    .nj-foto .nj-foto-akce { opacity: 0; transition: opacity .15s ease; }
+    .nj-foto:hover .nj-foto-akce { opacity: 1; }
+    .nj-foto:active { cursor: grabbing; }
+    .nj-odkaz:hover { color: #0F27D9 !important; text-decoration: underline; text-underline-offset: 3px; }
+    .nj-hl:active, .nj-sek:active, .nj-ghost:active, .nj-x:active, .nj-plus:active { transform: scale(.96); transition-duration: .08s; }
+    .nj-chip:active, .nj-typ:active, .nj-volba:active { transform: scale(.97); transition-duration: .08s; }
+    .nj-inp { transition: border-color .16s ease, background-color .16s ease, box-shadow .16s ease; }
+    .nj-inp:hover { border-color: #C9D0EE !important; }
+    .nj-inp:focus, .nj-inp:focus-within { border-color: #1B34F0 !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(27,52,240,.12); }
+    @media (max-width: 980px) { .nj-nahled { display: none !important; } .nj-telo { grid-template-columns: 1fr !important; } }
+    @media (prefers-reduced-motion: reduce) { .nj-hl:hover { transform: none; } }
 
     /* ── Odznáčky tarifů (TierBadge) — efekt roste s cenou ── */
     .tier-badge { position: relative; display: inline-flex; align-items: center; justify-content: center; perspective: 400px; }
@@ -182,6 +474,104 @@
       --tier-sheen-dur: 2.8s; --tier-sheen-ease: cubic-bezier(.5,0,.3,1); --tier-sheen-delay: -3.6s; --tier-sheen-width: 34px;
       --tier-aura: rgba(156,107,224,.8); --tier-aura-delay: -4.8s;
     }
+    /* ── Efekty tarifů (Yasin 27. 9., nová verze makej-tier-effects.css) ──
+       Kovový text (název tarifu v ceníku), přelévavý barevný text, kovový
+       odznáček (karta firmy v menu) a kovové tlačítko (ceník). Kov kreslí
+       metal-fx (WebGL2); tady jsou barvy tarifů pro jeho plátna (knihovna
+       má jeden preset na stránku → barva přes CSS filtr) a CSS náhrada,
+       když WebGL2 není. Písmo necháváme naše (Inter). */
+    @keyframes mk-metal-sheen {
+      0%       { background-position: 130% 0, 0 0; }
+      72%, 100% { background-position: -30% 0, 0 0; }
+    }
+    @keyframes mk-tier-drift {
+      0%, 100% { background-position: 0% 0%, 100% 100%, 50% 0%, 0 0; }
+      25%      { background-position: 100% 0%, 0% 100%, 100% 50%, 0 0; }
+      50%      { background-position: 100% 100%, 0% 0%, 50% 100%, 0 0; }
+      75%      { background-position: 0% 100%, 100% 0%, 0% 50%, 0 0; }
+    }
+    /* Přelévavý barevný text */
+    .mk-grad {
+      font: 700 40px/1.2 Inter, sans-serif; letter-spacing: -0.02em;
+      background-size: 180% 180%, 180% 180%, 180% 180%, 100% 100%; background-repeat: no-repeat;
+      -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+      animation: mk-tier-drift 8s linear infinite;
+    }
+    [data-tier="zakladni"]  .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #FFFFFF 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #8E9BB8 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #DDE3EE 0%, transparent 70%), linear-gradient(180deg, #9AA3B8 0%, #E6EAF2 100%); }
+    [data-tier="vyhodny"]   .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #6B70FF 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #9FD0FF 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #8A5CFF 0%, transparent 70%), linear-gradient(180deg, #2E33F0 0%, #B9BBFF 100%); }
+    [data-tier="dynamicky"] .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #5FD18D 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #C8F59A 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #2BC4B0 0%, transparent 70%), linear-gradient(180deg, #229B54 0%, #B8EFCB 100%); }
+    [data-tier="maximalni"] .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #F08A4B 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #FFC27A 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #E0452B 0%, transparent 70%), linear-gradient(180deg, #BE5518 0%, #FFD2B0 100%); }
+    [data-tier="vlastni"]   .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #A77BE8 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #F29BD8 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #6A6CF0 0%, transparent 70%), linear-gradient(180deg, #7A41C8 0%, #E0CCFA 100%); }
+
+    /* Barva kovu na plátnech metal-fx (text / odznáček / tlačítko) */
+    [data-tier="zakladni"]  [data-cell="text"] canvas, [data-tier="zakladni"]  .metal-fx-glow-svg { filter: grayscale(1) sepia(.6) hue-rotate(185deg) saturate(1.8) brightness(.95); }
+    [data-tier="zakladni"] [data-cell="badge"] canvas, [data-tier="zakladni"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(.6) hue-rotate(185deg) saturate(1.8) brightness(1); }
+    [data-tier="vyhodny"]   [data-cell="text"] canvas, [data-tier="vyhodny"]   .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(6) hue-rotate(200deg) brightness(.95); }
+    [data-tier="vyhodny"] [data-cell="badge"] canvas, [data-tier="vyhodny"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(6) hue-rotate(200deg) brightness(.7); }
+    [data-tier="dynamicky"] [data-cell="text"] canvas, [data-tier="dynamicky"] .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(95deg) brightness(.95); }
+    [data-tier="dynamicky"] [data-cell="badge"] canvas, [data-tier="dynamicky"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(95deg) brightness(.7); }
+    [data-tier="maximalni"] [data-cell="text"] canvas, [data-tier="maximalni"] .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(-12deg) brightness(.95); }
+    [data-tier="maximalni"] [data-cell="badge"] canvas, [data-tier="maximalni"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(-12deg) brightness(.7); }
+    [data-tier="vlastni"]   [data-cell="text"] canvas, [data-tier="vlastni"]   .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(4.5) hue-rotate(225deg) brightness(.95); }
+    [data-tier="vlastni"] [data-cell="badge"] canvas, [data-tier="vlastni"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(4.5) hue-rotate(225deg) brightness(.7); }
+
+    /* CSS náhrada kovového textu (bez WebGL2) */
+    .mk-sheen {
+      color: transparent; background-size: 250% 100%, 100% 100%; background-repeat: no-repeat;
+      -webkit-background-clip: text; background-clip: text;
+      animation: mk-metal-sheen 3.6s cubic-bezier(0.45, 0, 0.3, 1) infinite;
+    }
+    .mk-sheen.mk-liquid { background-size: 300% 100%, 100% 300%, 100% 100%; animation-name: mk-metal-liquid; }
+    @keyframes mk-metal-liquid {
+      0%       { background-position: 130% 0, 0 0%, 0 0; }
+      72%, 100% { background-position: -30% 0, 0 100%, 0 0; }
+    }
+
+    /* CSS náhrada kovového odznáčku */
+    .mk-rim {
+      position: relative; display: inline-flex; box-sizing: border-box; padding: 1.5px; border-radius: 999px;
+      background:
+        linear-gradient(100deg, transparent 36%, rgba(255,255,255,0.95) 50%, transparent 64%),
+        linear-gradient(180deg, var(--mk-m1) 0%, var(--mk-m2) 45%, var(--mk-m3) 55%, var(--mk-m4) 100%);
+      background-size: 250% 100%, 100% 100%; background-repeat: no-repeat;
+      box-shadow: 0 0 0 0.5px rgba(255,255,255,0.12);
+      animation: mk-metal-sheen 3.4s cubic-bezier(0.45, 0, 0.3, 1) infinite;
+    }
+    .mk-rim-fill {
+      position: relative; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+      height: 22px; min-width: 42px; padding: 0 10px; border-radius: 999px; overflow: hidden; isolation: isolate;
+      background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 100%), var(--mk-fill);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.22), inset 0 0 6px rgba(255,255,255,0.3);
+      font: 600 12.2px/1 Inter, sans-serif; color: var(--mk-text); white-space: nowrap;
+    }
+    .mk-rim-fill::before {
+      content: ""; position: absolute; left: 0; right: 0; top: 0; height: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.35), rgba(255,255,255,0)); pointer-events: none; z-index: -1;
+    }
+    .mk-rim-fill::after {
+      content: ""; position: absolute; top: -50%; bottom: -50%; left: 0; width: 40%;
+      background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+      transform: translate3d(-150%, 0, 0) skewX(-18deg); will-change: transform;
+      animation: mk-pill-sheen 3.4s cubic-bezier(0.45, 0, 0.3, 1) infinite; pointer-events: none; z-index: -1;
+    }
+    @keyframes mk-pill-sheen {
+      0%       { transform: translate3d(-150%, 0, 0) skewX(-18deg); }
+      72%, 100% { transform: translate3d(400%, 0, 0) skewX(-18deg); }
+    }
+    [data-tier="zakladni"]  .mk-rim { --mk-fill: #B7C1D6; --mk-text: #1F2430; --mk-m1: #FFFFFF; --mk-m2: #C9D0DE; --mk-m3: #7C869C; --mk-m4: #EEF1F7; --mk-glow: rgba(183,193,214,0.18); }
+    [data-tier="vyhodny"]   .mk-rim { --mk-fill: #2E33F0; --mk-text: #FFFFFF; --mk-m1: #E0E1FF; --mk-m2: #8C90FF; --mk-m3: #1C21B8; --mk-m4: #C9CBFF; --mk-glow: rgba(107,112,255,0.28); }
+    [data-tier="dynamicky"] .mk-rim { --mk-fill: #229B54; --mk-text: #FFFFFF; --mk-m1: #DDF7E6; --mk-m2: #6FD69A; --mk-m3: #146B38; --mk-m4: #C8F0D6; --mk-glow: rgba(95,209,141,0.22); }
+    [data-tier="maximalni"] .mk-rim { --mk-fill: #BE5518; --mk-text: #FFFFFF; --mk-m1: #FFE6D6; --mk-m2: #F5A06C; --mk-m3: #7A3008; --mk-m4: #FFD2B0; --mk-glow: rgba(240,138,75,0.24); }
+    [data-tier="vlastni"]   .mk-rim { --mk-fill: #7A41C8; --mk-text: #FFFFFF; --mk-m1: #EFE5FC; --mk-m2: #B994EE; --mk-m3: #4B2380; --mk-m4: #E3D3FA; --mk-glow: rgba(167,123,232,0.26); }
+
+    /* CSS náhrada kovového tlačítka */
+    .mk-rim--btn { padding: 2px; }
+    .mk-rim--btn .mk-rim-fill { height: auto; border: 0; padding: 10px 20px; font: 500 15px/1.2 Inter, sans-serif; cursor: pointer; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mk-grad, .mk-sheen, .mk-rim { animation: none; }
+      .mk-rim-fill::after { animation: none; opacity: 0; }
+    }
     @keyframes metalFlow { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
     @keyframes sheenSweep { 0%,8% { transform: translateX(-200%) skewX(-22deg); } 46%,100% { transform: translateX(900%) skewX(-22deg); } }
     @keyframes badgeTilt { 0%,100% { transform: rotateY(-9deg) rotateX(4deg); } 50% { transform: rotateY(9deg) rotateX(-4deg); } }
@@ -197,15 +587,58 @@
 
   <!-- Zámek dashboardu. Přihlášení řeší web — jedno, s rozcestníkem firma/
        brigádník. Nepřihlášený se tu jen krátce zastaví, než ho JS pošle tam. -->
-  <div id="auth-gate">
-    <div class="gate-card">
-      <div class="gate-logo">makej</div>
-      <div class="gate-desc" id="gate-msg">Přesměrování na přihlášení…</div>
-      <div class="gate-spin"></div>
+  <div id="auth-gate" class="nahr-plocha" role="status">
+    <div class="nahr-obsah">
+      <canvas id="gate-orb" aria-hidden="true"></canvas>
+      <p class="nahr-text" id="gate-msg">Nahráváme vaše údaje</p>
+      <!-- Stejné řádky jako načítání v appce (www/index.html, .load__t2),
+           ať se obě obrazovky neliší. Druhý přibude po 10 s, taky jako v appce. -->
+      <p class="nahr-pod" id="gate-pod">Zabere to jen chvilku. Nezavírejte prosím okno.</p>
+      <p class="nahr-pod" id="gate-dlouho" hidden>Ještě to chvíli potrvá…</p>
     </div>
   </div>
+  <!-- Orb (thinking-orbs, MIT) bez Reactu — viz /vendor/thinking-orbs/orb.js.
+       Když se nenačte, zůstanou aspoň tečky za textem. -->
+  <script>
+    // Okamžik kliknutí na „Přihlásit se" (web ho uložil) — modrá od něj drží
+    // nejméně 5 s. Kdo sem přijde přímo, tomu se počítá od otevření stránky.
+    window.__nahrOd = (function () {
+      try {
+        const u = Number(sessionStorage.getItem('makej-nahr-od'));
+        if (u && Date.now() - u < 20000) return u;
+      } catch (e) {}
+      return Date.now();
+    })();
+  </script>
+  <!-- blocking="render": stránka se ukáže až s nakresleným orbem (první
+       snímek se kreslí hned při spuštění), takže orb naskočí spolu s textem
+       a nedopadne později. Do té doby prohlížeč drží modrou z webu. -->
+  <script type="module" async blocking="render">
+    import { spustOrb } from '/vendor/thinking-orbs/orb.js?v=4';
+    window.__zastavOrb = spustOrb(document.getElementById('gate-orb'), { state: 'connecting', size: 64, zobrazit: 104 });
+  </script>
 
   <div id="root"></div>
+
+  <!-- Velké skripty až TADY, ne v <head>. Dokud je prohlížeč nestáhne
+       a nespustí (Babel má 3 MB), nesmí nic vykreslit — po přihlášení se
+       proto na vteřinu zasekl poslední obraz webu a pak stránka „problikla".
+       Modrá obrazovka výš se teď vykreslí dřív, než se na ně začne čekat. -->
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+  <!-- Kovový odznáček tarifu (metal-fx, MIT — /vendor/metal-fx/). Modul se
+       spustí až po Reactu výš; do té doby / bez WebGL2 kreslí menu CSS verzi
+       (.mk-rim). Kurzorové světlo vypnuté, jako v návrhu. -->
+  <script type="module">
+    import * as MFX from '/vendor/metal-fx/metal-fx.js?v=2';
+    try { MFX.setCursorLightConfig({ cursor: false }); } catch (e) {}
+    window.MetalFxLib = MFX;
+    window.dispatchEvent(new Event('metalfx-ready'));
+  </script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
   <script>
     // ── Auth gate ──
@@ -217,7 +650,66 @@
 
     const gate = document.getElementById('auth-gate');
     const gateMsg = document.getElementById('gate-msg');
-    function hideGate() { gate.classList.add('hidden'); }
+    const gatePod = document.getElementById('gate-pod');
+    const gateDlouho = document.getElementById('gate-dlouho');
+    // Modrá odejde, až je dashboard OPRAVDU vykreslený — ne ve chvíli, kdy se
+    // ověří přihlášení. Mezi tím se v prohlížeči ještě 2–4 s překládá 12
+    // souborů JSX; dřív se zámek schoval hned a člověk koukal na prázdnou
+    // tmavou plochu, která vypadala jako rozbitá stránka.
+    function hideGate() {
+      const root = document.getElementById('root');
+      let pojistka = 0;
+      // Modrá svítí nejméně 5 s od kliknutí na „Přihlásit se" (web to uloží do
+      // sessionStorage), bez ohledu na rychlost počítače. Dashboard se totiž
+      // vykreslí dřív, než do něj dotečou data z databáze — delší modrá to
+      // schová a dashboard naskočí rovnou naplněný. Kdo sem přijde přímo
+      // (záložka, obnovení), tomu se to počítá od otevření stránky.
+      const MIN_MODRA = 5000;
+      // Po 10 s od kliknutí přidat „Ještě to chvíli potrvá…" (stejně jako
+      // appka), ať člověk neusoudí, že to zamrzlo.
+      const dlouho = setTimeout(() => { gateDlouho.hidden = false; },
+        Math.max(0, (window.__nahrOd || Date.now()) + 10000 - Date.now()));
+      // window.__nahrOd nastavil skript hned pod zámkem: čerstvý čas kliknutí
+      // z webu, jinak otevření stránky. Záznam se nemaže — čte ho i orb a
+      // pořadí obou skriptů není zaručené; starý záznam odfiltruje 20s limit.
+      const od = window.__nahrOd || performance.timeOrigin || Date.now();
+      const hotovo = () => {
+        clearTimeout(pojistka);
+        clearTimeout(dlouho);
+        const zbyva = Math.max(0, od + MIN_MODRA - Date.now());
+        setTimeout(odejdi, zbyva);
+      };
+      const odejdi = () => {
+        // Snímek navíc, ať se dashboard stihne pod modrou vykreslit celý.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          gate.classList.add('odchazi');
+          root.classList.add('nahr-dovnitr');
+          setTimeout(() => {
+            gate.classList.add('hidden');
+            if (window.__zastavOrb) window.__zastavOrb();
+          }, 650);
+        }));
+      };
+      // Čeká se na NAČTENÁ DATA, ne jen na první vykreslení. Dřív stačilo, že
+      // se v #root něco objevilo — jenže to byla i mezinačítačka „Načítám
+      // data…", a když databáze odpovídala déle než 5 s (typicky refresh),
+      // modrá odešla a pod ní se točil kroužek. Signál posílá employer-main.jsx.
+      if (window.__empDataNactena) return hotovo();
+      window.addEventListener('emp-data-nactena', hotovo, { once: true });
+      // Kdyby se dashboard nenačetl vůbec (spadlý skript, výpadek sítě),
+      // nenechat člověka navždy na modré — říct to a nabídnout znovu.
+      pojistka = setTimeout(() => {
+        if (window.__empDataNactena) return;
+        gateMsg.textContent = 'Načítání trvá déle, než by mělo.';
+        clearTimeout(dlouho); gatePod.hidden = true; gateDlouho.hidden = true;
+        const obsah = gate.querySelector('.nahr-obsah');
+        const p = document.createElement('p'); p.className = 'nahr-chyba';
+        p.textContent = 'Zkontrolujte připojení a zkuste to znovu.';
+        const b = document.createElement('button'); b.className = 'nahr-znovu'; b.type = 'button';
+        b.textContent = 'Zkusit znovu'; b.onclick = () => location.reload();
+        obsah.append(p, b);
+      }, 25000);
+    }
 
     // Přihlášení má na starost web — jedno, s rozcestníkem firma/brigádník.
     // Přihlášená firma jde rovnou do dashboardu; kdokoli jiný (nepřihlášený
@@ -228,9 +720,13 @@
         hideGate();
         return;
       }
+      // Nic se nenahrává, jen přesměrovává — „nezavírejte okno" by tu mátlo.
+      gatePod.hidden = true;
       if (session && role !== 'employer') {
         // Přihlášený brigádník na adrese dashboardu → jasná hláška, pak pryč
         gateMsg.textContent = 'Tento dashboard je jen pro zaměstnavatele. Přesměrování…';
+      } else {
+        gateMsg.textContent = 'Přesměrování na přihlášení…';
       }
       window.location.replace('/?login=employer');
     });
@@ -239,15 +735,17 @@
   <script type="text/babel" src="app.jsx?v=3"></script>
   <script type="text/babel" src="employer-theme.jsx?v=5"></script>
   <script type="text/babel" src="employer-data.jsx?v=2"></script>
-  <script type="text/babel" src="employer-plans.jsx?v=3"></script>
-  <script type="text/babel" src="employer-shell.jsx?v=27"></script>
-  <script type="text/babel" src="employer-dashboard.jsx?v=26"></script>
-  <script type="text/babel" src="employer-pages.jsx?v=76"></script>
-  <script type="text/babel" src="employer-pages3.jsx?v=42"></script>
+  <script type="text/babel" src="employer-plans.jsx?v=4"></script>
+  <script type="text/babel" src="employer-shell.jsx?v=63"></script>
+  <script type="text/babel" src="employer-dashboard.jsx?v=40"></script>
+  <script type="text/babel" src="employer-pages.jsx?v=77"></script>
+  <script type="text/babel" src="employer-demo.jsx?v=6"></script>   <!-- ukázkové inzeráty — PŘED RELEASEM smazat -->
+  <script type="text/babel" src="employer-pages3.jsx?v=188"></script>
   <script type="text/babel" src="_premium/kraje-map.jsx?v=19"></script>
-  <script type="text/babel" src="_premium/analytics.jsx?v=28"></script>
-  <script type="text/babel" src="employer-supabase.jsx?v=7"></script>
+  <script type="text/babel" src="_premium/analytics.jsx?v=40"></script>
+  <script type="text/babel" src="employer-firma.jsx?v=5"></script>
+  <script type="text/babel" src="employer-supabase.jsx?v=22"></script>
   <script type="text/babel" src="employer-onboarding.jsx?v=1"></script>
-  <script type="text/babel" src="employer-main.jsx?v=36"></script>
+  <script type="text/babel" src="employer-main.jsx?v=52"></script>
 </body>
 </html>

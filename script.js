@@ -549,6 +549,20 @@ function initAuth() {
   if (heroRegisterBtn) heroRegisterBtn.addEventListener('click', e => { e.preventDefault(); goToEmailSignup(); });
   if (heroLoginBtn)    heroLoginBtn.addEventListener('click',    e => { e.preventDefault(); openModal('login'); });
 
+  // Dashboard firem posílá nepřihlášeného sem s ?login=employer. Dřív tu
+  // parametr nikdo nečetl — člověk skončil na úvodce a musel si přihlášení
+  // hledat sám. Teď se okno otevře rovnou a parametr zmizí z adresy, ať se
+  // okno neotevírá znovu při každém obnovení stránky.
+  try {
+    const parametry = new URLSearchParams(location.search);
+    if (parametry.has('login')) {
+      openModal('login');
+      parametry.delete('login');
+      const zbytek = parametry.toString();
+      history.replaceState(null, '', location.pathname + (zbytek ? '?' + zbytek : '') + location.hash);
+    }
+  } catch (e) { /* staré prohlížeče bez URLSearchParams — okno se prostě neotevře */ }
+
   // Escape key zavře modál
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeModals();
@@ -590,6 +604,10 @@ function initAuth() {
 
     btn.disabled = true;
     btn.textContent = 'Přihlašování...';
+    // Odkud se po přihlášení firmy rozlije modrá (prechodDoDashboardu).
+    // Změřit teď: po úspěchu se okno zavře a tlačítko už nejde najít.
+    const rb = btn.getBoundingClientRect();
+    window.__prechodOd = { x: rb.left + rb.width / 2, y: rb.top + rb.height / 2 };
 
     const { error } = await sb.auth.signInWithPassword({ email, password });
 
@@ -785,7 +803,8 @@ function initAuth() {
           ov.querySelectorAll('.role-card').forEach(b => { b.disabled = false; b.style.opacity = 1; });
           return chyba('Nepovedlo se uložit. Zkus to prosím znovu.');
         }
-        window.location.href = role === 'employer' ? '/employer/' : '/worker/';
+        if (role === 'employer') prechodDoDashboardu('/employer/');
+        else window.location.href = '/worker/';
       });
     });
   }
@@ -802,7 +821,8 @@ function initAuth() {
       // Univerzální předregistrace roli neposílá — chybějící role je tedy signál
       // „ještě si nevybral". Nemusíme se kvůli tomu ptát databáze.
       if (!role) { ukazRozcestnik(session.user); return; }
-      window.location.href = role === 'employer' ? '/employer/' : '/worker/';
+      if (role === 'employer') prechodDoDashboardu('/employer/');
+      else window.location.href = '/worker/';
     }
   });
 
@@ -1565,18 +1585,30 @@ function showToast(msg) {
     const pruh = pas.querySelector('.proc-pruh');
     if (!pruh || pruh.dataset.zdvojeno) return;
 
-    // Na mobilu stojí položky pod sebou jako seznam — nic se neposouvá.
-    // Kontrola MUSÍ být před zdvojením: jinak by se každý důvod na telefonu
-    // objevil dvakrát, protože klony se do seznamu přidají taky.
-    if (pas.scrollWidth <= pas.clientWidth + 4) return;
+    // Na mobilu (a u varianty --mrizka) stojí položky v mřížce pod sebou a nic
+    // se neposouvá. Pozná se to podle rozvržení, ne podle toho, jestli pruh
+    // přetéká: čtyři položky na /pro-zamestnavatele se od zhruba 1470 px vejdou
+    // celé a test na přetečení pruh na širokých monitorech vypnul úplně.
+    if (getComputedStyle(pruh).display !== 'flex') return;
 
-    Array.from(pruh.children).forEach(b => {
-      const kopie = b.cloneNode(true);
-      kopie.setAttribute('aria-hidden', 'true');
-      kopie.querySelectorAll('a, button, input').forEach(p => p.setAttribute('tabindex', '-1'));
-      pruh.appendChild(kopie);
-    });
+    // Sada se musí zopakovat tolikrát, aby se vedle viditelné části vešla ještě
+    // jedna celá — po skoku zpátky o jednu sadu tak vpravo nezůstane prázdno.
+    const puvodni = Array.from(pruh.children);
+    const sady = Math.max(2, Math.ceil((pas.clientWidth + pruh.scrollWidth) / pruh.scrollWidth));
+    for (let i = 1; i < sady; i++) {
+      puvodni.forEach(b => {
+        const kopie = b.cloneNode(true);
+        kopie.setAttribute('aria-hidden', 'true');
+        kopie.querySelectorAll('a, button, input').forEach(p => p.setAttribute('tabindex', '-1'));
+        pruh.appendChild(kopie);
+      });
+    }
     pruh.dataset.zdvojeno = '1';
+
+    // Délka jedné otáčky = odkud kam se pruh posune, než se zopakuje. Měří se
+    // z rozestupu prvních položek dvou sousedních sad, aby v ní byla i mezera
+    // mezi nimi — `scrollWidth` jedné sady ji v sobě nemá.
+    const otacka = pruh.children[puvodni.length].offsetLeft - pruh.children[0].offsetLeft;
 
     const tiche = matchMedia('(prefers-reduced-motion: reduce)');
     let stoji = 0;                                  // do kdy stojíme (timestamp)
@@ -1602,10 +1634,62 @@ function showToast(msg) {
       // plynulý, ať pruh pod kurzorem neseknou skokem.
       faktor += (cil - faktor) * Math.min(dt * NABEH, 1);
       if (!tiche.matches && ted >= stoji) pas.scrollLeft += RYCHLOST * faktor * dt;
-      const pul = pruh.scrollWidth / 2;
-      if (pas.scrollLeft >= pul) pas.scrollLeft -= pul;
-      else if (pas.scrollLeft < 0) pas.scrollLeft += pul;
+      if (pas.scrollLeft >= otacka) pas.scrollLeft -= otacka;
+      else if (pas.scrollLeft < 0) pas.scrollLeft += otacka;
       requestAnimationFrame(krok);
     })(minule);
   });
 })();
+
+/* ═══════════ PŘECHOD DO DASHBOARDU (modrá obrazovka) ═══════════
+   Po přihlášení firmy se modrá rozlije kruhem od tlačítka, v ní naskočí orb
+   a „Nahráváme vaše údaje" — a teprve pak se přejde na /employer/. Dashboard
+   začíná na úplně stejné modré (employer/index.html, #auth-gate), takže
+   přechod mezi stránkami není vidět. Vzhled obou je v nahravani.css.
+
+   Styl se přidá hned při načtení stránky, ne až při přihlášení — jinak by
+   se modrá první vteřinu vykreslila bez stylů. */
+(function () {
+  if (!document.querySelector('link[href^="/nahravani.css"]')) {
+    const l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = '/nahravani.css?v=7';
+    document.head.appendChild(l);
+  }
+})();
+
+function prechodDoDashboardu(cil) {
+  if (document.querySelector('.nahr-plocha')) return;         // už běží
+  // Okamžik kliknutí — dashboard podle něj drží modrou nejméně 5 s od něj.
+  try { sessionStorage.setItem('makej-nahr-od', String(Date.now())); } catch (e) {}
+  // Kruh se rozlije od tlačítka, kterým se člověk přihlásil. Po přihlášení
+  // přes Google (návrat přesměrováním) žádné tlačítko není — pak od středu.
+  const tlacitko = window.__prechodOd;
+  const x = tlacitko ? tlacitko.x : innerWidth / 2;
+  const y = tlacitko ? tlacitko.y : innerHeight / 2;
+
+  // Jen modrá plocha, bez orbu a textu — ty naskočí až v dashboardu
+  // (Yasin). Orb na obou stránkách by se musel při přechodu navazovat
+  // a jakákoli mezera mezi nimi byla vidět jako probliknutí.
+  const plocha = document.createElement('div');
+  plocha.className = 'nahr-plocha nahr-plocha--prechod';
+  plocha.style.setProperty('--x', x + 'px');
+  plocha.style.setProperty('--y', y + 'px');
+  plocha.setAttribute('role', 'status');
+  plocha.setAttribute('aria-label', 'Nahráváme vaše údaje');
+  document.body.appendChild(plocha);
+
+  // Dva snímky: prohlížeč musí nejdřív vykreslit výchozí nulový kruh,
+  // jinak by přechod přeskočil rovnou na konec.
+  requestAnimationFrame(() => requestAnimationFrame(() => plocha.classList.add('je')));
+  // Přejde se, až modrá zaplní obrazovku (kruh jede 0,8 s).
+  const tiche = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  setTimeout(() => { window.location.href = cil; }, tiche ? 150 : 850);
+}
+
+// Přihlášená firma klikne v menu na „Dashboard" → stejný přechod.
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href="/employer/"]');
+  if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+  e.preventDefault();
+  prechodDoDashboardu('/employer/');
+});

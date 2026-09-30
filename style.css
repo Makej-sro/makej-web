@@ -2342,3 +2342,128 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
 .proc-pruh--mrizka .proc-bod h3 { min-height: 2.2em; }
 @media (max-width: 900px) { .proc-pruh--mrizka { grid-template-columns: 1fr 1fr; gap: 40px 24px; } }
 @media (max-width: 520px) { .proc-pruh--mrizka { grid-template-columns: 1fr; } }
+
+/* ═══════════ PŘIHLÁŠENÍ A REGISTRACE — ve stylu appky ═══════════
+   Stejný vzhled jako přihlášení v mobilní appce (makej-aplikace,
+   www/index.html → #au-vitej): sytá modrá #0020F6, bílý wordmark v League
+   Spartan, průsvitná pole s bílým obrysem, bílé tlačítko. Dřív tu byla bílá
+   karta s kukajícím Makačem a gradientovým logem — k novému webu působila
+   dětsky. Musí stát až tady na konci, přebíjí starší „světlé modály" výš.
+   Platí i pro rozcestník předregistrovaných (script.js → ukazRozcestnik). */
+.modal-overlay { background: rgba(4,8,40,.62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.modal, #login-modal {
+  background: radial-gradient(90% 55% at 50% -14%, rgba(150,168,255,.42), rgba(150,168,255,0) 70%), #0020F6;
+  color: #fff; border: 0; border-radius: 28px;
+  padding: 44px 40px 34px;
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px); overflow-y: auto;
+  box-shadow: 0 40px 100px -24px rgba(0,6,70,.7);
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.3) transparent;
+}
+/* Wordmark jako v appce (.mark) — bílý, bez gradientu */
+.modal .modal-logo {
+  font-family: 'League Spartan', 'Inter', sans-serif; font-size: 40px; font-weight: 700;
+  letter-spacing: -.035em; line-height: 1; margin-bottom: 20px;
+  background: none; -webkit-text-fill-color: #fff; color: #fff;
+}
+/* Nadpis jako nadpisy fází v appce (.phead) */
+.modal .modal-title {
+  font-family: 'League Spartan', 'Inter', sans-serif; font-size: 26px; font-weight: 700;
+  letter-spacing: -.015em; line-height: 1.12; color: #fff; margin-bottom: 6px;
+}
+/* Nejsvětlejší text na modré je #C7D0FF (kontrast 5,5 : 1) — jako v appce */
+.modal .modal-subtitle { color: #C7D0FF; font-size: 15px; font-weight: 600; letter-spacing: -.01em; margin-bottom: 26px; }
+
+.modal .form-group { margin-bottom: 14px; }
+.modal .form-label { color: #C7D0FF; font-size: 13px; font-weight: 700; margin: 0 0 7px 4px; }
+.modal .form-input, .modal .mdp-btn {
+  background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.56);
+  border-radius: 15px; padding: 15px 16px; color: #fff;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif; font-size: 15.5px; font-weight: 600;
+}
+.modal .form-input::placeholder { color: #C7D0FF; font-weight: 500; }
+.modal .form-input:focus { background: rgba(255,255,255,.16); border-color: #fff; }
+/* Automatické vyplnění v Chromu by pole přebarvilo na světle modrou s tmavým textem */
+.modal .form-input:-webkit-autofill,
+.modal .form-input:-webkit-autofill:hover,
+.modal .form-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff; caret-color: #fff;
+  -webkit-box-shadow: 0 0 0 100px #1a36f7 inset; transition: background-color 99999s;
+}
+/* Rozbalovací výběr: vlastní bílá šipka; položky seznamu kreslí systém na bílém → tmavý text */
+.modal select.form-input {
+  appearance: none; -webkit-appearance: none; padding-right: 44px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center;
+}
+.modal select.form-input option { color: #0a0d2e; background: #fff; }
+.modal .mdp-btn iconify-icon { color: #fff; }
+.modal .mdp.mdp-empty .mdp-btn, .modal .mdp.mdp-empty .mdp-btn iconify-icon { color: #C7D0FF; }
+.modal .form-hint { color: #C7D0FF; font-size: 12px; margin: 7px 0 0 4px; }
+.modal .pw-toggle, .modal .pw-toggle--text { color: #C7D0FF; }
+.modal .pw-toggle:hover, .modal .pw-toggle--text:hover, .modal .pw-toggle--text:active { color: #fff; }
+
+.modal .modal-error { background: rgba(255,154,166,.16); border: 1.5px solid rgba(255,154,166,.6); color: #fff; border-radius: 14px; }
+
+/* Hlavní tlačítko — bílá pilulka s modrým textem jako „Přihlásit se" v appce */
+.modal .btn-primary {
+  background: #fff; color: #0020F6; border: 0; border-radius: 999px;
+  padding: 16px; margin-top: 10px;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif; font-size: 16px; font-weight: 800;
+  box-shadow: 0 14px 24px -14px rgba(0,0,0,.55);
+}
+@media (hover: hover) and (pointer: fine) {
+  .modal .btn-primary:hover { background: #EEF1FF; transform: translateY(-1px); box-shadow: 0 16px 26px -14px rgba(0,0,0,.6); }
+}
+.modal .btn-primary:active { transform: scale(.98); }
+
+.modal .modal-divider { color: #C7D0FF; font-size: 12.5px; font-weight: 600; margin: 20px 0; }
+.modal .modal-divider::before, .modal .modal-divider::after { background: rgba(255,255,255,.22); }
+
+/* Google podle jeho pravidel značky: bílé pozadí, obrys #747775, text #1f1f1f */
+.modal .btn-google {
+  background: #fff; color: #1f1f1f; border: 0; box-shadow: inset 0 0 0 1px #747775;
+  border-radius: 14px; height: 48px; padding: 0 16px;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif; font-size: 16px; font-weight: 500;
+}
+.modal .btn-google:hover { background: #f7f8f8; }
+
+.modal .modal-switch { color: #C7D0FF; font-size: 14px; margin-top: 22px; }
+.modal .modal-switch a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+
+.modal .modal-close {
+  top: 18px; right: 18px; width: 36px; height: 36px; border-radius: 999px;
+  background: rgba(255,255,255,.12); color: #fff; font-size: 15px;
+}
+.modal .modal-close:hover { background: rgba(255,255,255,.22); color: #fff; }
+
+.modal .modal-back { color: #C7D0FF; }
+.modal .modal-back:hover { color: #fff; }
+.modal .modal-back .back-ic, .modal .modal-back:hover .back-ic { filter: brightness(0) invert(1); opacity: .8; }
+
+.modal .login-forgot { color: #C7D0FF; }
+.modal .login-forgot:hover { color: #fff; }
+
+/* Volba role — jako karty volby v appce (.pick) */
+.modal .role-card {
+  background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.56);
+  border-radius: 18px; color: #fff;
+}
+@media (hover: hover) and (pointer: fine) {
+  .modal .role-card:hover { background: rgba(255,255,255,.16); border-color: #fff; }
+}
+.modal .role-card iconify-icon { color: #fff; }
+.modal .role-ic { filter: brightness(0) invert(1); }
+.modal .role-card small { color: #C7D0FF; }
+
+/* Souhlasy v registraci mají barvy napsané přímo v HTML (pro bílou kartu) */
+.modal .reg-consent { color: #C7D0FF !important; }
+.modal .reg-consent a, .modal #register-form > p:last-child a { color: #fff !important; text-decoration: underline; text-underline-offset: 3px; }
+.modal .reg-consent input { accent-color: #fff !important; }
+.modal #register-form > p:last-child { color: #C7D0FF !important; }
+
+@media (max-width: 500px) {
+  .modal, #login-modal { padding: 34px 22px 26px; border-radius: 24px; }
+  .modal .modal-logo { font-size: 38px; }
+}

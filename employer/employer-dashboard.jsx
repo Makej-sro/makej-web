@@ -1,108 +1,150 @@
 // Makej Employer — Dashboard (varianta 1d: modrá hlavička + pás metrik + pipeline + plán/živě/recenze)
 // Reuses T, E_KPIS, E_JOBS, E_CANDIDATES, E_ACTIVITY, E_REVIEWS, E_THREADS, window.empOpenProfile
 
-// ── Výběr období: vlastní bílo-modrá roletka + „Vlastní" rozsah přes vodorovná kolečka
-//    (stejný vizuál i chování jako výběr data narození v brigádnické appce: WWheel/WDatumPicker) ──
+// ── Výběr období: bílá roletka (7/30/90 dní · Rok) + „Vlastní" rozsah v klasickém
+//    kalendáři (27. 9.: kolečka den/měsíc/rok byla na výběr období moc složitá) ──
 const _EMES  = ['Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'];
-const _EROKY = (() => { const y = new Date().getFullYear(); const a = []; for (let r = y; r >= y - 6; r--) a.push(r); return a; })();
-const _eIso   = d => d.toISOString().slice(0, 10);
+const _EDNY_T = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'];
+// Místní datum → 'RRRR-MM-DD' (toISOString by kolem půlnoci posunul den kvůli UTC)
+const _eIso   = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 const _eRozloz = v => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); const t = new Date(); return m ? { y: +m[1], m: +m[2] - 1, d: +m[3] } : { y: t.getFullYear(), m: t.getMonth(), d: t.getDate() }; };
 const _eFmt      = v => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? (+m[3] + '. ' + (+m[2]) + '. ' + m[1]) : ''; };
 const _eFmtShort = v => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? (+m[3] + '. ' + (+m[2]) + '.') : ''; };
 
-// Vodorovné „kolečko" — roluješ do středu, prostřední položka se vybere (port WWheel).
-function EWheel({ items, index, itemW, onIndex }) {
-  const boxRef = useRefE(null);
-  const timRef = useRefE(null);
-  useEffectE(() => { const el = boxRef.current; if (el) el.scrollLeft = index * itemW; return () => clearTimeout(timRef.current); }, []);
-  function onScroll() {
-    clearTimeout(timRef.current);
-    timRef.current = setTimeout(() => {
-      const el = boxRef.current; if (!el) return;
-      const i = Math.max(0, Math.min(items.length - 1, Math.round(el.scrollLeft / itemW)));
-      if (i !== index) onIndex(i);
-    }, 90);
-  }
-  function klepni(i) { const el = boxRef.current; if (el) el.scrollTo({ left: i * itemW, behavior: 'smooth' }); if (i !== index) onIndex(i); }
-  const okraj = 'calc(50% - ' + (itemW / 2) + 'px)';
+// Kalendář na jeden den (pro „Od" a „Do" zvlášť). Nahoře šipky + výběr
+// měsíce a roku; dny mimo min–max nejdou vybrat; rozsah od–do je podbarvený,
+// ať je vidět, co už je vybrané.
+function ECalDen({ value, min, max, od, doo, onPick }) {
+  const [view, setView] = useStateE(() => { const r = _eRozloz(value); return { y: r.y, m: r.m }; });
+  const rokDnes = new Date().getFullYear(), mesDnes = new Date().getMonth();
+  const ROKY = []; for (let r = rokDnes; r >= rokDnes - 6; r--) ROKY.push(r);
+  const posun = k => setView(v => { const d = new Date(v.y, v.m + k, 1); return { y: d.getFullYear(), m: d.getMonth() }; });
+  const lzeDal = view.y < rokDnes || (view.y === rokDnes && view.m < mesDnes);
+
+  const odsazeni = (new Date(view.y, view.m, 1).getDay() + 6) % 7;   // pondělí = 0
+  const pocet = new Date(view.y, view.m + 1, 0).getDate();
+  const bunky = [];
+  for (let i = 0; i < odsazeni; i++) bunky.push(null);
+  for (let d = 1; d <= pocet; d++) bunky.push(_eIso(new Date(view.y, view.m, d)));
+  const dnes = _eIso(new Date());
+  const sel = { fontFamily: 'inherit', fontSize: 13, fontWeight: 700, color: '#0B1233', background: '#fff', border: '1px solid #E6E9F5', borderRadius: 8, padding: '4px 4px', cursor: 'pointer', outline: 'none' };
+  const sipka = on => ({ width: 28, height: 28, borderRadius: 8, border: '1px solid #E6E9F5', background: '#fff', color: on ? '#0B1233' : '#C7CCE3', fontSize: 15, cursor: on ? 'pointer' : 'default', display: 'grid', placeItems: 'center' });
+
   return (
-    <div style={{ position: 'relative' }}>
-      <div style={{ position: 'absolute', left: '50%', top: 4, bottom: 4, width: itemW - 10, transform: 'translateX(-50%)', borderRadius: 10, background: 'rgba(27,52,240,0.10)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 28, pointerEvents: 'none', zIndex: 2, background: 'linear-gradient(to right,#fff,rgba(255,255,255,0))' }} />
-      <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 28, pointerEvents: 'none', zIndex: 2, background: 'linear-gradient(to left,#fff,rgba(255,255,255,0))' }} />
-      <div ref={boxRef} onScroll={onScroll} className="e-wheel" style={{ display: 'flex', overflowX: 'auto', overflowY: 'hidden', scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
-        <div style={{ flex: '0 0 ' + okraj }} />
-        {items.map((it, i) => (
-          <button key={i} onClick={() => klepni(i)} style={{ flex: '0 0 ' + itemW + 'px', scrollSnapAlign: 'center', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 0', fontSize: i === index ? 15 : 13.5, fontWeight: i === index ? 800 : 600, color: i === index ? '#1B34F0' : '#7A82A6', transition: 'color .15s, font-size .15s' }}>{it}</button>
-        ))}
-        <div style={{ flex: '0 0 ' + okraj }} />
+    <div style={{ userSelect: 'none' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, marginBottom: 8 }}>
+        <button type="button" className="e-btn-sek" onClick={() => posun(-1)} style={sipka(true)} aria-label="Předchozí měsíc">‹</button>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <select value={view.m} onChange={e => setView(v => ({ ...v, m: +e.target.value }))} style={sel} aria-label="Měsíc">
+            {_EMES.map((n, i) => <option key={i} value={i} disabled={view.y === rokDnes && i > mesDnes}>{n}</option>)}
+          </select>
+          <select value={view.y} onChange={e => { const y = +e.target.value; setView(v => ({ y, m: y === rokDnes ? Math.min(v.m, mesDnes) : v.m })); }} style={sel} aria-label="Rok">
+            {ROKY.map(r => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
+        <button type="button" className={lzeDal ? 'e-btn-sek' : ''} onClick={() => lzeDal && posun(1)} style={sipka(lzeDal)} aria-label="Další měsíc">›</button>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', rowGap: 2 }}>
+        {_EDNY_T.map(t => <div key={t} style={{ textAlign: 'center', fontSize: 11.5, fontWeight: 700, color: '#A6ADCB', padding: '4px 0 6px' }}>{t}</div>)}
+        {bunky.map((d, i) => {
+          if (!d) return <div key={'x' + i} />;
+          const mimo = (min && d < min) || (max && d > max);
+          const vybrany = d === value;
+          const uvnitr = od && doo && d > od && d < doo;
+          const kraj = d === od || d === doo;
+          return (
+            <div key={d} style={{ height: 31, display: 'grid', placeItems: 'center', background: uvnitr ? '#F3F5FF' : 'transparent' }}>
+              <button type="button" disabled={mimo} onClick={() => onPick(d)}
+                className={'e-cal-den' + (vybrany ? ' kraj' : '')}
+                style={{ width: 29, height: 29, borderRadius: '50%', border: 'none', fontSize: 13, fontWeight: vybrany || kraj ? 800 : 600, cursor: mimo ? 'default' : 'pointer',
+                  background: vybrany ? '#0020F6' : kraj ? '#E2E7FF' : 'transparent', color: vybrany ? '#fff' : mimo ? '#D1D5E4' : '#0B1233',
+                  boxShadow: d === dnes && !vybrany ? 'inset 0 0 0 1.5px #C7D0FF' : 'none' }}>{+d.slice(8)}</button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-// Výběr data přes tři kolečka (den · měsíc · rok) — jako datum narození.
-function EDateWheel({ value, onChange }) {
-  const [dmy, setDmy] = useStateE(() => _eRozloz(value));
-  useEffectE(() => { setDmy(_eRozloz(value)); }, [value]);
-  const dim = new Date(dmy.y, dmy.m + 1, 0).getDate();
-  const DNY = []; for (let d = 1; d <= dim; d++) DNY.push(d);
-  function zmen(nove) {
-    const next = { ...dmy, ...nove };
-    const di = new Date(next.y, next.m + 1, 0).getDate();
-    if (next.d > di) next.d = di;
-    setDmy(next);
-    onChange(next.y + '-' + String(next.m + 1).padStart(2, '0') + '-' + String(next.d).padStart(2, '0'));
-  }
-  return (
-    <div style={{ background: '#fff', border: '1px solid #E6E9F5', borderRadius: 12, padding: '8px 0', overflow: 'hidden' }}>
-      <EWheel key={'d-' + dmy.y + '-' + dmy.m} items={DNY} index={dmy.d - 1} itemW={54} onIndex={i => zmen({ d: i + 1 })} />
-      <div style={{ height: 1, background: '#F0F2FA', margin: '6px 12px' }} />
-      <EWheel items={_EMES} index={dmy.m} itemW={112} onIndex={i => zmen({ m: i })} />
-      <div style={{ height: 1, background: '#F0F2FA', margin: '6px 12px' }} />
-      <EWheel items={_EROKY} index={Math.max(0, _EROKY.indexOf(dmy.y))} itemW={80} onIndex={i => zmen({ y: _EROKY[i] })} />
-    </div>
-  );
-}
-
 // Roletka výběru období: 7/30/90 dní · Rok · Vlastní (od–do přes kolečka).
+// Šířka tlačítka Období: pro 7/30/90 dní a Rok stejná (nejdelší „30 dní"),
+// takže mezi nimi ikona neposkočí; vlastní datum potřebuje víc místa.
+const _E_OBD_SIRKA = 154, _E_OBD_SIRKA_VL = 208;
 function EPeriodPicker({ value, onChange }) {
   const [open, setOpen] = useStateE(false);
-  const [showCustom, setShowCustom] = useStateE(false);
+  const [showCustom, setShowCustom] = useStateE(false);   // místo seznamu je vidět Od / Do
+  const [kal, setKal] = useStateE(null);                   // 'od' | 'do' — který kalendář je rozbalený
   const isCustom = value && typeof value === 'object';
-  const [from, setFrom] = useStateE(isCustom ? value.from : _eIso(new Date(Date.now() - 29 * 86400000)));
-  const [to, setTo] = useStateE(isCustom ? value.to : _eIso(new Date()));
+  const [rozsah, setRozsah] = useStateE(() => isCustom ? { from: value.from, to: value.to } : { from: _eIso(new Date(Date.now() - 29 * 86400000)), to: _eIso(new Date()) });
   const ref = useRefE(null);
+  const zavri = () => { setOpen(false); setShowCustom(false); setKal(null); };
   useEffectE(() => {
     if (!open) return;
-    const onClick = e => { if (ref.current && !ref.current.contains(e.target)) { setOpen(false); setShowCustom(false); } };
+    const onClick = e => { if (ref.current && !ref.current.contains(e.target)) zavri(); };
     document.addEventListener('click', onClick, true);
     return () => document.removeEventListener('click', onClick, true);
   }, [open]);
 
   const presets = [['7d', '7 dní'], ['30d', '30 dní'], ['90d', '90 dní'], ['rok', 'Rok']];
   const label = isCustom ? (_eFmtShort(value.from) + ' – ' + _eFmtShort(value.to)) : ((presets.find(p => p[0] === value) || ['', '30 dní'])[1]);
-  const pickPreset = k => { onChange(k); setOpen(false); setShowCustom(false); };
-  const applyCustom = () => { let a = from, b = to; if (new Date(a) > new Date(b)) { const t = a; a = b; b = t; } onChange({ from: a, to: b }); setOpen(false); setShowCustom(false); };
-  const optStyle = active => ({ display: 'block', width: '100%', textAlign: 'left', padding: '11px 16px', border: 'none', background: active ? '#EEF1FF' : 'transparent', color: active ? '#1B34F0' : '#0B1233', fontSize: 13.5, fontWeight: active ? 800 : 600, cursor: 'pointer' });
+  const pickPreset = k => { onChange(k); zavri(); };
+  // Vybraný den se jen zapíše do Od/Do (kalendář se zavře); data se přepočítají
+  // až tlačítkem Potvrdit.
+  const vyberDen = (kde, d) => {
+    const r = kde === 'od' ? { from: d, to: rozsah.to && rozsah.to < d ? d : rozsah.to } : { from: rozsah.from, to: d };
+    setRozsah(r); setKal(null);
+  };
+  const potvrd = () => { if (!rozsah.from || !rozsah.to) return; onChange({ from: rozsah.from, to: rozsah.to }); zavri(); };
+  const optStyle = active => ({ display: 'block', width: '100%', textAlign: 'center', padding: '9px 16px', border: 'none', background: active ? '#EEF1FF' : 'transparent', color: active ? '#1B34F0' : '#0B1233', fontSize: 13.5, fontWeight: active ? 800 : 600, cursor: 'pointer' });
+  const radek = (kde, popis, hodnota) => (
+    <div>
+      <button type="button" className="e-obd-vol" onClick={() => setKal(k => k === kde ? null : kde)}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, width: '100%', padding: '10px 12px', border: 'none', background: kal === kde ? '#EEF1FF' : 'transparent', cursor: 'pointer', textAlign: 'left' }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#7A82A6', width: 22 }}>{popis}</span>
+        <span style={{ flex: 1, fontSize: 13, fontWeight: 700, textAlign: 'right', color: kal === kde ? '#1B34F0' : '#0B1233' }}>{_eFmt(hodnota)}</span>
+      </button>
+      {kal === kde && (
+        <div style={{ padding: '4px 10px 10px' }}>
+          <ECalDen value={hodnota} od={rozsah.from} doo={rozsah.to}
+            min={kde === 'do' ? rozsah.from : null} max={_eIso(new Date())}
+            onPick={d => vyberDen(kde, d)} />
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
-      <button onClick={() => setOpen(o => !o)} style={{ fontSize: 13, fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,.16)', padding: '9px 14px', borderRadius: 9, border: 'none', cursor: 'pointer' }}>{label}</button>
+      {/* Bílé tlačítko s linkou (hlavičky záložek už nejsou modré). Popisek
+          říká, co to je — „Období: 30 dní", ne jen „30 dní". */}
+      {/* Pevná šířka: při přepnutí 7 dní ↔ 30 dní ↔ vlastní datum se mění jen
+          text, ikona ani tlačítko neposkočí. */}
+      <button type="button" className="e-btn-sek" onClick={() => open ? zavri() : setOpen(true)} style={{ width: isCustom ? _E_OBD_SIRKA_VL : _E_OBD_SIRKA, boxSizing: 'border-box', fontSize: 13.5, fontWeight: 600, color: '#0B1233', background: '#fff', padding: '9px 12px 9px 14px', borderRadius: 10, border: '1px solid #E6E9F5', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 7, whiteSpace: 'nowrap', overflow: 'hidden' }}>
+        <span aria-hidden="true" style={{ display: 'block', width: 17, height: 17, background: '#7A82A6', WebkitMaskImage: 'url(ikony/plan-smen.svg?v=1)', maskImage: 'url(ikony/plan-smen.svg?v=1)', WebkitMaskSize: 'contain', maskSize: 'contain', WebkitMaskRepeat: 'no-repeat', maskRepeat: 'no-repeat', WebkitMaskPosition: 'center', maskPosition: 'center' }} />
+        <span style={{ color: '#7A82A6' }}>Období:</span> {label}
+      </button>
       {open && (
-        <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 8, zIndex: 60, width: showCustom ? 300 : 172, background: '#fff', border: '1px solid #E6E9F5', borderRadius: 12, boxShadow: '0 18px 40px -14px rgba(20,22,40,.28)', overflow: 'hidden' }}>
-          {presets.map(([k, l]) => <button key={k} onClick={() => pickPreset(k)} style={optStyle(!isCustom && value === k)}>{l}</button>)}
-          <button onClick={() => setShowCustom(s => !s)} style={{ ...optStyle(isCustom || showCustom), borderTop: '1px solid #F0F2FA', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            Vlastní <span style={{ fontSize: 11 }}>{showCustom ? '▴' : '▾'}</span>
-          </button>
-          {showCustom && (
-            <div style={{ padding: '10px 12px 12px', borderTop: '1px solid #F0F2FA', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.06em', color: '#A6ADCB', textTransform: 'uppercase' }}>Od</div>
-              <EDateWheel value={from} onChange={setFrom} />
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.06em', color: '#A6ADCB', textTransform: 'uppercase', marginTop: 2 }}>Do</div>
-              <EDateWheel value={to} onChange={setTo} />
-              <button onClick={applyCustom} style={{ marginTop: 4, padding: '10px', borderRadius: 9, background: '#1B34F0', color: '#fff', border: 'none', fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>Použít</button>
-            </div>
+        <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 8, zIndex: 60, width: kal ? 258 : (isCustom ? _E_OBD_SIRKA_VL : _E_OBD_SIRKA), background: '#fff', border: '1px solid #E6E9F5', borderRadius: 12, boxShadow: '0 18px 40px -14px rgba(20,22,40,.28)', overflow: 'hidden' }}>
+          {!showCustom ? (
+            <>
+              {presets.map(([k, l]) => <button key={k} className="e-obd-vol" onClick={() => pickPreset(k)} style={optStyle(!isCustom && value === k)}>{l}</button>)}
+              <button className="e-obd-vol" onClick={() => setShowCustom(true)} style={{ ...optStyle(isCustom), borderTop: '1px solid #F0F2FA' }}>
+                Vlastní
+              </button>
+            </>
+          ) : (
+            // „Vlastní": seznam zmizí, zůstane jen Od a Do; každé rozbalí svůj kalendář.
+            // Zpět na 7/30/90 dní = zavřít a znovu otevřít roletku.
+            <>
+              {radek('od', 'Od', rozsah.from)}
+              <div style={{ height: 1, background: '#F0F2FA' }} />
+              {radek('do', 'Do', rozsah.to)}
+              <div style={{ padding: '8px 10px 10px', borderTop: '1px solid #F0F2FA' }}>
+                <button type="button" className="e-btn-hl" onClick={potvrd} disabled={!rozsah.from || !rozsah.to}
+                  style={{ width: '100%', padding: '8px 0', borderRadius: 9, border: 'none', background: '#0020F6', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Potvrdit</button>
+              </div>
+            </>
           )}
         </div>
       )}
@@ -110,278 +152,160 @@ function EPeriodPicker({ value, onChange }) {
   );
 }
 
-function EDashboard({ period = '30d', onTab, onNew, onPeriod, onSignOut }) {
-  // CSS řetězec → React style objekt (aby šel referenční markup portovat 1:1)
-  const sx = str => {
-    const o = {};
-    (str || '').split(';').forEach(p => {
-      const i = p.indexOf(':'); if (i < 0) return;
-      let k = p.slice(0, i).trim(); const v = p.slice(i + 1).trim();
-      if (!k) return;
-      k = k.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-      o[k] = v;
-    });
-    return o;
-  };
-  const fmt = n => Number(n || 0).toLocaleString('cs-CZ').replace(/,/g, ' ');
-  const pct = n => (Math.round(n * 10) / 10).toString().replace('.', ',');
+// ── DASHBOARD (zjednodušený 26. 9.) ──
+// Yasin: „jednoduchost jako Stripe, ale náš vzhled". Proto: modrá hlavička
+// a pás čísel zůstaly (stejné jako na ostatních záložkách), ale pod nimi
+// JEDNA bílá plocha místo sedmi karet, sekce oddělené jen linkou a mezerou,
+// modrá jen na odkazy. Pryč kanban „Pipeline" (zdvojoval Kandidáty),
+// ukázkový Plán směn a vymyšlená čísla (zhlédnutí 33 200, swipe right) —
+// všechno tady je skutečné: E_JOBS[].candidates (každý zájem s časem),
+// E_CANDIDATES, E_THREADS, E_REVIEWS, E_ACTIVITY.
+function EDashboard({ period = '30d', onTab, onNew, onPeriod }) {
   const go = tab => () => onTab && onTab(tab);
-  const openCand = c => () => {
-    if (c && c.worker_id && window.empOpenProfile) window.empOpenProfile(c.worker_id, { name: c.name, level: c.level, jobs_done: c.jobsDone, rating: c.rating });
-    else if (onTab) onTab('candidates');
-  };
+  const pl = (n, a, b, c) => n === 1 ? a : (n >= 2 && n <= 4) ? b : c;
+  const ink = '#0B1233', ink2 = '#3A4266', muted = '#7A82A6', line = '#EEF0F6', blue = '#1B34F0';
 
-  // ── Období: jednotné GLOBÁLNÍ (preset '7d'/'30d'/'90d'/'rok' NEBO {from,to} pro „Vlastní").
-  //    Roletka mění period v shellu (onPeriod = setPeriod), takže je synchronizovaná napříč stránkami. ──
-  const range = period;
-  const isCustom = range && typeof range === 'object';
+  const jobs = (typeof E_JOBS !== 'undefined' ? E_JOBS : []);
+  const C = (typeof E_CANDIDATES !== 'undefined' ? E_CANDIDATES : {});
+  const cekaji = (C.new || []).slice().sort((x, y) => new Date(x.createdAt || 0) - new Date(y.createdAt || 0));
+  const vlakna = (typeof E_THREADS !== 'undefined' ? E_THREADS : []);
+  const neprectene = vlakna.reduce((a, t) => a + (t.unread || 0), 0);
+  const recenze = (typeof E_REVIEWS !== 'undefined' ? E_REVIEWS : []);
+  const prumer = recenze.length ? recenze.reduce((a, r) => a + (r.rating || 0), 0) / recenze.length : 0;
+  const aktivita = (typeof E_ACTIVITY !== 'undefined' ? E_ACTIVITY : []);
+  const aktivni = jobs.filter(j => j.status === 'active' || j.status === 'urgent');
+  const tier = (typeof _employerPlanTier === 'function') ? _employerPlanTier() : 'vyhodny';
+  const limit = (typeof EMPLOYER_MAX_ACTIVE !== 'undefined' && EMPLOYER_MAX_ACTIVE[tier] != null) ? EMPLOYER_MAX_ACTIVE[tier] : 2;
 
-  // Zhlédnutí/Swipe škálované obdobím (jako dřív); u „Vlastní" úměrně počtu dnů.
-  const BASE_V = [320,380,420,510,480,560,620,590,670,720,760,820,880,940,1010,1080,1140,1200,1280,1340,1410,1480,1540,1620,1700,1780,1860,1940,2030,2120];
-  const BASE_S = [80,95,110,130,125,145,160,155,170,185,195,210,225,240,260,275,290,310,330,350,365,385,410,430,455,475,495,520,545,568];
-  const BASE_M = [8,10,12,15,13,17,19,18,21,23,25,27,29,32,35,37,40,42,45,48,50,53,56,59,62,65,68,72,75,78];
-  const customDays = isCustom ? Math.max(1, Math.round((new Date(range.to) - new Date(range.from)) / 86400000) + 1) : 0;
-  const scale = arr => {
-    if (isCustom) { const m = customDays / 30; return arr.map(x => Math.round(x * m)); }
-    return range === '7d' ? arr.slice(-7)
-      : range === '90d' ? arr.map(x => Math.round(x * 2.85))
-      : range === 'rok' ? arr.map(x => Math.round(x * 10.5)) : arr;
-  };
-  const seriesV = scale(BASE_V), seriesS = scale(BASE_S), seriesM = scale(BASE_M);
-  const views  = seriesV.reduce((a, b) => a + b, 0);
-  const swipes = seriesS.reduce((a, b) => a + b, 0);
-  const swipeRate = views > 0 ? swipes / views * 100 : 0;
-  const micro = arr => { const l = arr.slice(-5); const mx = Math.max.apply(null, l.concat(1)); return l.map(x => Math.max(15, Math.round(x / mx * 100))); };
+  // Zájemci a najatí za zvolené období — ze skutečných časů zájmu
+  const isCustom = period && typeof period === 'object';
+  const od = isCustom ? new Date(period.from).getTime() : Date.now() - ({ '7d': 7, '30d': 30, '90d': 90, rok: 365 }[period] || 30) * 86400000;
+  const doT = isCustom ? new Date(period.to).getTime() + 86400000 : Date.now() + 1;
+  const vObdobi = [];
+  jobs.forEach(j => (j.candidates || []).forEach(c => { const t = new Date(c.matched_at).getTime(); if (t >= od && t < doT) vObdobi.push(c); }));
+  const zajemci = vObdobi.length;
+  const najato = vObdobi.filter(c => c.status === 'accepted').length;
+  const rangeLbl = isCustom ? (_eFmt(period.from) + ' – ' + _eFmt(period.to)) : ({ '7d': '7 dní', '30d': '30 dní', '90d': '90 dní', rok: '12 měsíců' }[period] || '30 dní');
 
-  const kOf = id => (E_KPIS.find(k => k.id === id) || {});
-  const jobs = E_JOBS || [];
-  const matches = kOf('matches').value != null ? kOf('matches').value : jobs.reduce((a, j) => a + (j.matches || 0), 0);
-  const hires   = kOf('hired').value   != null ? kOf('hired').value   : jobs.reduce((a, j) => a + (j.hired || 0), 0);
-  const hireRate = matches > 0 ? hires / matches * 100 : 0;
-  const rk = kOf('rating');
-  const ratingStr = (rk.value != null ? String(rk.value) : '–').replace('.', ',');
-  const ratingCount = rk.count != null ? rk.count : 0;
-  const activeJobs = kOf('jobs').value != null ? kOf('jobs').value : jobs.filter(j => j.status === 'active' || j.status === 'urgent').length;
-  const totalJobs  = kOf('jobs').max   != null ? kOf('jobs').max   : jobs.length;
-  const rangeLbl = isCustom ? (_eFmt(range.from) + ' – ' + _eFmt(range.to)) : ({ '7d': '7 dní', '30d': '30 dní', '90d': '90 dní', 'rok': '12 měsíců' }[range] || '30 dní');
-
-  const metrics = [
-    { label: 'Zhlédnutí',   value: fmt(views),  chart: micro(seriesV), accent: '#fff' },
-    { label: 'Swipe right', value: fmt(swipes), pill: pct(swipeRate) + ' %' },
-    { label: 'Matche',      value: fmt(matches), chart: micro(seriesM), accent: '#FFC46B' },
-    { label: 'Najato',      value: fmt(hires),  sub: pct(hireRate) + ' % z matchů' },
-    { label: 'Hodnocení',   value: ratingStr, star: true, sub: ratingCount + ' hodnocení' },
+  const cisla = [
+    { l: 'Zájemci', v: zajemci, s: 'za ' + rangeLbl, kam: 'Kandidáti', onClick: go('candidates') },
+    { l: 'Najato', v: najato, s: zajemci ? Math.round(najato / zajemci * 100) + ' % zájemců' : 'za ' + rangeLbl },
+    { l: 'Aktivní inzeráty', v: aktivni.length + (limit === Infinity ? '' : ' / ' + limit), s: 'limit tarifu', kam: 'Inzeráty', onClick: go('jobs') },
+    { l: 'Hodnocení', v: prumer ? prumer.toFixed(1).replace('.', ',') : '—', s: recenze.length ? recenze.length + ' hodnocení' : 'zatím žádné', kam: recenze.length ? 'Recenze' : null, onClick: recenze.length ? go('reviews') : undefined },
   ];
-
-  // ── Pipeline kandidátů (mapování na E_CANDIDATES) ──
-  const PIP = {
-    blue:  { pill: '#1B34F0', pillBg: '#EEF1FF', chipBg: '#F6F7FC', meta: '#7A82A6' },
-    amber: { pill: '#fff',    pillBg: '#F5920B', chipBg: '#FFF8EE', meta: '#B96F06' },
-    green: { pill: '#0B7B4B', pillBg: '#E6F7EF', chipBg: '#E6F7EF', meta: '#0B7B4B' },
-  };
-  const cand = E_CANDIDATES || {};
-  const cols = [
-    { key: 'new',       title: 'Nový match',      list: cand.new || [],       tone: PIP.blue,  meta: c => [c.jobTitle || (c.tags && c.tags[0]) || '', c.lastSeen].filter(Boolean).join(' · ') },
-    { key: 'awaiting',  title: 'Čeká na odpověď', list: cand.shortlist || [], tone: PIP.amber, highlight: true, meta: c => c.lastSeen ? ('naposled ' + c.lastSeen) : 'čeká na odpověď' },
-    { key: 'interview', title: 'Na pohovoru',     list: cand.interview || [], tone: PIP.blue,  meta: c => c.interview || 'pohovor domluven' },
-    { key: 'hired',     title: 'Najato',          list: cand.hired || [],     tone: PIP.green, meta: c => c.shift || (c.jobTitle ? ('nástup · ' + c.jobTitle) : 'najato') },
-  ];
-  const pipeTotal = cols.reduce((a, c) => a + c.list.length, 0);
-
-  // ── Tabulka inzerátů ──
-  const jobRows = jobs.slice(0, 5);
-  const maxV = Math.max.apply(null, jobRows.map(j => j.views || 0).concat(1));
-  const maxS = Math.max.apply(null, jobRows.map(j => j.swipes || 0).concat(1));
-
-  // ── Plán směn (zatím ukázková data — až bude API pro směny, napojit) ──
-  const week = [
-    { d: 'Po', v: '3', st: 'ok' }, { d: 'Út', v: '3', st: 'ok' }, { d: 'St', v: '4/5', st: 'warn' },
-    { d: 'Čt', v: '4', st: 'ok' }, { d: 'Pá', v: '4', st: 'ok' }, { d: 'So', v: '—', st: 'off' }, { d: 'Ne', v: '—', st: 'off' },
-  ];
-  const dayStyle = { ok: 'background:#EEF1FF;color:#1B34F0', warn: 'background:#FFF3E0;color:#B96F06;border:1.5px solid #F5920B', off: 'background:#F6F7FC;color:#A6ADCB' };
-
-  // ── Recenze ──
-  const lastRev = (E_REVIEWS && E_REVIEWS[0])
-    || (rk.lastReview ? { text: rk.lastReview.text, author: rk.lastReview.reviewer, when: rk.lastReview.when } : null);
+  const dniOd = iso => { const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000); return isNaN(d) ? null : Math.max(0, d); };
+  const kdy = iso => { const d = dniOd(iso); return d == null ? '' : d === 0 ? 'dnes' : d === 1 ? 'včera' : 'před ' + d + ' dny'; };
+  const nadpis = (t, odkaz, kam) => (
+    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
+      <span style={{ fontSize: 16, fontWeight: 800, color: ink }}>{t}</span>
+      {odkaz && <span onClick={go(kam)} style={{ fontSize: 13, fontWeight: 700, color: blue, cursor: 'pointer' }}>{odkaz}</span>}
+    </div>
+  );
+  const radek = { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderTop: '1px solid ' + line };
 
   return (
-    <div style={{ padding: 20, height: '100%', boxSizing: 'border-box' }}>
-      <div style={sx('background:#F1F3FB;border:1px solid #DDE1F0;border-radius:22px;overflow:hidden;height:100%;display:flex;flex-direction:column')}>
+    <div className="e-ram" style={{ padding: 20, height: '100%', boxSizing: 'border-box' }}>
+      <div style={{ background: '#F1F3FB', border: '1px solid #DDE1F0', borderRadius: 22, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
 
-        {/* Modrá hlavička — připnutá (nescrolluje) */}
-        <div style={sx('background:#1B34F0;padding:14px 26px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;flex:none')}>
-          <div style={sx('display:flex;align-items:center;gap:14px;min-width:0')}>
-            <span style={sx('font-size:22px;font-weight:800;color:#fff;letter-spacing:-.02em')}>Dashboard</span>
-            <span style={sx('width:1px;height:22px;background:rgba(255,255,255,.28)')} />
-            <span style={sx('font-size:14px;color:#C7D0FF')}>{rangeLbl} · {activeJobs} aktivních inzerátů · {pipeTotal} kandidátů v procesu</span>
-          </div>
-          <div style={sx('display:flex;align-items:center;gap:10px')}>
-            <EPeriodPicker value={range} onChange={onPeriod} />
-            <button onClick={onNew} style={sx('font-size:14px;font-weight:800;color:#1B34F0;background:#fff;padding:11px 18px;border-radius:9px;border:none;cursor:pointer')}>+ Nový inzerát</button>
-          </div>
+        <ETabHlava title="Dashboard">
+          <EPeriodPicker value={period} onChange={onPeriod} />
+          <EBtnHl onClick={onNew}>+ Nový inzerát</EBtnHl>
+        </ETabHlava>
+
+        {/* Pás čísel — 4 skutečná čísla, každé vede tam, kde se s ním pracuje */}
+        <div style={{ flex: 'none' }}>
+          <EMetriky items={cisla} />
         </div>
 
-        {/* Modrý pás metrik — připnutý (nescrolluje) */}
-        <div style={sx('background:#1B34F0;display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:6px;flex:none')}>
-          {metrics.map((m, i) => (
-            <div key={i} style={sx('padding:6px 24px 12px;display:flex;flex-direction:column;gap:7px' + (i > 0 ? ';border-left:1px solid rgba(255,255,255,.2)' : ''))}>
-              <span style={sx('font-size:11px;font-weight:800;letter-spacing:.09em;color:#A9B7FF;text-transform:uppercase')}>{m.label}</span>
-              <div style={sx('display:flex;align-items:flex-end;justify-content:space-between;gap:12px')}>
-                {m.star ? (
-                  <div style={sx('display:flex;align-items:baseline;gap:5px')}>
-                    <span style={sx('font-size:26px;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1')}>{m.value}</span>
-                    <span style={sx('font-size:14px;color:#FFC46B')}>★</span>
-                  </div>
-                ) : (
-                  <span style={sx('font-size:26px;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1')}>{m.value}</span>
+        {/* Jedna bílá plocha, sekce oddělené linkou a mezerou.
+            Pevná obrazovka (28. 9.): plocha vyplní okno až dolů a každý
+            sloupec se posouvá sám, jen když se do něj obsah nevejde. */}
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 24px 22px' }}>
+          <div style={{ background: '#fff', border: '1px solid #E6E9F5', borderRadius: 18, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 340px', gridTemplateRows: 'minmax(0,1fr)', height: '100%', minHeight: 360, boxSizing: 'border-box', overflow: 'hidden' }}>
+
+            <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 34, minWidth: 0, minHeight: 0, overflowY: 'auto' }}>
+              {/* Čeká na vás */}
+              <div>
+                {nadpis('Čeká na vás', cekaji.length ? 'Všichni kandidáti' : null, 'candidates')}
+                {cekaji.length === 0 && neprectene === 0 && (
+                  <div style={{ ...radek, color: muted, fontSize: 14 }}>{jobs.length ? 'Všechno máte vyřízené.' : 'Až se někdo přihlásí na váš inzerát, uvidíte ho tady.'}</div>
                 )}
-                {m.chart && (
-                  <div style={sx('display:flex;align-items:flex-end;gap:2px;height:24px')}>
-                    {m.chart.map((h, j) => <span key={j} style={{ width: 5, height: h + '%', borderRadius: 2, background: j >= m.chart.length - 2 ? m.accent : 'rgba(255,255,255,.3)' }} />)}
-                  </div>
-                )}
-                {m.pill && <span style={sx('font-size:12px;font-weight:800;color:#fff;background:rgba(255,255,255,.16);padding:3px 7px;border-radius:6px')}>{m.pill}</span>}
-                {m.sub && <span style={sx('font-size:12px;color:#C7D0FF')}>{m.sub}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Tělo — vejde se celé na jednu obrazovku, žádný scroll (overflow:hidden); rozestupy zhuštěné */}
-        <div style={sx('padding:14px 22px 16px;display:grid;grid-template-columns:1fr 336px;gap:16px;align-items:stretch;flex:1;min-height:0;overflow:hidden')}>
-
-          {/* Levý sloupec */}
-          <div style={sx('display:flex;flex-direction:column;gap:12px;min-width:0')}>
-            <div style={sx('display:flex;align-items:center;justify-content:space-between;gap:16px')}>
-              <div style={sx('display:flex;align-items:center;gap:10px')}>
-                <span style={sx('font-size:16px;font-weight:800;color:#0B1233')}>Pipeline kandidátů</span>
-                <span style={sx('font-size:12px;font-weight:700;color:#7A82A6;background:#fff;border:1px solid #E6E9F5;padding:3px 9px;border-radius:999px')}>Vše {pipeTotal}</span>
-              </div>
-              <button onClick={go('candidates')} style={sx('font-size:13px;font-weight:700;color:#1B34F0;background:none;border:none;cursor:pointer')}>Kandidáti →</button>
-            </div>
-
-            <div style={sx('display:grid;grid-template-columns:repeat(4,1fr);gap:12px')}>
-              {cols.map(col => {
-                const t = col.tone;
-                return (
-                  <div key={col.key} style={{ ...sx('background:#fff;border-radius:14px;display:flex;flex-direction:column;gap:9px'), border: col.highlight ? '2px solid #F5920B' : '1px solid #E6E9F5', padding: col.highlight ? 10 : 11 }}>
-                    <div style={sx('display:flex;align-items:center;justify-content:space-between;gap:8px')}>
-                      <span style={sx('font-size:13px;font-weight:800;color:#0B1233')}>{col.title}</span>
-                      <span style={{ ...sx('font-size:12px;font-weight:800;padding:2px 8px;border-radius:999px'), color: t.pill, background: t.pillBg }}>{col.list.length}</span>
-                    </div>
-                    <div style={sx('display:flex;flex-direction:column;gap:8px')}>
-                      {col.list.length === 0 && <span style={sx('font-size:12px;color:#A6ADCB;text-align:center;padding:8px 4px')}>Nikdo tu teď není</span>}
-                      {col.list.slice(0, 2).map(c => (
-                        <div key={c.id} onClick={openCand(c)} style={{ ...sx('border-radius:10px;padding:11px 12px;display:flex;flex-direction:column;gap:4px;cursor:pointer'), background: t.chipBg }}>
-                          <span style={sx('font-size:13px;font-weight:700;color:#0B1233')}>{c.name}</span>
-                          <span style={{ ...sx('font-size:11px'), color: t.meta }}>{col.meta(c)}</span>
-                        </div>
-                      ))}
-                      {col.list.length > 2 && <span onClick={go('candidates')} style={sx('font-size:11px;font-weight:700;color:#7A82A6;text-align:center;padding:4px;cursor:pointer')}>+ {col.list.length - 2} dalších</span>}
-                      {col.highlight && col.list.length > 0 && <button onClick={go('chat')} style={sx('font-size:12px;font-weight:800;color:#fff;background:#0B1233;border:none;border-radius:9px;padding:9px;text-align:center;cursor:pointer')}>Odpovědět všem</button>}
-                      {col.key === 'hired' && col.list.length > 0 && <button onClick={go('calendar')} style={sx('font-size:11px;font-weight:700;color:#7A82A6;background:none;border:none;text-align:center;padding:4px;cursor:pointer')}>Přidat do plánu směn</button>}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Tabulka inzerátů — roste a vyplní zbytek levého sloupce */}
-            <div style={sx('background:#fff;border:1px solid #E6E9F5;border-radius:16px;padding:14px 18px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0')}>
-              <div style={sx('display:flex;align-items:center;justify-content:space-between;gap:16px')}>
-                <span style={sx('font-size:16px;font-weight:800;color:#0B1233')}>Inzeráty a jejich výkon</span>
-                <button onClick={go('jobs')} style={sx('font-size:13px;font-weight:700;color:#1B34F0;background:none;border:none;cursor:pointer')}>Všech {totalJobs} →</button>
-              </div>
-              <div style={sx('display:flex;flex-direction:column;flex:1;justify-content:space-between')}>
-                <div style={sx('display:grid;grid-template-columns:1.5fr 1fr 1fr .8fr 96px;gap:14px;padding:0 2px 8px;font-size:11px;font-weight:800;letter-spacing:.07em;color:#A6ADCB;text-transform:uppercase')}>
-                  <span>Pozice</span><span>Zhlédnutí</span><span>Swipe right</span><span style={sx('text-align:right')}>Match</span><span style={sx('text-align:right')}>Stav</span>
-                </div>
-                {jobRows.length === 0 && (
-                  <button onClick={go('jobs')} style={sx('margin-top:8px;font-size:13px;font-weight:800;color:#1B34F0;background:#EEF1FF;border:none;border-radius:10px;padding:14px;text-align:center;cursor:pointer')}>+ Vytvořit první inzerát</button>
-                )}
-                {jobRows.map(j => {
-                  const active = j.status === 'active' || j.status === 'urgent';
-                  const vW = Math.round((j.views || 0) / maxV * 100);
-                  const sW = Math.round((j.swipes || 0) / maxS * 100);
-                  const f1 = active ? '#1B34F0' : '#A6ADCB';
-                  const f2 = active ? '#5C71FF' : '#A6ADCB';
+                {cekaji.slice(0, 4).map(c => {
+                  const d = dniOd(c.createdAt);
                   return (
-                    <div key={j.id} onClick={go('jobs')} style={sx('display:grid;grid-template-columns:1.5fr 1fr 1fr .8fr 96px;gap:14px;align-items:center;padding:8px 2px;border-top:1px solid #F0F2FA;cursor:pointer')}>
-                      <span style={sx('font-size:14px;font-weight:700;color:#0B1233')}>{j.title}</span>
-                      <div style={sx('display:flex;flex-direction:column;gap:5px')}>
-                        <span style={sx('font-size:13px;font-weight:600;color:#3A4266')}>{fmt(j.views)}</span>
-                        <span style={sx('height:4px;border-radius:999px;background:#EEF1FF;display:block')}><span style={{ display: 'block', width: vW + '%', height: '100%', borderRadius: 999, background: f1 }} /></span>
+                    <div key={c.id} style={radek}>
+                      <span style={{ width: 36, height: 36, flex: 'none', borderRadius: 10, background: '#EEF1FF', color: blue, fontSize: 13, fontWeight: 800, display: 'grid', placeItems: 'center' }}>{c.avatar}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14.5, fontWeight: 700, color: ink }}>{c.name}</div>
+                        <div style={{ fontSize: 12.5, color: muted }}>{[c.jobTitle || 'Inzerát', c.createdAt ? kdy(c.createdAt) : c.lastSeen].filter(Boolean).join(' · ')}</div>
                       </div>
-                      <div style={sx('display:flex;flex-direction:column;gap:5px')}>
-                        <span style={sx('font-size:13px;font-weight:600;color:#3A4266')}>{fmt(j.swipes)}</span>
-                        <span style={sx('height:4px;border-radius:999px;background:#EEF1FF;display:block')}><span style={{ display: 'block', width: sW + '%', height: '100%', borderRadius: 999, background: f2 }} /></span>
-                      </div>
-                      <span style={sx('font-size:14px;font-weight:800;color:#0B1233;text-align:right')}>{j.matches || 0}</span>
-                      <span style={sx('text-align:right')}><span style={{ ...sx('font-size:11px;font-weight:800;padding:3px 8px;border-radius:6px'), color: active ? '#0FA968' : '#7A82A6', background: active ? '#E6F7EF' : '#F1F3FB' }}>{active ? 'Aktivní' : 'Vypnuto'}</span></span>
+                      {d >= 2 && <span style={{ fontSize: 12, fontWeight: 700, color: '#B96F06' }}>čeká {d} {pl(d, 'den', 'dny', 'dní')}</span>}
+                      <span onClick={go('candidates')} style={{ fontSize: 13, fontWeight: 700, color: blue, cursor: 'pointer', marginLeft: 8 }}>Odpovědět</span>
                     </div>
                   );
                 })}
+                {cekaji.length > 4 && <div style={{ ...radek, fontSize: 13, color: muted }}>a {cekaji.length - 4} {pl(cekaji.length - 4, 'další', 'další', 'dalších')}</div>}
+                {neprectene > 0 && (
+                  <div style={radek}>
+                    <span style={{ width: 36, height: 36, flex: 'none', borderRadius: 10, background: '#EEF1FF', display: 'grid', placeItems: 'center' }}><Icon name="chat-round-line-bold" size={17} color={blue} /></span>
+                    <span style={{ flex: 1, fontSize: 14.5, fontWeight: 700, color: ink }}>{neprectene} {pl(neprectene, 'nepřečtená zpráva', 'nepřečtené zprávy', 'nepřečtených zpráv')}</span>
+                    <span onClick={go('chat')} style={{ fontSize: 13, fontWeight: 700, color: blue, cursor: 'pointer' }}>Otevřít</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Inzeráty */}
+              <div>
+                {nadpis('Inzeráty', jobs.length ? 'Všechny inzeráty' : null, 'jobs')}
+                {jobs.length === 0 ? (
+                  <div style={{ ...radek, fontSize: 14, color: muted }}>Zatím žádný inzerát.<span onClick={onNew} style={{ fontWeight: 700, color: blue, cursor: 'pointer' }}>Vytvořit první</span></div>
+                ) : (
+                  <>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) 1fr 90px 90px', gap: 12, padding: '10px 0 8px', fontSize: 12.5, color: muted }}>
+                      <span>Pozice</span><span>Stav</span><span style={{ textAlign: 'right' }}>Zájemci</span><span style={{ textAlign: 'right' }}>Najato</span>
+                    </div>
+                    {jobs.slice(0, 6).map(j => {
+                      const zap = j.status === 'active' || j.status === 'urgent';
+                      return (
+                        <div key={j.id} onClick={go('jobs')} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) 1fr 90px 90px', gap: 12, padding: '12px 0', borderTop: '1px solid ' + line, fontSize: 14, color: ink, cursor: 'pointer', alignItems: 'center' }}>
+                          <span style={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.title}</span>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: ink2 }}><span style={{ width: 7, height: 7, borderRadius: 99, background: zap ? '#0FA968' : '#C3C8DA' }} />{zap ? 'Aktivní' : j.status === 'filled' ? 'Obsazeno' : 'Vypnuto'}</span>
+                          <span style={{ textAlign: 'right' }}>{(j.candidates || []).length}</span>
+                          <span style={{ textAlign: 'right' }}>{j.hired || 0}</span>
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Pravý sloupec */}
-          <div style={sx('display:flex;flex-direction:column;gap:12px')}>
-
-            {/* Plán směn */}
-            <div style={sx('background:#fff;border:1px solid #E6E9F5;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0;justify-content:space-between')}>
-              <div style={sx('display:flex;align-items:center;justify-content:space-between;gap:12px')}>
-                <span style={sx('font-size:15px;font-weight:800;color:#0B1233')}>Plán směn</span>
-                <button onClick={go('calendar')} style={sx('font-size:12px;font-weight:700;color:#1B34F0;background:none;border:none;cursor:pointer')}>tento týden →</button>
-              </div>
-              <div style={sx('display:grid;grid-template-columns:repeat(7,1fr);gap:6px')}>
-                {week.map((d, i) => (
-                  <div key={i} style={sx('display:flex;flex-direction:column;gap:6px;align-items:center')}>
-                    <span style={sx('font-size:11px;font-weight:700;color:' + (d.st === 'warn' ? '#0B1233' : '#A6ADCB'))}>{d.d}</span>
-                    <span style={{ ...sx('width:100%;height:44px;border-radius:8px;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;' + dayStyle[d.st]) }}>{d.v}</span>
+            <div style={{ borderLeft: '1px solid #E6E9F5', padding: '24px 24px', display: 'flex', flexDirection: 'column', gap: 34, minHeight: 0, overflowY: 'auto' }}>
+              {/* Poslední aktivita */}
+              <div>
+                {nadpis('Poslední aktivita')}
+                {aktivita.length === 0 && <div style={{ ...radek, fontSize: 14, color: muted }}>Zatím se nic nestalo.</div>}
+                {aktivita.slice(0, 5).map((a, i) => (
+                  <div key={i} style={{ padding: '11px 0', borderTop: '1px solid ' + line, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <span style={{ fontSize: 13.5, color: ink2, lineHeight: 1.4 }}><b style={{ color: ink }}>{a.who}</b> {a.what}</span>
+                    <span style={{ fontSize: 12, color: muted }}>{a.when}</span>
                   </div>
                 ))}
               </div>
-              <div onClick={go('calendar')} style={sx('display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#FFF8EE;border-radius:10px;cursor:pointer')}>
-                <span style={sx('font-size:13px;color:#0B1233')}>Středa: 1 směna neobsazená</span>
-                <span style={sx('font-size:12px;font-weight:800;color:#B96F06')}>Doplnit</span>
-              </div>
-            </div>
-
-            {/* Živě */}
-            <div style={sx('background:#fff;border:1px solid #E6E9F5;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:11px;flex:1;min-height:0')}>
-              <div style={sx('display:flex;align-items:center;justify-content:space-between;gap:12px')}>
-                <div style={sx('display:flex;align-items:center;gap:8px')}>
-                  <span style={sx('width:7px;height:7px;border-radius:50%;background:#0FA968')} />
-                  <span style={sx('font-size:15px;font-weight:800;color:#0B1233')}>Živě</span>
-                </div>
-                <span style={sx('font-size:12px;color:#7A82A6')}>24 h</span>
-              </div>
-              <div style={sx('display:flex;flex-direction:column;gap:11px;flex:1;justify-content:space-between')}>
-                {(E_ACTIVITY || []).slice(0, 5).map((a, i) => (
-                  <div key={i} style={sx('display:flex;gap:10px;align-items:baseline')}>
-                    <span style={sx('font-size:11px;color:#A6ADCB;width:74px;flex:none')}>{a.when}</span>
-                    <span style={sx('font-size:13px;color:#0B1233;line-height:1.4')}><b>{a.who}</b> {a.what}</span>
+              {/* Hodnocení */}
+              <div>
+                {nadpis('Hodnocení', recenze.length ? 'Recenze' : null, 'reviews')}
+                {recenze.length ? (
+                  <div style={{ ...radek, gap: 10 }}>
+                    <span style={{ fontSize: 26, fontWeight: 800, color: ink, letterSpacing: '-.02em' }}>{prumer.toFixed(1).replace('.', ',')}</span>
+                    <span style={{ fontSize: 13, color: muted }}>{recenze.length} hodnocení</span>
                   </div>
-                ))}
-                {(!E_ACTIVITY || E_ACTIVITY.length === 0) && <span style={sx('font-size:12px;color:#A6ADCB')}>Zatím žádná aktivita</span>}
+                ) : (
+                  <div style={{ ...radek, fontSize: 14, color: muted }}>Zatím vás nikdo nehodnotil.</div>
+                )}
+                {recenze[0] && recenze[0].text && <div style={{ fontSize: 13.5, color: ink2, lineHeight: 1.5 }}>„{recenze[0].text}" — {recenze[0].author}</div>}
               </div>
             </div>
-
-            {/* Recenze */}
-            <div style={sx('background:#fff;border:1px solid #E6E9F5;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;justify-content:space-between')}>
-              <div style={sx('display:flex;align-items:center;justify-content:space-between;gap:12px')}>
-                <span style={sx('font-size:15px;font-weight:800;color:#0B1233')}>Recenze</span>
-                <span style={sx('font-size:12px;font-weight:800;color:#B96F06;background:#FFF3E0;padding:3px 8px;border-radius:999px')}>{ratingCount} {ratingCount === 1 ? 'hodnocení' : 'hodnocení'}</span>
-              </div>
-              <div style={sx('display:flex;align-items:baseline;gap:8px')}>
-                <span style={sx('font-size:28px;font-weight:800;color:#0B1233;letter-spacing:-.02em')}>{ratingStr}</span>
-                <span style={sx('font-size:14px;color:#F5920B;letter-spacing:.06em')}>★★★★★</span>
-              </div>
-              {lastRev && <span style={sx('font-size:13px;color:#3A4266')}>„{lastRev.text}" — {lastRev.author}{lastRev.when ? (', ' + lastRev.when) : ''}</span>}
-              <button onClick={go('reviews')} style={sx('font-size:12px;font-weight:800;color:#1B34F0;background:none;border:1px solid #D5DAF0;border-radius:9px;padding:9px;text-align:center;cursor:pointer')}>Reagovat</button>
-            </div>
-
           </div>
         </div>
       </div>

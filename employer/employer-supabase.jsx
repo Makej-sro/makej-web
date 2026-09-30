@@ -171,21 +171,66 @@ async function markThreadReadE(userId, matchId) {
   if (error) console.error('markThreadReadE:', error);
 }
 
+// ── Topování (29. 9.) ───────────────────────────────────────────────────────
+// Topovaný inzerát má jobs.top_until v budoucnu → appka ho dává na začátek feedu
+// (RPC get_feed_jobs řadí top_until desc, appka to drží i po filtrech) a ukazuje
+// zlatou pilulku TOP. Kvůli měsíčnímu limitu tarifu (EMPLOYER_TOP_MESICNE) se každé
+// topování zapisuje do tabulky job_topovani (migration_topovani.sql). Dokud ji Sam
+// nespustí, počítá se z jobs.top_until — každý inzerát pak nejvýš jednou za měsíc.
+const E_TOP_HODIN = 72;
+const E_TOPOVANI  = [];        // topování v tomto měsíci: { job_id, started_at, ends_at }
+let _eTopTabulka  = null;      // null = nevíme, false = tabulka v DB zatím není
+const _eZacatekMesice = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); };
+const _eBezTabulky = e => /job_topovani|does not exist|could not find|PGRST205|42P01/i.test(((e && e.code) || '') + ' ' + ((e && e.message) || ''));
+
+async function topovatJobE(jobId) {
+  const od = new Date(), konec = new Date(od.getTime() + E_TOP_HODIN * 3600000);
+  // Nejdřív samotné vyzdvižení — kdyby pak nevyšel záznam, chyba jde ve prospěch firmy
+  const { error } = await sb.from('jobs').update({ top_until: konec.toISOString() }).eq('id', jobId);
+  if (error) { console.error('topovatJobE:', error); return null; }
+  const zaznam = { job_id: jobId, started_at: od.toISOString(), ends_at: konec.toISOString() };
+  if (_eTopTabulka !== false) {
+    const { error: e2 } = await sb.from('job_topovani').insert(zaznam);
+    if (e2) { if (_eBezTabulky(e2)) _eTopTabulka = false; else console.error('topovatJobE záznam:', e2); }
+  }
+  E_TOPOVANI.push(zaznam);
+  const j = E_JOBS.find(x => x.id === jobId);
+  if (j) { j.boosted = true; j.topUntil = konec.toISOString(); }
+  return konec.toISOString();
+}
+
 async function fetchEmployerData(employerId) {
   try {
-    const [profileRes, jobsRes] = await Promise.all([
+    const [profileRes, jobsRes, topRes] = await Promise.all([
       sb.from('profiles').select('*').eq('id', employerId).single(),
       sb.from('jobs').select('*').eq('employer_id', employerId).order('created_at', { ascending: false }),
+      sb.from('job_topovani').select('job_id, started_at, ends_at').eq('employer_id', employerId).gte('started_at', _eZacatekMesice().toISOString()),
     ]);
 
     const profile = profileRes.data;
     const jobs    = jobsRes.data || [];
     const jobIds  = jobs.map(j => j.id);
 
+    // Topování v tomto měsíci (limit tarifu) — z job_topovani, jinak odhad z jobs.top_until
+    E_TOPOVANI.length = 0;
+    if (!topRes.error) { _eTopTabulka = true; (topRes.data || []).forEach(t => E_TOPOVANI.push(t)); }
+    else {
+      if (_eBezTabulky(topRes.error)) _eTopTabulka = false; else console.warn('job_topovani:', topRes.error.message);
+      jobs.forEach(j => {
+        if (!j.top_until) return;
+        const od = new Date(new Date(j.top_until).getTime() - E_TOP_HODIN * 3600000);
+        if (od >= _eZacatekMesice()) E_TOPOVANI.push({ job_id: j.id, started_at: od.toISOString(), ends_at: j.top_until });
+      });
+    }
+
     let matches = [], messages = [], reviews = [];
+    const viewsByJob = {};
+    const viewsByDay = {};          // job_id → { 'RRRR-MM-DD': počet } pro graf v detailu
+    let zhlednutiSDatem = false;
+    const trustBy = {};   // worker_id → { dokoncene, zrusene } pro stupeň důvěry
 
     if (jobIds.length > 0) {
-      const [matchRes, reviewRes] = await Promise.all([
+      const [matchRes, reviewRes, viewRes] = await Promise.all([
         sb.from('matches')
           .select('*, worker:profiles!matches_worker_id_fkey(*), job:jobs(*)')
           .in('job_id', jobIds)
@@ -194,9 +239,39 @@ async function fetchEmployerData(employerId) {
           .select('*, reviewer:profiles!reviews_reviewer_id_fkey(name)')
           .eq('reviewed_id', employerId)
           .order('created_at', { ascending: false }),
+        // Zhlédnutí: appka zapisuje job_views 1× na brigádníka a inzerát, když mu
+        // karta vyjede ve feedu (logJobViewW v www/worker-supabase.jsx). S datem
+        // (created_at) kvůli grafu po dnech; kdyby sloupec v DB nebyl, jen počty.
+        sb.from('job_views').select('job_id, created_at').in('job_id', jobIds)
+          .then(r => r.error ? sb.from('job_views').select('job_id').in('job_id', jobIds) : r),
       ]);
+      if (viewRes.error) console.warn('job_views:', viewRes.error.message);
+      (viewRes.data || []).forEach(v => {
+        viewsByJob[v.job_id] = (viewsByJob[v.job_id] || 0) + 1;
+        if (v.created_at) {
+          const d = new Date(v.created_at);
+          const den = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+          const m = viewsByDay[v.job_id] || (viewsByDay[v.job_id] = {});
+          m[den] = (m[den] || 0) + 1;
+        }
+      });
+      zhlednutiSDatem = (viewRes.data || []).some(v => v.created_at);
       matches = matchRes.data || [];
       reviews = reviewRes.data || [];
+
+      // Stupeň důvěry brigádníka (Nový / Spolehlivý / Ověřený / Top) — stejný
+      // jako v aplikaci. Počty dokončených a zrušených směn jsou napříč VŠEMI
+      // firmami, ty firma přes RLS nevidí → funkce worker_trust_stats v DB
+      // (security definer, vrací jen čísla). Dokud v DB není, odznak se
+      // neukazuje — radši nic než špatný stupeň.
+      const wIds = [...new Set(matches.map(m => m.worker_id).filter(Boolean))];
+      if (wIds.length) {
+        try {
+          const tr = await sb.rpc('worker_trust_stats', { worker_ids: wIds });
+          if (tr.error) console.warn('worker_trust_stats:', tr.error.message);
+          (tr.data || []).forEach(r => { trustBy[r.worker_id] = { dokoncene: Number(r.dokoncene) || 0, zrusene: Number(r.zrusene) || 0 }; });
+        } catch (e) { console.warn('worker_trust_stats:', e); }
+      }
 
       const matchIds = matches.map(m => m.id);
       if (matchIds.length > 0) {
@@ -251,22 +326,35 @@ async function fetchEmployerData(employerId) {
         id: job.id, title: job.title,
         company: job.company || companyName,
         status, plan: 'Standard',
-        views: 0, swipes: jm.length, matches: jm.length, hired, pending, ctr: 0,
+        views: viewsByJob[job.id] || 0, viewsByDay: zhlednutiSDatem ? (viewsByDay[job.id] || {}) : null, swipes: jm.length, matches: jm.length, hired, pending, ctr: 0,
         daysLeft, pay: job.pay, payUnit: job.pay_unit || 'Kč/h',
         accent: _strColor(job.id),
         location: job.location, date: job.date,
         description: job.description,
+        // Pro kartu inzerátu ve stejné podobě jako v appce (EJobKartaApp)
+        timeText: [job.time_start, job.time_end].filter(Boolean).join(' – '),
+        photos: Array.isArray(job.photos) ? job.photos : [], image: job.image_url || null,
+        contract: job.contract || '', recurrence: job.recurrence || '', jobType: job.job_type || '',
+        // Obsah celého inzerátu tak, jak ho ukazuje appka (okno Upravit inzerát + náhled)
+        kraj: job.kraj || '', payout: job.payout || '', duties: job.duties || '',
+        expectations: Array.isArray(job.expectations) ? job.expectations : [], bonuses: Array.isArray(job.bonuses) ? job.bonuses : [],
+        offer: Array.isArray(job.offer) ? job.offer : [], perks: Array.isArray(job.perks) ? job.perks : [],
+        requirements: Array.isArray(job.requirements) ? job.requirements : [],
+        positions: job.positions || 0, hoursPerWeek: job.hours_per_week || null,
+        boosted: !!(job.top_until && new Date(job.top_until) > new Date()), topUntil: job.top_until || null,
         tags: Array.isArray(job.tags) ? job.tags : [],
         created_at: job.created_at,
         // Kandidáti, kteří na tento inzerát swipli (bez ohledu na pozdější rozhodnutí firmy) —
         // reálná data pro statistiky inzerátu (unikátní/noví kandidáti, rychlost swipnutí po zveřejnění)
-        candidates: jm.map(m => ({ worker_id: m.worker_id, matched_at: m.created_at, status: m.status })),
+        candidates: jm.map(m => ({ worker_id: m.worker_id, matched_at: m.created_at, status: m.status, birth_date: m.worker?.birth_date || null, education: m.worker?.education || '' })),
       };
     });
     E_JOBS.length = 0;
     newJobs.forEach(j => E_JOBS.push(j));
 
     // ── E_CANDIDATES ─────────────────────────────────────────────────────────
+    // Věk z data narození (mini profil kandidáta)
+    const _vek = d => { const b = new Date(d); if (!d || isNaN(b)) return null; const n = new Date(); let v = n.getFullYear() - b.getFullYear(); if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) v--; return v > 0 && v < 100 ? v : null; };
     const toCandidate = m => {
       const w    = m.worker || {};
       const name = w.name || 'Kandidát';
@@ -275,11 +363,14 @@ async function fetchEmployerData(employerId) {
         name,
         avatar: name.split(' ').map(p => p[0] || '').join('').slice(0,2).toUpperCase() || '??',
         color: _strColor(m.worker_id || m.id),
-        age: null, rating: Number(w.rating || 0).toFixed(1),
-        jobsDone: w.jobs_done || 0, distance: null, level: w.level || 1, match: 0,
+        age: _vek(w.birth_date), rating: Number(w.rating || 0).toFixed(1),
+        // Mini profil v záložce Kandidáti (29. 9.): profilovka, pár vět o sobě, odkud je
+        photo: w.avatar_url || null, bio: (w.bio || '').trim(), city: w.city || '',
+        trust: trustBy[m.worker_id] ? { ...trustBy[m.worker_id], hodnoceni: Number(w.rating) || 0 } : null,
         tags: Array.isArray(w.skills) ? w.skills : [],
         lastSeen: _relTime(m.created_at), jobTitle: m.job?.title || '',
         status: m.status,
+        createdAt: m.created_at,   // Dashboard → „Čeká na vás" (řazení, „čeká X dní")
       };
     };
     const pending  = matches.filter(m => m.status === 'pending');
@@ -324,6 +415,9 @@ async function fetchEmployerData(employerId) {
             shift: { role: msg.metadata.role, date: msg.metadata.date, time: msg.metadata.time, pay: msg.metadata.pay },
             t: _fmtTime(msg.created_at), id: msg.id,
           };
+          if (msg.type === 'job_offer' && msg.metadata) return {
+            from, kind: 'job', job: msg.metadata, t: _fmtTime(msg.created_at), id: msg.id,
+          };
           if (msg.type === 'interview_offer' && msg.metadata) return {
             from, kind: 'interview',
             interview: { date: msg.metadata.date, time: msg.metadata.time, location: msg.metadata.location, note: msg.metadata.note },
@@ -344,10 +438,10 @@ async function fetchEmployerData(employerId) {
         color: _strColor(match.worker_id || match.id),
         role: match.job?.title || '',
         city: w.address || '', rating: Number(w.rating || 0).toFixed(1),
-        jobsDone: w.jobs_done || 0, level: w.level || 1, cvUrl: w.cv_url || '',
+        trust: trustBy[match.worker_id] ? { ...trustBy[match.worker_id], hodnoceni: Number(w.rating) || 0 } : null, cvUrl: w.cv_url || '',
         verified: !!w.verified,
         skills: Array.isArray(w.skills) ? w.skills : [],
-        last: lastMsg ? (lastMsg.kind === 'shift' ? '📅 Nabídka směny' : lastMsg.kind === 'interview' ? '🗓️ Pozvánka na pohovor' : lastMsg.kind === 'file' ? (lastMsg.file.typ === 'image' ? '📷 Fotka' : '📎 ' + lastMsg.file.nazev) : lastMsg.text) || 'Nová shoda' : 'Nová shoda',
+        last: lastMsg ? (lastMsg.kind === 'shift' ? '📅 Nabídka směny' : lastMsg.kind === 'job' ? 'Nabídka brigády: ' + (lastMsg.job.title || '') : lastMsg.kind === 'interview' ? '🗓️ Pozvánka na pohovor' : lastMsg.kind === 'file' ? (lastMsg.file.typ === 'image' ? '📷 Fotka' : '📎 ' + lastMsg.file.nazev) : lastMsg.text) || 'Nová shoda' : 'Nová shoda',
         time: _relTime(match.created_at),
         unread, online: false, msgs: threadMsgs,
       };
@@ -415,6 +509,41 @@ async function fetchEmployerData(employerId) {
 }
 
 // Accept a candidate: mark match as accepted + mark job as filled
+// Nabídka brigády do chatu (28. 9.): firma vybere jeden ze svých aktivních
+// inzerátů a brigádníkovi přijde do zpráv jako karta (type 'job_offer').
+// V appce na ni klepne, otevře se detail a může rovnou dát „Mám zájem".
+async function sendJobOfferE(matchId, job) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session?.user || !matchId || !job) return null;
+  const metadata = {
+    job_id: job.id, title: job.title || '', pay: job.pay || null, pay_unit: job.payUnit || 'Kč/h',
+    location: job.location || '', date: job.date || '',
+  };
+  const { data, error } = await sb.from('messages').insert({
+    match_id: matchId, sender_id: session.user.id,
+    text: 'Nabídka brigády: ' + (job.title || ''), type: 'job_offer', metadata,
+  }).select().single();
+  if (error) { console.error('sendJobOfferE:', error); return null; }
+  // Vlastní zprávy realtime do vláken nepřidává (odběr bere jen zprávy od
+  // druhé strany) → kartu vložit do vlákna hned, ať je v chatu vidět.
+  const t = E_THREADS.find(x => x.id === matchId);
+  if (t) {
+    if (!Array.isArray(t.msgs)) t.msgs = [];
+    if (!t.msgs.some(m => m.id === data.id)) t.msgs = [...t.msgs, { from: 'me', kind: 'job', job: metadata, t: _fmtTime(data.created_at || new Date().toISOString()), id: data.id }];
+    t.last = 'Nabídka brigády: ' + (job.title || '');
+  }
+  return data;
+}
+
+// Stupeň důvěry pro jednoho brigádníka (profil kandidáta). null = v DB chybí funkce.
+async function workerTrustE(workerId) {
+  try {
+    const { data, error } = await sb.rpc('worker_trust_stats', { worker_ids: [workerId] });
+    if (error || !data || !data[0]) return null;
+    return { dokoncene: Number(data[0].dokoncene) || 0, zrusene: Number(data[0].zrusene) || 0 };
+  } catch (e) { return null; }
+}
+
 async function acceptCandidate(matchId, jobId) {
   const { error: mErr } = await sb.from('matches').update({ status: 'accepted' }).eq('id', matchId);
   if (mErr) { console.error('acceptCandidate match error:', mErr); return false; }
@@ -446,6 +575,30 @@ async function updateEmployerProfile(updates) {
   return true;
 }
 
+// Pole inzerátu, která ukazuje appka (sloupce z migrace 2026-08-22 + nové
+// positions / hours_per_week). Posílají se jen ta, která formulář vyplnil.
+const _JOB_OBSAH = ['contract', 'recurrence', 'payout', 'duties', 'expectations', 'bonuses', 'offer', 'perks', 'photos', 'image_url', 'positions', 'hours_per_week'];
+const _jobObsah = fields => {
+  const out = {};
+  _JOB_OBSAH.forEach(k => { if (fields[k] !== undefined) out[k] = fields[k]; });
+  return out;
+};
+// Zápis do jobs, který přežije sloupec, co v DB ještě není (např. positions,
+// dokud Sam nespustí migraci): PostgREST vrátí PGRST204 „Could not find the 'x'
+// column" → sloupec vynecháme a zkusíme znovu. Ostatní chyby se vrací beze změny.
+async function _jobsZapis(payload, provest) {
+  const p = { ...payload };
+  for (let i = 0; i < 6; i++) {
+    const res = await provest(p);
+    const err = res && res.error;
+    const m = err && /could not find the '([a-z_]+)' column/i.exec(err.message || '');
+    if (!m || !(m[1] in p)) return res;
+    console.warn('jobs: sloupec ' + m[1] + ' v DB zatím není — ukládám bez něj');
+    delete p[m[1]];
+  }
+  return provest(p);
+}
+
 async function createJobE(employerId, fields) {
   const ts = fields.time_start || '00:00';
   const te = fields.time_end   || '00:00';
@@ -473,13 +626,49 @@ async function createJobE(employerId, fields) {
     requirements: Array.isArray(fields.requirements) ? fields.requirements : [],
     job_type:    fields.job_type || 'brigada',
     status:      'active',
+    ..._jobObsah(fields),
   };
-  const { data, error } = await sb.from('jobs').insert(payload).select().single();
+  const { data, error } = await _jobsZapis(payload, p => sb.from('jobs').insert(p).select().single());
   if (error) { console.error('createJobE error:', error); return null; }
   return data;
 }
 
 Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, _strColor, _relTime, _fmtTime });
+
+// Zapnout / pozastavit inzerát. DB zná jen stavy active | filled | expired
+// (schema.sql CHECK), appka ve feedu ukazuje jen 'active' — pozastavený je
+// proto 'expired' (dashboard ho čte jako „Neaktivní").
+// Úprava inzerátu z okna „Upravit inzerát" (stejná pole jako createJobE, bez stavu)
+async function updateJobE(jobId, fields) {
+  const ts = fields.time_start || null, te = fields.time_end || null;
+  let duration = null;
+  if (ts && te) { const [sh, sm] = ts.split(':').map(Number), [eh, em] = te.split(':').map(Number); duration = Math.max(0, (eh * 60 + em) - (sh * 60 + sm)); }
+  const payload = {
+    title: fields.title, description: fields.description || '',
+    pay: parseInt(fields.pay) || 0, pay_unit: fields.pay_unit || 'Kč/h',
+    location: fields.location || '', tags: Array.isArray(fields.tags) ? fields.tags : [],
+    ..._jobObsah(fields),
+  };
+  if (Array.isArray(fields.requirements)) payload.requirements = fields.requirements;
+  if (fields.kraj) payload.kraj = fields.kraj;
+  if (fields.job_type) payload.job_type = fields.job_type;   // brigada | part_time | full_time | jednrazova_vypomoc
+  if (fields.date) payload.date = fields.date;
+  if (ts) payload.time_start = ts;
+  if (te) payload.time_end = te;
+  if (duration != null) payload.duration = duration;
+  const { error } = await _jobsZapis(payload, p => sb.from('jobs').update(p).eq('id', jobId));
+  if (error) { console.error('updateJobE:', error); return false; }
+  return true;
+}
+
+async function setJobActiveE(jobId, zapnout) {
+  const { error } = await sb.from('jobs').update({ status: zapnout ? 'active' : 'expired' }).eq('id', jobId);
+  if (error) { console.error('setJobActiveE:', error); return false; }
+  const j = (typeof E_JOBS !== 'undefined' ? E_JOBS : []).find(x => x.id === jobId);
+  if (j) j.status = zapnout ? 'active' : 'paused';
+  return true;
+}
+Object.assign(window, { setJobActiveE, updateJobE, workerTrustE, sendJobOfferE, topovatJobE });
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -731,44 +920,8 @@ async function submitReviewE(matchId, workerId, rating, text) {
   return true;
 }
 
-async function updateJobE(jobId, fields) {
-  const ts = fields.time_start || '00:00';
-  const te = fields.time_end   || '00:00';
-  let duration = 0;
-  try {
-    const [sh, sm] = ts.split(':').map(Number);
-    const [eh, em] = te.split(':').map(Number);
-    duration = Math.max(0, (eh * 60 + em) - (sh * 60 + sm));
-  } catch (_) {}
-
-  const dateVal = fields.date || new Date().toISOString().slice(0, 10);
-  const payload = {
-    title:       fields.title,
-    description: fields.description || '',
-    pay:         parseInt(fields.pay) || 0,
-    pay_unit:    fields.pay_unit || 'Kč/h',
-    location:    fields.location || '',
-    date:        dateVal,
-    event_date:  _isoDate(dateVal),
-    time_start:  ts,
-    time_end:    te,
-    duration,
-    tags:        Array.isArray(fields.tags) ? fields.tags : [],
-    requirements: Array.isArray(fields.requirements) ? fields.requirements : [],
-    benefits:    Array.isArray(fields.benefits) ? fields.benefits : [],
-    positions:   parseInt(fields.positions) || 1,
-    dress_code:  fields.dress_code || null,
-    contact_note: fields.contact_note || null,
-    job_type:    fields.job_type || 'brigada',
-    kraj:        fields.kraj || null,
-    lat:         fields.lat != null ? fields.lat : null,
-    lng:         fields.lng != null ? fields.lng : null,
-    photos:      Array.isArray(fields.photos) ? fields.photos : [],
-  };
-  const { data, error } = await sb.from('jobs').update(payload).eq('id', jobId).select().single();
-  if (error) { console.error('updateJobE error:', error); return null; }
-  return data;
-}
+// (Starší updateJobE, který přepisoval i fotky, polohu a další sloupce prázdnými
+// hodnotami a nikde se nevolal, nahradila 28. 9. verze nahoře u setJobActiveE.)
 
 async function uploadChatFileE(matchId, file, fileType) {
   if (!matchId || !file) return null;
