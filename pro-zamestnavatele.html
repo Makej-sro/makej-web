@@ -23,14 +23,14 @@
   <meta property="og:url" content="https://makej.eu/pro-zamestnavatele" />
   <meta property="og:title" content="Najděte pracovníky za hodiny — brigády i stálá práce | Makej" />
   <meta property="og:description" content="Hledáte pracovníky na brigádu, part-time i plný úvazek? Zadejte inzerát za 60 sekund a vybírejte z těch, kdo sami projevili zájem. Bez zdlouhavého náboru." />
-  <meta property="og:image" content="https://makej.eu/og-image.png" />
+  <meta property="og:image" content="https://makej.eu/og-image.png?v=6" />
   <meta property="og:locale" content="cs_CZ" />
   <meta property="og:site_name" content="Makej" />
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Najděte pracovníky za hodiny — brigády i stálá práce | Makej" />
   <meta name="twitter:description" content="Hledáte pracovníky na brigádu, part-time i plný úvazek? Zadejte inzerát za 60 sekund a vybírejte z těch, kdo sami projevili zájem. Bez zdlouhavého náboru." />
-  <meta name="twitter:image" content="https://makej.eu/og-image.png" />
+  <meta name="twitter:image" content="https://makej.eu/og-image.png?v=6" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="/favicon.png?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -40,7 +40,9 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=157" />
+  <link rel="stylesheet" href="style.css?v=158" />
+  <!-- Vzhled ceníku sdílený s dashboardem (employer/index.html). -->
+  <link rel="stylesheet" href="/cenik.css?v=6" />
   <style>
     /* ═══════════ BENTO DESIGN (pro zaměstnavatele) ═══════════ */
     #employers { padding: 0; }
@@ -647,30 +649,12 @@
       #pricing .yp-period{color:#9ca3af;font-size:12.5px;margin-top:5px;}
       #pricing .yp-savew{min-height:24px;margin:6px 0 4px;display:flex;justify-content:center;align-items:center;}
       #pricing .yp-savew span{opacity:0;transition:opacity .2s;background:rgba(0,198,55,.12);border:1px solid rgba(0,198,55,.3);color:#00a82f;font-size:10.5px;font-weight:800;border-radius:8px;padding:3px 9px;}
+      /* Výhodný roční slevu nemá — poznámka místo zelené úspory, ať je to
+         po přepnutí na Ročně vidět a cena nevypadá jako chyba. */
+      #pricing .yp-savew span.yp-bez-slevy{background:rgba(10,13,46,.05);border-color:rgba(10,13,46,.12);color:#6b7280;font-weight:700;}
       #pricing .yp-savew.on span{opacity:1;}
       #pricing .yp-hr{border-top:1px solid rgba(0,0,0,.07);margin:4px 0 14px;}
-      /* ── Kalkulačka v tarifu Vlastní ──────────────────────────────────
-         Fialová je barva té kartičky, ne brandová modrá — jinak by posuvník
-         přetahoval pozornost od „Nejoblíbenější". */
-      #pricing .yp-kalk{display:flex;flex-direction:column;gap:9px;margin:-4px 0 14px;text-align:left;}
-      #pricing .yp-kalk-radek{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer;}
-      #pricing .yp-kalk-cislo{width:74px;height:32px;box-sizing:border-box;border:1.5px solid rgba(139,92,246,.35);border-radius:10px;background:#fff;font-family:inherit;font-size:14px;font-weight:800;color:#111827;text-align:center;outline:none;padding:0 4px;-moz-appearance:textfield;}
-      #pricing .yp-kalk-cislo::-webkit-outer-spin-button,
-      #pricing .yp-kalk-cislo::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
-      #pricing .yp-kalk-cislo:focus{border-color:#8B5CF6;box-shadow:0 0 0 3px rgba(139,92,246,.15);}
-      #pricing .yp-kalk-drah{position:relative;height:24px;}
-      /* Tečky u hranic pásem — kde se láme množstevní sleva. */
-      #pricing .yp-kalk-znacky{position:absolute;inset:0;pointer-events:none;}
-      #pricing .yp-kalk-znacky i{position:absolute;top:9px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#C9B8E6;transition:background .2s;}
-      #pricing .yp-kalk-znacky i.je{background:rgba(255,255,255,.92);}
-      #pricing .yp-posuvnik{-webkit-appearance:none;appearance:none;position:absolute;left:0;top:6px;width:100%;height:12px;border-radius:99px;outline:none;margin:0;cursor:pointer;background:#E9E0F6;}
-      #pricing .yp-posuvnik::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #8B5CF6;box-sizing:border-box;box-shadow:0 2px 8px rgba(139,92,246,.35);cursor:grab;}
-      #pricing .yp-posuvnik::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #8B5CF6;box-sizing:border-box;box-shadow:0 2px 8px rgba(139,92,246,.35);cursor:grab;}
-      #pricing .yp-posuvnik:focus-visible{box-shadow:0 0 0 3px rgba(139,92,246,.25);}
-      #pricing .yp-kalk-meze{display:flex;justify-content:space-between;font-size:10.5px;color:#9ca3af;margin-top:-3px;}
-      /* Přebíjí `.yp-savew span{opacity:0}` — tahle plaketa na ročním
-         přepínači nevisí, řídí se počtem inzerátů. */
-      #pricing .yp-savew span.yp-kalk-sleva{opacity:1;background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.32);color:#6D3FD1;}
+
       #pricing .yp-feats{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;text-align:left;}
       #pricing .yp-feat{display:flex;align-items:flex-start;gap:9px;font-size:13px;font-weight:600;line-height:1.35;}
       #pricing .yp-feat iconify-icon{flex:0 0 auto;margin-top:1px;}
@@ -692,113 +676,217 @@
       @media (max-width:900px){#pricing .yp-cards{grid-template-columns:repeat(2,1fr);}}
       @media (max-width:560px){#pricing .yp-cards{grid-template-columns:1fr;}}
     </style>
-    <div class="yp-wrap">
-      <div class="yp-head reveal">
-        <h2 class="yp-h2">Vyber si svůj plán</h2>
-        <p class="yp-sub">Bez závazků. Zrušení kdykoliv.</p>
-        <div class="yp-toggle">
-          <div class="yp-trow">
-            <span id="yp-lbl-m" class="on">Měsíčně</span>
-            <div class="yp-sw" id="yp-sw"><i></i></div>
-            <span id="yp-lbl-a">Ročně</span>
-          </div>
-          <div class="yp-save" id="yp-save">chci šetřit</div>
+    <!-- .e-c2 nese barvu písma celé sekce (#0B1033). Bez něj dědí texty bez
+         vlastní barvy tu ze stránky — a ta je světlá, takže ceny i popisky
+         funkcí byly bílé na bílé. -->
+    <div class="yp-wrap e-c2">
+      <!-- Bez třídy `reveal`: tu rozsvěcí setupReveal() ve script.js podle
+           seznamu selektorů a `.e-c2-hlava` v něm není — zůstala by navždy
+           průhledná. Dashboard hlavičku stejně neanimuje. -->
+      <div class="e-c2-hlava">
+        <h2 class="e-c2-h1">Vyber si svůj plán</h2>
+        <div class="e-c2-prep" role="group" aria-label="Fakturace">
+          <button type="button" id="yp-prep-m">Měsíčně</button>
+          <button type="button" class="on" id="yp-prep-r">Ušetřit s ročním<span class="e-c2-sleva">−15 %</span></button>
         </div>
       </div>
-      <div class="yp-cards">
-          <div class="yp-card" style="background:rgba(138,180,255,.07);border:1.5px solid rgba(138,180,255,.30)">
-            
-            <div class="yp-name">Základní</div>
-            <div class="yp-price"><span class="free">Zdarma</span></div>
-            <div class="yp-period">navždy zdarma</div>
-            <div class="yp-savew"></div>
-            <div class="yp-hr"></div>
-            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">1 aktivní inzerát</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Oslovování kandidátů 1×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:close-circle-bold" width="15" style="color:#d1d5db"></iconify-icon><span style="color:#9ca3af">Topování inzerátu</span></div><div class="yp-feat"><iconify-icon icon="solar:close-circle-bold" width="15" style="color:#d1d5db"></iconify-icon><span style="color:#9ca3af">Ověřená firma</span></div></div>
-            <div class="yp-cta"><a class="yp-btn employer-cta-register" href="javascript:void(0)" style="border:1.5px solid #8AB4FF;color:#111827">Začít zdarma</a></div>
-          </div>
-          <div class="yp-card" style="background:rgba(91,107,255,.07);border:1.5px solid rgba(91,107,255,.30)">
-            <div class="yp-name">Výhodný</div>
-            <div class="yp-price"><span class="yp-num">990</span><span class="kc"> Kč</span></div>
-            <div class="yp-period">za měsíc bez DPH</div>
-            <div class="yp-savew"></div>
-            <div class="yp-hr"></div>
-            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">2 aktivní inzeráty</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Topování inzerátu 1×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Ověřená firma</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Oslovování kandidátů 3×/měs</span></div></div>
-            <div class="yp-cta"><a class="yp-btn employer-cta-register" href="javascript:void(0)" style="border:1.5px solid #5B6BFF;color:#111827">Vybrat Výhodný</a></div>
-          </div>
-          <div class="yp-card" style="background:rgba(91,214,138,.07);border:1.5px solid rgba(91,214,138,.30)">
-            <div class="yp-badge"><iconify-icon icon="solar:star-bold" width="12"></iconify-icon>Nejoblíbenější</div>
-            <div class="yp-name">Dynamický</div>
-            <div class="yp-price"><span class="yp-num" data-a="1" data-plan="dynamicky">3 990</span><span class="kc"> Kč</span></div>
-            <div class="yp-period">za měsíc bez DPH</div>
-            <div class="yp-savew"><span>ušetříš 7 200 Kč/rok</span></div>
-            <div class="yp-hr"></div>
-            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">5 aktivních inzerátů</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Topování inzerátu 3×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Plné statistiky + CSV export</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Prioritní řešení podpory</span></div></div>
-            <div class="yp-cta"><a class="yp-btn pop employer-cta-register" href="javascript:void(0)">Vybrat Dynamický</a></div>
-          </div>
-          <div class="yp-card" style="background:rgba(255,209,102,.07);border:1.5px solid rgba(255,209,102,.30)">
-            
-            <div class="yp-name">Maximální</div>
-            <div class="yp-price"><span class="yp-num" data-a="1" data-plan="maximalni">9 990</span><span class="kc"> Kč</span></div>
-            <div class="yp-period">za měsíc bez DPH</div>
-            <div class="yp-savew"><span>ušetříš 18 000 Kč/rok</span></div>
-            <div class="yp-hr"></div>
-            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">10 aktivních inzerátů</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Topování inzerátu 5×/měs</span></div><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Prémiový badge + Urgent 2×</span></div></div>
-            <div class="yp-cta"><a class="yp-btn employer-cta-register" href="javascript:void(0)" style="border:1.5px solid #FFD166;color:#111827">Vybrat Maximální</a></div>
-          </div>
-          <div class="yp-card" style="background:rgba(224,176,255,.07);border:1.5px solid rgba(224,176,255,.30)">
-            
-            <div class="yp-name">Vlastní</div>
-            <div class="yp-price"><span class="yp-num" id="yp-kalk-cena">17 990</span><span class="kc"> Kč</span></div>
-            <div class="yp-period">za měsíc bez DPH</div>
-            <!-- Množstevní sleva má vlastní třídu: .yp-savew span je schované,
-                 dokud přepínač nezapne roční platbu, a tahle se řídí počtem
-                 inzerátů, ne fakturačním obdobím. -->
-            <div class="yp-savew"><span class="yp-kalk-sleva" id="yp-kalk-sleva" hidden></span></div>
-            <div class="yp-hr"></div>
-            <!-- Kalkulačka: počet aktivních inzerátů → měsíční cena. Obsluha je
-                 v kalkulackaVlastni() níž, tam je i sazebník. -->
-            <div class="yp-kalk">
-              <label class="yp-kalk-radek" for="yp-kalk-pocet">
-                <span>Aktivních inzerátů</span>
-                <input class="yp-kalk-cislo" id="yp-kalk-pocet" type="number" min="20" max="5000" step="1" value="20" inputmode="numeric">
-              </label>
-              <div class="yp-kalk-drah">
-                <input class="yp-posuvnik" id="yp-kalk-posuvnik" type="range" min="0" max="0" step="1" value="0" aria-label="Počet aktivních inzerátů">
-                <span class="yp-kalk-znacky" id="yp-kalk-znacky" aria-hidden="true"></span>
-              </div>
-              <div class="yp-kalk-meze"><span>20</span><span>5 000</span></div>
-            </div>
-            <div class="yp-hr"></div>
-            <div class="yp-feats"><div class="yp-feat"><iconify-icon icon="solar:check-circle-bold" width="15" style="color:#16a34a"></iconify-icon><span style="color:#374151">Vše z Maximální</span></div></div>
-            <div class="yp-cta"><a class="yp-btn" id="yp-kalk-cta" style="border:1px solid rgba(224,176,255,.47);color:#374151" href="mailto:podpora@makej.eu">Nezávazná poptávka</a></div>
-          </div>
+      <div class="e-c2-karty">
+      <div class="e-c2-karta" data-tier="zakladni" style="--tier:#8AB4FF;--tier-a:#8AB4FF59">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="e-c2-kdo">Pro začátek</div>
+          <div class="e-c2-nazev"><span class="mk-grad">Základní</span></div>
+          <div class="e-c2-popis">Vyzkoušejte si nábor bez rizika a bez platby.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="e-c2-cena"><span class="e-c2-num">Zdarma</span></div>
+          <div class="e-c2-obd">navždy zdarma</div>
+          <div class="e-c2-uspora"></div>
+        </div>
+        <div style="display:flex;justify-content:center">
+          <span class="mk-rim mk-rim--btn"><a class="mk-rim-fill employer-cta-register" href="javascript:void(0)">Začít zdarma</a></span>
+        </div>
+        <div class="e-c2-funkce">
+          <div class="e-c2-uvod">Obsahuje:</div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>1 aktivní inzerát</span></div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Oslovování kandidátů 1×/měs</span></div>
+          <div class="e-c2-f ne"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M5 9h8" fill="none" stroke="#C3C7D4" stroke-width="2" stroke-linecap="round"/></svg><span>Topování inzerátu</span></div>
+          <div class="e-c2-f ne"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M5 9h8" fill="none" stroke="#C3C7D4" stroke-width="2" stroke-linecap="round"/></svg><span>Ověřená firma</span></div>
+        </div>
       </div>
-      <button class="yp-comparebtn" id="yp-comparebtn">Zobrazit srovnání funkcí</button>
-      <div class="yp-table-wrap" id="yp-table-wrap">
-        <table class="yp-table">
-          <thead><tr><th></th><th>Základní</th><th>Výhodný</th><th>Dynamický</th><th>Maximální</th><th>Vlastní</th></tr></thead>
-          <tbody>
-            <tr class="yp-sec"><td colspan="6">Inzeráty</td></tr>
-            <tr><td>Aktivní inzeráty</td><td><span class="yp-cell-txt">1</span></td><td><span class="yp-cell-txt">2</span></td><td><span class="yp-cell-txt">5</span></td><td><span class="yp-cell-txt">10</span></td><td><span class="yp-cell-txt">20–5 000</span></td></tr>
-            <tr><td>Topování inzerátu</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-txt">1×/měs</span></td><td><span class="yp-cell-txt">3×/měs</span></td><td><span class="yp-cell-txt">5×/měs</span></td><td><span class="yp-cell-txt">5×/měs</span></td></tr>
-            <tr><td>Plánování inzerátu</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr><td>Custom šablona inzerátů (pozadí)</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr class="yp-sec"><td colspan="6">Nábor a viditelnost</td></tr>
-            <tr><td>Oslovování kandidátů</td><td><span class="yp-cell-txt">1×/měs</span></td><td><span class="yp-cell-txt">3×/měs</span></td><td><span class="yp-cell-txt">10×/měs</span></td><td><span class="yp-cell-txt">20×/měs</span></td><td><span class="yp-cell-txt">20×/měs+</span></td></tr>
-            <tr><td>Ověřená firma</td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr><td>Video na profilu</td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr><td>Prémiový badge</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr><td>Notifikace Urgent</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-txt">1×</span></td><td><span class="yp-cell-txt">2×</span></td><td><span class="yp-cell-txt">3×</span></td></tr>
-            <tr><td>Zmínka na FB + IG Makej</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr><td>Branding</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr class="yp-sec"><td colspan="6">Data a reporting</td></tr>
-            <tr><td>Základní statistiky</td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr><td>Plné statistiky + CSV export</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr class="yp-sec"><td colspan="6">Tým a podpora</td></tr>
-            <tr><td>Rozdělení rolí uživatelů v týmu</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-            <tr><td>Prioritní řešení podpory</td><td><span class="yp-cell-no">–</span></td><td><span class="yp-cell-no">–</span></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td><td><iconify-icon icon="solar:check-circle-bold" width="17" style="color:#16a34a"></iconify-icon></td></tr>
-          </tbody>
-        </table>
+      <div class="e-c2-karta" data-tier="vyhodny" style="--tier:#5B6BFF;--tier-a:#5B6BFF59">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="e-c2-kdo">Občasný nábor</div>
+          <div class="e-c2-nazev"><span class="mk-grad">Výhodný</span></div>
+          <div class="e-c2-popis">Když jednou za čas hledáte nového kolegu.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="e-c2-cena"><span class="e-c2-num">990</span><span class="e-c2-kc">Kč</span></div>
+          <div class="e-c2-obd">za měsíc</div>
+          <div class="e-c2-uspora"></div>
+        </div>
+        <div style="display:flex;justify-content:center">
+          <span class="mk-rim mk-rim--btn"><a class="mk-rim-fill employer-cta-register" href="javascript:void(0)">Vybrat Výhodný</a></span>
+        </div>
+        <div class="e-c2-funkce">
+          <div class="e-c2-uvod">Vše ze Základní, a navíc:</div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>2 aktivní inzeráty</span></div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Topování inzerátu 1×/měs</span></div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Oslovování kandidátů 3×/měs</span></div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Ověřená firma</span></div>
+        </div>
+      </div>
+      <div class="e-c2-karta" data-tier="dynamicky" style="--tier:#5BD68A;--tier-a:#5BD68A59">
+        <div class="e-c2-stitek-dop">Nejoblíbenější</div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="e-c2-kdo">Aktivně hledám</div>
+          <div class="e-c2-nazev"><span class="mk-grad">Dynamický</span></div>
+          <div class="e-c2-popis">Pro firmy, které nabírají průběžně na více pozic.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="e-c2-cena"><span class="e-c2-num" data-plan="dynamicky">3 390</span><span class="e-c2-kc">Kč</span></div>
+          <div class="e-c2-obd">za měsíc</div>
+          <div class="e-c2-uspora"></div>
+        </div>
+        <div style="display:flex;justify-content:center">
+          <span class="mk-rim mk-rim--btn"><a class="mk-rim-fill employer-cta-register" href="javascript:void(0)">Vybrat Dynamický</a></span>
+        </div>
+        <div class="e-c2-funkce">
+          <div class="e-c2-uvod">Vše z Výhodný, a navíc:</div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>5 aktivních inzerátů</span></div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Topování inzerátu 3×/měs</span></div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Plné statistiky + CSV export</span></div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Prioritní řešení podpory</span></div>
+        </div>
+      </div>
+      <div class="e-c2-karta" data-tier="maximalni" style="--tier:#FFD166;--tier-a:#FFD16659">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="e-c2-kdo">Rostoucí tým</div>
+          <div class="e-c2-nazev"><span class="mk-grad">Maximální</span></div>
+          <div class="e-c2-popis">Když potřebujete obsadit hodně míst rychle.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="e-c2-cena"><span class="e-c2-num" data-plan="maximalni">8 490</span><span class="e-c2-kc">Kč</span></div>
+          <div class="e-c2-obd">za měsíc</div>
+          <div class="e-c2-uspora"></div>
+        </div>
+        <div style="display:flex;justify-content:center">
+          <span class="mk-rim mk-rim--btn"><a class="mk-rim-fill employer-cta-register" href="javascript:void(0)">Vybrat Maximální</a></span>
+        </div>
+        <div class="e-c2-funkce">
+          <div class="e-c2-uvod">Vše z Dynamický, a navíc:</div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>10 aktivních inzerátů</span></div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Topování inzerátu 5×/měs</span></div>
+          <div class="e-c2-f"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Prémiový badge + Urgent 2×</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="e-c2-vl" data-tier="vlastni">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="e-c2-kdo">Pro velké firmy</div>
+          <div class="e-c2-nazev"><span class="mk-grad">Vlastní</span></div>
+          <div class="e-c2-popis">Desítky pozic a podmínky na míru. Vše z Maximální.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+            <label for="yp-kalk-posuvnik" style="font-size:13.5px;font-weight:600;color:#B7BCD0">Aktivních inzerátů</label>
+            <span id="yp-kalk-pocet" style="font-size:18px;font-weight:800;font-variant-numeric:tabular-nums">20</span>
+          </div>
+          <input type="range" id="yp-kalk-posuvnik" min="0" max="0" step="1" value="0" aria-label="Počet aktivních inzerátů">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#8990AD"><span>20</span><span>100</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:24px">
+          <div class="e-c2-vl-cena">
+            <div style="display:flex;align-items:baseline;gap:6px;white-space:nowrap">
+              <span style="font-size:15px;font-weight:700;color:#B7BCD0">od</span>
+              <span class="e-c2-num" id="yp-kalk-cena" style="font-size:30px">17 990</span>
+              <span style="font-size:15px;font-weight:700;color:#B7BCD0">Kč</span>
+            </div>
+            <div style="font-size:12.5px;color:#B7BCD0;white-space:nowrap">za měsíc <span id="yp-kalk-sleva" hidden></span></div>
+          </div>
+          <a class="e-c2-vl-btn" id="yp-kalk-cta" href="mailto:podpora@makej.eu">Nezávazná poptávka</a>
+        </div>
+      </div>
+
+      <div class="e-c2-pata">
+        <button class="yp-comparebtn" id="yp-comparebtn">Zobrazit srovnání funkcí</button>
+      </div>
+      <!-- Srovnání funkcí — okno jako v dashboardu (EPricing → showCompare):
+           nahoře přilepené sloupce tarifů s cenou a tlačítkem, pod nimi řádky.
+           Zavírá ✕, klik vedle i Esc. -->
+      <div class="e-srov-plocha" id="yp-srov" hidden>
+        <div class="e-srov-okno" role="dialog" aria-modal="true" aria-label="Srovnání funkcí">
+          <div class="e-srov-hlava">
+            <div>
+              <div class="e-srov-h1">Srovnání funkcí</div>
+              <div class="e-srov-h2" id="yp-srov-obdobi">Ceny při ročním placení</div>
+            </div>
+            <button type="button" class="e-c2-x" id="yp-srov-zavrit" aria-label="Zavřít">
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="#0B1033" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="e-srov-telo">
+            <div class="e-srov-mriz">
+              <div class="e-srov-radek e-srov-zahlavi">
+                <div class="e-srov-prep">
+                  <div class="e-c2-prep e-c2-prep-mini" role="group" aria-label="Fakturace">
+                    <button type="button" id="yp-srov-m">Měsíčně</button>
+                    <button type="button" class="on" id="yp-srov-r">Ročně<span class="e-c2-sleva">−15 %</span></button>
+                  </div>
+                </div>
+          <div class="e-srov-sl" data-tier="zakladni">
+            <div class="e-srov-stitek-misto"></div>
+            <div class="e-c2-nazev e-srov-nazev"><span class="mk-grad">Základní</span></div>
+            <div class="e-srov-cena" data-cena="zakladni">Zdarma</div>
+            <button type="button" class="e-c2-tl-out e-srov-tl employer-cta-register">Začít zdarma</button>
+          </div>
+          <div class="e-srov-sl" data-tier="vyhodny">
+            <div class="e-srov-stitek-misto"></div>
+            <div class="e-c2-nazev e-srov-nazev"><span class="mk-grad">Výhodný</span></div>
+            <div class="e-srov-cena" data-cena="vyhodny">990 Kč / měs</div>
+            <button type="button" class="e-c2-tl-out e-srov-tl employer-cta-register">Vybrat</button>
+          </div>
+          <div class="e-srov-sl" data-tier="dynamicky">
+            <div class="e-srov-stitek-misto"><span class="e-srov-stitek">Nejoblíbenější</span></div>
+            <div class="e-c2-nazev e-srov-nazev"><span class="mk-grad">Dynamický</span></div>
+            <div class="e-srov-cena" data-cena="dynamicky">3 390 Kč / měs</div>
+            <button type="button" class="e-c2-tl-prim e-srov-tl employer-cta-register">Vybrat</button>
+          </div>
+          <div class="e-srov-sl" data-tier="maximalni">
+            <div class="e-srov-stitek-misto"></div>
+            <div class="e-c2-nazev e-srov-nazev"><span class="mk-grad">Maximální</span></div>
+            <div class="e-srov-cena" data-cena="maximalni">8 490 Kč / měs</div>
+            <button type="button" class="e-c2-tl-out e-srov-tl employer-cta-register">Vybrat</button>
+          </div>
+          <div class="e-srov-sl" data-tier="vlastni">
+            <div class="e-srov-stitek-misto"></div>
+            <div class="e-c2-nazev e-srov-nazev"><span class="mk-grad">Vlastní</span></div>
+            <div class="e-srov-cena" data-cena="vlastni">od 17 990 Kč / měs</div>
+            <a class="e-c2-tl-out e-srov-tl" href="mailto:podpora@makej.eu?subject=Popt%C3%A1vka%20tarifu%20Vlastn%C3%AD">Poptávka</a>
+          </div>
+              </div>
+        <div class="e-srov-radek e-srov-sekce"><div>Inzeráty</div><div></div><div></div><div></div><div></div><div></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Aktivní inzeráty</div><div><span>1</span></div><div><span>2</span></div><div><span>5</span></div><div><span>10</span></div><div><span>20–100</span></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Topování inzerátu</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><span>1×/měs</span></div><div><span>3×/měs</span></div><div><span>5×/měs</span></div><div><span>5×/měs+</span></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Plánování inzerátu</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Custom šablona inzerátů (pozadí)</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div class="e-srov-radek e-srov-sekce"><div>Nábor a viditelnost</div><div></div><div></div><div></div><div></div><div></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Oslovování kandidátů</div><div><span>1×/měs</span></div><div><span>3×/měs</span></div><div><span>10×/měs</span></div><div><span>20×/měs</span></div><div><span>20×/měs+</span></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Ověřená firma</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Video na profilu</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Prémiový badge</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Notifikace Urgent</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><span>1×</span></div><div><span>2×</span></div><div><span>3×+</span></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Zmínka na FB + IG Makej</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Branding</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div class="e-srov-radek e-srov-sekce"><div>Data a reporting</div><div></div><div></div><div></div><div></div><div></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Základní statistiky</div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Plné statistiky + CSV export</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div class="e-srov-radek e-srov-sekce"><div>Tým a podpora</div><div></div><div></div><div></div><div></div><div></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Rozdělení rolí uživatelů v týmu</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+        <div class="e-srov-radek e-c2-srow"><div class="e-srov-popis">Prioritní řešení podpory</div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="14" height="14" viewBox="0 0 14 14" aria-label="ne"><path d="M3 7h8" stroke="#C3C7D4" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><svg width="20" height="20" viewBox="0 0 18 18" aria-label="ano"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1164,7 +1252,11 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=67"></script>
+  <script src="script.js?v=68"></script>
+  <!-- Kovové názvy a tlačítka v ceníku — stejné komponenty jako dashboard
+       (metal-fx + React, bez Babelu). Načte se až u ceníku; když se
+       nenačte nebo prohlížeč neumí WebGL2, zůstane CSS náhrada. -->
+  <script src="/cenik-kov.js?v=2"></script>
   <script>
     // FAQ accordion
     function toggleFaq(el) {
@@ -1175,30 +1267,25 @@
     }
 
     /* Kalkulačka u tarifu Vlastní: počet aktivních inzerátů → měsíční cena.
-       Sazebník je pásmový — prvních 20 inzerátů je v základu za 10 000 Kč a
+       Sazebník je pásmový — prvních 20 inzerátů je v základu za 18 000 Kč a
        každý další stojí podle pásma čím dál míň. Výsledek se zaokrouhlí na
-       tisíce a sníží o korunu, ať ceny končí na 999 jako zbytek ceníku.
-       Posuvník nejde po jednotkách: u tisíců inzerátů nemá smysl přebírat po
-       jednom, takže má pevné kroky (po 10 / 50 / 100 podle velikosti). */
+       tisíce a sníží o korunu, ať ceny končí na 990 jako zbytek ceníku.
+       Strop je 100 inzerátů; nad něj se řeší individuálně, proto posuvník
+       končí tam. Kroky jsou po 5, na takhle krátkém rozsahu to stačí. */
     (function kalkulackaVlastni() {
-      var cena   = document.getElementById('yp-kalk-cena');
-      var sleva  = document.getElementById('yp-kalk-sleva');
-      var pole   = document.getElementById('yp-kalk-pocet');
-      var posuv  = document.getElementById('yp-kalk-posuvnik');
-      var znacky = document.getElementById('yp-kalk-znacky');
-      var cta    = document.getElementById('yp-kalk-cta');
-      if (!cena || !pole || !posuv) return;
+      var cena  = document.getElementById('yp-kalk-cena');
+      var sleva = document.getElementById('yp-kalk-sleva');
+      var pocet = document.getElementById('yp-kalk-pocet');
+      var posuv = document.getElementById('yp-kalk-posuvnik');
+      var cta   = document.getElementById('yp-kalk-cta');
+      if (!cena || !pocet || !posuv) return;
 
       var ZAKLAD = 18000, OD = 20;
       // [do kolika inzerátů, kolik stojí každý další v tomhle pásmu]
-      var PASMA = [[50,810],[100,630],[250,450],[500,324],[1000,216],[2500,144],[5000,90]];
-      var PRAHY = [50, 100, 250, 500, 1000, 2500];
-      var PALEC = 22;   // šířka puntíku posuvníku, viz .yp-posuvnik::-webkit-slider-thumb
+      var PASMA = [[50,810],[100,630]];
 
       var kroky = [], v;
-      for (v = 20;  v <= 100;  v += 10)  kroky.push(v);
-      for (v = 150; v <= 500;  v += 50)  kroky.push(v);
-      for (v = 600; v <= 5000; v += 100) kroky.push(v);
+      for (v = 20; v <= 100; v += 5) kroky.push(v);
       posuv.max = kroky.length - 1;
 
       function cenaZa(n) {
@@ -1208,67 +1295,29 @@
           p += (Math.min(n, PASMA[i][0]) - spodek) * PASMA[i][1];
           spodek = PASMA[i][0];
         }
-        return Math.round(p / 1000) * 1000 - 10;   // ceny končí na 990
+        return Math.round(p / 1000) * 1000 - 10;
       }
       function cz(n) { return n.toLocaleString('cs-CZ'); }
-      function nejblizsi(n) {
-        return kroky.reduce(function (a, b) { return Math.abs(b - n) < Math.abs(a - n) ? b : a; });
-      }
-      // Puntík se nepohybuje po celé šířce, ale mezi svými krajními polohami —
-      // tečky i vybarvení dráhy musí počítat se stejným odsazením, jinak se
-      // u krajů rozejdou.
-      function podil(i) { return i / (kroky.length - 1); }
-      function pozice(p) { return 'calc(' + (PALEC / 2) + 'px + (100% - ' + PALEC + 'px) * ' + p + ')'; }
 
-      znacky.innerHTML = PRAHY.map(function (b) {
-        return '<i data-prah="' + b + '" style="left:' + pozice(podil(kroky.indexOf(b))) + '"></i>';
-      }).join('');
-
-      function vykresli(i, prepsatPole) {
-        var n = kroky[i], c = cenaZa(n), p = podil(i);
+      function vykresli() {
+        var n = kroky[+posuv.value], c = cenaZa(n);
+        pocet.textContent = cz(n);
         cena.textContent = cz(c);
-        // Šestimístná cena se do kartičky v plné velikosti nevejde a „Kč" by
-        // spadlo na druhý řádek — kartička by pak byla vyšší než ostatní.
-        cena.style.fontSize = c >= 100000 ? '31px' : (c >= 10000 ? '39px' : '');
         // Sleva proti orientační sazbě 900 Kč za inzerát — tolik vychází
         // vstupní cena tarifu (17 990 Kč za 20 inzerátů).
-        var s = Math.round((1 - c / (n * 900)) * 100);
-        sleva.textContent = 'množstevní sleva ' + s + ' %';
-        sleva.hidden = s <= 0;
-        posuv.value = i;
-        posuv.style.background = 'linear-gradient(90deg,#8B5CF6 0,#8B5CF6 ' + pozice(p)
-          + ',#E9E0F6 ' + pozice(p) + ',#E9E0F6 100%)';
-        Array.prototype.forEach.call(znacky.children, function (t) {
-          t.classList.toggle('je', n >= +t.dataset.prah);
-        });
-        if (prepsatPole) pole.value = n;
+        var sl = Math.round((1 - c / (n * 900)) * 100);
+        sleva.textContent = '· sleva ' + sl + ' %';
+        sleva.hidden = sl <= 0;
         if (cta) cta.href = 'mailto:podpora@makej.eu?subject='
           + encodeURIComponent('Poptávka tarifu Vlastní — ' + cz(n) + ' inzerátů');
       }
-
-      posuv.addEventListener('input', function () { vykresli(+posuv.value, true); });
-      // Psaní do políčka posouvá i jezdec, ale hodnotu v políčku nepřepisujeme,
-      // dokud se píše — jinak by se pod rukama měnilo rozepsané číslo.
-      pole.addEventListener('input', function () {
-        var n = parseInt(pole.value, 10);
-        if (!isNaN(n) && n >= OD && n <= 5000) vykresli(kroky.indexOf(nejblizsi(n)), false);
-      });
-      // Až po dopsání číslo srovnáme na nejbližší krok.
-      pole.addEventListener('change', srovnej);
-      pole.addEventListener('blur', srovnej);
-      function srovnej() {
-        var n = parseInt(pole.value, 10);
-        if (isNaN(n)) n = kroky[+posuv.value];
-        vykresli(kroky.indexOf(nejblizsi(Math.max(OD, Math.min(5000, n)))), true);
-      }
-      pole.addEventListener('keydown', function (e) { if (e.key === 'Enter') pole.blur(); });
-
-      vykresli(0, true);
+      posuv.addEventListener('input', vykresli);
+      vykresli();
     })();
 
     // Ceník: přepínač měsíčně/ročně + srovnání
     (function () {
-      var annual = false;
+      var annual = true;   // dashboard startuje na roční platbě (návrh 27. 9.)
       var data = { dynamicky: { m: 3990, a: 3390 }, maximalni: { m: 9990, a: 8490 } };
       function cz(n){ return n.toLocaleString('cs-CZ'); }
       // Cena se k nové hodnotě dopočítá, neskočí. Kdo má vypnuté animace,
@@ -1291,23 +1340,56 @@
           else el._bezi = null;
         })(start);
       }
+      // Úspora se vypisuje jen při roční platbě a jen tam, kde nějaká je —
+      // Výhodný ji nemá, takže mu řádek zůstane prázdný (ale drží výšku, ať
+      // karta při přepnutí neposkočí).
+      var USPORA = { dynamicky: 7200, maximalni: 18000 };
       function apply() {
-        document.querySelectorAll('#pricing .yp-num[data-plan]').forEach(function (el) {
-          var d = data[el.getAttribute('data-plan')]; if (d) napocitej(el, annual ? d.a : d.m);
+        document.querySelectorAll('#pricing .e-c2-num[data-plan]').forEach(function (el) {
+          var id = el.getAttribute('data-plan'), d = data[id];
+          if (d) napocitej(el, annual ? d.a : d.m);
+          var karta = el.closest('.e-c2-karta');
+          var u = karta && karta.querySelector('.e-c2-uspora');
+          if (u) u.textContent = (annual && USPORA[id]) ? 'Ušetříte ' + cz(USPORA[id]) + ' Kč ročně' : '';
         });
-        document.querySelectorAll('#pricing .yp-savew').forEach(function (w) { w.classList.toggle('on', annual); });
-        var sw = document.getElementById('yp-sw'); if (sw) sw.classList.toggle('on', annual);
-        var lm = document.getElementById('yp-lbl-m'); if (lm) lm.classList.toggle('on', !annual);
-        var la = document.getElementById('yp-lbl-a'); if (la) la.classList.toggle('on', annual);
-        var sv = document.getElementById('yp-save'); if (sv) sv.classList.toggle('on', annual);
+        var bm = document.getElementById('yp-prep-m'); if (bm) bm.classList.toggle('on', !annual);
+        var br = document.getElementById('yp-prep-r'); if (br) br.classList.toggle('on', annual);
+        // Totéž v okně se srovnáním — přepínač, popisek i ceny ve sloupcích.
+        var sm = document.getElementById('yp-srov-m'); if (sm) sm.classList.toggle('on', !annual);
+        var sr = document.getElementById('yp-srov-r'); if (sr) sr.classList.toggle('on', annual);
+        var ob = document.getElementById('yp-srov-obdobi');
+        if (ob) ob.textContent = annual ? 'Ceny při ročním placení' : 'Ceny při měsíčním placení';
+        document.querySelectorAll('#yp-srov [data-cena]').forEach(function (el) {
+          var d = data[el.getAttribute('data-cena')];
+          if (d) el.textContent = cz(annual ? d.a : d.m) + ' Kč / měs';
+        });
       }
-      var sw = document.getElementById('yp-sw');
-      if (sw) sw.addEventListener('click', function () { annual = !annual; apply(); });
+      var bm = document.getElementById('yp-prep-m'), br = document.getElementById('yp-prep-r');
+      if (bm) bm.addEventListener('click', function () { annual = false; apply(); });
+      if (br) br.addEventListener('click', function () { annual = true;  apply(); });
+      apply();   // výchozí stav (Ročně) — dopíše úspory pod ceny
+      // ── Okno se srovnáním funkcí ──
+      var okno = document.getElementById('yp-srov');
+      function otevri(ano) {
+        if (!okno) return;
+        okno.hidden = !ano;
+        document.body.style.overflow = ano ? 'hidden' : '';
+      }
       var cb = document.getElementById('yp-comparebtn');
-      if (cb) cb.addEventListener('click', function () {
-        var on = document.getElementById('yp-table-wrap').classList.toggle('on');
-        cb.textContent = on ? 'Skrýt srovnání funkcí' : 'Zobrazit srovnání funkcí';
+      if (cb) cb.addEventListener('click', function () { otevri(true); });
+      var zav = document.getElementById('yp-srov-zavrit');
+      if (zav) zav.addEventListener('click', function () { otevri(false); });
+      // Klik vedle okna zavírá, klik uvnitř ne.
+      if (okno) okno.addEventListener('click', function (e) { if (e.target === okno) otevri(false); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && okno && !okno.hidden) otevri(false);
       });
+
+      // Přepínač uvnitř okna je tentýž stav jako na stránce.
+      var sm = document.getElementById('yp-srov-m'), sr = document.getElementById('yp-srov-r');
+      if (sm) sm.addEventListener('click', function () { annual = false; apply(); });
+      if (sr) sr.addEventListener('click', function () { annual = true;  apply(); });
+
       apply();
     })();
   </script>

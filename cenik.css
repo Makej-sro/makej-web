@@ -1,0 +1,209 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   CENÍK — sdílený vzhled dashboardu i webu
+   ══════════════════════════════════════════════════════════════════════════
+   Načítá ho `employer/index.html` (záložka Tarify) i `pro-zamestnavatele.html`
+   (sekce #pricing). Dřív žil dvakrát: jednou jako řetězec `_CENIK2_CSS`
+   v employer-pages3.jsx, podruhé opsaný do stylů webu — a při každé Yasinově
+   úpravě se to muselo přenášet ručně. Tady se mění na jednom místě.
+
+   Kovové nápisy a tlačítka kreslí v dashboardu knihovna metal-fx přes WebGL2.
+   `.mk-grad` a `.mk-rim` níž jsou její čistě CSS náhrada — dashboard je
+   používá tam, kde WebGL2 není, web zatím všude.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Dashboard si uvnitř #root vynucuje Inter; na webu by ceník jinak zdědil
+   Plus Jakarta Sans a při stejných rozměrech vypadal jinak. */
+.e-c2, .e-c2 * { font-family: "Inter", -apple-system, system-ui, sans-serif; }
+
+/* Obal ceníku. Rámeček ani podklad nemá — na bílé sekci webu by byl jen
+   linkou kolem ničeho. V dashboardu kartu kreslí obal v JSX. */
+.e-c2{display:flex;flex-direction:column;gap:14px;padding:14px 24px 20px;color:#0B1033;}
+.e-c2-hlava{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;}
+.e-c2-h1{margin:0 0 4px;font-size:28px;line-height:1.15;font-weight:800;letter-spacing:-.02em;}
+.e-c2-sub{margin:0;font-size:15px;color:#5B6178;}
+.e-c2-prep{display:flex;align-items:center;gap:4px;padding:4px;background:#fff;border:1px solid #E3E6EE;border-radius:999px;}
+.e-c2-prep button{border:0;cursor:pointer;font:inherit;font-size:14px;font-weight:600;padding:8px 18px;border-radius:999px;background:transparent;color:#5B6178;display:flex;align-items:center;gap:8px;transition:background .18s,color .18s;}
+.e-c2-prep button.on{background:#0B1033;color:#fff;}
+.e-c2-prep .e-c2-sleva{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:#DCFCE7;color:#15803D;}
+.e-c2-karty{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding-top:10px;align-items:stretch;}
+.e-c2-karta{position:relative;background:#fff;border:1px solid #E3E6EE;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;transition:border-color .28s ease,box-shadow .28s ease,transform .28s cubic-bezier(.2,.8,.2,1);}
+/* Najetí: rámeček v barvě tarifu (jako kovový název) — plynule, zesílený
+   vnitřní linkou (žádné poskočení obsahu) a jemná záře ve stejné barvě.
+   Nejoblíbenější už nemá trvalý modrý rámeček — stačí štítek nad kartou. */
+.e-c2-karta:hover{border-color:var(--tier);box-shadow:inset 0 0 0 1px var(--tier),0 14px 34px -14px var(--tier-a);transform:translateY(-2px);}
+.e-c2-stitek-dop{position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:#0020F6;color:#fff;}
+.e-c2-stitek-vas{position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:#EEF1FF;border:1px solid #D6DCFF;color:#0020F6;}
+.e-c2-kdo{font-size:13px;font-weight:500;color:#8A90A6;}
+.e-c2-nazev{font-size:19px;font-weight:700;}
+.e-c2-popis{font-size:13px;line-height:1.4;color:#5B6178;text-wrap:pretty;min-height:36px;}
+.e-c2-cena{display:flex;align-items:baseline;gap:6px;height:36px;}
+.e-c2-num{font-size:34px;line-height:1;font-weight:800;letter-spacing:-.02em;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.e-c2-kc{font-size:17px;font-weight:700;color:#5B6178;}
+.e-c2-obd{font-size:13.5px;color:#5B6178;}
+.e-c2-uspora{font-size:12.5px;font-weight:600;height:17px;transition:color .2s;}
+.e-c2-btn{cursor:pointer;font:inherit;font-size:14.5px;font-weight:700;height:40px;border-radius:11px;border:1px solid #CDD2DF;background:#fff;color:#0B1033;width:100%;transition:border-color .15s,background .15s;}
+.e-c2-btn:hover{border-color:#0B1033;}
+.e-c2-btn.prim{border:0;background:#0020F6;color:#fff;}
+.e-c2-btn.prim:hover{background:#0019C4;}
+.e-c2-btn:disabled{background:#F3F4F8;border:1px solid #EEF0F5;color:#8A90A6;cursor:default;}
+.e-c2-funkce{border-top:1px solid #EEF0F5;padding-top:12px;display:flex;flex-direction:column;gap:7px;}
+.e-c2-uvod{font-size:12.5px;font-weight:600;color:#5B6178;}
+.e-c2-f{display:flex;gap:8px;font-size:13.5px;line-height:1.35;}
+.e-c2-f.ne{color:#A0A5B8;}
+.e-c2-f svg{flex:none;margin-top:1px;}
+.e-c2-vl{background:#0B1033;border-radius:18px;padding:16px 26px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:36px;align-items:center;color:#fff;}
+.e-c2-vl .e-c2-kdo,.e-c2-vl .e-c2-popis{color:#B7BCD0;}
+.e-c2-vl .e-c2-popis{min-height:0;font-size:14px;}
+.e-c2-vl input[type=range]{width:100%;margin:0;accent-color:#0020F6;cursor:pointer;}
+/* Cena v pruhu Vlastní má vyhrazenou šířku podle nejdelší hodnoty
+   (436 990 Kč). Bez toho se při přechodu přes sto tisíc rozšířil sloupec
+   s cenou, zúžil popis vlevo, ten se zalomil na víc řádků — a celý pruh
+   povyrostl. Čísla jsou navíc tabulková, takže neposkakují ani při psaní. */
+.e-c2-vl-cena{display:flex;flex-direction:column;gap:2px;min-width:215px;}
+.e-c2-vl-btn{cursor:pointer;font:inherit;font-size:14.5px;font-weight:700;height:40px;padding:0 20px;border-radius:11px;border:0;background:#fff;color:#0B1033;white-space:nowrap;display:inline-flex;align-items:center;text-decoration:none;}
+.e-c2-vl-btn:hover{background:#E6E9F5;text-decoration:none;}
+.e-c2-pata{display:flex;align-items:baseline;justify-content:center;gap:12px;text-align:center;}
+.e-c2-pata button{background:none;border:0;cursor:pointer;font:inherit;font-size:14.5px;font-weight:700;color:#0020F6;padding:2px;}
+.e-c2-pata button:hover{color:#0019C4;text-decoration:underline;}
+.e-c2-pata p{margin:0;font-size:12.5px;color:#8A90A6;}
+.e-c2-akt{display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 18px;border-radius:999px;background:#EEF1FF;border:1px solid #D6DCFF;color:#0020F6;font-size:14px;font-weight:700;white-space:nowrap;box-sizing:border-box;cursor:default;}
+.e-c2-prep-mini button{font-size:13px;padding:7px 13px;}
+.e-c2-prep-mini .e-c2-sleva{font-size:11px;padding:2px 7px;}
+.e-obj-karta{background:#fff;border-radius:20px;box-shadow:0 24px 64px -16px rgba(11,16,51,.35);padding:24px 26px 20px;display:flex;flex-direction:column;gap:18px;color:#0B1033;}
+.e-obj-box{background:#F6F7FA;border:1px solid #EEF0F5;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+.e-obj-kdy{font-size:13px;color:#5B6178;background:#F6F7FA;border-radius:10px;padding:10px 12px;}
+.e-obj-pravni{font-size:12px;line-height:1.5;color:#8A90A6;text-align:center;margin-top:-6px;text-wrap:pretty;}
+.e-obj-pravni a{color:#5B6178;text-decoration:underline;text-underline-offset:2px;}
+.e-obj-pravni a:hover{color:#0020F6;}
+.e-obj-ok{width:52px;height:52px;border-radius:50%;background:#16A34A;display:grid;place-items:center;box-shadow:0 10px 24px -8px rgba(22,163,74,.55);}
+.e-c2-x{cursor:pointer;width:40px;height:40px;flex:none;border-radius:10px;border:1px solid #E3E6EE;background:#fff;display:flex;align-items:center;justify-content:center;transition:border-color .15s;}
+.e-c2-x:hover{border-color:#0B1033;}
+.e-c2-tl-prim{cursor:pointer;border:0;background:#0020F6;color:#fff;transition:background .15s;}
+.e-c2-tl-prim:hover{background:#0019C4;}
+.e-c2-tl-out{cursor:pointer;border:1px solid #CDD2DF;background:#fff;color:#0B1033;transition:border-color .15s;}
+.e-c2-tl-out:hover{border-color:#0B1033;text-decoration:none;}
+.e-c2-srow:hover{background:#FAFBFD;}
+
+/* Název tarifu v ceníku má 19 px. V dashboardu tu velikost předává React
+   komponentě jako parametr; ve statickém HTML ji musí říct CSS, jinak se
+   použije výchozích 40 px z `.mk-grad`. */
+.e-c2-nazev .mk-grad { font: 700 19px/1.2 Inter, sans-serif; letter-spacing: -.02em; }
+
+/* ── Srovnání funkcí — okno (dashboard: EPricing → showCompare) ── */
+.e-srov-plocha{position:fixed;inset:0;z-index:1000;background:rgba(11,16,51,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;}
+.e-srov-plocha[hidden]{display:none;}
+.e-srov-okno{background:#fff;border-radius:20px;width:100%;max-width:1200px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;overflow:hidden;color:#0B1033;box-shadow:0 30px 80px -20px rgba(11,16,51,.5);}
+.e-srov-hlava{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 30px;border-bottom:1px solid #EEF0F5;}
+.e-srov-h1{font-size:22px;font-weight:800;letter-spacing:-.01em;}
+.e-srov-h2{font-size:14px;color:#5B6178;margin-top:4px;}
+.e-srov-telo{overflow:auto;padding:0 30px 30px;}
+.e-srov-mriz{min-width:880px;}
+.e-srov-radek{display:grid;grid-template-columns:minmax(220px,1.6fr) repeat(5,minmax(120px,1fr));}
+.e-srov-zahlavi{position:sticky;top:0;z-index:1;background:#fff;border-bottom:1px solid #E3E6EE;}
+.e-srov-prep{display:flex;align-items:flex-start;padding-top:18px;}
+.e-srov-sl{display:flex;flex-direction:column;gap:6px;padding:18px 12px 14px;text-align:center;}
+.e-srov-stitek-misto{height:20px;display:flex;justify-content:center;}
+.e-srov-stitek{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#0020F6;color:#fff;}
+.e-srov-nazev{min-height:20px;display:flex;justify-content:center;}
+.e-srov-nazev .mk-grad{font:700 16px/1.2 Inter,sans-serif;}
+.e-srov-cena{font-size:13px;color:#5B6178;margin-bottom:6px;}
+.e-srov-tl{font:inherit;font-size:13px;font-weight:700;height:36px;border-radius:10px;padding:0 14px;width:100%;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;}
+.e-srov-sekce > div:first-child{padding:26px 0 10px;font-size:13px;font-weight:700;letter-spacing:.02em;}
+.e-srov-sekce > div{border-bottom:1px solid #E3E6EE;}
+.e-c2-srow{border-bottom:1px solid #EEF0F5;}
+.e-srov-popis{padding:13px 16px 13px 0;font-size:14.5px;font-weight:500;line-height:1.4;display:flex;align-items:center;}
+.e-c2-srow > div:not(.e-srov-popis){display:flex;align-items:center;justify-content:center;padding:13px 8px;font-size:14px;font-weight:600;}
+
+/* ── Kovový název a tlačítko (CSS náhrada metal-fx) ── */
+@keyframes mk-metal-sheen {
+  0%       { background-position: 130% 0, 0 0; }
+  72%, 100% { background-position: -30% 0, 0 0; }
+}
+@keyframes mk-tier-drift {
+  0%, 100% { background-position: 0% 0%, 100% 100%, 50% 0%, 0 0; }
+  25%      { background-position: 100% 0%, 0% 100%, 100% 50%, 0 0; }
+  50%      { background-position: 100% 100%, 0% 0%, 50% 100%, 0 0; }
+  75%      { background-position: 0% 100%, 100% 0%, 0% 50%, 0 0; }
+}
+/* Přelévavý barevný text */
+.mk-grad {
+  font: 700 40px/1.2 Inter, sans-serif; letter-spacing: -0.02em;
+  background-size: 180% 180%, 180% 180%, 180% 180%, 100% 100%; background-repeat: no-repeat;
+  -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  animation: mk-tier-drift 8s linear infinite;
+}
+[data-tier="zakladni"]  .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #FFFFFF 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #8E9BB8 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #DDE3EE 0%, transparent 70%), linear-gradient(180deg, #9AA3B8 0%, #E6EAF2 100%); }
+[data-tier="vyhodny"]   .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #6B70FF 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #9FD0FF 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #8A5CFF 0%, transparent 70%), linear-gradient(180deg, #2E33F0 0%, #B9BBFF 100%); }
+[data-tier="dynamicky"] .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #5FD18D 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #C8F59A 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #2BC4B0 0%, transparent 70%), linear-gradient(180deg, #229B54 0%, #B8EFCB 100%); }
+[data-tier="maximalni"] .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #F08A4B 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #FFC27A 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #E0452B 0%, transparent 70%), linear-gradient(180deg, #BE5518 0%, #FFD2B0 100%); }
+[data-tier="vlastni"]   .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #A77BE8 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #F29BD8 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #6A6CF0 0%, transparent 70%), linear-gradient(180deg, #7A41C8 0%, #E0CCFA 100%); }
+
+/* Barva kovu na plátnech metal-fx (text / odznáček / tlačítko) */
+[data-tier="zakladni"]  [data-cell="text"] canvas, [data-tier="zakladni"]  .metal-fx-glow-svg { filter: grayscale(1) sepia(.6) hue-rotate(185deg) saturate(1.8) brightness(.95); }
+[data-tier="zakladni"] [data-cell="badge"] canvas, [data-tier="zakladni"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(.6) hue-rotate(185deg) saturate(1.8) brightness(1); }
+[data-tier="vyhodny"]   [data-cell="text"] canvas, [data-tier="vyhodny"]   .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(6) hue-rotate(200deg) brightness(.95); }
+[data-tier="vyhodny"] [data-cell="badge"] canvas, [data-tier="vyhodny"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(6) hue-rotate(200deg) brightness(.7); }
+[data-tier="dynamicky"] [data-cell="text"] canvas, [data-tier="dynamicky"] .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(95deg) brightness(.95); }
+[data-tier="dynamicky"] [data-cell="badge"] canvas, [data-tier="dynamicky"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(95deg) brightness(.7); }
+[data-tier="maximalni"] [data-cell="text"] canvas, [data-tier="maximalni"] .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(-12deg) brightness(.95); }
+[data-tier="maximalni"] [data-cell="badge"] canvas, [data-tier="maximalni"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(-12deg) brightness(.7); }
+[data-tier="vlastni"]   [data-cell="text"] canvas, [data-tier="vlastni"]   .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(4.5) hue-rotate(225deg) brightness(.95); }
+[data-tier="vlastni"] [data-cell="badge"] canvas, [data-tier="vlastni"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(4.5) hue-rotate(225deg) brightness(.7); }
+
+/* CSS náhrada kovového textu (bez WebGL2) */
+.mk-sheen {
+  color: transparent; background-size: 250% 100%, 100% 100%; background-repeat: no-repeat;
+  -webkit-background-clip: text; background-clip: text;
+  animation: mk-metal-sheen 3.6s cubic-bezier(0.45, 0, 0.3, 1) infinite;
+}
+.mk-sheen.mk-liquid { background-size: 300% 100%, 100% 300%, 100% 100%; animation-name: mk-metal-liquid; }
+@keyframes mk-metal-liquid {
+  0%       { background-position: 130% 0, 0 0%, 0 0; }
+  72%, 100% { background-position: -30% 0, 0 100%, 0 0; }
+}
+
+/* CSS náhrada kovového odznáčku */
+.mk-rim {
+  position: relative; display: inline-flex; box-sizing: border-box; padding: 1.5px; border-radius: 999px;
+  background:
+    linear-gradient(100deg, transparent 36%, rgba(255,255,255,0.95) 50%, transparent 64%),
+    linear-gradient(180deg, var(--mk-m1) 0%, var(--mk-m2) 45%, var(--mk-m3) 55%, var(--mk-m4) 100%);
+  background-size: 250% 100%, 100% 100%; background-repeat: no-repeat;
+  box-shadow: 0 0 0 0.5px rgba(255,255,255,0.12);
+  animation: mk-metal-sheen 3.4s cubic-bezier(0.45, 0, 0.3, 1) infinite;
+}
+.mk-rim-fill {
+  position: relative; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+  height: 22px; min-width: 42px; padding: 0 10px; border-radius: 999px; overflow: hidden; isolation: isolate;
+  background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 100%), var(--mk-fill);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.22), inset 0 0 6px rgba(255,255,255,0.3);
+  font: 600 12.2px/1 Inter, sans-serif; color: var(--mk-text); white-space: nowrap;
+}
+.mk-rim-fill::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 50%;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.35), rgba(255,255,255,0)); pointer-events: none; z-index: -1;
+}
+.mk-rim-fill::after {
+  content: ""; position: absolute; top: -50%; bottom: -50%; left: 0; width: 40%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+  transform: translate3d(-150%, 0, 0) skewX(-18deg); will-change: transform;
+  animation: mk-pill-sheen 3.4s cubic-bezier(0.45, 0, 0.3, 1) infinite; pointer-events: none; z-index: -1;
+}
+@keyframes mk-pill-sheen {
+  0%       { transform: translate3d(-150%, 0, 0) skewX(-18deg); }
+  72%, 100% { transform: translate3d(400%, 0, 0) skewX(-18deg); }
+}
+[data-tier="zakladni"]  .mk-rim { --mk-fill: #B7C1D6; --mk-text: #1F2430; --mk-m1: #FFFFFF; --mk-m2: #C9D0DE; --mk-m3: #7C869C; --mk-m4: #EEF1F7; --mk-glow: rgba(183,193,214,0.18); }
+[data-tier="vyhodny"]   .mk-rim { --mk-fill: #2E33F0; --mk-text: #FFFFFF; --mk-m1: #E0E1FF; --mk-m2: #8C90FF; --mk-m3: #1C21B8; --mk-m4: #C9CBFF; --mk-glow: rgba(107,112,255,0.28); }
+[data-tier="dynamicky"] .mk-rim { --mk-fill: #229B54; --mk-text: #FFFFFF; --mk-m1: #DDF7E6; --mk-m2: #6FD69A; --mk-m3: #146B38; --mk-m4: #C8F0D6; --mk-glow: rgba(95,209,141,0.22); }
+[data-tier="maximalni"] .mk-rim { --mk-fill: #BE5518; --mk-text: #FFFFFF; --mk-m1: #FFE6D6; --mk-m2: #F5A06C; --mk-m3: #7A3008; --mk-m4: #FFD2B0; --mk-glow: rgba(240,138,75,0.24); }
+[data-tier="vlastni"]   .mk-rim { --mk-fill: #7A41C8; --mk-text: #FFFFFF; --mk-m1: #EFE5FC; --mk-m2: #B994EE; --mk-m3: #4B2380; --mk-m4: #E3D3FA; --mk-glow: rgba(167,123,232,0.26); }
+
+/* CSS náhrada kovového tlačítka */
+.mk-rim--btn { padding: 2px; }
+.mk-rim--btn .mk-rim-fill { height: auto; border: 0; padding: 10px 20px; font: 500 15px/1.2 Inter, sans-serif; cursor: pointer; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-grad, .mk-sheen, .mk-rim { animation: none; }
+  .mk-rim-fill::after { animation: none; opacity: 0; }
+}

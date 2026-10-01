@@ -6,6 +6,8 @@
   <title>Makej — dashboard pro zaměstnavatele</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="stylesheet" href="/nahravani.css?v=7" />
+  <!-- Vzhled ceníku sdílený s webem (pro-zamestnavatele.html → #pricing). -->
+  <link rel="stylesheet" href="/cenik.css?v=6" />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/LeagueSpartan-Variable.woff2" crossorigin />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -480,98 +482,7 @@
        metal-fx (WebGL2); tady jsou barvy tarifů pro jeho plátna (knihovna
        má jeden preset na stránku → barva přes CSS filtr) a CSS náhrada,
        když WebGL2 není. Písmo necháváme naše (Inter). */
-    @keyframes mk-metal-sheen {
-      0%       { background-position: 130% 0, 0 0; }
-      72%, 100% { background-position: -30% 0, 0 0; }
-    }
-    @keyframes mk-tier-drift {
-      0%, 100% { background-position: 0% 0%, 100% 100%, 50% 0%, 0 0; }
-      25%      { background-position: 100% 0%, 0% 100%, 100% 50%, 0 0; }
-      50%      { background-position: 100% 100%, 0% 0%, 50% 100%, 0 0; }
-      75%      { background-position: 0% 100%, 100% 0%, 0% 50%, 0 0; }
-    }
-    /* Přelévavý barevný text */
-    .mk-grad {
-      font: 700 40px/1.2 Inter, sans-serif; letter-spacing: -0.02em;
-      background-size: 180% 180%, 180% 180%, 180% 180%, 100% 100%; background-repeat: no-repeat;
-      -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
-      animation: mk-tier-drift 8s linear infinite;
-    }
-    [data-tier="zakladni"]  .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #FFFFFF 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #8E9BB8 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #DDE3EE 0%, transparent 70%), linear-gradient(180deg, #9AA3B8 0%, #E6EAF2 100%); }
-    [data-tier="vyhodny"]   .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #6B70FF 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #9FD0FF 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #8A5CFF 0%, transparent 70%), linear-gradient(180deg, #2E33F0 0%, #B9BBFF 100%); }
-    [data-tier="dynamicky"] .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #5FD18D 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #C8F59A 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #2BC4B0 0%, transparent 70%), linear-gradient(180deg, #229B54 0%, #B8EFCB 100%); }
-    [data-tier="maximalni"] .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #F08A4B 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #FFC27A 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #E0452B 0%, transparent 70%), linear-gradient(180deg, #BE5518 0%, #FFD2B0 100%); }
-    [data-tier="vlastni"]   .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #A77BE8 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #F29BD8 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #6A6CF0 0%, transparent 70%), linear-gradient(180deg, #7A41C8 0%, #E0CCFA 100%); }
-
-    /* Barva kovu na plátnech metal-fx (text / odznáček / tlačítko) */
-    [data-tier="zakladni"]  [data-cell="text"] canvas, [data-tier="zakladni"]  .metal-fx-glow-svg { filter: grayscale(1) sepia(.6) hue-rotate(185deg) saturate(1.8) brightness(.95); }
-    [data-tier="zakladni"] [data-cell="badge"] canvas, [data-tier="zakladni"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(.6) hue-rotate(185deg) saturate(1.8) brightness(1); }
-    [data-tier="vyhodny"]   [data-cell="text"] canvas, [data-tier="vyhodny"]   .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(6) hue-rotate(200deg) brightness(.95); }
-    [data-tier="vyhodny"] [data-cell="badge"] canvas, [data-tier="vyhodny"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(6) hue-rotate(200deg) brightness(.7); }
-    [data-tier="dynamicky"] [data-cell="text"] canvas, [data-tier="dynamicky"] .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(95deg) brightness(.95); }
-    [data-tier="dynamicky"] [data-cell="badge"] canvas, [data-tier="dynamicky"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(95deg) brightness(.7); }
-    [data-tier="maximalni"] [data-cell="text"] canvas, [data-tier="maximalni"] .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(-12deg) brightness(.95); }
-    [data-tier="maximalni"] [data-cell="badge"] canvas, [data-tier="maximalni"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(4) hue-rotate(-12deg) brightness(.7); }
-    [data-tier="vlastni"]   [data-cell="text"] canvas, [data-tier="vlastni"]   .metal-fx-glow-svg { filter: grayscale(1) sepia(1) saturate(4.5) hue-rotate(225deg) brightness(.95); }
-    [data-tier="vlastni"] [data-cell="badge"] canvas, [data-tier="vlastni"] [data-cell="btn"] canvas { filter: grayscale(1) sepia(1) saturate(4.5) hue-rotate(225deg) brightness(.7); }
-
-    /* CSS náhrada kovového textu (bez WebGL2) */
-    .mk-sheen {
-      color: transparent; background-size: 250% 100%, 100% 100%; background-repeat: no-repeat;
-      -webkit-background-clip: text; background-clip: text;
-      animation: mk-metal-sheen 3.6s cubic-bezier(0.45, 0, 0.3, 1) infinite;
-    }
-    .mk-sheen.mk-liquid { background-size: 300% 100%, 100% 300%, 100% 100%; animation-name: mk-metal-liquid; }
-    @keyframes mk-metal-liquid {
-      0%       { background-position: 130% 0, 0 0%, 0 0; }
-      72%, 100% { background-position: -30% 0, 0 100%, 0 0; }
-    }
-
-    /* CSS náhrada kovového odznáčku */
-    .mk-rim {
-      position: relative; display: inline-flex; box-sizing: border-box; padding: 1.5px; border-radius: 999px;
-      background:
-        linear-gradient(100deg, transparent 36%, rgba(255,255,255,0.95) 50%, transparent 64%),
-        linear-gradient(180deg, var(--mk-m1) 0%, var(--mk-m2) 45%, var(--mk-m3) 55%, var(--mk-m4) 100%);
-      background-size: 250% 100%, 100% 100%; background-repeat: no-repeat;
-      box-shadow: 0 0 0 0.5px rgba(255,255,255,0.12);
-      animation: mk-metal-sheen 3.4s cubic-bezier(0.45, 0, 0.3, 1) infinite;
-    }
-    .mk-rim-fill {
-      position: relative; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
-      height: 22px; min-width: 42px; padding: 0 10px; border-radius: 999px; overflow: hidden; isolation: isolate;
-      background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 100%), var(--mk-fill);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.22), inset 0 0 6px rgba(255,255,255,0.3);
-      font: 600 12.2px/1 Inter, sans-serif; color: var(--mk-text); white-space: nowrap;
-    }
-    .mk-rim-fill::before {
-      content: ""; position: absolute; left: 0; right: 0; top: 0; height: 50%;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.35), rgba(255,255,255,0)); pointer-events: none; z-index: -1;
-    }
-    .mk-rim-fill::after {
-      content: ""; position: absolute; top: -50%; bottom: -50%; left: 0; width: 40%;
-      background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
-      transform: translate3d(-150%, 0, 0) skewX(-18deg); will-change: transform;
-      animation: mk-pill-sheen 3.4s cubic-bezier(0.45, 0, 0.3, 1) infinite; pointer-events: none; z-index: -1;
-    }
-    @keyframes mk-pill-sheen {
-      0%       { transform: translate3d(-150%, 0, 0) skewX(-18deg); }
-      72%, 100% { transform: translate3d(400%, 0, 0) skewX(-18deg); }
-    }
-    [data-tier="zakladni"]  .mk-rim { --mk-fill: #B7C1D6; --mk-text: #1F2430; --mk-m1: #FFFFFF; --mk-m2: #C9D0DE; --mk-m3: #7C869C; --mk-m4: #EEF1F7; --mk-glow: rgba(183,193,214,0.18); }
-    [data-tier="vyhodny"]   .mk-rim { --mk-fill: #2E33F0; --mk-text: #FFFFFF; --mk-m1: #E0E1FF; --mk-m2: #8C90FF; --mk-m3: #1C21B8; --mk-m4: #C9CBFF; --mk-glow: rgba(107,112,255,0.28); }
-    [data-tier="dynamicky"] .mk-rim { --mk-fill: #229B54; --mk-text: #FFFFFF; --mk-m1: #DDF7E6; --mk-m2: #6FD69A; --mk-m3: #146B38; --mk-m4: #C8F0D6; --mk-glow: rgba(95,209,141,0.22); }
-    [data-tier="maximalni"] .mk-rim { --mk-fill: #BE5518; --mk-text: #FFFFFF; --mk-m1: #FFE6D6; --mk-m2: #F5A06C; --mk-m3: #7A3008; --mk-m4: #FFD2B0; --mk-glow: rgba(240,138,75,0.24); }
-    [data-tier="vlastni"]   .mk-rim { --mk-fill: #7A41C8; --mk-text: #FFFFFF; --mk-m1: #EFE5FC; --mk-m2: #B994EE; --mk-m3: #4B2380; --mk-m4: #E3D3FA; --mk-glow: rgba(167,123,232,0.26); }
-
-    /* CSS náhrada kovového tlačítka */
-    .mk-rim--btn { padding: 2px; }
-    .mk-rim--btn .mk-rim-fill { height: auto; border: 0; padding: 10px 20px; font: 500 15px/1.2 Inter, sans-serif; cursor: pointer; }
-
-    @media (prefers-reduced-motion: reduce) {
-      .mk-grad, .mk-sheen, .mk-rim { animation: none; }
-      .mk-rim-fill::after { animation: none; opacity: 0; }
-    }
+    /* Kovové nápisy a tlačítka (.mk-grad, .mk-rim) jsou v /cenik.css — sdílí je web. */
     @keyframes metalFlow { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
     @keyframes sheenSweep { 0%,8% { transform: translateX(-200%) skewX(-22deg); } 46%,100% { transform: translateX(900%) skewX(-22deg); } }
     @keyframes badgeTilt { 0%,100% { transform: rotateY(-9deg) rotateX(4deg); } 50% { transform: rotateY(9deg) rotateX(-4deg); } }
@@ -740,7 +651,7 @@
   <script type="text/babel" src="employer-dashboard.jsx?v=40"></script>
   <script type="text/babel" src="employer-pages.jsx?v=77"></script>
   <script type="text/babel" src="employer-demo.jsx?v=6"></script>   <!-- ukázkové inzeráty — PŘED RELEASEM smazat -->
-  <script type="text/babel" src="employer-pages3.jsx?v=190"></script>
+  <script type="text/babel" src="employer-pages3.jsx?v=192"></script>
   <script type="text/babel" src="_premium/kraje-map.jsx?v=19"></script>
   <script type="text/babel" src="_premium/analytics.jsx?v=40"></script>
   <script type="text/babel" src="employer-firma.jsx?v=5"></script>

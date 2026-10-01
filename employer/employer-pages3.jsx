@@ -1323,7 +1323,7 @@ const PLANS = [
   },
   {
     id: 'vlastni', name: 'Vlastní', calc: true, period: 'za měsíc',
-    kdo: 'Pro velké firmy', popis: 'Desítky až tisíce pozic a podmínky na míru. Vše z Maximální.',
+    kdo: 'Pro velké firmy', popis: 'Desítky pozic a podmínky na míru. Vše z Maximální.',
     color: '#E0B0FF', rgb: '224,176,255',
     feats: [['Vše z Maximální', true]],
     cta: 'Nezávazná poptávka', contact: true,
@@ -1334,7 +1334,7 @@ const PLANS = [
 // Hodnota buňky: true/false (má/nemá) nebo text (konkrétní limit).
 const FEATURE_ROWS = [
   { section: 'Inzeráty' },
-  { label: 'Aktivní inzeráty',                 cells: { zakladni: '1',      vyhodny: '2',      dynamicky: '5',       maximalni: '10',      vlastni: '20–5 000' } },
+  { label: 'Aktivní inzeráty',                 cells: { zakladni: '1',      vyhodny: '2',      dynamicky: '5',       maximalni: '10',      vlastni: '20–100' } },
   { label: 'Topování inzerátu',                cells: { zakladni: false,    vyhodny: '1×/měs', dynamicky: '3×/měs',  maximalni: '5×/měs',  vlastni: '5×/měs' } },
   { label: 'Plánování inzerátu',               cells: { zakladni: false,    vyhodny: false,    dynamicky: true,      maximalni: true,      vlastni: true } },
   { label: 'Custom šablona inzerátů (pozadí)', cells: { zakladni: false,    vyhodny: false,    dynamicky: true,      maximalni: true,      vlastni: true } },
@@ -1420,15 +1420,14 @@ const _CENIK_CSS = `
 `;
 
 // Kalkulačka tarifu Vlastní — stejný sazebník jako na webu (kalkulackaVlastni()).
-// Základ 10 000 Kč za 20 inzerátů, každý další podle pásma; výsledek se
-// zaokrouhlí na tisíce a sníží o korunu (ceny končí na 999).
+// Základ 18 000 Kč za 20 inzerátů, každý další podle pásma; výsledek se
+// zaokrouhlí na tisíce a sníží o korunu (ceny končí na 990). Strop je
+// 100 inzerátů — nad něj se řeší individuálně, proto posuvník končí tam.
 const _KALK_ZAKLAD = 18000, _KALK_OD = 20;
-const _KALK_PASMA = [[50,810],[100,630],[250,450],[500,324],[1000,216],[2500,144],[5000,90]];
+const _KALK_PASMA = [[50,810],[100,630]];
 const _KALK_KROKY = (() => {
   const k = []; let v;
-  for (v = 20;  v <= 100;  v += 10)  k.push(v);
-  for (v = 150; v <= 500;  v += 50)  k.push(v);
-  for (v = 600; v <= 5000; v += 100) k.push(v);
+  for (v = 20; v <= 100; v += 5) k.push(v);
   return k;
 })();
 function _kalkCena(n) {
@@ -1469,69 +1468,8 @@ function CenikCislo({ value, style, className = 'yp-num' }) {
 // pruh Vlastní s posuvníkem. Vzhled a texty z návrhu, písmo a modrá naše;
 // zůstává dopočítávání cen při přepnutí Měsíčně/Ročně (CenikCislo) a
 // kalkulačka ceny Vlastního (stejný sazebník jako Samův web).
-const _CENIK2_CSS = `
-.e-c2{display:flex;flex-direction:column;gap:14px;padding:14px 24px 14px;color:#0B1033;}
-.e-c2-hlava{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;}
-.e-c2-h1{margin:0 0 4px;font-size:28px;line-height:1.15;font-weight:800;letter-spacing:-.02em;}
-.e-c2-sub{margin:0;font-size:15px;color:#5B6178;}
-.e-c2-prep{display:flex;align-items:center;gap:4px;padding:4px;background:#fff;border:1px solid #E3E6EE;border-radius:999px;}
-.e-c2-prep button{border:0;cursor:pointer;font:inherit;font-size:14px;font-weight:600;padding:8px 18px;border-radius:999px;background:transparent;color:#5B6178;display:flex;align-items:center;gap:8px;transition:background .18s,color .18s;}
-.e-c2-prep button.on{background:#0B1033;color:#fff;}
-.e-c2-prep .e-c2-sleva{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:#DCFCE7;color:#15803D;}
-.e-c2-karty{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding-top:10px;align-items:stretch;}
-.e-c2-karta{position:relative;background:#fff;border:1px solid #E3E6EE;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;transition:border-color .28s ease,box-shadow .28s ease,transform .28s cubic-bezier(.2,.8,.2,1);}
-/* Najetí: rámeček v barvě tarifu (jako kovový název) — plynule, zesílený
-   vnitřní linkou (žádné poskočení obsahu) a jemná záře ve stejné barvě.
-   Nejoblíbenější už nemá trvalý modrý rámeček — stačí štítek nad kartou. */
-.e-c2-karta:hover{border-color:var(--tier);box-shadow:inset 0 0 0 1px var(--tier),0 14px 34px -14px var(--tier-a);transform:translateY(-2px);}
-.e-c2-stitek-dop{position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:#0020F6;color:#fff;}
-.e-c2-stitek-vas{position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:#EEF1FF;border:1px solid #D6DCFF;color:#0020F6;}
-.e-c2-kdo{font-size:13px;font-weight:500;color:#8A90A6;}
-.e-c2-nazev{font-size:19px;font-weight:700;}
-.e-c2-popis{font-size:13px;line-height:1.4;color:#5B6178;text-wrap:pretty;min-height:36px;}
-.e-c2-cena{display:flex;align-items:baseline;gap:6px;height:36px;}
-.e-c2-num{font-size:34px;line-height:1;font-weight:800;letter-spacing:-.02em;white-space:nowrap;font-variant-numeric:tabular-nums;}
-.e-c2-kc{font-size:17px;font-weight:700;color:#5B6178;}
-.e-c2-obd{font-size:13.5px;color:#5B6178;}
-.e-c2-uspora{font-size:12.5px;font-weight:600;height:17px;transition:color .2s;}
-.e-c2-btn{cursor:pointer;font:inherit;font-size:14.5px;font-weight:700;height:40px;border-radius:11px;border:1px solid #CDD2DF;background:#fff;color:#0B1033;width:100%;transition:border-color .15s,background .15s;}
-.e-c2-btn:hover{border-color:#0B1033;}
-.e-c2-btn.prim{border:0;background:#0020F6;color:#fff;}
-.e-c2-btn.prim:hover{background:#0019C4;}
-.e-c2-btn:disabled{background:#F3F4F8;border:1px solid #EEF0F5;color:#8A90A6;cursor:default;}
-.e-c2-funkce{border-top:1px solid #EEF0F5;padding-top:12px;display:flex;flex-direction:column;gap:7px;}
-.e-c2-uvod{font-size:12.5px;font-weight:600;color:#5B6178;}
-.e-c2-f{display:flex;gap:8px;font-size:13.5px;line-height:1.35;}
-.e-c2-f.ne{color:#A0A5B8;}
-.e-c2-f svg{flex:none;margin-top:1px;}
-.e-c2-vl{background:#0B1033;border-radius:18px;padding:16px 26px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:36px;align-items:center;color:#fff;}
-.e-c2-vl .e-c2-kdo,.e-c2-vl .e-c2-popis{color:#B7BCD0;}
-.e-c2-vl .e-c2-popis{min-height:0;font-size:14px;}
-.e-c2-vl input[type=range]{width:100%;margin:0;accent-color:#0020F6;cursor:pointer;}
-.e-c2-vl-btn{cursor:pointer;font:inherit;font-size:14.5px;font-weight:700;height:40px;padding:0 20px;border-radius:11px;border:0;background:#fff;color:#0B1033;white-space:nowrap;display:inline-flex;align-items:center;text-decoration:none;}
-.e-c2-vl-btn:hover{background:#E6E9F5;text-decoration:none;}
-.e-c2-pata{display:flex;align-items:baseline;justify-content:center;gap:12px;text-align:center;}
-.e-c2-pata button{background:none;border:0;cursor:pointer;font:inherit;font-size:14.5px;font-weight:700;color:#0020F6;padding:2px;}
-.e-c2-pata button:hover{color:#0019C4;text-decoration:underline;}
-.e-c2-pata p{margin:0;font-size:12.5px;color:#8A90A6;}
-.e-c2-akt{display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 18px;border-radius:999px;background:#EEF1FF;border:1px solid #D6DCFF;color:#0020F6;font-size:14px;font-weight:700;white-space:nowrap;box-sizing:border-box;cursor:default;}
-.e-c2-prep-mini button{font-size:13px;padding:7px 13px;}
-.e-c2-prep-mini .e-c2-sleva{font-size:11px;padding:2px 7px;}
-.e-obj-karta{background:#fff;border-radius:20px;box-shadow:0 24px 64px -16px rgba(11,16,51,.35);padding:24px 26px 20px;display:flex;flex-direction:column;gap:18px;color:#0B1033;}
-.e-obj-box{background:#F6F7FA;border:1px solid #EEF0F5;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
-.e-obj-kdy{font-size:13px;color:#5B6178;background:#F6F7FA;border-radius:10px;padding:10px 12px;}
-.e-obj-pravni{font-size:12px;line-height:1.5;color:#8A90A6;text-align:center;margin-top:-6px;text-wrap:pretty;}
-.e-obj-pravni a{color:#5B6178;text-decoration:underline;text-underline-offset:2px;}
-.e-obj-pravni a:hover{color:#0020F6;}
-.e-obj-ok{width:52px;height:52px;border-radius:50%;background:#16A34A;display:grid;place-items:center;box-shadow:0 10px 24px -8px rgba(22,163,74,.55);}
-.e-c2-x{cursor:pointer;width:40px;height:40px;flex:none;border-radius:10px;border:1px solid #E3E6EE;background:#fff;display:flex;align-items:center;justify-content:center;transition:border-color .15s;}
-.e-c2-x:hover{border-color:#0B1033;}
-.e-c2-tl-prim{cursor:pointer;border:0;background:#0020F6;color:#fff;transition:background .15s;}
-.e-c2-tl-prim:hover{background:#0019C4;}
-.e-c2-tl-out{cursor:pointer;border:1px solid #CDD2DF;background:#fff;color:#0B1033;transition:border-color .15s;}
-.e-c2-tl-out:hover{border-color:#0B1033;text-decoration:none;}
-.e-c2-srow:hover{background:#FAFBFD;}
-`;
+// Vzhled ceníku (.e-c2*) je v /cenik.css — stejný soubor načítá i web.
+
 // Barvy tarifů = hlavní barva kovového názvu (_MK_TIER.hex v employer-shell.jsx)
 const _C2_BARVA = { zakladni: '#B7C1D6', vyhodny: '#2E33F0', dynamicky: '#229B54', maximalni: '#BE5518', vlastni: '#7A41C8' };
 const _C2_ANO = <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
@@ -1555,7 +1493,7 @@ function CenikVlastni({ plan, onPocet }) {
           <span style={{ fontSize: 18, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{n.toLocaleString('cs-CZ')}</span>
         </div>
         <input type="range" min="0" max={_KALK_KROKY.length - 1} step="1" value={i} onChange={e => setI(+e.target.value)} aria-label="Počet aktivních inzerátů" />
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#8990AD' }}><span>20</span><span>5 000</span></div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#8990AD' }}><span>20</span><span>100</span></div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -1622,7 +1560,6 @@ function EPricing({ onTab, onPlanChange }) {
     <div style={{ background: '#fff', border: '1px solid #DDE1F0', borderRadius: 22, overflow: 'hidden' }}>
     {/* Bez hlavičky „Tarify" (Yasin 27. 9.) — nadpis stránky je „Vyber si svůj plán" */}
     <style>{_CENIK_CSS}</style>
-    <style>{_CENIK2_CSS}</style>
     <div className="e-c2">
 
       <div className="e-c2-hlava">

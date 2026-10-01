@@ -23,14 +23,14 @@
   <meta property="og:url" content="https://makej.eu/" />
   <meta property="og:title" content="Brigády a práce ve tvém okolí | Makej" />
   <meta property="og:description" content="Najdi brigádu, part-time i jednorázový přivýdělek ve svém okolí. Swajpni nabídku, matchni se s firmou a domluv se v chatu. Pro brigádníky zdarma." />
-  <meta property="og:image" content="https://makej.eu/og-image.png" />
+  <meta property="og:image" content="https://makej.eu/og-image.png?v=6" />
   <meta property="og:locale" content="cs_CZ" />
   <meta property="og:site_name" content="Makej" />
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Brigády a práce ve tvém okolí | Makej" />
   <meta name="twitter:description" content="Najdi brigádu, part-time i jednorázový přivýdělek ve svém okolí. Swajpni nabídku, matchni se s firmou a domluv se v chatu. Pro brigádníky zdarma." />
-  <meta name="twitter:image" content="https://makej.eu/og-image.png" />
+  <meta name="twitter:image" content="https://makej.eu/og-image.png?v=6" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="/favicon.png?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=157" />
+  <link rel="stylesheet" href="style.css?v=158" />
 
     <!-- ═══════════ ÚVODNÍ NAPSÁNÍ NADPISU ═══════════
        Místo modré plochy s logem se na čisté stránce po písmenech napíše
@@ -64,6 +64,9 @@
        Písmena se prolínají, neskáčou: tvrdý psací stroj i s kurzorem tu byl
        vyzkoušený a působil hůř. */
     .hero-slovo { white-space: nowrap; }
+    /* Slovo i tečka za ním jako jeden celek — řádek se smí zlomit před nimi,
+       ne mezi nimi. */
+    .hero-konec { white-space: nowrap; }
     .hero-pis { opacity: 0; transition: opacity .16s ease; }
     .hero-pis.je-tu { opacity: 1; }
 
@@ -148,7 +151,7 @@
         "slogan": "Swajpuj. Matchuj. Pracuj.",
         "url": "https://makej.eu/",
         "logo": "https://makej.eu/favicon.png",
-        "image": "https://makej.eu/og-image.png",
+        "image": "https://makej.eu/og-image.png?v=6",
         "description": "Makej je česká aplikace pro hledání brigád a práce. Swajpni nabídku, matchni se se zaměstnavatelem a začni vydělávat ještě dnes.",
         "email": "podpora@makej.eu",
         "foundingDate": "2026-08-18",
@@ -228,7 +231,17 @@
     // Textové uzly kolem .hero-typer rozložíme na písmena. Před typerem =
     // „Práce na jeden ", za ním tečka — ta se musí objevit až po slově.
     var pred = [], za = [], zaTyperem = false;
-    [].slice.call(obal.childNodes).forEach(function (uzel) {
+    // Tečka sedí v .hero-konec vedle typeru, ne přímo v obalu — projít se proto
+    // musí i uzly uvnitř něj, jinak by zůstala prostým textem a objevila by se
+    // hned, místo aby přišla až po dopsaném slově.
+    var uzly = [];
+    [].slice.call(obal.childNodes).forEach(function (u) {
+      if (u.nodeType === 1 && u.classList.contains('hero-konec')) {
+        [].slice.call(u.childNodes).forEach(function (v) { uzly.push([v, u]); });
+      } else { uzly.push([u, obal]); }
+    });
+    uzly.forEach(function (par) {
+      var uzel = par[0], rodic = par[1];
       if (uzel === typer) { zaTyperem = true; return; }
       if (uzel.nodeType !== 3) return;
       var frag = document.createDocumentFragment();
@@ -246,7 +259,7 @@
         });
         frag.appendChild(slovo);
       });
-      obal.replaceChild(frag, uzel);
+      rodic.replaceChild(frag, uzel);
     });
 
     obal.style.opacity = '1';     // písmena jsou schovaná každé zvlášť, obal už ne
@@ -313,7 +326,10 @@
   <section id="hero">
     <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="hero-main">
-      <h1 class="hero-h1"><span>Práce na jeden <span class="hero-typer" id="hero-typer"><span class="typer-word" id="typer-word">swajp</span></span>.</span></h1>
+      <!-- Střídané slovo a tečka musí zůstat na jednom řádku — proto je obě
+           drží .hero-konec (nowrap). Na úzkém displeji se jinak zalomilo
+           mezi ně a tečka visela sama na dalším řádku. -->
+      <h1 class="hero-h1"><span>Práce na jeden <span class="hero-konec"><span class="hero-typer" id="hero-typer"><span class="typer-word" id="typer-word">swajp</span></span>.</span></span></h1>
 
       <!-- hero-cta-auth: odhlášený; hero-cta-loggedin přepíná script.js -->
       <div class="hero-cta" id="hero-cta-auth">
@@ -661,6 +677,6 @@
   <!-- ═══════════ COOKIE BANNER ═══════════ -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=67"></script>
+  <script src="script.js?v=68"></script>
 </body>
 </html>
