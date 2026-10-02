@@ -716,6 +716,13 @@ function EmployerApp() {
     }
     await fetchEmployerData(empId.current);
     setTick(t => t + 1);
+    // Plný tarif → createJobE ho uložil jako neaktivní; po „Hotovo" říct proč.
+    if (result.status === 'paused') {
+      const tier = typeof _employerPlanTier === 'function' ? _employerPlanTier() : 'zakladni';
+      const lim = (typeof EMPLOYER_MAX_ACTIVE !== 'undefined' && EMPLOYER_MAX_ACTIVE[tier]) || 1;
+      const naz = (typeof EMPLOYER_TARIF_NAZEV !== 'undefined' && EMPLOYER_TARIF_NAZEV[tier]) || '';
+      setTimeout(() => addToast('Uloženo jako neaktivní', 'Tarif ' + naz + ' dovoluje ' + lim + ' aktivní ' + (lim === 1 ? 'inzerát' : lim < 5 ? 'inzeráty' : 'inzerátů') + '. Vypněte jiný, nebo navyšte tarif.', 'ℹ️', 'info'), 2700);
+    }
     // Načítání ukaž aspoň chvíli, ať to nepřeskočí (i když se uloží hned)
     const MIN_LOADING = 2600;
     setTimeout(() => {
@@ -751,12 +758,15 @@ function EmployerApp() {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  // Theme toggle re-render (+ po uložení profilu firmy — levé menu ukazuje logo a název)
+  // Theme toggle re-render. Po uložení profilu firmy jen překreslit (levé menu ukazuje
+  // logo a název) — NE přemountovat záložku: tick zahodil hlášku o uložení a formulář
+  // se načetl znovu z EPROFILE, takže fotka pozadí, která se neuložila, hned zmizela.
   useEffectE(() => {
     const handler = () => setTick(t => t + 1);
+    const profil = () => setUnreadNudge(n => n + 1);
     window.addEventListener('makej-theme-toggle', handler);
-    window.addEventListener('emp-profil-ulozen', handler);
-    return () => { window.removeEventListener('makej-theme-toggle', handler); window.removeEventListener('emp-profil-ulozen', handler); };
+    window.addEventListener('emp-profil-ulozen', profil);
+    return () => { window.removeEventListener('makej-theme-toggle', handler); window.removeEventListener('emp-profil-ulozen', profil); };
   }, []);
 
   // Initial data fetch on mount
@@ -847,6 +857,7 @@ function EmployerApp() {
               : { from: 'them', text: msg.text, t: _fmtTime(msg.created_at), id: msg.id };
             t.msgs = [...t.msgs, bubble];
           }
+          t.lastAt = msg.created_at || new Date().toISOString();
           if (msg.match_id === open) { try { localStorage.setItem('emp-lastread-' + msg.match_id, Date.now()); } catch (e) {} }
           else { t.unread = (t.unread || 0) + 1; addToast(t.name || 'Nová zpráva', preview, '💬', 'info', { initials: t.avatar, color: t.color }); }
           setUnreadNudge(n => n + 1);
@@ -857,8 +868,38 @@ function EmployerApp() {
     return () => { if (chan) { try { sb.removeChannel(chan); } catch (e) {} } };
   }, [loaded]);
 
+  // Odhlášení jako „vypnutí proudu" (Yasin 1. 10.): dashboard ztmavne shora
+  // dolů, uprostřed se po znacích dopíše „Neplecha ukončena" s blikajícím
+  // kurzorem (jako „Je hotovo." v appce) a za ~2,2 s je člověk na webu.
+  // Odhlášení běží souběžně s animací. Prvky se staví mimo React — stránka
+  // stejně hned odchází. Styly .e-tma* jsou v index.html.
+  // scope 'local' = odhlásit jen tohle zařízení; výchozí 'global' by firmu
+  // odhlásil všude naráz (i v appce na mobilu).
   async function handleSignOut() {
-    await sb.auth.signOut({ scope: 'local' });
+    if (document.querySelector('.e-tma')) return;
+    const odhlaseni = sb.auth.signOut({ scope: 'local' }).catch(() => {});
+    const VETA = 'Neplecha ukončena';
+    const tma = document.createElement('div');
+    tma.className = 'e-tma';
+    tma.innerHTML = '<div class="e-tma-clona"></div>'
+      + '<div class="e-tma-veta" aria-live="polite"><div><span></span><i aria-hidden="true"></i></div></div>';
+    document.body.appendChild(tma);
+    const cil = tma.querySelector('span');
+    const bezPohybu = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const animace = new Promise(hotovo => {
+      if (bezPohybu) { cil.textContent = VETA; setTimeout(hotovo, 700); return; }
+      // Psát se začne, až je tma dole (clona dojede za ~.65 s).
+      setTimeout(() => {
+        let i = 0;
+        (function krok() {
+          cil.textContent = VETA.slice(0, ++i);
+          if (i < VETA.length) setTimeout(krok, 50);
+          else setTimeout(hotovo, 720);   // chvíle na přečtení — na webu za ~2,2 s
+        })();
+      }, 620);
+    });
+    // Na web hned po dopsání; kdyby odhlášení vázlo, nejpozději za 3 s.
+    await Promise.race([Promise.all([animace, odhlaseni]), new Promise(r => setTimeout(r, 3000))]);
     window.location.href = '/';
   }
 
@@ -866,12 +907,20 @@ function EmployerApp() {
   const meta   = { ...(TITLES[tab] || TITLES.dash), subtitle: tab === 'dash' ? `Přehled výkonu náboru za ${periodLabel}` : (TITLES[tab] || TITLES.dash).subtitle };
   const noData = loaded && E_JOBS.length === 0;
 
+  // Onboarding (naše, Yasin ho ve své verzi nemá): firma z čekacího listu má
+  // vyplněný jen název, IČO a e-mail. Dokud nedoplní sídlo a obor, do dashboardu
+  // ji nepustíme — jinak by inzerovala jako firma, o které brigádník neví, kde
+  // sídlí ani co dělá. Test na `typeof` drží, i kdyby se skript nenačetl.
+  if (loaded && typeof eOnboardingNeeded === 'function' && eOnboardingNeeded(EPROFILE)) {
+    return <EOnboarding onDone={() => setTick(t => t + 1)} onSignOut={handleSignOut} />;
+  }
+
   let body;
   if (!loaded) {
     body = <ELoadingSpinner />;
   // Období není v key: změna období jen překreslí (data se počítají z props),
   // nepřipojí záložku znovu — jinak by se při výběru Od/Do zavřela roletka.
-  } else if (tab === 'dash')        body = <EDashboard key={tick} period={period} onTab={setTab} onNew={() => setShowNewJob(true)} onPeriod={setPeriod} />;
+  } else if (tab === 'dash')        body = <EDashboard key={tick} period={period} onTab={setTab} onNew={() => setShowNewJob(true)} onPeriod={setPeriod} onOpenChat={openChat} />;
   else if (tab === 'analytics')     body = <EAnalytics key={tick} period={period} onNew={() => setShowNewJob(true)} onTab={setTab} onPeriod={setPeriod} />;
   else if (tab === 'jobs')          body = <EJobs key={tick} onTab={setTab} onNew={() => setShowNewJob(true)} period={period} onPeriod={setPeriod} />;
   else if (tab === 'candidates')    body = <ECandidates key={tick} onOpenChat={openChat} onNew={() => setShowNewJob(true)} period={period} onPeriod={setPeriod} />;
@@ -892,13 +941,6 @@ function EmployerApp() {
     </div>
   );
 
-  // Firma z čekacího listu má vyplněný jen název a IČO. Dokud nedoplní sídlo
-  // a obor, nepustíme ji do dashboardu — obchází to celý obal včetně sidebaru,
-  // ať se nedá proklikat jinam. Protějšek brigádnického onboardingu v appce.
-  if (loaded && typeof eOnboardingNeeded === 'function' && eOnboardingNeeded(EPROFILE)) {
-    return <EOnboarding onDone={() => setTick(t => t + 1)} onSignOut={handleSignOut} />;
-  }
-
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%', background: '#fff', position: 'relative' }}>
       <div style={{
@@ -912,7 +954,7 @@ function EmployerApp() {
         filter: 'blur(80px)', pointerEvents: 'none',
       }} />
 
-      {loaded && <ESidebar tab={tab} onTab={setTab} onSignOut={handleSignOut}
+      {loaded && <ESidebar tab={tab} onTab={setTab} onSignOut={handleSignOut} onNew={() => setShowNewJob(true)}
         mobile={isMobile} open={navOpen} onClose={() => setNavOpen(false)} />}
 
       {/* Ztmavení obsahu pod vysunutým drawerem */}

@@ -107,6 +107,9 @@ const EMPLOYER_MAX_ACTIVE = { zakladni: 1, vyhodny: 2, dynamicky: 5, maximalni: 
 // Kolikrát za kalendářní měsíc smí firma topovat inzerát (ceník: řádek „Topování inzerátu").
 // Jedno topování = inzerát je E_TOP_HODIN hodin v appce mezi prvními kartami (employer-supabase.jsx).
 const EMPLOYER_TOP_MESICNE = { zakladni: 0, vyhodny: 1, dynamicky: 3, maximalni: 5, vlastni: 5 };
+// Kolikrát za kalendářní měsíc smí firma označit inzerát jako urgentní (ceník: řádek
+// „Notifikace Urgent"). Označení platí do začátku směny (urgentniJobE v employer-supabase.jsx).
+const EMPLOYER_URGENT_MESICNE = { zakladni: 0, vyhodny: 0, dynamicky: 1, maximalni: 2, vlastni: 3 };
 const EMPLOYER_TARIF_NAZEV  = { zakladni: 'Základní', vyhodny: 'Výhodný', dynamicky: 'Dynamický', maximalni: 'Maximální', vlastni: 'Vlastní' };
 
 function _employerPlanTier() {

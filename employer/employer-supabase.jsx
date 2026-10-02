@@ -174,14 +174,27 @@ async function markThreadReadE(userId, matchId) {
 // ── Topování (29. 9.) ───────────────────────────────────────────────────────
 // Topovaný inzerát má jobs.top_until v budoucnu → appka ho dává na začátek feedu
 // (RPC get_feed_jobs řadí top_until desc, appka to drží i po filtrech) a ukazuje
-// zlatou pilulku TOP. Kvůli měsíčnímu limitu tarifu (EMPLOYER_TOP_MESICNE) se každé
+// zlatou nálepku TOP. Kvůli měsíčnímu limitu tarifu (EMPLOYER_TOP_MESICNE) se každé
 // topování zapisuje do tabulky job_topovani (migration_topovani.sql). Dokud ji Sam
 // nespustí, počítá se z jobs.top_until — každý inzerát pak nejvýš jednou za měsíc.
 const E_TOP_HODIN = 72;
 const E_TOPOVANI  = [];        // topování v tomto měsíci: { job_id, started_at, ends_at }
 let _eTopTabulka  = null;      // null = nevíme, false = tabulka v DB zatím není
-const _eZacatekMesice = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); };
-const _eBezTabulky = e => /job_topovani|does not exist|could not find|PGRST205|42P01/i.test(((e && e.code) || '') + ' ' + ((e && e.message) || ''));
+// TESTOVÁNÍ (Yasin 1. 10.): limit topování se nepočítá za kalendářní měsíc,
+// ale od posledního přihlášení — každé přihlášení dá znovu plný počet podle
+// tarifu. Čas přihlášení zapisuje web (script.js, 'makej-prihlaseni-od').
+// PŘED SPUŠTĚNÍM přepnout na false → zase kalendářní měsíc.
+const E_LIMITY_OD_PRIHLASENI = true;
+const _eZacatekMesice = () => {
+  if (E_LIMITY_OD_PRIHLASENI) {
+    let od = 0;
+    try { od = Number(localStorage.getItem('makej-prihlaseni-od')) || 0; } catch (e) {}
+    if (!od) { od = Date.now(); try { localStorage.setItem('makej-prihlaseni-od', String(od)); } catch (e) {} }
+    return new Date(od);
+  }
+  const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1);
+};
+const _eBezTabulky = e => /job_topovani|job_urgentni|does not exist|could not find|PGRST205|42P01/i.test(((e && e.code) || '') + ' ' + ((e && e.message) || ''));
 
 async function topovatJobE(jobId) {
   const od = new Date(), konec = new Date(od.getTime() + E_TOP_HODIN * 3600000);
@@ -199,12 +212,63 @@ async function topovatJobE(jobId) {
   return konec.toISOString();
 }
 
+// ── Urgentní (Yasin 2. 10.) ─────────────────────────────────────────────────
+// Dřív byl inzerát urgentní sám (směna do 2 dnů). Teď ho firma označí sama a kolikrát
+// za měsíc, určuje tarif (EMPLOYER_URGENT_MESICNE). Označení platí do začátku směny:
+// jobs.urgent_until = datum + čas od. Do té doby má inzerát v appce i tady fialovou
+// pilulku Urgentní a u termínu odpočet. Inzerát bez budoucího termínu (průběžný nábor,
+// prošlé datum) je urgentní E_URG_HODIN hodin jako topování. Každé označení se zapisuje
+// do job_urgentni (migration_urgentni.sql); dokud tabulka není, počítá se z jobs.urgent_until.
+const E_URGENTNI  = [];        // urgentní označení v tomto měsíci: { job_id, started_at, ends_at }
+const E_URG_HODIN = 72;
+let _eUrgTabulka  = null;
+// DOČASNĚ, dokud Sam nespustí migration_urgentni.sql: když v DB chybí sloupec
+// jobs.urgent_until, uloží se označení jen v tomhle prohlížeči (localStorage), ať jde
+// urgentní vyzkoušet. Appka ho pak nevidí. Po migraci se to samo přestane používat
+// (zápis do DB projde) — pak tenhle kus smazat.
+const _E_URG_LOKAL = 'makej-urgent-test';
+const _eUrgLokal = () => { try { return JSON.parse(localStorage.getItem(_E_URG_LOKAL) || '{}') || {}; } catch (e) { return {}; } };
+const _eBezSloupce = e => /urgent_until|PGRST204|42703/i.test(((e && e.code) || '') + ' ' + ((e && e.message) || ''));
+// Do kdy bude inzerát urgentní: začátek směny, nebo E_URG_HODIN od teď, když budoucí termín nemá
+function _eUrgentDo(j) {
+  const zac = j ? _eZacatekSmeny(j.date, j.timeText) : null;
+  return zac && zac > new Date() ? zac : new Date(Date.now() + E_URG_HODIN * 3600000);
+}
+// Začátek směny: 'RRRR-MM-DD' + první čas z „7:00 – 15:00" (bez času půlnoc). Jinak null.
+function _eZacatekSmeny(date, casy) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(date || ''); if (!m) return null;
+  const t = /(\d{1,2}):(\d{2})/.exec(casy || '');
+  return new Date(+m[1], +m[2] - 1, +m[3], t ? +t[1] : 0, t ? +t[2] : 0);
+}
+async function urgentniJobE(jobId) {
+  const j = E_JOBS.find(x => x.id === jobId);
+  const zac = _eUrgentDo(j);
+  const { error } = await sb.from('jobs').update({ urgent_until: zac.toISOString() }).eq('id', jobId);
+  if (error) {
+    if (!_eBezSloupce(error)) { console.error('urgentniJobE:', error); return null; }
+    console.warn('urgentniJobE: jobs.urgent_until v DB chybí (čeká na migration_urgentni.sql) — uloženo jen v prohlížeči');
+    try { const m = _eUrgLokal(); m[jobId] = zac.toISOString(); localStorage.setItem(_E_URG_LOKAL, JSON.stringify(m)); } catch (e) { return null; }
+    E_URGENTNI.push({ job_id: jobId, started_at: new Date().toISOString(), ends_at: zac.toISOString() });
+    if (j) { j.status = 'urgent'; j.urgentUntil = zac.toISOString(); }
+    return zac.toISOString();
+  }
+  const zaznam = { job_id: jobId, started_at: new Date().toISOString(), ends_at: zac.toISOString() };
+  if (_eUrgTabulka !== false) {
+    const { error: e2 } = await sb.from('job_urgentni').insert(zaznam);
+    if (e2) { if (_eBezTabulky(e2)) _eUrgTabulka = false; else console.error('urgentniJobE záznam:', e2); }
+  }
+  E_URGENTNI.push(zaznam);
+  if (j) { j.status = 'urgent'; j.urgentUntil = zac.toISOString(); }
+  return zac.toISOString();
+}
+
 async function fetchEmployerData(employerId) {
   try {
-    const [profileRes, jobsRes, topRes] = await Promise.all([
+    const [profileRes, jobsRes, topRes, urgRes] = await Promise.all([
       sb.from('profiles').select('*').eq('id', employerId).single(),
       sb.from('jobs').select('*').eq('employer_id', employerId).order('created_at', { ascending: false }),
       sb.from('job_topovani').select('job_id, started_at, ends_at').eq('employer_id', employerId).gte('started_at', _eZacatekMesice().toISOString()),
+      sb.from('job_urgentni').select('job_id, started_at, ends_at').eq('employer_id', employerId).gte('started_at', _eZacatekMesice().toISOString()),
     ]);
 
     const profile = profileRes.data;
@@ -222,6 +286,22 @@ async function fetchEmployerData(employerId) {
         if (od >= _eZacatekMesice()) E_TOPOVANI.push({ job_id: j.id, started_at: od.toISOString(), ends_at: j.top_until });
       });
     }
+
+    // Urgentní označení v tomto měsíci — z job_urgentni, jinak odhad z jobs.urgent_until
+    E_URGENTNI.length = 0;
+    if (!urgRes.error) { _eUrgTabulka = true; (urgRes.data || []).forEach(t => E_URGENTNI.push(t)); }
+    else {
+      if (_eBezTabulky(urgRes.error)) _eUrgTabulka = false; else console.warn('job_urgentni:', urgRes.error.message);
+      jobs.forEach(j => { if (j.urgent_until && new Date(j.urgent_until) >= _eZacatekMesice()) E_URGENTNI.push({ job_id: j.id, started_at: null, ends_at: j.urgent_until }); });
+    }
+    // DOČASNĚ (viz _E_URG_LOKAL): označení uložená jen v prohlížeči, dokud DB nemá urgent_until
+    const urgLokal = _eUrgLokal();
+    jobs.forEach(j => {
+      const u = urgLokal[j.id];
+      if (!u || j.urgent_until) return;
+      j.urgent_until = u;
+      if (new Date(u) >= _eZacatekMesice() && !E_URGENTNI.some(x => x.job_id === j.id)) E_URGENTNI.push({ job_id: j.id, started_at: null, ends_at: u });
+    });
 
     let matches = [], messages = [], reviews = [];
     const viewsByJob = {};
@@ -319,8 +399,12 @@ async function fetchEmployerData(employerId) {
         }
         if (!isNaN(d.getTime())) daysLeft = Math.max(0, Math.ceil((d - today) / 86400000));
       }
-      let status = job.status === 'filled' ? 'filled' : (job.status === 'expired' ? 'paused' : 'active');
-      if (status === 'active' && daysLeft > 0 && daysLeft <= 2) status = 'urgent';
+      // Stav „Naplněno" není (Yasin 30. 9.): neumíme poznat, kdy je brigáda opravdu
+      // obsazená, a firma ji za pár měsíců zase zapne. Inzerát je jen aktivní nebo
+      // neaktivní — starý 'filled' v DB se ukáže jako Neaktivní a jde znovu zapnout.
+      let status = job.status === 'active' ? 'active' : 'paused';
+      // Urgentní jen když ho firma označila a směna ještě nezačala (2. 10., dřív sám do 2 dnů)
+      if (status === 'active' && job.urgent_until && new Date(job.urgent_until) > today) status = 'urgent';
 
       return {
         id: job.id, title: job.title,
@@ -342,6 +426,7 @@ async function fetchEmployerData(employerId) {
         requirements: Array.isArray(job.requirements) ? job.requirements : [],
         positions: job.positions || 0, hoursPerWeek: job.hours_per_week || null,
         boosted: !!(job.top_until && new Date(job.top_until) > new Date()), topUntil: job.top_until || null,
+        urgentUntil: job.urgent_until || null,
         tags: Array.isArray(job.tags) ? job.tags : [],
         created_at: job.created_at,
         // Kandidáti, kteří na tento inzerát swipli (bez ohledu na pozdější rozhodnutí firmy) —
@@ -436,6 +521,7 @@ async function fetchEmployerData(employerId) {
         name: wName,
         avatar: wName.split(' ').map(p => p[0] || '').join('').slice(0,2).toUpperCase() || '??',
         color: _strColor(match.worker_id || match.id),
+        photo: w.avatar_url || null,   // profilovka — Dashboard ji ukazuje u „čeká na odpověď"
         role: match.job?.title || '',
         city: w.address || '', rating: Number(w.rating || 0).toFixed(1),
         trust: trustBy[match.worker_id] ? { ...trustBy[match.worker_id], hodnoceni: Number(w.rating) || 0 } : null, cvUrl: w.cv_url || '',
@@ -443,6 +529,8 @@ async function fetchEmployerData(employerId) {
         skills: Array.isArray(w.skills) ? w.skills : [],
         last: lastMsg ? (lastMsg.kind === 'shift' ? '📅 Nabídka směny' : lastMsg.kind === 'job' ? 'Nabídka brigády: ' + (lastMsg.job.title || '') : lastMsg.kind === 'interview' ? '🗓️ Pozvánka na pohovor' : lastMsg.kind === 'file' ? (lastMsg.file.typ === 'image' ? '📷 Fotka' : '📎 ' + lastMsg.file.nazev) : lastMsg.text) || 'Nová shoda' : 'Nová shoda',
         time: _relTime(match.created_at),
+        // Kdy přišla poslední zpráva (ISO) — Dashboard z toho počítá, jak dlouho kandidát čeká na odpověď
+        lastAt: (messages.find(m => m.match_id === match.id) || {}).created_at || null,
         unread, online: false, msgs: threadMsgs,
       };
     });
@@ -508,7 +596,6 @@ async function fetchEmployerData(employerId) {
   }
 }
 
-// Accept a candidate: mark match as accepted + mark job as filled
 // Nabídka brigády do chatu (28. 9.): firma vybere jeden ze svých aktivních
 // inzerátů a brigádníkovi přijde do zpráv jako karta (type 'job_offer').
 // V appce na ni klepne, otevře se detail a může rovnou dát „Mám zájem".
@@ -544,13 +631,12 @@ async function workerTrustE(workerId) {
   } catch (e) { return null; }
 }
 
-async function acceptCandidate(matchId, jobId) {
+// Přijetí kandidáta: jen match → accepted. Inzerát zůstává, jak je — dřív se
+// po prvním přijatém přepnul na 'filled' a zmizel z appky (Yasin 30. 9.: stav
+// Naplněno není, vypnout si ho firma může sama).
+async function acceptCandidate(matchId) {
   const { error: mErr } = await sb.from('matches').update({ status: 'accepted' }).eq('id', matchId);
   if (mErr) { console.error('acceptCandidate match error:', mErr); return false; }
-
-  const { error: jErr } = await sb.from('jobs').update({ status: 'filled' }).eq('id', jobId);
-  if (jErr) { console.error('acceptCandidate job error:', jErr); return false; }
-
   return true;
 }
 
@@ -599,6 +685,12 @@ async function _jobsZapis(payload, provest) {
   return provest(p);
 }
 
+function _eTarifPlny() {
+  const tier = typeof _employerPlanTier === 'function' ? _employerPlanTier() : 'zakladni';
+  const lim = (typeof EMPLOYER_MAX_ACTIVE !== 'undefined' && EMPLOYER_MAX_ACTIVE[tier] != null) ? EMPLOYER_MAX_ACTIVE[tier] : Infinity;
+  return E_JOBS.filter(j => j.status === 'active' || j.status === 'urgent').length >= lim;
+}
+
 async function createJobE(employerId, fields) {
   const ts = fields.time_start || '00:00';
   const te = fields.time_end   || '00:00';
@@ -625,7 +717,10 @@ async function createJobE(employerId, fields) {
     tags:        Array.isArray(fields.tags) ? fields.tags : [],
     requirements: Array.isArray(fields.requirements) ? fields.requirements : [],
     job_type:    fields.job_type || 'brigada',
-    status:      'active',
+    // Tarif hlídá počet aktivních (Yasin 1. 10.): dřív šel každý nový inzerát
+    // rovnou do aktivních, i když byl tarif plný. Teď se při plném tarifu
+    // uloží jako neaktivní — firma ho zapne, až uvolní místo.
+    status:      _eTarifPlny() ? 'paused' : 'active',
     ..._jobObsah(fields),
   };
   const { data, error } = await _jobsZapis(payload, p => sb.from('jobs').insert(p).select().single());
@@ -633,11 +728,11 @@ async function createJobE(employerId, fields) {
   return data;
 }
 
-Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, _strColor, _relTime, _fmtTime });
+Object.assign(window, { fetchEmployerData, acceptCandidate, rejectCandidate, updateEmployerProfile, createJobE, _strColor, _relTime, _fmtTime, E_LIMITY_OD_PRIHLASENI });
 
 // Zapnout / pozastavit inzerát. DB zná jen stavy active | filled | expired
 // (schema.sql CHECK), appka ve feedu ukazuje jen 'active' — pozastavený je
-// proto 'expired' (dashboard ho čte jako „Neaktivní").
+// proto 'expired' (dashboard ho čte jako „Neaktivní"). 'filled' se nepoužívá.
 // Úprava inzerátu z okna „Upravit inzerát" (stejná pole jako createJobE, bez stavu)
 async function updateJobE(jobId, fields) {
   const ts = fields.time_start || null, te = fields.time_end || null;
@@ -668,7 +763,7 @@ async function setJobActiveE(jobId, zapnout) {
   if (j) j.status = zapnout ? 'active' : 'paused';
   return true;
 }
-Object.assign(window, { setJobActiveE, updateJobE, workerTrustE, sendJobOfferE, topovatJobE });
+Object.assign(window, { setJobActiveE, updateJobE, workerTrustE, sendJobOfferE, topovatJobE, urgentniJobE, _eZacatekSmeny, _eUrgentDo });
 
 
 // ═══════════════════════════════════════════════════════════════

@@ -487,7 +487,7 @@ const WAGE_PERCENTILES = [
 ];
 const WAGE_TOP10_KC_H = 220;
 const WAGE_BENCHMARK_UPDATED = '2026-04-01';
-const WAGE_BENCHMARK_EMAIL = 'podpora@makej.eu';
+const WAGE_BENCHMARK_EMAIL = 'data@makej.eu';
 
 // Jediné místo, které zná zdroj dat. Později stačí přepsat tělo těchto funkcí
 // (např. na fetch živých dat z platformy) — zbytek komponenty zůstane beze změny.

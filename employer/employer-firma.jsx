@@ -64,6 +64,211 @@ function PFRadek({ label, children, first }) {
   );
 }
 
+// ── Posun a přiblížení fotky v rámu (30. 9.) ──
+// Společné pro logo (okno PFOrez) i úvodní fotku (upravuje se přímo na profilu,
+// jako na Facebooku). Fotka se posouvá tažením (myš i prst), přibližuje kolečkem
+// k místu pod myší nebo posuvníkem (1–4×) a vždy vyplní celý rám — prázdný okraj
+// nevznikne. vyrez() vykreslí to, co je v rámu vidět, do JPEG.
+const _PF_ZOOM_MAX = 4;
+function _usePfPozice(img, ramRef) {
+  const [ram, setRam] = React.useState({ w: 0, h: 0 });
+  const [st, setSt] = React.useState(null);            // { z, u, v } — přiblížení a bod fotky uprostřed rámu
+  const [tahne, setTahne] = React.useState(false);
+  const tah = React.useRef(null);
+  React.useEffect(() => { setSt(img ? { z: 1, u: img.naturalWidth / 2, v: img.naturalHeight / 2 } : null); }, [img]);
+  React.useLayoutEffect(() => {
+    const el = ramRef.current; if (!el) return;
+    const zmer = () => setRam({ w: el.clientWidth, h: el.clientHeight });
+    zmer();
+    if (!window.ResizeObserver) return;
+    const ro = new ResizeObserver(zmer); ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const iw = img ? img.naturalWidth : 1, ih = img ? img.naturalHeight : 1;
+  const s0 = ram.w && ram.h ? Math.max(ram.w / iw, ram.h / ih) : 1;   // při z = 1 fotka přesně vyplní rám
+  const omez = (z, u, v) => {
+    const s = s0 * z, pw = ram.w / (2 * s), ph = ram.h / (2 * s);
+    return { z, u: Math.min(Math.max(u, pw), iw - pw), v: Math.min(Math.max(v, ph), ih - ph) };
+  };
+  const cur = img && st && ram.w ? omez(st.z, st.u, st.v) : null;
+  const s = cur ? s0 * cur.z : 1;
+  // Přiblížit tak, aby bod pod myší (px, py v rámu) zůstal na místě; bez myši střed
+  const zoomNa = (z2, px, py) => setSt(p => {
+    if (!p) return p;
+    const c = omez(p.z, p.u, p.v);
+    const z = Math.min(Math.max(z2, 1), _PF_ZOOM_MAX);
+    const ox = (px == null ? ram.w / 2 : px) - ram.w / 2, oy = (py == null ? ram.h / 2 : py) - ram.h / 2;
+    return omez(z, c.u + ox / (s0 * c.z) - ox / (s0 * z), c.v + oy / (s0 * c.z) - oy / (s0 * z));
+  });
+  // Kolečko: nativní posluchač (React ho má pasivní) — stránka se přitom nesmí posouvat
+  const kolecko = React.useRef(null);
+  kolecko.current = e => {
+    if (!cur) return;
+    e.preventDefault();
+    const r = ramRef.current.getBoundingClientRect();
+    zoomNa(cur.z * Math.exp(-e.deltaY * 0.0015), e.clientX - r.left, e.clientY - r.top);
+  };
+  React.useEffect(() => {
+    const el = ramRef.current; if (!el) return;
+    const h = e => kolecko.current(e);
+    el.addEventListener('wheel', h, { passive: false });
+    return () => el.removeEventListener('wheel', h);
+  }, []);
+  const ovladani = {
+    onPointerDown: e => { if (!cur) return; e.currentTarget.setPointerCapture(e.pointerId); tah.current = { x: e.clientX, y: e.clientY }; setTahne(true); },
+    onPointerMove: e => {
+      const t = tah.current; if (!t) return;
+      const dx = e.clientX - t.x, dy = e.clientY - t.y;
+      tah.current = { x: e.clientX, y: e.clientY };
+      setSt(p => { const c = omez(p.z, p.u, p.v); return omez(c.z, c.u - dx / (s0 * c.z), c.v - dy / (s0 * c.z)); });
+    },
+    onPointerUp: () => { tah.current = null; setTahne(false); },
+    onPointerCancel: () => { tah.current = null; setTahne(false); },
+  };
+  const obrazekStyl = cur ? { position: 'absolute', left: ram.w / 2 - cur.u * s, top: ram.h / 2 - cur.v * s, width: iw * s, height: ih * s, maxWidth: 'none', pointerEvents: 'none', display: 'block' } : null;
+  // Výřez → JPEG. Malou fotku nezvětšuje (výstup nejvýš tak velký jako výřez);
+  // průhlednost (logo) dostane bílý podklad — JPEG ji neumí.
+  const vyrez = maxW => new Promise((ok, chyba) => {
+    if (!cur) return chyba(new Error('neni'));
+    const sw = ram.w / s, sh = ram.h / s, sx = cur.u - sw / 2, sy = cur.v - sh / 2;
+    const W = Math.max(1, Math.min(maxW, Math.round(sw))), H = Math.max(1, Math.round(W * ram.h / ram.w));
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
+    try { c.toBlob(b => b ? ok(b) : chyba(new Error('toBlob')), 'image/jpeg', 0.9); } catch (e) { chyba(e); }
+  });
+  return { cur, zoomNa, ovladani, obrazekStyl, vyrez, tahne };
+}
+
+// Načíst fotku pro úpravu — ze souboru, nebo z adresy (úvodní fotka, fotky firmy).
+// Z adresy s crossOrigin, jinak by plátno nešlo uložit (Supabase Storage CORS povoluje).
+function _pfNactiFotku(zdroj) {
+  return new Promise((ok, chyba) => {
+    const soubor = typeof zdroj !== 'string';
+    const url = soubor ? URL.createObjectURL(zdroj) : zdroj;
+    const i = new Image();
+    if (!soubor) i.crossOrigin = 'anonymous';
+    i.onload = () => ok({ img: i, url });
+    i.onerror = () => { if (soubor) URL.revokeObjectURL(url); chyba(new Error('load')); };
+    i.src = url;
+  });
+}
+
+// ── Úprava loga před nahráním (30. 9.) — okno se čtvercovým rámem ──
+// Rám má tvar, v jakém se logo ukazuje (čtverec se zaoblenými rohy). Úvodní
+// fotka se neupravuje v okně, ale přímo na profilu (viz ECompanyProfile).
+function PFOrez({ file, onZrus, onUloz, onJina }) {
+  const ramRef = React.useRef(null);
+  const [foto, setFoto] = React.useState(null);        // { img, url }
+  const [ukladam, setUkladam] = React.useState(false);
+  const poz = _usePfPozice(foto && foto.img, ramRef);
+  React.useEffect(() => {
+    let zruseno = false, url = null;
+    _pfNactiFotku(file).then(f => { url = f.url; if (!zruseno) setFoto(f); }).catch(() => onZrus(true));
+    return () => { zruseno = true; if (url) URL.revokeObjectURL(url); };
+  }, [file]);
+  React.useEffect(() => {
+    const esc = e => { if (e.key === 'Escape') onZrus(); };
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
+  }, []);
+  const uloz = () => {
+    if (!poz.cur || ukladam) return;
+    setUkladam(true);
+    poz.vyrez(600).then(onUloz).catch(() => setUkladam(false));
+  };
+
+  return ReactDOM.createPortal(
+    <div onClick={() => !ukladam && onZrus()} style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(11,18,51,.4)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, animation: 'eDotazIn .18s ease-out' }}>
+      <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Upravit logo"
+        style={{ width: 440, maxWidth: '100%', background: '#fff', borderRadius: 18, boxShadow: '0 30px 80px -20px rgba(11,18,51,.45)', padding: '24px 26px 22px' }}>
+        <div style={{ fontSize: 20, fontWeight: 800, color: '#0B1233', letterSpacing: '-.02em' }}>Upravit logo</div>
+
+        <div ref={ramRef} {...poz.ovladani}
+          style={{ position: 'relative', margin: '18px auto 0', width: 'min(300px, 100%)', aspectRatio: '1', borderRadius: '23%',
+            overflow: 'hidden', background: '#F1F3FB', boxShadow: 'inset 0 0 0 1px #E6E9F5', cursor: poz.cur ? (poz.tahne ? 'grabbing' : 'grab') : 'default', touchAction: 'none', userSelect: 'none' }}>
+          {poz.cur && <img src={foto.url} alt="" draggable={false} style={poz.obrazekStyl} />}
+          {!poz.cur && <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 13.5, color: '#7A82A6' }}>Načítám fotku…</div>}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 18 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#3A4266', flex: 'none' }}>Přiblížení</span>
+          <input type="range" min="1" max={_PF_ZOOM_MAX} step="0.01" value={poz.cur ? poz.cur.z : 1} disabled={!poz.cur}
+            onChange={e => poz.zoomNa(parseFloat(e.target.value))} aria-label="Přiblížení"
+            style={{ flex: 1, accentColor: '#1B34F0', cursor: 'pointer' }} />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 20, flexWrap: 'wrap' }}>
+          <span onClick={() => !ukladam && onJina()} style={{ fontSize: 13.5, fontWeight: 700, color: '#1B34F0', cursor: 'pointer' }}>Vybrat jinou fotku</span>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <EBtnSek onClick={() => onZrus()} disabled={ukladam}>Zrušit</EBtnSek>
+            <EBtnHl onClick={uloz} disabled={!poz.cur || ukladam}>{ukladam ? 'Ukládám…' : 'Uložit'}</EBtnHl>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+// Nabídka u úvodní fotky (jako Facebook): bez fotky jen Nahrát fotku; s fotkou
+// i Vybrat z fotek firmy, Změnit pozici a Odebrat. V portálu — karta hlavičky
+// má overflow:hidden a nabídku by ořízla.
+function PFCoverMenu({ poz, polozky, onZavri }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const venku = e => { if (ref.current && !ref.current.contains(e.target)) onZavri(); };
+    const esc = e => { if (e.key === 'Escape') onZavri(); };
+    document.addEventListener('mousedown', venku, true);
+    document.addEventListener('keydown', esc);
+    window.addEventListener('scroll', onZavri, true);
+    window.addEventListener('resize', onZavri);
+    return () => { document.removeEventListener('mousedown', venku, true); document.removeEventListener('keydown', esc); window.removeEventListener('scroll', onZavri, true); window.removeEventListener('resize', onZavri); };
+  }, []);
+  return ReactDOM.createPortal(
+    <div ref={ref} role="menu" style={{ position: 'fixed', top: poz.top, right: poz.right, zIndex: 300, minWidth: 240, background: '#fff', border: '1px solid #E6E9F5', borderRadius: 12, padding: 6, boxShadow: '0 18px 40px -14px rgba(20,22,40,.3)', animation: 'eKartaIn .16s cubic-bezier(.2,.8,.2,1) both' }}>
+      {polozky.map((x, i) => x === '-' ? <div key={i} style={{ height: 1, background: '#F0F2FA', margin: '4px 6px' }} /> : (
+        <button key={x.l} role="menuitem" onClick={() => { onZavri(); x.go(); }}
+          style={{ display: 'flex', alignItems: 'center', gap: 11, width: '100%', padding: '10px 10px', borderRadius: 8, border: 'none', background: 'transparent', color: '#1F2433', fontSize: 14, fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#F3F4F6'; }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}>
+          <Icon name={x.ic} size={19} color="#3A4266" />{x.l}
+        </button>
+      ))}
+    </div>,
+    document.body
+  );
+}
+
+// Výběr úvodní fotky z Fotek firmy
+function PFVyberFotky({ fotky, onVyber, onZrus }) {
+  React.useEffect(() => {
+    const esc = e => { if (e.key === 'Escape') onZrus(); };
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
+  }, []);
+  return ReactDOM.createPortal(
+    <div onClick={onZrus} style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(11,18,51,.4)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, animation: 'eDotazIn .18s ease-out' }}>
+      <div onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Vybrat úvodní fotku"
+        style={{ width: 620, maxWidth: '100%', maxHeight: 'calc(100vh - 32px)', overflowY: 'auto', background: '#fff', borderRadius: 18, boxShadow: '0 30px 80px -20px rgba(11,18,51,.45)', padding: '24px 26px 22px' }}>
+        <div style={{ fontSize: 20, fontWeight: 800, color: '#0B1233', letterSpacing: '-.02em' }}>Vybrat úvodní fotku</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 10, marginTop: 18 }}>
+          {fotky.map(u => (
+            <button key={u} type="button" onClick={() => onVyber(u)} className="e-pf-vyber"
+              style={{ padding: 0, border: 'none', borderRadius: 12, overflow: 'hidden', cursor: 'pointer', aspectRatio: '4 / 3', background: '#F1F3FB' }}>
+              <img src={u} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            </button>
+          ))}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 18 }}><EBtnSek onClick={onZrus}>Zrušit</EBtnSek></div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 function ECompanyProfile({ onTab, onSignOut } = {}) {
   const P = (typeof EPROFILE !== 'undefined' ? EPROFILE : {});
   const C = (typeof ECOMPANY !== 'undefined' ? ECOMPANY : {});
@@ -72,24 +277,28 @@ function ECompanyProfile({ onTab, onSignOut } = {}) {
   const [saving, setSaving] = React.useState(false);
   const [hlaska, setHlaska] = React.useState(null);       // { text, chyba }
   const [nahravam, setNahravam] = React.useState(null);   // 'cover' | 'logo' | 'photos'
-  const [email, setEmail] = React.useState(P.email || '');
+  const [orez, setOrez] = React.useState(null);           // { file } — okno úpravy loga před nahráním
+  // Úvodní fotka se upravuje přímo na profilu (jako Facebook): { img, url, novy }
+  const [coverUprava, setCoverUprava] = React.useState(null);
+  const [coverMenu, setCoverMenu] = React.useState(null); // { top, right } — nabídka u tlačítka
+  const [vyberFotky, setVyberFotky] = React.useState(false);
   const soubory = React.useRef({});
-
-  React.useEffect(() => {
-    if (email || typeof sb === 'undefined') return;
-    sb.auth.getSession().then(({ data }) => { const e = data && data.session && data.session.user && data.session.user.email; if (e) setEmail(e); });
-  }, []);
+  const coverRef = React.useRef(null);
+  const poz = _usePfPozice(coverUprava && coverUprava.img, coverRef);
 
   const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setDirty(true); };
   const setSit = (k, v) => { setForm(f => ({ ...f, socials: { ...f.socials, [k]: v } })); setDirty(true); };
   const setDen = (k, v) => { setForm(f => ({ ...f, hours: { ...f.hours, [k]: v } })); setDirty(true); };
-  const ukaz = (text, chyba) => { setHlaska({ text, chyba }); setTimeout(() => setHlaska(null), chyba ? 5200 : 3200); };
+  const ukaz = (text, chyba) => { setHlaska({ text, chyba }); setTimeout(() => setHlaska(null), chyba ? 9000 : 3200); };
 
   // ── Fotky: výběr souboru → zmenšení → bucket `uploads` → URL do formuláře ──
   const vyber = kind => { const el = soubory.current[kind]; if (el) { el.value = ''; el.click(); } };
   async function nahraj(kind, fileList) {
     const files = Array.from(fileList || []).filter(f => /^image\//.test(f.type));
     if (!files.length || typeof uploadImageE !== 'function' || typeof sb === 'undefined') return;
+    // Logo: nejdřív okno úpravy; úvodní fotka: hned na profil do úpravy pozice
+    if (kind === 'logo') { setOrez({ file: files[0] }); return; }
+    if (kind === 'cover') { upravCover(files[0]); return; }
     setNahravam(kind);
     const { data: { session } } = await sb.auth.getSession();
     const uid = session && session.user && session.user.id;
@@ -99,13 +308,60 @@ function ECompanyProfile({ onTab, onSignOut } = {}) {
       for (const f of files.slice(0, volno)) { const u = await uploadImageE(uid, 'firma-foto', f, 1400); if (u) urls.push(u); }
       if (urls.length) { setForm(fm => ({ ...fm, photos: [...fm.photos, ...urls] })); setDirty(true); }
       if (urls.length < Math.min(files.length, volno)) ukaz('Některou fotku se nepodařilo nahrát, zkuste to znovu.', true);
-    } else {
-      const u = await uploadImageE(uid, kind === 'cover' ? 'firma-pozadi' : 'firma-logo', files[0], kind === 'cover' ? 2400 : 600);
-      if (u) set(kind === 'cover' ? 'cover_url' : 'logo_url', u);
-      else ukaz('Fotku se nepodařilo nahrát, zkuste to znovu.', true);
     }
     setNahravam(null);
   }
+  // Výřez (logo z okna, úvodní fotka z profilu) → bucket `uploads` → hned do profilu.
+  // Fotky se ukládají rovnou po „Uložit" v úpravě, ne až tlačítkem Uložit změny.
+  async function nahrajVyrez(kind, blob) {
+    setOrez(null);
+    setNahravam(kind);
+    const { data: { session } } = await sb.auth.getSession();
+    const uid = session && session.user && session.user.id;
+    const u = await uploadImageE(uid, kind === 'cover' ? 'firma-pozadi' : 'firma-logo', blob, kind === 'cover' ? 2400 : 600);
+    if (u) await ulozFotku(kind === 'cover' ? 'cover_url' : 'logo_url', u);
+    else ukaz('Fotku se nepodařilo nahrát, zkuste to znovu.', true);
+    setNahravam(null);
+    return !!u;
+  }
+  async function ulozFotku(pole, url) {
+    setForm(f => ({ ...f, [pole]: url }));
+    const ok = typeof updateEmployerProfile === 'function' ? await updateEmployerProfile({ [pole]: url }) : false;
+    if (ok) { window.dispatchEvent(new Event('emp-profil-ulozen')); return; }   // levé menu ukazuje logo
+    setDirty(true);   // zůstane ve formuláři, lišta dole nabídne uložit znovu
+    ukaz(pole === 'cover_url' ? 'Úvodní fotku se zatím nepodařilo uložit — databáze na ni ještě není připravená.' : 'Logo se nepodařilo uložit, zkuste to znovu.', true);
+  }
+
+  // ── Úvodní fotka: úprava pozice přímo na profilu ──
+  // zdroj = soubor (nová fotka) nebo adresa (stávající úvodní / fotka firmy)
+  async function upravCover(zdroj) {
+    try {
+      const f = await _pfNactiFotku(zdroj);
+      setCoverUprava({ ...f, soubor: typeof zdroj !== 'string' });
+    } catch (e) { ukaz('Tuhle fotku se nepodařilo otevřít. Zkuste JPG nebo PNG, případně ji nahrajte znovu.', true); }
+  }
+  const zrusCover = () => { if (coverUprava && coverUprava.soubor) URL.revokeObjectURL(coverUprava.url); setCoverUprava(null); };
+  async function ulozCover() {
+    if (!poz.cur || nahravam) return;
+    let blob;
+    try { blob = await poz.vyrez(2400); }
+    catch (e) { ukaz('Tuhle fotku teď nejde upravit — nahrajte ji prosím znovu.', true); return; }
+    const ok = await nahrajVyrez('cover', blob);
+    if (ok) zrusCover();
+  }
+  const otevriCoverMenu = e => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setCoverMenu({ top: r.bottom + 8, right: Math.max(8, window.innerWidth - r.right) });
+  };
+  const coverPolozky = form.cover_url ? [
+    ...(form.photos.length ? [{ l: 'Vybrat úvodní fotku', ic: 'gallery-linear', go: () => setVyberFotky(true) }] : []),
+    { l: 'Nahrát fotku', ic: 'upload-minimalistic-linear', go: () => vyber('cover') },
+    { l: 'Změnit pozici', ic: 'move-linear', go: () => upravCover(form.cover_url) },
+    '-',
+    { l: 'Odebrat', ic: 'trash-bin-minimalistic-linear', go: () => ulozFotku('cover_url', '') },
+  ] : [
+    { l: 'Nahrát fotku', ic: 'upload-minimalistic-linear', go: () => vyber('cover') },
+  ];
   const souborInput = kind => (
     <input type="file" accept="image/*" multiple={kind === 'photos'} hidden
       ref={el => { if (el) soubory.current[kind] = el; }} onChange={e => nahraj(kind, e.target.files)} />
@@ -120,29 +376,27 @@ function ECompanyProfile({ onTab, onSignOut } = {}) {
       logo_url: form.logo_url, photos: form.photos,
       socials: form.socials, branding: { ...(P.branding || {}), color: form.brand },
     };
-    const nove = {
-      cover_url: form.cover_url, founded: form.founded.trim() || null, career_url: form.career.trim(),
-      phone: form.phone.trim(), contact_email: form.email.trim(), opening_hours: form.hours,
-    };
-    let ok = typeof updateEmployerProfile === 'function' ? await updateEmployerProfile(zaklad) : false;
-    let noveOk = ok && typeof updateEmployerProfile === 'function' ? await updateEmployerProfile(nove) : false;
+    // Sloupce z migration_profil_firmy.sql. Každý zvlášť: když v DB některý chybí
+    // (30. 9. chyběly cover_url, career_url, contact_email, opening_hours), dřív
+    // spadl celý zápis a neuložil se ani telefon a rok založení, které v DB už jsou.
+    const nove = [
+      ['cover_url', form.cover_url, 'úvodní fotka'], ['founded', form.founded.trim() || null, 'rok založení'],
+      ['career_url', form.career.trim(), 'kariérní stránka'], ['phone', form.phone.trim(), 'telefon'],
+      ['contact_email', form.email.trim(), 'e-mail'], ['opening_hours', form.hours, 'otevírací doba'],
+    ];
+    const ok = typeof updateEmployerProfile === 'function' ? await updateEmployerProfile(zaklad) : false;
+    const neulozene = [];
+    if (ok) for (const [k, v, popis] of nove) { if (!(await updateEmployerProfile({ [k]: v }))) neulozene.push(popis); }
     setSaving(false);
     if (!ok) { ukaz('Uložení se nezdařilo, zkuste to znovu.', true); return; }
     setDirty(false);
     if (C && form.name.trim()) { C.name = form.name.trim(); C.logo = C.name.split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase(); }
     window.dispatchEvent(new Event('emp-profil-ulozen'));   // levé menu (logo, název)
-    ukaz(noveOk ? 'Profil uložen.' : 'Profil uložen. Fotka pozadí, kontakty a otevírací doba se začnou ukládat po úpravě databáze.', !noveOk);
+    ukaz(neulozene.length
+      ? 'Profil uložen, ale ' + neulozene.join(', ') + (neulozene.length > 1 ? ' se zatím neukládají' : ' se zatím neukládá') + ' — databáze na to ještě není připravená.'
+      : 'Profil uložen.', neulozene.length > 0);
   }
   const zahod = () => { setForm(_pfZProfilu(P, C)); setDirty(false); };
-
-  // ── Vyplněnost ──
-  const kontrola = [
-    ['název firmy', !!form.name.trim()], ['obor', !!form.industry], ['popis firmy', form.bio.trim().length > 30],
-    ['logo', !!form.logo_url], ['fotku pozadí', !!form.cover_url], ['adresu', !!form.address.trim()],
-    ['kontakt', !!(form.phone.trim() || form.email.trim())], ['fotky firmy', form.photos.length > 0],
-  ];
-  const pct = Math.round(kontrola.filter(k => k[1]).length / kontrola.length * 100);
-  const chybi = kontrola.filter(k => !k[1]).map(k => k[0]);
 
   const nazev = form.name.trim() || 'Název vaší firmy';
   const inicialy = (form.name.trim() || C.name || '?').split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
@@ -150,11 +404,6 @@ function ECompanyProfile({ onTab, onSignOut } = {}) {
   const verified = !!P.verified;
   const recenze = (typeof E_REVIEWS !== 'undefined' ? E_REVIEWS : []);
   const prumer = recenze.length ? (recenze.reduce((a, r) => a + (r.rating || 0), 0) / recenze.length) : 0;
-  const jobs = (typeof E_JOBS !== 'undefined' ? E_JOBS : []);
-  const aktivni = jobs.filter(j => j.status === 'active' || j.status === 'urgent').length;
-  const tier = (typeof _employerPlanTier === 'function') ? _employerPlanTier() : 'vyhodny';
-  const limit = (typeof EMPLOYER_MAX_ACTIVE !== 'undefined' && EMPLOYER_MAX_ACTIVE[tier] != null) ? EMPLOYER_MAX_ACTIVE[tier] : 2;
-  const brandGrad = 'linear-gradient(120deg, ' + form.brand + ' 0%, ' + form.brand + 'B3 55%, ' + form.brand + '33 100%)';
 
   const karta = { background: '#fff', border: '1px solid #E6E9F5', borderRadius: 18, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 };
   const nadpis = { fontSize: 16, fontWeight: 800, color: '#0B1233', letterSpacing: '-.01em' };
@@ -163,38 +412,61 @@ function ECompanyProfile({ onTab, onSignOut } = {}) {
   return (
     <div className="e-ram e-volne" style={{ padding: 20 }}>
       <div style={{ background: '#F1F3FB', border: '1px solid #DDE1F0', borderRadius: 22, overflow: 'hidden' }}>
-        <ETabHlava title="Profil firmy">
-          {dirty ? (
-            <>
-              <EBtnSek onClick={zahod} disabled={saving}>Zahodit změny</EBtnSek>
-              <EBtnHl onClick={uloz} disabled={saving}>{saving ? 'Ukládám…' : 'Uložit změny'}</EBtnHl>
-            </>
-          ) : (
-            <span style={{ fontSize: 13.5, fontWeight: 600, color: '#7A82A6' }}>Takhle vás uvidí brigádníci v aplikaci</span>
-          )}
-        </ETabHlava>
-
+        {/* Bez nadpisu „Profil firmy" a popisku (Yasin 30. 9.) — že jde o profil,
+            je vidět; víc místa pro samotný vzhled. Uložení nabízí plovoucí lišta dole. */}
         <div style={{ padding: '4px 24px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
           {/* ── Hlavička: fotka pozadí + logo + název ── */}
           <div style={{ background: '#fff', border: '1px solid #E6E9F5', borderRadius: 18, overflow: 'hidden' }}>
             {souborInput('cover')}{souborInput('logo')}{souborInput('photos')}
-            <div style={{ position: 'relative', height: 300, background: form.cover_url ? ('#DDE1F0 center/cover no-repeat url("' + form.cover_url + '")') : brandGrad }}>
-              {!form.cover_url && (
-                <div onClick={() => vyber('cover')} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 7, cursor: 'pointer', color: '#fff', textAlign: 'center', padding: '0 24px' }}>
-                  <span style={{ width: 52, height: 52, borderRadius: 16, background: 'rgba(255,255,255,.22)', display: 'grid', placeItems: 'center' }}><Icon name="gallery-add-bold" size={24} color="#fff" /></span>
-                  <span style={{ fontSize: 17, fontWeight: 800 }}>Přidat fotku pozadí</span>
-                  <span style={{ fontSize: 13, opacity: .9, maxWidth: 440, lineHeight: 1.45 }}>Provozovna, tým, auta, výrobek — nebo grafika s názvem firmy. Na šířku, ideálně 2400 × 600 px.</span>
+            {orez && <PFOrez key={orez.file.name + orez.file.size + orez.file.lastModified} file={orez.file}
+              onZrus={chyba => { setOrez(null); if (chyba === true) ukaz('Tuhle fotku se nepodařilo otevřít. Zkuste JPG nebo PNG.', true); }}
+              onJina={() => vyber('logo')} onUloz={blob => nahrajVyrez('logo', blob)} />}
+            {coverMenu && <PFCoverMenu poz={coverMenu} polozky={coverPolozky} onZavri={() => setCoverMenu(null)} />}
+            {vyberFotky && <PFVyberFotky fotky={form.photos} onZrus={() => setVyberFotky(false)} onVyber={u => { setVyberFotky(false); upravCover(u); }} />}
+            {/* Úvodní fotka (Yasin 30. 9., jako Facebook). Rám 4 : 1 — stejný poměr, v jakém
+                se výřez ukládá, takže na profilu je přesně to, co si firma nastavila.
+                Bez fotky světlá plocha #F2F8FC, při najetí zešedne (.e-pf-cover-prazdne).
+                V úpravě: tažením posun, kolečkem / posuvníkem přiblížení, Zrušit / Uložit. */}
+            <div ref={coverRef} className={form.cover_url || coverUprava ? undefined : 'e-pf-cover-prazdne'} {...(coverUprava ? poz.ovladani : {})}
+              style={{ position: 'relative', aspectRatio: '4 / 1', minHeight: 170, overflow: 'hidden',
+                background: form.cover_url ? ('#DDE1F0 center/cover no-repeat url("' + form.cover_url + '")') : undefined,
+                ...(coverUprava ? { background: '#0B1233', cursor: poz.tahne ? 'grabbing' : 'grab', touchAction: 'none', userSelect: 'none' } : {}) }}>
+              {coverUprava && poz.cur && <img src={coverUprava.url} alt="" draggable={false} style={poz.obrazekStyl} />}
+              {!form.cover_url && !coverUprava && (
+                <div onClick={() => vyber('cover')} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 7, cursor: 'pointer', color: '#0B1233', textAlign: 'center', padding: '0 24px' }}>
+                  <span style={{ width: 52, height: 52, borderRadius: 16, background: '#fff', display: 'grid', placeItems: 'center', boxShadow: '0 4px 12px -6px rgba(11,18,51,.18)' }}><Icon name="gallery-add-bold" size={24} color="#1B34F0" /></span>
+                  <span style={{ fontSize: 17, fontWeight: 800 }}>Přidat úvodní fotku</span>
                 </div>
               )}
-              <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 8 }}>
-                {form.cover_url && <button onClick={() => set('cover_url', '')} style={{ fontSize: 13, fontWeight: 700, color: '#fff', background: 'rgba(11,18,51,.5)', backdropFilter: 'blur(6px)', border: 'none', padding: '9px 13px', borderRadius: 10, cursor: 'pointer' }}>Odebrat</button>}
-                <button onClick={() => vyber('cover')} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 800, color: '#0B1233', background: 'rgba(255,255,255,.94)', border: 'none', padding: '9px 13px', borderRadius: 10, cursor: 'pointer' }}>
-                  <Icon name="camera-bold" size={15} color="#0B1233" />{form.cover_url ? 'Změnit fotku pozadí' : 'Nahrát fotku pozadí'}
-                </button>
-              </div>
-              {nahravam === 'cover' && <div style={{ position: 'absolute', inset: 0, background: 'rgba(11,18,51,.45)', display: 'grid', placeItems: 'center', color: '#fff', fontSize: 15, fontWeight: 800 }}>Nahrávám fotku…</div>}
+              {coverUprava ? (
+                <>
+                  {/* Nahoře vpravo jen přiblížení — bez vysvětlivek (Yasin 30. 9.); táhnout jde všude kromě posuvníku */}
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 3, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16, padding: '14px 18px 26px', background: 'linear-gradient(180deg, rgba(11,18,51,.45), rgba(11,18,51,0))', color: '#fff', pointerEvents: 'none' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 10, pointerEvents: 'auto' }} onPointerDown={e => e.stopPropagation()}>
+                      <span style={{ fontSize: 12.5, fontWeight: 700 }}>Přiblížení</span>
+                      <input type="range" min="1" max={_PF_ZOOM_MAX} step="0.01" value={poz.cur ? poz.cur.z : 1} disabled={!poz.cur}
+                        onChange={e => poz.zoomNa(parseFloat(e.target.value))} aria-label="Přiblížení" style={{ width: 150, accentColor: '#fff', cursor: 'pointer' }} />
+                    </span>
+                  </div>
+                  <div style={{ position: 'absolute', bottom: 16, right: 16, zIndex: 3, display: 'flex', gap: 8 }} onPointerDown={e => e.stopPropagation()}>
+                    <button onClick={zrusCover} disabled={nahravam === 'cover'} style={{ fontSize: 13.5, fontWeight: 700, color: '#0B1233', background: 'rgba(255,255,255,.94)', border: 'none', padding: '9px 16px', borderRadius: 10, cursor: 'pointer' }}>Zrušit</button>
+                    <button onClick={ulozCover} disabled={!poz.cur || nahravam === 'cover'} className="e-btn-hl" style={{ fontSize: 13.5, fontWeight: 700, color: '#fff', background: '#1B34F0', border: 'none', padding: '9px 18px', borderRadius: 10, cursor: 'pointer' }}>{nahravam === 'cover' ? 'Ukládám…' : 'Uložit'}</button>
+                  </div>
+                </>
+              ) : (
+                /* Tlačítko vpravo dole → nabídka (bez fotky jen Nahrát fotku) */
+                <div style={{ position: 'absolute', bottom: 16, right: 16, zIndex: 3 }}>
+                  <button onClick={e => coverMenu ? setCoverMenu(null) : otevriCoverMenu(e)} aria-haspopup="menu" aria-expanded={!!coverMenu}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 800, color: '#0B1233', background: 'rgba(255,255,255,.96)', border: 'none', padding: '9px 14px', borderRadius: 10, cursor: 'pointer', boxShadow: '0 4px 14px -6px rgba(11,18,51,.3)' }}>
+                    <Icon name="camera-bold" size={16} color="#0B1233" />{form.cover_url ? 'Upravit úvodní fotku' : 'Přidat úvodní fotku'}
+                  </button>
+                </div>
+              )}
+              {nahravam === 'cover' && <div style={{ position: 'absolute', inset: 0, background: 'rgba(11,18,51,.45)', display: 'grid', placeItems: 'center', color: '#fff', fontSize: 15, fontWeight: 800 }}>Ukládám úvodní fotku…</div>}
             </div>
-            <div style={{ padding: '0 28px 22px', display: 'flex', alignItems: 'flex-end', gap: 20, marginTop: -64, position: 'relative', flexWrap: 'wrap' }}>
+            {/* Řádek s logem zasahuje 64 px do úvodní fotky: jeho průhledná část nesmí brát
+                kliknutí (Zrušit / Uložit / Upravit úvodní fotku) ani tažení fotky — klikat jde jen na obsah */}
+            <div className="e-pf-radek-loga" style={{ padding: '0 28px 22px', display: 'flex', alignItems: 'flex-end', gap: 20, marginTop: -64, position: 'relative', flexWrap: 'wrap', pointerEvents: 'none' }}>
               <div onClick={() => vyber('logo')} title={form.logo_url ? 'Změnit logo' : 'Nahrát logo'}
                 style={{ position: 'relative', width: 132, height: 132, flex: 'none', borderRadius: 30, border: '5px solid #fff', background: form.logo_url ? '#fff' : form.brand, boxShadow: '0 12px 30px -12px rgba(11,18,51,.5)', overflow: 'hidden', cursor: 'pointer', display: 'grid', placeItems: 'center', color: '#fff', fontSize: 44, fontWeight: 800 }}>
                 {form.logo_url ? <img src={form.logo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; }} /> : inicialy}
@@ -297,40 +569,9 @@ function ECompanyProfile({ onTab, onSignOut } = {}) {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-              {pct < 100 && (
-                <div style={{ ...karta, gap: 10, background: '#FFF8EE', borderColor: '#FFE2B8' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                    <span style={{ fontSize: 14, fontWeight: 800, color: '#0B1233' }}>Profil vyplněný na {pct} %</span>
-                    <span style={{ width: 90, height: 6, borderRadius: 999, background: '#FFE2B8', overflow: 'hidden', display: 'block' }}><span style={{ display: 'block', width: pct + '%', height: '100%', background: '#F5920B', borderRadius: 999 }} /></span>
-                  </div>
-                  <span style={{ fontSize: 12.5, color: '#7A5A2A', lineHeight: 1.5 }}>Ještě chybí: {chybi.join(', ')}.</span>
-                </div>
-              )}
-
-              <div style={{ ...karta, gap: 12 }}>
-                <span style={nadpis}>Účet a tarif</span>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                  {typeof TierMetalBadge === 'function' ? <TierMetalBadge plan={C.plan} label={null} /> : <span>{C.plan}</span>}
-                  <button onClick={() => onTab && onTab('pricing')} style={{ fontSize: 13, fontWeight: 800, color: '#1B34F0', background: '#EEF1FF', border: 'none', padding: '8px 12px', borderRadius: 9, cursor: 'pointer' }}>Změnit tarif</button>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                    <span style={{ color: '#7A82A6' }}>Aktivní inzeráty</span>
-                    <span style={{ fontWeight: 800, color: '#0B1233' }}>{aktivni} / {limit === Infinity ? '∞' : limit}</span>
-                  </div>
-                  <span style={{ height: 6, borderRadius: 999, background: '#EEF1FF', display: 'block', overflow: 'hidden' }}><span style={{ display: 'block', height: '100%', borderRadius: 999, background: '#1B34F0', width: (limit === Infinity ? 100 : Math.min(100, Math.round(aktivni / Math.max(1, limit) * 100))) + '%' }} /></span>
-                </div>
-                <PFRadek label="Přihlášení" first><span style={{ fontSize: 13.5, fontWeight: 600, color: '#0B1233', wordBreak: 'break-all' }}>{email || '—'}</span></PFRadek>
-                <PFRadek label="Ověření">
-                  {verified
-                    ? <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0B7B4B' }}>Firma je ověřená</span>
-                    : <a href="mailto:podpora@makej.eu?subject=Ověření%20firmy" style={{ fontSize: 13.5, fontWeight: 800, color: '#1B34F0', textDecoration: 'none' }}>Požádat o ověření ›</a>}
-                </PFRadek>
-                <button onClick={() => onSignOut && onSignOut()} style={{ marginTop: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: '#7A82A6', background: '#fff', border: '1px solid #E6E9F5', padding: 11, borderRadius: 11, cursor: 'pointer' }}>
-                  <Icon name="logout-2-linear" size={15} color="#7A82A6" />Odhlásit se
-                </button>
-              </div>
-
+              {/* Karty „Profil vyplněný na X %" a „Účet a tarif" zatím pryč (Yasin 30. 9.).
+                  Tarif a odhlášení jsou v kartě firmy dole v levém menu, nedoplněný
+                  profil hlásí Dashboard v „Co je potřeba udělat". */}
               <div style={{ ...karta, gap: 4 }}>
                 <span style={{ ...nadpis, marginBottom: 8 }}>Údaje o firmě</span>
                 <PFRadek label="IČO" first><input className="e-pf-inp" value={form.ico} onChange={e => set('ico', e.target.value)} placeholder="+ Doplnit" inputMode="numeric" /></PFRadek>

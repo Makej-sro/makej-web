@@ -136,14 +136,18 @@ function TierMetalBadge({ plan, label = 'Tarif', onClick }) {
 // Název tarifu jako tekutý kov (metal-fx MetalText). Návrh je na tmavé pozadí
 // se světlým odstínem (label); na bílém ceníku bereme hlavní barvu (hex),
 // jinak by byl třeba Základní skoro neviditelný. Bez WebGL2 CSS náhrada.
-function _MkMetalTextGL({ lib, t, prefix, font, color }) {
+// Šedé „Tarif" před názvem: odraz z metal-fx (useMetalTextReflection) se v dashboardu
+// nevykreslí — prvek s odrazem knihovna do textu nevloží —, takže slovo stálo bez pohybu
+// (Yasin 2. 10.: „chybí ti animace slova Tarif"). Proto přejíždějící odlesk v CSS (.mk-sheen,
+// stejně jako v náhradě bez WebGL); na tmavém je odlesk silnější.
+function _MkMetalTextGL({ lib, t, prefix, font, color, tmave }) {
   const ref = useRefE(null);
   lib.useMetalTextReflection(ref);
   const MetalText = lib.MetalText;
   return (
     <span data-tier={t.id}>
       <span data-cell="text" style={{ display: 'inline-flex', gap: '0.25em', alignItems: 'baseline' }}>
-        {prefix && <span ref={ref} style={{ font, color: '#6b6b6b' }}>{prefix}</span>}
+        {prefix && <span ref={ref} className="mk-sheen" style={{ font, backgroundImage: 'linear-gradient(100deg, transparent 38%, rgba(255,255,255,' + (tmave ? '0.6' : '0.32') + ') 50%, transparent 62%), linear-gradient(#6b6b6b, #6b6b6b)' }}>{prefix}</span>}
         <MetalText font={font} color={color} strength={0.9} reflectionTargets={prefix ? [{ ref, strength: 0.64 }] : undefined}>{t.name}</MetalText>
       </span>
     </span>
@@ -154,7 +158,7 @@ function TierMetalText({ tier, prefix = null, size = 19, weight = 700, naSvetlem
   const lib = useMetalFx();
   const font = weight + ' ' + size + 'px/1.2 Inter, sans-serif';
   const color = naSvetlem ? t.hex : t.label;
-  if (lib) return <_MkMetalTextGL lib={lib} t={t} prefix={prefix} font={font} color={color} />;
+  if (lib) return <_MkMetalTextGL lib={lib} t={t} prefix={prefix} font={font} color={color} tmave={!naSvetlem} />;
   return (
     <span data-tier={t.id} style={{ display: 'inline-flex', gap: '0.25em', alignItems: 'baseline', font }}>
       {prefix && <span className="mk-sheen" style={{ backgroundImage: 'linear-gradient(100deg, transparent 38%, rgba(255,255,255,0.32) 50%, transparent 62%), linear-gradient(#6b6b6b, #6b6b6b)' }}>{prefix}</span>}
@@ -226,7 +230,7 @@ const _IKONY_APP = {
   settings:   'ikony/nastaveni.svg?v=1',   // Iconly Light-Outline / Setting
 };
 
-function ESidebar({ tab, onTab, onSignOut, mobile = false, open = false, onClose }) {
+function ESidebar({ tab, onTab, onSignOut, onNew, mobile = false, open = false, onClose }) {
   // Reálné počty z živých globálů (0 → badge se skryje)
   const jobsBadge = (typeof E_JOBS !== 'undefined' ? E_JOBS.filter(j => j.status === 'active' || j.status === 'urgent').length : 0) || null;
   const candBadge = (typeof E_CANDIDATES !== 'undefined' ? (E_CANDIDATES.new || []).length : 0) || null;
@@ -299,6 +303,12 @@ function ESidebar({ tab, onTab, onSignOut, mobile = false, open = false, onClose
     return () => { document.removeEventListener('mousedown', mimo); document.removeEventListener('keydown', esc); };
   }, [kartaOtevrena]);
   useEffectE(() => { if (sbal) setKartaOtevrena(false); }, [sbal]);
+  // Odhlášení na dva kliky na stejném místě: první přepne tlačítko na
+  // potvrzení (nad ním otázka, vlevo Zrušit), druhý odhlásí. Kdo to myslí
+  // vážně, udělá rychlý dvojklik bez hýbání myší (Yasin 1. 10.). Nabídka je
+  // přichycená spodkem, takže otázka ji natáhne nahoru a tlačítko stojí.
+  const [potvrdOdhlaseni, setPotvrdOdhlaseni] = useStateE(false);
+  useEffectE(() => { if (!kartaOtevrena) setPotvrdOdhlaseni(false); }, [kartaOtevrena]);
   const P = (typeof EPROFILE !== 'undefined' ? EPROFILE : {});
   const logoUrl = P.logo_url || '';
   // Bez vyplněného názvu firmy bral dashboard jméno člověka („Samuel") —
@@ -320,11 +330,35 @@ function ESidebar({ tab, onTab, onSignOut, mobile = false, open = false, onClose
         </button>
       ))}
       <div style={{ height: 1, background: '#F0F2FA', margin: '4px 6px' }} />
-      <button role="menuitem" onClick={() => { setKartaOtevrena(false); onSignOut && onSignOut(); }}
-        style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 10px', borderRadius: 8, border: 'none', background: 'transparent', color: '#6B7280', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}
-        onMouseEnter={e => { e.currentTarget.style.background = '#F3F4F6'; }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}>
-        <Icon name="logout-2-linear" size={17} color="#9CA3AF" />Odhlásit se
-      </button>
+      {/* Zavřít (křížek) = zpátky na web, přihlášení zůstane (na webu je pak
+          v liště „Dashboard"). Odhlásit se = přihlášení z tohoto zařízení
+          zmizí. Odhlásit je pořád červené s bílými dveřmi, křížek bílý
+          a zčervená až při najetí (Yasin 1. 10.). Křížek je znak ✕ jako
+          u ostatních zavíracích tlačítek v dashboardu. */}
+      {potvrdOdhlaseni && (
+        <div style={{ padding: '6px 8px 4px', fontSize: 13, fontWeight: 700, color: '#1F2433' }}>Opravdu se chcete odhlásit?</div>
+      )}
+      <div style={{ display: 'flex', gap: 6, padding: '4px 4px 2px' }}>
+        {potvrdOdhlaseni
+          ? <button role="menuitem" onClick={() => setPotvrdOdhlaseni(false)}
+              style={{ flexShrink: 0, padding: '9px 12px', borderRadius: 8, border: '1px solid #E6E9F5', background: '#fff', color: '#374151', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', transition: 'background .15s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#F3F4F6'; }} onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}>Zrušit</button>
+          : <button role="menuitem" title="Zavřít" aria-label="Zavřít"
+              onClick={() => { setKartaOtevrena(false); window.location.href = '/'; }}
+              style={{ width: 38, flexShrink: 0, borderRadius: 8, border: '1px solid #E6E9F5', background: '#fff', color: '#6B7280', fontSize: 15, lineHeight: 1, cursor: 'pointer', display: 'grid', placeItems: 'center', transition: 'background .15s, color .15s, border-color .15s' }}
+              onMouseEnter={e => { const b = e.currentTarget; b.style.background = '#f43f5e'; b.style.borderColor = '#f43f5e'; b.style.color = '#fff'; }}
+              onMouseLeave={e => { const b = e.currentTarget; b.style.background = '#fff'; b.style.borderColor = '#E6E9F5'; b.style.color = '#6B7280'; }}>✕</button>}
+        <button role="menuitem"
+          onClick={() => {
+            if (!potvrdOdhlaseni) { setPotvrdOdhlaseni(true); return; }
+            // Nabídka i rozmazání zůstanou — přes ně se stáhne tma (handleSignOut).
+            onSignOut && onSignOut();
+          }}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '9px 8px', borderRadius: 8, border: 'none', background: potvrdOdhlaseni ? '#e11d48' : '#f43f5e', color: '#fff', fontSize: 13.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'background .15s' }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#e11d48'; }} onMouseLeave={e => { e.currentTarget.style.background = potvrdOdhlaseni ? '#e11d48' : '#f43f5e'; }}>
+          <Icon name="logout-2-linear" size={17} color="#fff" />{potvrdOdhlaseni ? 'Odhlásit' : 'Odhlásit se'}
+        </button>
+      </div>
     </>
   );
 
@@ -360,6 +394,21 @@ function ESidebar({ tab, onTab, onSignOut, mobile = false, open = false, onClose
         {/* Přepínač světlý/tmavý režim tu byl — schovaný, dokud se tmavý režim
             nedodělá (Yasin 25. 9.). Logika zůstává: window.toggleMakejTheme v app.jsx. */}
       </div>
+
+      {/* Nový inzerát nahoře v menu (Yasin 30. 9.): na jednom místě, které si
+          lidi zapamatují, místo tlačítka v hlavičce každé záložky. Stejná stavba
+          jako položky menu (ikona na stejném místě), jen modrá; v úzkém pruhu
+          zůstane modrý čtvereček s plusem. */}
+      <button type="button" className="e-btn-hl" title={sbal ? 'Nový inzerát' : undefined}
+        onClick={() => { onNew && onNew(); if (mobile && onClose) onClose(); }}
+        style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '10px 12px', margin: '0 0 22px', borderRadius: 10,
+          background: '#0020F6', border: 'none', color: '#fff', cursor: 'pointer', textAlign: 'left',
+          fontFamily: T.fontUI, fontWeight: 700, fontSize: 13.5, boxShadow: '0 6px 16px -8px rgba(0,32,246,.55)' }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+          <path d="M12 5v14M5 12h14" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+        <span style={pismo}>Nový inzerát</span>
+      </button>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: 18, flex: 1 }}>
         {sections.map((sec, i) => (
@@ -441,7 +490,30 @@ function ESidebar({ tab, onTab, onSignOut, mobile = false, open = false, onClose
           nedalo kliknout. Teď jedna karta: logo, název, tarif. Klik otevře menu
           Profil firmy / Tarif a platby / Odhlásit se. */}
       <div ref={kartaRef} style={{ position: 'relative', marginTop: 10, paddingTop: 10, borderTop: '1px solid #E5E7EB' }}>
-        {kartaOtevrena && !sbal && (
+        {/* Potvrzení odhlášení: všechno okolo se rozmaže, ať si toho člověk
+            všimne (Yasin 1. 10.). Rozmazání je přes celé okno (portál), takže
+            nabídka musí ven z menu nad něj — <aside> má vlastní zIndex 40.
+            Stojí přesně tam, kde byla (spodek 6 px nad kartou), a bez
+            animace, aby se tlačítko pod kurzorem nehnulo. Klik do rozmazaného
+            místa nabídku zavře (posluchač „mimo" výš). */}
+        {kartaOtevrena && potvrdOdhlaseni && ReactDOM.createPortal(
+          <div aria-hidden="true" style={{ position: 'fixed', inset: 0, zIndex: 250, background: 'rgba(10,13,46,.14)', backdropFilter: 'blur(7px)', WebkitBackdropFilter: 'blur(7px)', animation: 'eRozmazIn .22s ease both' }} />,
+          document.body
+        )}
+        {kartaOtevrena && !sbal && potvrdOdhlaseni && kartaRef.current && (() => {
+          const kr = kartaRef.current.getBoundingClientRect();
+          return ReactDOM.createPortal(
+            <div ref={kartaMenuRef} role="menu" style={{
+              position: 'fixed', left: kr.left, width: kr.width, bottom: window.innerHeight - kr.top - 1 + 6, zIndex: 300,
+              background: '#fff', border: '1px solid #E6E9F5', borderRadius: 12, padding: 6, boxSizing: 'border-box',
+              boxShadow: '0 18px 40px -14px rgba(20,22,40,.3)',
+            }}>
+              {kartaPolozky}
+            </div>,
+            document.body
+          );
+        })()}
+        {kartaOtevrena && !sbal && !potvrdOdhlaseni && (
           <div role="menu" style={{
             position: 'absolute', left: 0, right: 0, bottom: 'calc(100% + 6px)', zIndex: 5,
             background: '#fff', border: '1px solid #E6E9F5', borderRadius: 12, padding: 6,
@@ -888,12 +960,11 @@ function SectionHeader({ title, subtitle, action }) {
   );
 }
 
-// ── Hlavička záložky a pás čísel (26. 9.) ──
+// ── Hlavička záložky (26. 9.; pás čísel EMetriky zrušen 30. 9. — přehled je jen na Dashboardu) ──
 // Yasin: „pryč s modrým rámečkem, jen název záložky, profesionální dashboard,
-// hlavně jednoznačný". Proto všechny záložky kreslí hlavičku i čísla přes tyhle
+// hlavně jednoznačný". Proto všechny záložky kreslí hlavičku přes tyhle
 // komponenty — jeden vzhled, žádná modrá plocha. Modrá zůstává jen pro hlavní
-// akci (tlačítko) a odkazy. Číslo, které někam vede, je celé klikací a při
-// najetí zešedne (bez modrého odkazu).
+// akci (tlačítko) a odkazy.
 const _EH = { ink: '#0B1233', ink2: '#3A4266', muted: '#7A82A6', line: '#E6E9F5', line2: '#EEF0F6', blue: '#1B34F0' };
 
 function ETabHlava({ title, children }) {
@@ -1102,46 +1173,4 @@ function EFiltrHledat({ value, onChange, placeholder, width = 220 }) {
   );
 }
 
-// Pás čísel: [{ l: 'Popisek', v: hodnota, s: 'podtext', kam: 'Text odkazu', onClick, varovani }]
-// Pás jde schovat (Yasin 29. 9.: „ta horní lajna mi zavazela") úchytem pod ním —
-// stejným jako u levého menu, jen naležato: v klidu šedá čárka, při najetí šipka
-// ^ (skrýt) / v (ukázat). Volba platí pro všechny záložky a pamatuje se v prohlížeči.
-// Čekající kandidáti se neztratí — počet má i položka Kandidáti v menu.
-function EMetriky({ items }) {
-  const [skryte, setSkryte] = useStateE(() => { try { return localStorage.getItem('emp-cisla-skryte') === '1'; } catch (e) { return false; } });
-  const prepni = () => { const v = !skryte; setSkryte(v); try { localStorage.setItem('emp-cisla-skryte', v ? '1' : '0'); } catch (e) {} };
-  return (
-    <div className="e-pruh-ram" style={{ padding: '0 24px', position: 'relative' }}>
-    <div style={{ display: 'grid', gridTemplateRows: skryte ? '0fr' : '1fr', opacity: skryte ? 0 : 1, transition: 'grid-template-rows .24s cubic-bezier(.2,.8,.2,1), opacity .18s ease' }}>
-    <div style={{ minHeight: 0, overflow: 'hidden' }}>
-    <div className="e-pruh" style={{ display: 'grid', gridTemplateColumns: 'repeat(' + items.length + ', minmax(0,1fr))', background: '#fff', border: '1px solid ' + _EH.line, borderRadius: 14, overflow: 'hidden' }}>
-      {items.map((m, i) => (
-        // Klikací políčko nemá modrý odkaz (Yasin 27. 9.) — pozná se podle toho,
-        // že při najetí zešedne; kam vede, řekne bublina (title).
-        <div key={i} className={m.onClick ? 'e-pruh-klik' : undefined} onClick={m.onClick} title={m.onClick && m.kam ? m.kam : undefined}
-          role={m.onClick ? 'button' : undefined} tabIndex={m.onClick ? 0 : undefined}
-          onKeyDown={m.onClick ? (e => { if (e.key === 'Enter') m.onClick(); }) : undefined}
-          style={{ padding: '12px 18px', display: 'flex', flexDirection: 'column', gap: 3, borderLeft: i ? '1px solid ' + _EH.line2 : 'none', cursor: m.onClick ? 'pointer' : 'default', minWidth: 0 }}>
-          {/* Decentnější pás (28. 9.): číslo 20 px místo 28 a podtext vedle
-              něj na jednom řádku — pás je o třetinu nižší a malá čísla
-              (0, 1, 2) na začátku nepůsobí prázdně. */}
-          <span style={{ fontSize: 12.5, fontWeight: 600, color: _EH.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.l}</span>
-          <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
-            <span className="e-pruh-v" style={{ fontSize: 20, fontWeight: 700, color: m.varovani ? '#C2410C' : _EH.ink, letterSpacing: '-.01em', lineHeight: 1.2, whiteSpace: 'nowrap', flex: 'none' }}>{m.v}</span>
-            <span style={{ fontSize: 12.5, color: _EH.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{m.s}</span>
-          </span>
-        </div>
-      ))}
-    </div>
-    </div>
-    </div>
-    <button type="button" className={'e-uchyt-v' + (skryte ? ' zavreno' : '')} onClick={prepni}
-      aria-label={skryte ? 'Ukázat čísla' : 'Skrýt čísla'} aria-expanded={!skryte}>
-      <span className="e-uchyt-l" /><span className="e-uchyt-p" />
-      <em className="e-uchyt-tip">{skryte ? 'Ukázat čísla' : 'Skrýt čísla'}</em>
-    </button>
-    </div>
-  );
-}
-
-Object.assign(window, { TierMetalBadge, TierMetalText, TierGradientText, TierMetalButton, ELogo, ESidebar, ETopbar, Sparkline, AreaChart, BarChart, Donut, ECard, SectionHeader, ETabHlava, EBtnHl, EBtnSek, ESegment, EMetriky, EIkona, eTrust, ETrustBadge, EFiltrLista, EFiltrVpravo, EFiltrVyber, EFiltrPrepinac, EFiltrRazeni, EFiltrHledat });
+Object.assign(window, { TierMetalBadge, TierMetalText, TierGradientText, TierMetalButton, ELogo, ESidebar, ETopbar, Sparkline, AreaChart, BarChart, Donut, ECard, SectionHeader, ETabHlava, EBtnHl, EBtnSek, ESegment, EIkona, eTrust, ETrustBadge, EFiltrLista, EFiltrVpravo, EFiltrVyber, EFiltrPrepinac, EFiltrRazeni, EFiltrHledat });

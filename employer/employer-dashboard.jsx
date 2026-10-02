@@ -1,4 +1,4 @@
-// Makej Employer — Dashboard (varianta 1d: modrá hlavička + pás metrik + pipeline + plán/živě/recenze)
+// Makej Employer — Dashboard: přehled všeho, co firma potřebuje vědět (30. 9.: co udělat, inzeráty, tarif, nábor)
 // Reuses T, E_KPIS, E_JOBS, E_CANDIDATES, E_ACTIVITY, E_REVIEWS, E_THREADS, window.empOpenProfile
 
 // ── Výběr období: bílá roletka (7/30/90 dní · Rok) + „Vlastní" rozsah v klasickém
@@ -152,32 +152,114 @@ function EPeriodPicker({ value, onChange }) {
   );
 }
 
-// ── DASHBOARD (zjednodušený 26. 9.) ──
-// Yasin: „jednoduchost jako Stripe, ale náš vzhled". Proto: modrá hlavička
-// a pás čísel zůstaly (stejné jako na ostatních záložkách), ale pod nimi
-// JEDNA bílá plocha místo sedmi karet, sekce oddělené jen linkou a mezerou,
-// modrá jen na odkazy. Pryč kanban „Pipeline" (zdvojoval Kandidáty),
-// ukázkový Plán směn a vymyšlená čísla (zhlédnutí 33 200, swipe right) —
-// všechno tady je skutečné: E_JOBS[].candidates (každý zájem s časem),
-// E_CANDIDATES, E_THREADS, E_REVIEWS, E_ACTIVITY.
-function EDashboard({ period = '30d', onTab, onNew, onPeriod }) {
+// ── DASHBOARD — přehled všeho na jednom místě (30. 9.) ──
+// Yasin 30. 9.: „hrozně těžký se v tom vyznat". Pás čísel byl na každé záložce
+// a nebylo jasné, kde co hledat. Z ostatních záložek proto zmizel a všechno,
+// co by firma měla vědět, je jen tady:
+//  - Co je potřeba udělat: kdo čeká na odpověď ve Zprávách, noví zájemci po
+//    inzerátech, inzeráty, které potřebují pozornost, nedoplněný profil firmy.
+//    Každá položka jedním klikem vede přesně tam, kde se vyřídí.
+//  - Vpravo Tarif (kolik inzerátů ještě jde zapnout, topování) a Nábor za období.
+//  - Vaše inzeráty: karty 1:1 jako v Inzerátech (tak je vidí brigádník) v řadě
+//    do strany (EJobRada z pages3) — Yasin: tabulka „je to jenom text". Nad
+//    kartou stav (Aktivní / Urgentní / Neaktivní — Naplněno není).
+//  - Dole Poslední aktivita a Hodnocení.
+// Všechno ze skutečných dat (E_JOBS, E_CANDIDATES, E_THREADS, E_REVIEWS,
+// E_ACTIVITY, EPROFILE) — nic vymyšleného.
+const _DB_UKOLU = 6;          // kolik položek „Co je potřeba udělat" je vidět, než se rozbalí zbytek
+
+// Kulatý čtvereček s fotkou nebo iniciálami (jako seznam konverzací ve Zprávách)
+function _EDbAvatar({ foto, ini, barva, size = 40, ring }) {
+  return (
+    <span style={{ width: size, height: size, flex: 'none', borderRadius: Math.round(size * .3), overflow: 'hidden', display: 'grid', placeItems: 'center',
+      background: foto ? '#EEF1FF' : (barva || '#1B34F0'), color: '#fff', fontSize: Math.round(size * .34), fontWeight: 800, boxShadow: ring ? '0 0 0 2px #fff' : 'none' }}>
+      {foto ? <img src={foto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { e.currentTarget.style.display = 'none'; }} /> : ini}
+    </span>
+  );
+}
+
+function EDashboard({ period = '30d', onTab, onNew, onPeriod, onOpenChat }) {
+  const [vse, setVse] = useStateE(false);
   const go = tab => () => onTab && onTab(tab);
   const pl = (n, a, b, c) => n === 1 ? a : (n >= 2 && n <= 4) ? b : c;
-  const ink = '#0B1233', ink2 = '#3A4266', muted = '#7A82A6', line = '#EEF0F6', blue = '#1B34F0';
+  const ink = '#0B1233', ink2 = '#3A4266', muted = '#7A82A6', line = '#EEF0F6', blue = '#1B34F0', oranz = '#F5920B';
 
   const jobs = (typeof E_JOBS !== 'undefined' ? E_JOBS : []);
   const C = (typeof E_CANDIDATES !== 'undefined' ? E_CANDIDATES : {});
-  const cekaji = (C.new || []).slice().sort((x, y) => new Date(x.createdAt || 0) - new Date(y.createdAt || 0));
   const vlakna = (typeof E_THREADS !== 'undefined' ? E_THREADS : []);
-  const neprectene = vlakna.reduce((a, t) => a + (t.unread || 0), 0);
   const recenze = (typeof E_REVIEWS !== 'undefined' ? E_REVIEWS : []);
-  const prumer = recenze.length ? recenze.reduce((a, r) => a + (r.rating || 0), 0) / recenze.length : 0;
   const aktivita = (typeof E_ACTIVITY !== 'undefined' ? E_ACTIVITY : []);
+  const P = (typeof EPROFILE !== 'undefined' ? EPROFILE : {});
+  const F = (typeof ECOMPANY !== 'undefined' ? ECOMPANY : {});
+  const prumer = recenze.length ? recenze.reduce((a, r) => a + (r.rating || 0), 0) / recenze.length : 0;
   const aktivni = jobs.filter(j => j.status === 'active' || j.status === 'urgent');
+
+  // Tarif: kolik inzerátů smí běžet najednou a kolikrát za měsíc jde topovat
   const tier = (typeof _employerPlanTier === 'function') ? _employerPlanTier() : 'vyhodny';
   const limit = (typeof EMPLOYER_MAX_ACTIVE !== 'undefined' && EMPLOYER_MAX_ACTIVE[tier] != null) ? EMPLOYER_MAX_ACTIVE[tier] : 2;
+  const tarif = (typeof EMPLOYER_TARIF_NAZEV !== 'undefined' && EMPLOYER_TARIF_NAZEV[tier]) || '';
+  const topLimit = (typeof EMPLOYER_TOP_MESICNE !== 'undefined' && EMPLOYER_TOP_MESICNE[tier]) || 0;
+  const topPouzito = (typeof E_TOPOVANI !== 'undefined' ? E_TOPOVANI : []).length;
+  const volno = limit === Infinity ? Infinity : limit - aktivni.length;
 
-  // Zájemci a najatí za zvolené období — ze skutečných časů zájmu
+  // Jak dlouho už něco čeká: minuty od času → „20 min" / „5 h" / „3 dny"
+  const minOd = iso => { const t = new Date(iso).getTime(); return iso && !isNaN(t) ? Math.max(0, Math.floor((Date.now() - t) / 60000)) : null; };
+  const dobaTxt = m => m < 60 ? Math.max(1, m) + ' min' : m < 1440 ? Math.floor(m / 60) + ' h' : Math.floor(m / 1440) + ' ' + pl(Math.floor(m / 1440), 'den', 'dny', 'dní');
+  // Detail inzerátu přes adresu (#inzeraty/<id>) — EJobs si ho z ní při otevření vezme
+  const otevriInzerat = id => () => { try { history.pushState(null, '', '#inzeraty/' + encodeURIComponent(id)); } catch (e) {} onTab && onTab('jobs'); };
+  const firma = [{ foto: P.logo_url || null, ini: F.logo || '?', barva: '#0020F6' }];   // logo jako v levém menu
+
+  // ── Co je potřeba udělat ──
+  const ukoly = [];
+  // Zprávy, na které firma ještě neodpověděla (poslední zpráva je od kandidáta)
+  vlakna.forEach(t => {
+    const m = t.msgs && t.msgs[t.msgs.length - 1];
+    if (!m || m.from !== 'them') return;
+    ukoly.push({ key: 'z' + t.id, min: minOd(t.lastAt), lide: [{ foto: t.photo, ini: t.avatar, barva: t.color }],
+      titul: t.name + ' čeká na vaši odpověď',
+      pod: [t.last ? '„' + t.last + '"' : '', t.role].filter(Boolean).join(' · '),
+      akce: 'Odepsat', klik: () => onOpenChat ? onOpenChat(t.id) : onTab && onTab('chat') });
+  });
+  // Noví zájemci, na které firma ještě nereagovala — po inzerátech
+  const skupiny = {};
+  (C.new || []).forEach(c => {
+    const k = c.job_id || c.jobTitle || '?';
+    const s = skupiny[k] || (skupiny[k] = { job_id: c.job_id, titul: c.jobTitle || 'Inzerát', lidi: [], min: null });
+    s.lidi.push(c);
+    const m = minOd(c.createdAt);
+    if (m != null && (s.min == null || m > s.min)) s.min = m;
+  });
+  // Urgentní inzerát (firma ho označila, platí do začátku směny, employer-supabase.jsx) s neobsazenými místy
+  const naborHori = j => j.status === 'urgent' && (j.hired || 0) < Math.max(1, j.positions || 0);
+  const terminTxt = j => 'termín ' + (j.daysLeft === 1 ? 'zítra' : 'za ' + j.daysLeft + ' dny') + ', ' + (j.positions ? 'přijato ' + (j.hired || 0) + ' z ' + j.positions : 'zatím nikdo přijatý');
+  Object.values(skupiny).forEach(s => {
+    const n = s.lidi.length;
+    const j = jobs.find(x => x.id === s.job_id);
+    const jmena = s.lidi.slice(0, 2).map(c => c.name).join(', ') + (n > 2 ? ' a ' + (n - 2) + ' ' + pl(n - 2, 'další', 'další', 'dalších') : '');
+    ukoly.push({ key: 'k' + s.job_id, min: s.min, lide: s.lidi.map(c => ({ foto: c.photo, ini: c.avatar, barva: c.color })),
+      titul: s.titul + ': ' + n + ' ' + pl(n, 'nový zájemce čeká', 'noví zájemci čekají', 'nových zájemců čeká') + ' na vaši reakci',
+      pod: j && naborHori(j) ? 'Pozor, ' + terminTxt(j) + ' · ' + jmena : jmena,
+      akce: 'Projít', klik: () => { window.__empCandJob = s.job_id || null; onTab && onTab('candidates'); } });
+  });
+  ukoly.sort((a, b) => (b.min || 0) - (a.min || 0));   // nejdéle čekající nahoře
+  // Inzeráty, které potřebují pozornost
+  const fotoInzeratu = j => [{ foto: j.image || (Array.isArray(j.photos) && j.photos[0]) || null, ini: F.logo || '?', barva: '#1B34F0' }];
+  if (!jobs.length) ukoly.push({ key: 'j0', lide: firma, titul: 'Přidejte první inzerát', pod: 'Dokud nemáte inzerát, brigádníci vás v aplikaci nenajdou.', akce: 'Vytvořit', klik: onNew });
+  else if (!aktivni.length) ukoly.push({ key: 'j1', lide: firma, titul: 'Nemáte žádný aktivní inzerát', pod: 'Brigádníci vás teď v aplikaci nevidí. Zapněte některý z inzerátů.', akce: 'Inzeráty', klik: go('jobs') });
+  if (volno < 0) ukoly.push({ key: 'j2', lide: firma, titul: 'Máte víc aktivních inzerátů, než dovoluje tarif', pod: 'Aktivní ' + aktivni.length + ' z ' + limit + '. Pozastavte ' + (-volno) + ' ' + pl(-volno, 'inzerát', 'inzeráty', 'inzerátů') + ', nebo si navyšte tarif.', akce: 'Tarify', klik: go('pricing') });
+  // Urgentní inzerát, na který se zatím nikdo nepřihlásil (se zájemci je výš u nich)
+  aktivni.filter(j => naborHori(j) && !skupiny[j.id]).forEach(j => {
+    ukoly.push({ key: 'u' + j.id, lide: fotoInzeratu(j), titul: j.title + ': ' + terminTxt(j),
+      pod: 'Zatím se nikdo nepřihlásil.' + (topPouzito < topLimit && !(j.topUntil && new Date(j.topUntil) > new Date()) ? ' Topování ho v aplikaci posune mezi první inzeráty.' : ''),
+      akce: 'Otevřít', klik: otevriInzerat(j.id) });
+  });
+  // Nedoplněný profil firmy (jen sloupce, které v DB už jsou — stejné hranice jako Profil firmy)
+  const chybi = [['název firmy', (P.company_name || '').trim()], ['logo', P.logo_url], ['popis firmy', (P.bio || '').trim().length > 30],
+    ['obor', P.industry], ['adresa', (P.address || '').trim()]].filter(x => !x[1]).map(x => x[0]);
+  if (chybi.length) ukoly.push({ key: 'p', lide: firma, titul: 'Doplňte profil firmy', pod: 'Chybí: ' + chybi.join(', ') + '. Brigádníci si profil otevřou u vašich inzerátů.', akce: 'Doplnit', klik: go('company') });
+  const vidimUkoly = vse ? ukoly : ukoly.slice(0, _DB_UKOLU);
+
+  // ── Nábor za zvolené období ──
   const isCustom = period && typeof period === 'object';
   const od = isCustom ? new Date(period.from).getTime() : Date.now() - ({ '7d': 7, '30d': 30, '90d': 90, rok: 365 }[period] || 30) * 86400000;
   const doT = isCustom ? new Date(period.to).getTime() + 86400000 : Date.now() + 1;
@@ -185,125 +267,178 @@ function EDashboard({ period = '30d', onTab, onNew, onPeriod }) {
   jobs.forEach(j => (j.candidates || []).forEach(c => { const t = new Date(c.matched_at).getTime(); if (t >= od && t < doT) vObdobi.push(c); }));
   const zajemci = vObdobi.length;
   const najato = vObdobi.filter(c => c.status === 'accepted').length;
-  const rangeLbl = isCustom ? (_eFmt(period.from) + ' – ' + _eFmt(period.to)) : ({ '7d': '7 dní', '30d': '30 dní', '90d': '90 dní', rok: '12 měsíců' }[period] || '30 dní');
+  // Zhlédnutí po dnech jen když je DB měří s datem (viewsByDay), jinak se neukazují
+  const sDatem = jobs.some(j => j.viewsByDay);
+  let zhlednuti = 0;
+  if (sDatem) jobs.forEach(j => Object.entries(j.viewsByDay || {}).forEach(([den, n]) => { const t = new Date(den + 'T12:00:00').getTime(); if (t >= od - 43200000 && t < doT) zhlednuti += n; }));
 
-  const cisla = [
-    { l: 'Zájemci', v: zajemci, s: 'za ' + rangeLbl, kam: 'Kandidáti', onClick: go('candidates') },
-    { l: 'Najato', v: najato, s: zajemci ? Math.round(najato / zajemci * 100) + ' % zájemců' : 'za ' + rangeLbl },
-    { l: 'Aktivní inzeráty', v: aktivni.length + (limit === Infinity ? '' : ' / ' + limit), s: 'limit tarifu', kam: 'Inzeráty', onClick: go('jobs') },
-    { l: 'Hodnocení', v: prumer ? prumer.toFixed(1).replace('.', ',') : '—', s: recenze.length ? recenze.length + ' hodnocení' : 'zatím žádné', kam: recenze.length ? 'Recenze' : null, onClick: recenze.length ? go('reviews') : undefined },
-  ];
-  const dniOd = iso => { const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000); return isNaN(d) ? null : Math.max(0, d); };
-  const kdy = iso => { const d = dniOd(iso); return d == null ? '' : d === 0 ? 'dnes' : d === 1 ? 'včera' : 'před ' + d + ' dny'; };
-  const nadpis = (t, odkaz, kam) => (
-    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
-      <span style={{ fontSize: 16, fontWeight: 800, color: ink }}>{t}</span>
-      {odkaz && <span onClick={go(kam)} style={{ fontSize: 13, fontWeight: 700, color: blue, cursor: 'pointer' }}>{odkaz}</span>}
+  // ── Inzeráty: urgentní a aktivní první, pak neaktivní (stav Naplněno není, 30. 9.) ──
+  const PORADI = { urgent: 0, active: 1, paused: 2 };
+  const _stav = s => (typeof _jbStatusMap === 'function') ? _jbStatusMap(s) : 'active';
+  const serazene = jobs.map(j => ({ ...j, _state: _stav(j.status) })).sort((a, b) => ((PORADI[a.status] ?? 9) - (PORADI[b.status] ?? 9)) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
+
+  // ── Společné kousky ──
+  const karta = { background: '#fff', border: '1px solid #E6E9F5', borderRadius: 16, padding: '18px 22px 20px', minWidth: 0 };
+  const nadpis = (t, prava) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 32, marginBottom: 8 }}>
+      <span style={{ fontSize: 16, fontWeight: 800, color: ink, letterSpacing: '-.01em' }}>{t}</span>
+      {prava}
     </div>
   );
-  const radek = { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderTop: '1px solid ' + line };
+  const odkaz = (t, kam) => <span onClick={typeof kam === 'function' ? kam : go(kam)} style={{ fontSize: 13, fontWeight: 700, color: blue, cursor: 'pointer', whiteSpace: 'nowrap' }}>{t}</span>;
+  const klavesa = f => e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); f(); } };
+  const cislo = (l, v, pod) => (
+    <div style={{ minWidth: 0 }}>
+      <div style={{ fontSize: 12.5, fontWeight: 600, color: muted }}>{l}</div>
+      <div style={{ fontSize: 24, fontWeight: 800, color: ink, letterSpacing: '-.02em', lineHeight: 1.25, marginTop: 2 }}>{v}</div>
+      {pod ? <div style={{ fontSize: 12, color: muted, marginTop: 1 }}>{pod}</div> : null}
+    </div>
+  );
 
   return (
-    <div className="e-ram" style={{ padding: 20, height: '100%', boxSizing: 'border-box' }}>
-      <div style={{ background: '#F1F3FB', border: '1px solid #DDE1F0', borderRadius: 22, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className="e-ram" style={{ padding: 20 }}>
+      <div style={{ background: '#F1F3FB', border: '1px solid #DDE1F0', borderRadius: 22, overflow: 'hidden' }}>
 
-        <ETabHlava title="Dashboard">
-          <EPeriodPicker value={period} onChange={onPeriod} />
-          <EBtnHl onClick={onNew}>+ Nový inzerát</EBtnHl>
-        </ETabHlava>
+        {/* „+ Nový inzerát" je nahoře v levém menu (30. 9.), v hlavičce už ne */}
+        <ETabHlava title="Dashboard" />
 
-        {/* Pás čísel — 4 skutečná čísla, každé vede tam, kde se s ním pracuje */}
-        <div style={{ flex: 'none' }}>
-          <EMetriky items={cisla} />
-        </div>
+        {/* Jedna posuvná plocha: nahoře co udělat + tarif a nábor, pod tím
+            karty inzerátů přes celou šířku, dole aktivita a hodnocení */}
+        <div className="e-db-telo" style={{ padding: '2px 24px 24px', overflowX: 'hidden' }}>
+          <div className="e-db-mriz" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 340px', gap: 20, alignItems: 'start' }}>
 
-        {/* Jedna bílá plocha, sekce oddělené linkou a mezerou.
-            Pevná obrazovka (28. 9.): plocha vyplní okno až dolů a každý
-            sloupec se posouvá sám, jen když se do něj obsah nevejde. */}
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 24px 22px' }}>
-          <div style={{ background: '#fff', border: '1px solid #E6E9F5', borderRadius: 18, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 340px', gridTemplateRows: 'minmax(0,1fr)', height: '100%', minHeight: 360, boxSizing: 'border-box', overflow: 'hidden' }}>
-
-            <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 34, minWidth: 0, minHeight: 0, overflowY: 'auto' }}>
-              {/* Čeká na vás */}
-              <div>
-                {nadpis('Čeká na vás', cekaji.length ? 'Všichni kandidáti' : null, 'candidates')}
-                {cekaji.length === 0 && neprectene === 0 && (
-                  <div style={{ ...radek, color: muted, fontSize: 14 }}>{jobs.length ? 'Všechno máte vyřízené.' : 'Až se někdo přihlásí na váš inzerát, uvidíte ho tady.'}</div>
-                )}
-                {cekaji.slice(0, 4).map(c => {
-                  const d = dniOd(c.createdAt);
-                  return (
-                    <div key={c.id} style={radek}>
-                      <span style={{ width: 36, height: 36, flex: 'none', borderRadius: 10, background: '#EEF1FF', color: blue, fontSize: 13, fontWeight: 800, display: 'grid', placeItems: 'center' }}>{c.avatar}</span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14.5, fontWeight: 700, color: ink }}>{c.name}</div>
-                        <div style={{ fontSize: 12.5, color: muted }}>{[c.jobTitle || 'Inzerát', c.createdAt ? kdy(c.createdAt) : c.lastSeen].filter(Boolean).join(' · ')}</div>
+            {/* Co je potřeba udělat */}
+            <div style={karta}>
+              {nadpis(<>Co je potřeba udělat{ukoly.length > 0 && <span style={{ marginLeft: 8, fontSize: 12.5, fontWeight: 700, color: blue, background: '#EEF1FF', padding: '3px 9px', borderRadius: 999, verticalAlign: 2 }}>{ukoly.length}</span>}</>)}
+              {ukoly.length === 0 ? (
+                <div style={{ borderTop: '1px solid ' + line, padding: '16px 0 2px' }}>
+                  <div style={{ fontSize: 14.5, fontWeight: 700, color: ink }}>Všechno máte vyřízené</div>
+                  <div style={{ fontSize: 13, color: muted, marginTop: 3 }}>Až vám někdo napíše nebo projeví zájem o inzerát, uvidíte to tady.</div>
+                </div>
+              ) : (
+                <div style={{ margin: '0 -22px -20px' }}>
+                  {vidimUkoly.map(u => {
+                    const dlouho = u.min != null && u.min >= 1440;
+                    const lide = (u.lide || []).slice(0, 2);
+                    return (
+                      <div key={u.key} className="e-db-rad e-db-ukol" role="button" tabIndex={0} onClick={u.klik} onKeyDown={klavesa(u.klik)}
+                        style={{ display: 'grid', gridTemplateColumns: '56px minmax(0,1fr) auto auto', alignItems: 'center', gap: 12, padding: '12px 22px', borderTop: '1px solid ' + line, cursor: 'pointer' }}>
+                        {/* Kdo nebo co: profilovka, u víc zájemců dvě přes sebe; logo firmy; fotka inzerátu */}
+                        <span style={{ position: 'relative', width: 56, height: 40, display: 'block' }}>
+                          {lide.map((a, i) => <span key={i} style={{ position: 'absolute', top: 0, left: i * 16, zIndex: 2 - i }}><_EDbAvatar {...a} ring={lide.length > 1} /></span>)}
+                        </span>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 14.5, fontWeight: 700, color: ink, lineHeight: 1.35 }}>{u.titul}</div>
+                          {u.pod && <div style={{ fontSize: 13, color: muted, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.pod}</div>}
+                        </div>
+                        {u.min != null
+                          ? (dlouho
+                              ? <span style={{ fontSize: 11.5, fontWeight: 700, color: '#B96F06', background: '#FFF3E0', padding: '3px 9px', borderRadius: 999, whiteSpace: 'nowrap' }}>čeká {dobaTxt(u.min)}</span>
+                              : <span style={{ fontSize: 12.5, color: muted, whiteSpace: 'nowrap' }}>čeká {dobaTxt(u.min)}</span>)
+                          : <span />}
+                        <span style={{ fontSize: 13, fontWeight: 700, color: blue, whiteSpace: 'nowrap', minWidth: 58, textAlign: 'right' }}>{u.akce}</span>
                       </div>
-                      {d >= 2 && <span style={{ fontSize: 12, fontWeight: 700, color: '#B96F06' }}>čeká {d} {pl(d, 'den', 'dny', 'dní')}</span>}
-                      <span onClick={go('candidates')} style={{ fontSize: 13, fontWeight: 700, color: blue, cursor: 'pointer', marginLeft: 8 }}>Odpovědět</span>
+                    );
+                  })}
+                  {ukoly.length > _DB_UKOLU && (
+                    <div className="e-db-rad" role="button" tabIndex={0} onClick={() => setVse(v => !v)} onKeyDown={klavesa(() => setVse(v => !v))}
+                      style={{ padding: '12px 22px', borderTop: '1px solid ' + line, fontSize: 13, fontWeight: 700, color: blue, cursor: 'pointer' }}>
+                      {vse ? 'Ukázat méně' : 'Ukázat všech ' + ukoly.length}
                     </div>
-                  );
-                })}
-                {cekaji.length > 4 && <div style={{ ...radek, fontSize: 13, color: muted }}>a {cekaji.length - 4} {pl(cekaji.length - 4, 'další', 'další', 'dalších')}</div>}
-                {neprectene > 0 && (
-                  <div style={radek}>
-                    <span style={{ width: 36, height: 36, flex: 'none', borderRadius: 10, background: '#EEF1FF', display: 'grid', placeItems: 'center' }}><Icon name="chat-round-line-bold" size={17} color={blue} /></span>
-                    <span style={{ flex: 1, fontSize: 14.5, fontWeight: 700, color: ink }}>{neprectene} {pl(neprectene, 'nepřečtená zpráva', 'nepřečtené zprávy', 'nepřečtených zpráv')}</span>
-                    <span onClick={go('chat')} style={{ fontSize: 13, fontWeight: 700, color: blue, cursor: 'pointer' }}>Otevřít</span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'grid', gap: 20, minWidth: 0 }}>
+              {/* Tarif: kolik inzerátů ještě jde zapnout a kolikrát topovat */}
+              <div style={karta}>
+                {nadpis(tarif ? 'Tarif ' + tarif : 'Tarif', odkaz('Změnit tarif', 'pricing'))}
+                <div style={{ borderTop: '1px solid ' + line, paddingTop: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: ink2 }}>Aktivní inzeráty</span>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: volno < 0 ? '#C2410C' : ink }}>{aktivni.length}{limit !== Infinity && <span style={{ fontWeight: 600, color: muted }}> z {limit}</span>}</span>
                   </div>
-                )}
+                  {limit !== Infinity && limit <= 10 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(' + limit + ', minmax(0,1fr))', gap: 4, marginTop: 10 }}>
+                      {Array.from({ length: limit }, (_, i) => <span key={i} style={{ height: 8, borderRadius: 4, background: i < aktivni.length ? (volno < 0 ? oranz : blue) : '#E6E9F5' }} />)}
+                    </div>
+                  )}
+                  <div style={{ fontSize: 13, color: volno < 0 ? '#C2410C' : muted, marginTop: 9, lineHeight: 1.45 }}>
+                    {volno === Infinity ? 'Váš tarif nemá limit.'
+                      : volno > 0 ? 'Můžete zapnout ještě ' + volno + ' ' + pl(volno, 'inzerát', 'inzeráty', 'inzerátů') + '.'
+                      : volno === 0 ? 'Limit je plný. Další inzerát zapnete, až jiný pozastavíte.'
+                      : 'O ' + (-volno) + ' víc, než tarif dovoluje.'}
+                  </div>
+                </div>
+                <div style={{ borderTop: '1px solid ' + line, marginTop: 14, paddingTop: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: ink2 }}>{typeof E_LIMITY_OD_PRIHLASENI !== 'undefined' && E_LIMITY_OD_PRIHLASENI ? 'Topování' : 'Topování tento měsíc'}</span>
+                    {topLimit > 0 && <span style={{ fontSize: 15, fontWeight: 800, color: ink }}>{topPouzito}<span style={{ fontWeight: 600, color: muted }}> z {topLimit}</span></span>}
+                  </div>
+                  <div style={{ fontSize: 13, color: muted, marginTop: 5, lineHeight: 1.45 }}>
+                    {topLimit === 0 ? 'Váš tarif topování nezahrnuje.'
+                      : topPouzito >= topLimit ? (typeof E_LIMITY_OD_PRIHLASENI !== 'undefined' && E_LIMITY_OD_PRIHLASENI ? 'Máte vyčerpané, obnoví se při dalším přihlášení.' : 'Tento měsíc máte vyčerpané.')
+                      : 'Můžete topovat ještě ' + (topLimit - topPouzito) + '×.'}
+                  </div>
+                </div>
               </div>
 
-              {/* Inzeráty */}
-              <div>
-                {nadpis('Inzeráty', jobs.length ? 'Všechny inzeráty' : null, 'jobs')}
-                {jobs.length === 0 ? (
-                  <div style={{ ...radek, fontSize: 14, color: muted }}>Zatím žádný inzerát.<span onClick={onNew} style={{ fontWeight: 700, color: blue, cursor: 'pointer' }}>Vytvořit první</span></div>
-                ) : (
-                  <>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) 1fr 90px 90px', gap: 12, padding: '10px 0 8px', fontSize: 12.5, color: muted }}>
-                      <span>Pozice</span><span>Stav</span><span style={{ textAlign: 'right' }}>Zájemci</span><span style={{ textAlign: 'right' }}>Najato</span>
-                    </div>
-                    {jobs.slice(0, 6).map(j => {
-                      const zap = j.status === 'active' || j.status === 'urgent';
-                      return (
-                        <div key={j.id} onClick={go('jobs')} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) 1fr 90px 90px', gap: 12, padding: '12px 0', borderTop: '1px solid ' + line, fontSize: 14, color: ink, cursor: 'pointer', alignItems: 'center' }}>
-                          <span style={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.title}</span>
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: ink2 }}><span style={{ width: 7, height: 7, borderRadius: 99, background: zap ? '#0FA968' : '#C3C8DA' }} />{zap ? 'Aktivní' : j.status === 'filled' ? 'Obsazeno' : 'Vypnuto'}</span>
-                          <span style={{ textAlign: 'right' }}>{(j.candidates || []).length}</span>
-                          <span style={{ textAlign: 'right' }}>{j.hired || 0}</span>
-                        </div>
-                      );
-                    })}
-                  </>
-                )}
+              {/* Nábor za zvolené období */}
+              <div style={karta}>
+                {nadpis('Nábor', <EPeriodPicker value={period} onChange={onPeriod} />)}
+                <div style={{ borderTop: '1px solid ' + line, paddingTop: 14, display: 'grid', gridTemplateColumns: sDatem ? 'repeat(3, minmax(0,1fr))' : 'repeat(2, minmax(0,1fr))', gap: 12 }}>
+                  {sDatem && cislo('Zhlédnutí', zhlednuti.toLocaleString('cs-CZ'))}
+                  {cislo('Zájemci', zajemci)}
+                  {cislo('Najato', najato, zajemci ? Math.round(najato / zajemci * 100) + ' % zájemců' : null)}
+                </div>
               </div>
             </div>
 
-            <div style={{ borderLeft: '1px solid #E6E9F5', padding: '24px 24px', display: 'flex', flexDirection: 'column', gap: 34, minHeight: 0, overflowY: 'auto' }}>
-              {/* Poslední aktivita */}
-              <div>
-                {nadpis('Poslední aktivita')}
-                {aktivita.length === 0 && <div style={{ ...radek, fontSize: 14, color: muted }}>Zatím se nic nestalo.</div>}
-                {aktivita.slice(0, 5).map((a, i) => (
-                  <div key={i} style={{ padding: '11px 0', borderTop: '1px solid ' + line, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <span style={{ fontSize: 13.5, color: ink2, lineHeight: 1.4 }}><b style={{ color: ink }}>{a.who}</b> {a.what}</span>
-                    <span style={{ fontSize: 12, color: muted }}>{a.when}</span>
+            {/* Vaše inzeráty — karty přes celou šířku, stejná řada jako v záložce Inzeráty (EJobRada) */}
+            <div className="e-db-cela" style={{ gridColumn: '1 / -1', minWidth: 0, paddingTop: 8 }}>
+              {jobs.length === 0 ? (
+                <>
+                  {nadpis('Vaše inzeráty')}
+                  <div style={{ ...karta, padding: '28px 22px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: ink }}>Zatím žádný inzerát</div>
+                    <div style={{ fontSize: 13.5, color: muted, marginTop: 4 }}>Až ho přidáte, uvidíte ho tady tak, jak ho vidí brigádníci v aplikaci.</div>
+                    <div style={{ marginTop: 14 }}><EBtnHl onClick={onNew}>+ Nový inzerát</EBtnHl></div>
                   </div>
-                ))}
-              </div>
-              {/* Hodnocení */}
-              <div>
-                {nadpis('Hodnocení', recenze.length ? 'Recenze' : null, 'reviews')}
+                </>
+              ) : typeof EJobRada !== 'undefined' && (
+                <EJobRada nazev="Vaše inzeráty" stavNad jobs={serazene} onOpen={j => otevriInzerat(j.id)()}
+                  extra={<span style={{ marginLeft: 6 }}>{odkaz('Spravovat v Inzerátech', 'jobs')}</span>} />
+              )}
+            </div>
+
+            {/* Poslední aktivita */}
+            <div style={karta}>
+              {nadpis('Poslední aktivita')}
+              {aktivita.length === 0 && <div style={{ borderTop: '1px solid ' + line, paddingTop: 14, fontSize: 14, color: muted }}>Zatím se nic nestalo.</div>}
+              {aktivita.slice(0, 5).map((a, i) => (
+                <div key={i} style={{ padding: '11px 0', borderTop: '1px solid ' + line, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+                  <span style={{ fontSize: 13.5, color: ink2, lineHeight: 1.4, minWidth: 0 }}><b style={{ color: ink }}>{a.who}</b> {a.what}</span>
+                  <span style={{ fontSize: 12, color: muted, whiteSpace: 'nowrap', flex: 'none' }}>{a.when}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Hodnocení */}
+            <div style={karta}>
+              {nadpis('Hodnocení', recenze.length ? odkaz('Recenze', 'reviews') : null)}
+              <div style={{ borderTop: '1px solid ' + line, paddingTop: 14 }}>
                 {recenze.length ? (
-                  <div style={{ ...radek, gap: 10 }}>
-                    <span style={{ fontSize: 26, fontWeight: 800, color: ink, letterSpacing: '-.02em' }}>{prumer.toFixed(1).replace('.', ',')}</span>
-                    <span style={{ fontSize: 13, color: muted }}>{recenze.length} hodnocení</span>
-                  </div>
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                      <span style={{ fontSize: 26, fontWeight: 800, color: ink, letterSpacing: '-.02em' }}>{prumer.toFixed(1).replace('.', ',')}</span>
+                      <span style={{ fontSize: 13, color: muted }}>z 5 · {recenze.length} hodnocení</span>
+                    </div>
+                    {recenze[0] && recenze[0].text && <div style={{ fontSize: 13.5, color: ink2, lineHeight: 1.5, marginTop: 8 }}>„{recenze[0].text}" — {recenze[0].author}</div>}
+                  </>
                 ) : (
-                  <div style={{ ...radek, fontSize: 14, color: muted }}>Zatím vás nikdo nehodnotil.</div>
+                  <div style={{ fontSize: 14, color: muted }}>Zatím vás nikdo nehodnotil.</div>
                 )}
-                {recenze[0] && recenze[0].text && <div style={{ fontSize: 13.5, color: ink2, lineHeight: 1.5 }}>„{recenze[0].text}" — {recenze[0].author}</div>}
               </div>
             </div>
           </div>
