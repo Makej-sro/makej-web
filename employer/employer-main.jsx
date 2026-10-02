@@ -858,7 +858,7 @@ function EmployerApp() {
   }, [loaded]);
 
   async function handleSignOut() {
-    await sb.auth.signOut();
+    await sb.auth.signOut({ scope: 'local' });
     window.location.href = '/';
   }
 

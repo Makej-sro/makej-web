@@ -10,7 +10,7 @@
     gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
     gtag('set', 'ads_data_redaction', true);
   </script>
-  <link rel="stylesheet" href="/consent.css?v=2" />
+  <link rel="stylesheet" href="/consent.css?v=3" />
   <script src="/consent.js?v=4" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -36,13 +36,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Instrument+Sans:wght@400;500;600&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
-  <script src="/iconify-icons.js"></script>
+  <script src="/iconify-icons.js?v=3"></script>
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" as="image" href="/krok-1.jpg?v=6" />
   <link rel="preload" as="image" href="/krok-2.jpg?v=5" />
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=158" />
+  <link rel="stylesheet" href="style.css?v=178" />
   <style>
     /* Bolt-style střídavé kroky (foto + text) */
     .bolt-journey { position: relative; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
@@ -74,7 +74,7 @@
       padding: 5px 14px; border-radius: 100px;
       background: rgba(0,32,246,.16); border: 1px solid rgba(208,208,255,.14);
     }
-    .bolt-text h3 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3vw, 2.4rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    .bolt-text h3 { font-family: var(--font-heading); font-size: clamp(1.7rem, calc(3vw / var(--z, 1)), 2.4rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
     .bolt-text p { color: var(--muted-fg); font-size: 1.05rem; line-height: 1.7; max-width: 460px; }
 
     @media (max-width: 768px) {
@@ -87,11 +87,11 @@
     /* ── Kroky jako galerie (stejný vzor jako u zaměstnavatelů) ── */
     #how-it-works .bolt-steps {
       display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: clamp(20px, 3vw, 40px); align-items: start;
+      gap: clamp(20px, calc(3vw / var(--z, 1)), 40px); align-items: start;
       position: relative; z-index: 2;
     }
     #how-it-works .bolt-row { display: block; grid-template-columns: none; gap: 0; }
-    #how-it-works .bolt-row:nth-child(2) { margin-top: clamp(26px, 5vw, 64px); }
+    #how-it-works .bolt-row:nth-child(2) { margin-top: clamp(26px, calc(5vw / var(--z, 1)), 64px); }
     /* kaskáda, když do obrazu přijde víc karet najednou */
     #how-it-works .bolt-row:nth-child(2) { transition-delay: .1s; }
     #how-it-works .bolt-row:nth-child(3) { transition-delay: .2s; }
@@ -107,13 +107,13 @@
     .hsp-gal-word {
       position: absolute; left: 0; right: 0; top: 46%; transform: translateY(-50%); text-align: center;
       font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
-      font-size: clamp(4rem, 15vw, 13rem); letter-spacing: -.04em; color: rgba(10,13,46,.05);
+      font-size: clamp(4rem, calc(15vw / var(--z, 1)), 13rem); letter-spacing: -.04em; color: rgba(10,13,46,.05);
       line-height: 1; z-index: 0; pointer-events: none; white-space: nowrap;
     }
     @media (max-width: 760px) {
       #how-it-works .bolt-steps { grid-template-columns: 1fr; gap: 34px; }
       #how-it-works .bolt-row:nth-child(2) { margin-top: 0; }
-      .hsp-gal-word { font-size: clamp(3rem, 22vw, 7rem); }
+      .hsp-gal-word { font-size: clamp(3rem, calc(22vw / var(--z, 1)), 7rem); }
     }
 
 
@@ -147,14 +147,14 @@
        Obsah zarovnaný nahoru (žádné vertikální centrování), aby po doskočení
        fontu nadpis nepřecentrovával celý blok = žádný skok při scrollu. */
     #features { background: var(--pl-canvas); box-sizing: border-box;
-      padding-top: clamp(72px, 9vw, 118px); padding-bottom: clamp(40px, 5vw, 56px); }
+      padding-top: clamp(72px, calc(9vw / var(--z, 1)), 118px); padding-bottom: clamp(40px, calc(5vw / var(--z, 1)), 56px); }
     /* panel jde přes celou šířku, ať se velké slovo v pozadí rozjede k okrajům */
     #features .container { width: 100%; max-width: none; padding: 0; }
 
     /* ── Video ukázka aplikace (full-bleed přes celou šířku stránky) ── */
     #features .feat-video {
       position: relative;
-      width: 100vw;
+      width: calc(100vw / var(--z, 1));
       left: 50%;
       transform: translateX(-50%);
       margin: 14px 0 64px;
@@ -162,7 +162,7 @@
       background: #0a0d2e;
       overflow: hidden;
       aspect-ratio: 16 / 9;       /* rezervuje výšku → žádný CLS, než se video načte */
-      max-height: 90vh;
+      max-height: calc(90vh / var(--z, 1));
     }
     #features .feat-video video {
       display: block;
@@ -191,7 +191,7 @@
        stojí přímo na ploše sekce — žádné rámečky ani karty. */
     .fx-head { text-align: center; max-width: 720px; margin: 0 auto 54px; padding: 0 24px; }
     #features .bf2-title { margin: 0; max-width: none; font-family: var(--font-heading);
-      font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, 4.4vw, 3rem);
+      font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, calc(4.4vw / var(--z, 1)), 3rem);
       letter-spacing: -.02em; line-height: 1.02; color: #0e1116; }
     #features .bf2-sub { margin: 14px 0 0; max-width: none; font-size: 1.08rem;
       line-height: 1.6; color: rgba(14,17,22,.55); text-wrap: pretty; }
@@ -202,11 +202,11 @@
     /* ═══════════ Modré hero s telefonem (jako employer) ═══════════ */
     .emp-hero-blue { background: #0b21f6; position: relative; overflow: hidden; padding: 134px 24px 0; text-align: center; }
     .eh-head { max-width: 950px; margin: 0 auto; position: relative; z-index: 2; }
-    .eh-head h1 { font-family: var(--font-heading); font-size: clamp(2.7rem, 7vw, 5.4rem); font-weight: 800; color: #0a0d2e; line-height: 1.02; letter-spacing: -.025em; margin: 0 0 26px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .eh-head h1 { font-family: var(--font-heading); font-size: clamp(2.7rem, calc(7vw / var(--z, 1)), 5.4rem); font-weight: 800; color: #0a0d2e; line-height: 1.02; letter-spacing: -.025em; margin: 0 0 26px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .eh-head h1 .eh-accent { color: #0020f6; }
     /* ── Vstupní animace hero (v duchu landing page) ── */
     .eh-line { display: block; overflow: hidden; padding-bottom: .3em; margin-bottom: -.3em; }
-    .eh-line-in { display: inline-block; transform: translateY(120%); animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) both; will-change: transform; }
+    .eh-line-in { display: inline-block; transform: translateY(160%); animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) both; will-change: transform; }
     .eh-line:nth-child(1) .eh-line-in { animation-delay: .1s; }
     .eh-line:nth-child(2) .eh-line-in { animation-delay: .26s; }
     .emp-hero-blue .eh-grad {
@@ -218,7 +218,7 @@
     @media (prefers-reduced-motion: reduce) {
       .eh-line-in, .emp-hero-blue .eh-grad, .eh-sub, .eh-btn { animation: none !important; transform: none !important; }
     }
-    .eh-sub { color: #4b5578; font-size: clamp(1.02rem, 1.6vw, 1.3rem); line-height: 1.5; max-width: 640px; margin: 0 auto 34px; }
+    .eh-sub { color: #4b5578; font-size: clamp(1.02rem, calc(1.6vw / var(--z, 1)), 1.3rem); line-height: 1.5; max-width: 640px; margin: 0 auto 34px; }
         .eh-btn { display: inline-block; background: #191919; color: #fff; font-family: var(--font-sans); font-weight: 700; font-size: 1.02rem; padding: 16px 32px; border-radius: 16px; text-decoration: none; cursor: pointer; transition: background .25s ease, color .25s ease, transform .2s ease; }
     .eh-btn:hover { background: #0020f6; color: #fff; transform: translateY(-2px); }
 
@@ -227,7 +227,7 @@
        sjede dolů a překlopí k zemi. Text hera naskočí až po dosednutí.
        Zoomy a pád jsou v proměnných, aby se daly na malých oknech přiškrtit. */
     .mkj-visual {
-      --z0: .80; --z1: .40; --dy0: 26px; --dy: 258px; --tilt: 42deg;
+      --z0: .80; --z1: .40; --dy0: 26px; --dy: 436px; --tilt: 42deg;
       position: absolute; inset: 0; z-index: 1; pointer-events: none;
       perspective: 1700px; perspective-origin: 50% 42%;
       display: flex; align-items: center; justify-content: center; overflow: hidden;
@@ -283,10 +283,14 @@
        Zoomy podle výšky okna: --z0 aby velký telefon vyplnil ~92 % výšky, --z1 aby
        po dosednutí zbylo místo pod tlačítkem. --dy0 posadí start kousek níž, aby velký
        telefon nezajel pod logo v navbaru. */
-    @media (min-height: 650px)  { .mkj-visual { --z0: .86;  --z1: .47; --dy: 275px; } }
-    @media (min-height: 710px)  { .mkj-visual { --z0: .92;  --z1: .54; --dy: 295px; } }
-    @media (min-height: 770px)  { .mkj-visual { --z0: .98;  --z1: .60; --dy: 320px; } }
-    @media (min-height: 830px)  { .mkj-visual { --z0: 1.05; --z1: .66; --dy: 345px; } }
+    /* Nízká okna (Windows notebooky 1280 × 720, 1366 × 768): telefon dosedal
+       vršek za tlačítko „Vytvořit účet zdarma" — posazený níž, aby mezi nimi
+       zbylo ~20 px (1. 10. 2026; dřív dy 275 / 295 / 320 / 345). */
+    @media (min-height: 650px)  { .mkj-visual { --z0: .86;  --z1: .47; --dy: 416px; } }
+    @media (min-height: 710px)  { .mkj-visual { --z0: .92;  --z1: .54; --dy: 392px; } }
+    @media (min-height: 770px)  { .mkj-visual { --z0: .98;  --z1: .60; --dy: 370px; } }
+    @media (min-height: 830px)  { .mkj-visual { --z0: 1.05; --z1: .66; --dy: 370px; } }
+    @media (min-height: 870px)  { .mkj-visual { --z0: 1.05; --z1: .66; --dy: 345px; } }
     @media (min-height: 950px)  { .mkj-visual { --z0: 1.18; --z1: .72; --dy: 380px; } }
     @media (min-height: 1050px) { .mkj-visual { --z0: 1.30; --z1: .78; --dy: 415px; } }
     @media (prefers-reduced-motion: reduce) {
@@ -304,10 +308,10 @@
        .vx-nav a .vx-intro, globální .vx-sec / .vx-wrap / .vx-h2 by přebývaly. ── */
     .vx-close { background: #0020f6;
       padding: 96px 0; text-align: center; }
-    .vx-close .vx-wrap { width: min(1120px, 90vw); margin: 0 auto; }
+    .vx-close .vx-wrap { width: min(1120px, calc(90vw / var(--z, 1))); margin: 0 auto; }
     .vx-close .vx-sec-head { max-width: 640px; margin: 0 auto; }
     .vx-close .vx-h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
-      font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.02;
+      font-size: clamp(1.9rem, calc(4.4vw / var(--z, 1)), 3rem); letter-spacing: -.02em; line-height: 1.02;
       margin: 12px 0 0; color: #fff; text-wrap: balance; }
     .vx-close .vx-sec-head p { color: rgba(255,255,255,.85); max-width: 640px;
       margin: 16px auto 0; font-size: 1.08rem; line-height: 1.6; }
@@ -325,7 +329,7 @@
        s modrou — proto kolem něj není rámeček ani stín navíc. */
     .vx-close--foto { text-align: left; padding: 84px 0; }
     .vx-close--foto .vx-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.18fr);
-      align-items: center; gap: clamp(28px, 5vw, 64px); }
+      align-items: center; gap: clamp(28px, calc(5vw / var(--z, 1)), 64px); }
     .vx-close--foto .vx-sec-head { max-width: 520px; margin: 0; }
     .vx-close--foto .vx-sec-head p { margin-left: 0; margin-right: 0; }
     .vx-close--foto .vxc-foto img { display: block; width: 100%; height: auto; }
@@ -372,7 +376,7 @@
     body { background: #fff; }
     body::before { display: none !important; }
     .emp-hero-blue { padding-top: 0 !important; }
-    .eh-head { margin-top: clamp(94px, 12vh, 120px); margin-top: clamp(94px, calc(var(--hero-h, 100vh) * .12), 120px); }
+    .eh-head { margin-top: clamp(94px, calc(12vh / var(--z, 1)), 120px); margin-top: clamp(94px, calc(var(--hero-h, calc(100vh / var(--z, 1))) * .12), 120px); }
         /* Rozložení stejné jako hlavní navbar: logo vlevo, odkazy absolutně vycentrované
        přes celou lištu, CTA vpravo. */
     .vx-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 16px 24px; transition: background .25s, box-shadow .25s, padding .2s; }
@@ -398,7 +402,7 @@
       }
 
     /* ── Hero jako u Lidé: modrý→bílý gradient + „drop" animace telefonu ── */
-    .emp-hero-blue { background: #fff !important; height: 100vh; height: var(--hero-h, 100vh); min-height: 0; }
+    .emp-hero-blue { background: #fff !important; height: calc(100vh / var(--z, 1)); height: var(--hero-h, calc(100vh / var(--z, 1))); min-height: 0; }
     /* Každý kus textu naskočí ve chvíli, kdy ho vrch padajícího telefonu mine —
        ne až po dosednutí. Časy jsou dopočítané z průběhu phEnter (drží do 0,8 s,
        pak easing): řádek 1 v 0,96 s, řádek 2 v 1,05 s, podnadpis 1,15 s, tlačítko 1,28 s. */
@@ -410,9 +414,9 @@
 
     /* ── Intro sekce (styl jako u Lidé) ── */
     .vx-intro { background:#fff; padding: 92px 0; }
-    .vx-intro .vx-wrap { width: min(1100px, 90vw); margin: 0 auto; text-align:center; }
+    .vx-intro .vx-wrap { width: min(1100px, calc(90vw / var(--z, 1))); margin: 0 auto; text-align:center; }
     .vx-intro .vx-kick { display:inline-block; font-family:var(--font-heading); font-size:.72rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#0020f6; }
-    .vx-intro h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.03; margin: 12px 0 0; color:#0a0d2e; }
+    .vx-intro h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, calc(4.4vw / var(--z, 1)), 3rem); letter-spacing: -.02em; line-height: 1.03; margin: 12px 0 0; color:#0a0d2e; }
     .vx-intro p { max-width: 780px; margin: 16px auto 0; color:#5b6478; font-size: 1.16rem; line-height: 1.6; }
     .js-reveal-up { opacity:0; transform: translateY(60px); transition: opacity 1s cubic-bezier(.2,.8,.25,1), transform 1s cubic-bezier(.2,.8,.25,1); }
     .js-reveal-up.is-in { opacity:1; transform:none; }
@@ -426,7 +430,9 @@
     (function () {
       var r = document.documentElement, lastW = null;
       function set() {
-        r.style.setProperty('--hero-h', window.innerHeight + 'px');
+        // ÷ zoom: na velkém monitoru je stránka zvětšená (style.css, VELKÉ OBRAZOVKY)
+        var z = parseFloat(getComputedStyle(r).zoom) || 1;
+        r.style.setProperty('--hero-h', window.innerHeight / z + 'px');
         lastW = window.innerWidth;
       }
       set();
@@ -455,7 +461,7 @@
         <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       </div>
       <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" aria-expanded="false">
-        <span></span><span></span>
+        <span></span><span></span><span></span>
       </button>
     </div>
     <!-- Mobile Menu -->
@@ -488,7 +494,7 @@
             <a href="/podpora">Podpora</a>
           </div>
           <button class="mobile-menu-btn vx-burger" aria-label="Menu" aria-expanded="false">
-            <span></span><span></span>
+            <span></span><span></span><span></span>
           </button>
           <div class="vx-nav-actions">
             <a href="#" class="vx-signin worker-cta-register">Vytvořit účet</a>
@@ -877,7 +883,7 @@
   <div class="modal-overlay" id="modal-overlay">
 
     <!-- LOGIN MODAL -->
-    <div class="modal" id="login-modal" style="overflow:visible;">
+    <div class="modal" id="login-modal">
       <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej</div>
       <h2 class="modal-title">Přihlásit se</h2>
@@ -897,6 +903,7 @@
             <input class="form-input" type="text" id="login-key" placeholder="Zadej klíč" inputmode="numeric" autocomplete="off" />
             <p class="form-hint">Pouze pro oficiální testovací a vývojářské účty.</p>
           </div>
+          <label class="login-pamatovat" for="login-pamatovat"><input type="checkbox" id="login-pamatovat" checked /><span>Zůstat přihlášen</span></label>
           <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
       </form>
       <div class="modal-divider"><span>nebo</span></div>
@@ -995,7 +1002,8 @@
   <!-- ═══════════ COOKIE BANNER ═══════════ -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=68"></script>
+  <script src="/pamet-prihlaseni.js?v=2"></script>
+  <script src="script.js?v=77"></script>
   <!-- Lazy-play ukázkového videa: stáhne a přehraje až ve viewportu (šetří data + LCP) -->
   <script>
   (function () {
@@ -1031,12 +1039,12 @@
       if (!el) return;
       var lastW = null;
       var STUPNE = [
-        [1050, 1.30, .78, 415], [950, 1.18, .72, 380], [830, 1.05, .66, 345],
-        [770,  .98, .60, 320], [710,  .92, .54, 295], [650,  .86, .47, 275],
-        [0,    .80, .40, 258]
+        [1050, 1.30, .78, 415], [950, 1.18, .72, 380], [870, 1.05, .66, 345], [830, 1.05, .66, 370],
+        [770,  .98, .60, 370], [710,  .92, .54, 392], [650,  .86, .47, 416],
+        [0,    .80, .40, 436]
       ];
       function apply() {
-        var h = window.innerHeight, s;
+        var h = window.innerHeight / (parseFloat(getComputedStyle(document.documentElement).zoom) || 1), s;
         for (var i = 0; i < STUPNE.length; i++) { if (h >= STUPNE[i][0]) { s = STUPNE[i]; break; } }
         el.style.setProperty('--z0', s[1]);
         el.style.setProperty('--z1', s[2]);

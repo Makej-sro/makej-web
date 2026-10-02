@@ -10,7 +10,7 @@
     gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
     gtag('set', 'ads_data_redaction', true);
   </script>
-  <link rel="stylesheet" href="/consent.css?v=2" />
+  <link rel="stylesheet" href="/consent.css?v=3" />
   <script src="/consent.js?v=4" defer></script>
   <script>
     document.documentElement.classList.add('oc-intro');
@@ -47,11 +47,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="/iconify-icons.js"></script>
+  <script src="/iconify-icons.js?v=3"></script>
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=158" />
+  <link rel="stylesheet" href="/style.css?v=178" />
   <style>
     /* ═══════════ O NÁS — návrh z Claude Design, doplněný o náš navbar,
        sekci se stažením a patičku. Modrá sjednocena na značkovou #0020f6. ═══════════ */
@@ -77,12 +77,12 @@
 
     /* ── hero: jen nadpis a dva sloupce textu ── */
     /* hero na celou výšku obrazovky, obsah svisle na střed */
-    .oc-hero { background: #fff; min-height: 100vh; min-height: 100svh;
+    .oc-hero { background: #fff; min-height: calc(100vh / var(--z, 1)); min-height: calc(100svh / var(--z, 1));
       display: flex; align-items: center; position: relative;
       /* dole visí přes okraj nápis „Makej“ — spodní odsazení mu drží místo */
-      padding-bottom: clamp(64px, 12vw, 190px); }
-    .oc-hero-txt { width: min(1280px, 92vw); margin: 0 auto; position: relative; z-index: 1;
-      padding: clamp(104px, 12vh, 150px) 0 clamp(48px, 6vw, 84px); }
+      padding-bottom: clamp(64px, calc(12vw / var(--z, 1)), 190px); }
+    .oc-hero-txt { width: min(1280px, calc(92vw / var(--z, 1))); margin: 0 auto; position: relative; z-index: 1;
+      padding: clamp(104px, calc(12vh / var(--z, 1)), 150px) 0 clamp(48px, calc(6vw / var(--z, 1)), 84px); }
 
     /* ── Obří „Makej“ na spodní hraně hera: větší část je v heru, zbytek přetéká
        do sekce „Proč vzniklo“ (translateY laděné okem, 50 % sedělo moc nízko).
@@ -92,20 +92,20 @@
       transform: translateY(40%); text-align: center; pointer-events: none;
       user-select: none; overflow-anchor: none; }
     .oc-wm span { display: block; font-family: var(--font-heading); font-weight: 900;
-      font-size: clamp(84px, 22vw, 340px); line-height: .82; letter-spacing: -.05em;
+      font-size: clamp(84px, calc(22vw / var(--z, 1)), 340px); line-height: .82; letter-spacing: -.05em;
       color: var(--wm); animation: omWm 1s cubic-bezier(.22,1,.36,1) .5s both; }
     /* první sekce pod herem — víc místa nahoře, ať spodní půlka nápisu nekolidovala s nadpisem */
-    .oc-sec.oc-under-wm { padding-top: clamp(96px, 15vw, 210px); }
-    .oc-h1 { margin: 0; font-weight: 900; font-size: clamp(56px, 9vw, 132px); line-height: 1;
+    .oc-sec.oc-under-wm { padding-top: clamp(96px, calc(15vw / var(--z, 1)), 210px); }
+    .oc-h1 { margin: 0; font-weight: 900; font-size: clamp(56px, calc(9vw / var(--z, 1)), 132px); line-height: 1;
       letter-spacing: -.05em; text-transform: uppercase; }
     .oc-h1 span { display: block; animation: omMask .9s cubic-bezier(.22,1,.36,1) both; }
     .oc-h1 span:nth-child(2) { animation-delay: .12s; }
 
     /* dva sloupce pod nadpisem — vlevo tvrzení, vpravo podrobnosti */
-    .oc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(26px, 4vw, 72px);
-      margin-top: clamp(36px, 5vw, 64px); max-width: 980px;
+    .oc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(26px, calc(4vw / var(--z, 1)), 72px);
+      margin-top: clamp(36px, calc(5vw / var(--z, 1)), 64px); max-width: 980px;
       animation: omRise .9s cubic-bezier(.22,1,.36,1) .34s both; }
-    .oc-cols .lead { margin: 0; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.5;
+    .oc-cols .lead { margin: 0; font-size: clamp(17px, calc(1.5vw / var(--z, 1)), 21px); line-height: 1.5;
       font-weight: 500; color: var(--ink); text-wrap: pretty; }
     .oc-cols .detail p { margin: 0 0 16px; font-size: 15.5px; line-height: 1.7; color: var(--mut); }
     .oc-cols .detail p:last-child { margin-bottom: 0; }
@@ -130,38 +130,38 @@
     .oc-intro .oc-cols, .oc-intro .oc-wm span { animation-delay: 2.2s; }
 
     /* ── společné pro sekce ── */
-    .oc-sec { padding: clamp(64px, 9vw, 110px) 56px; }
+    .oc-sec { padding: clamp(64px, calc(9vw / var(--z, 1)), 110px) 56px; }
     .oc-in { max-width: 1280px; margin: 0 auto; }
-    .oc-h2 { margin: 0; font-weight: 900; font-size: clamp(32px, 4.6vw, 56px); line-height: 1.02;
+    .oc-h2 { margin: 0; font-weight: 900; font-size: clamp(32px, calc(4.6vw / var(--z, 1)), 56px); line-height: 1.02;
       letter-spacing: -.035em; text-transform: uppercase; text-wrap: balance; }
     .oc-h2 .b { color: var(--blue); }
 
     /* ── Editorial hlavička sekce: obří dvouřádkový nadpis vlevo, perex vpravo,
        obojí zarovnané na spodní linku, pod tím vlasová čára. ── */
-    .oc-head { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(32px, 5vw, 72px);
-      align-items: end; padding-bottom: clamp(36px, 5vw, 64px); border-bottom: 1px solid var(--line); }
-    .oc-eh { margin: 0; font-weight: 900; font-size: clamp(48px, 8.2vw, 104px); line-height: .86;
+    .oc-head { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(32px, calc(5vw / var(--z, 1)), 72px);
+      align-items: end; padding-bottom: clamp(36px, calc(5vw / var(--z, 1)), 64px); border-bottom: 1px solid var(--line); }
+    .oc-eh { margin: 0; font-weight: 900; font-size: clamp(48px, calc(8.2vw / var(--z, 1)), 104px); line-height: .86;
       letter-spacing: -.05em; text-transform: uppercase; }
-    .oc-head p { margin: 0 0 12px; max-width: 480px; font-size: clamp(16px, 1.5vw, 20px);
+    .oc-head p { margin: 0 0 12px; max-width: 480px; font-size: clamp(16px, calc(1.5vw / var(--z, 1)), 20px);
       line-height: 1.55; color: var(--txt); text-wrap: pretty; }
 
     /* ── problémy — číslované řádky oddělené linkami ── */
     .oc-rows { list-style: none; margin: 0; padding: 0; }
-    .oc-rows li { display: grid; grid-template-columns: 92px 1fr 1fr; gap: clamp(24px, 4vw, 56px);
-      align-items: start; padding: clamp(30px, 3.6vw, 46px) 0; border-bottom: 1px solid var(--line); }
+    .oc-rows li { display: grid; grid-template-columns: 92px 1fr 1fr; gap: clamp(24px, calc(4vw / var(--z, 1)), 56px);
+      align-items: start; padding: clamp(30px, calc(3.6vw / var(--z, 1)), 46px) 0; border-bottom: 1px solid var(--line); }
     .oc-rows li:last-child { border-bottom: 0; padding-bottom: 0; }
-    .oc-num { font-weight: 900; font-size: clamp(30px, 3.4vw, 44px); line-height: 1;
+    .oc-num { font-weight: 900; font-size: clamp(30px, calc(3.4vw / var(--z, 1)), 44px); line-height: 1;
       letter-spacing: -.04em; color: var(--wm); font-family: var(--font-heading); }
-    .oc-rows h3 { margin: 0; font-weight: 800; font-size: clamp(23px, 2.7vw, 34px); line-height: 1.1;
+    .oc-rows h3 { margin: 0; font-weight: 800; font-size: clamp(23px, calc(2.7vw / var(--z, 1)), 34px); line-height: 1.1;
       letter-spacing: -.03em; text-wrap: balance; }
-    .oc-rows p { margin: 6px 0 0; max-width: 440px; font-size: clamp(15.5px, 1.35vw, 18px);
+    .oc-rows p { margin: 6px 0 0; max-width: 440px; font-size: clamp(15.5px, calc(1.35vw / var(--z, 1)), 18px);
       line-height: 1.6; color: var(--mut); text-wrap: pretty; }
 
     /* ── modrý pás s citátem ── */
-    .oc-quote { background: var(--blue); color: #fff; padding: clamp(60px, 7vw, 88px) 56px; }
-    .oc-quote-in { display: grid; grid-template-columns: 1.25fr .75fr; gap: clamp(36px, 5vw, 72px);
+    .oc-quote { background: var(--blue); color: #fff; padding: clamp(60px, calc(7vw / var(--z, 1)), 88px) 56px; }
+    .oc-quote-in { display: grid; grid-template-columns: 1.25fr .75fr; gap: clamp(36px, calc(5vw / var(--z, 1)), 72px);
       align-items: center; max-width: 1280px; margin: 0 auto; }
-    .oc-quote h2 { margin: 0 0 22px; font-weight: 900; font-size: clamp(34px, 5vw, 62px); line-height: 1;
+    .oc-quote h2 { margin: 0 0 22px; font-weight: 900; font-size: clamp(34px, calc(5vw / var(--z, 1)), 62px); line-height: 1;
       letter-spacing: -.04em; text-transform: uppercase; text-wrap: balance; }
     .oc-quote p { margin: 0; max-width: 520px; font-size: 18px; line-height: 1.6; color: rgba(255,255,255,.82); }
     /* Ikona appky bez rámu — její modrá je shodná s pásem (#0020f6),
@@ -170,27 +170,27 @@
     .oc-shot img { width: min(100%, 500px); height: auto; display: block; }
 
     /* ── na čem pracujeme — dva sloupce položek oddělených linkami ── */
-    .oc-list2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(32px, 5vw, 72px); }
-    .oc-list2 > div { padding: clamp(28px, 3vw, 40px) 0; border-bottom: 1px solid var(--line); }
+    .oc-list2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(32px, calc(5vw / var(--z, 1)), 72px); }
+    .oc-list2 > div { padding: clamp(28px, calc(3vw / var(--z, 1)), 40px) 0; border-bottom: 1px solid var(--line); }
     /* poslední řádek mřížky (dvě položky) je bez linky — sekci ukončuje až odkaz pod ní */
     .oc-list2 > div:nth-last-child(-n+2) { border-bottom: 0; }
-    .oc-list2 h3 { margin: 0 0 10px; font-weight: 800; font-size: clamp(21px, 2.4vw, 30px);
+    .oc-list2 h3 { margin: 0 0 10px; font-weight: 800; font-size: clamp(21px, calc(2.4vw / var(--z, 1)), 30px);
       line-height: 1.1; letter-spacing: -.03em; text-wrap: balance; }
-    .oc-list2 p { margin: 0; max-width: 420px; font-size: clamp(15px, 1.3vw, 17px);
+    .oc-list2 p { margin: 0; max-width: 420px; font-size: clamp(15px, calc(1.3vw / var(--z, 1)), 17px);
       line-height: 1.6; color: var(--mut); text-wrap: pretty; }
     /* textový odkaz s podtržítkem místo pilulky — drží editorial ráz sekce */
-    .oc-cta { margin-top: clamp(44px, 5vw, 72px); }
+    .oc-cta { margin-top: clamp(44px, calc(5vw / var(--z, 1)), 72px); }
     .oc-cta a { display: inline-flex; align-items: center; gap: 14px; font-family: var(--font-heading);
-      font-weight: 800; font-size: clamp(17px, 1.8vw, 22px); letter-spacing: -.02em; color: var(--blue);
+      font-weight: 800; font-size: clamp(17px, calc(1.8vw / var(--z, 1)), 22px); letter-spacing: -.02em; color: var(--blue);
       padding-bottom: 10px; border-bottom: 2px solid var(--blue);
       transition: color .2s ease, border-color .2s ease; }
     .oc-cta a:hover { color: var(--ink); border-bottom-color: var(--ink); }
 
     /* ── tým ── */
-    .oc-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(28px, 3vw, 40px);
-      padding-top: clamp(36px, 4.5vw, 56px); }
+    .oc-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(28px, calc(3vw / var(--z, 1)), 40px);
+      padding-top: clamp(36px, calc(4.5vw / var(--z, 1)), 56px); }
     .oc-person { min-width: 0; }
-    .oc-person h3 { margin: 0 0 8px; font-weight: 900; font-size: clamp(24px, 2.7vw, 34px);
+    .oc-person h3 { margin: 0 0 8px; font-weight: 900; font-size: clamp(24px, calc(2.7vw / var(--z, 1)), 34px);
       letter-spacing: -.03em; }
     .oc-person p { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .16em;
       text-transform: uppercase; color: var(--blue); }
@@ -207,14 +207,14 @@
 
     /* Kotva #kontakt — míří sem odkaz z patičky všech stránek. scroll-margin
        drží nadpis pod přilepenou lištou, jinak by se pod ni schoval. */
-    .oc-kontakt { padding-top: clamp(36px, 4.5vw, 56px); }
+    .oc-kontakt { padding-top: clamp(36px, calc(4.5vw / var(--z, 1)), 56px); }
     /* Kotva #kontakt (z patičky všech stránek) sedí na bloku s lidmi, ne na
        samotném kontaktu — ten je hned pod ním, takže se do okna vejde obojí.
        Když mířila přímo na kontakt, tým zůstal nad horní hranou. */
     .oc-team { scroll-margin-top: 20px; }
     .oc-kontakt h3 { margin: 0 0 8px; font-size: 12px; font-weight: 700;
       letter-spacing: .16em; text-transform: uppercase; color: var(--blue); }
-    .oc-kontakt a { font-weight: 800; font-size: clamp(20px, 2.2vw, 28px);
+    .oc-kontakt a { font-weight: 800; font-size: clamp(20px, calc(2.2vw / var(--z, 1)), 28px);
       letter-spacing: -.02em; color: var(--ink); transition: color .2s ease; }
     .oc-kontakt a:hover { color: var(--blue); }
 
@@ -239,7 +239,7 @@
     }
     @media (max-width: 680px) {
       .oc-sec, .oc-quote { padding-left: 22px; padding-right: 22px; }
-      .oc-hero { min-height: 92vh; min-height: 92svh; }
+      .oc-hero { min-height: calc(92vh / var(--z, 1)); min-height: calc(92svh / var(--z, 1)); }
       .oc-hero-txt { padding: 108px 0 48px; }
       .oc-cols { grid-template-columns: 1fr; gap: 24px; }
       .oc-team { grid-template-columns: 1fr; gap: 24px; }
@@ -271,7 +271,7 @@
         <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       </div>
       <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" aria-expanded="false">
-        <span></span><span></span>
+        <span></span><span></span><span></span>
       </button>
     </div>
     <div class="mobile-menu" id="mobile-menu">
@@ -321,7 +321,8 @@
         if (!r.width || !r.height) return;
         var z = Math.min(window.innerWidth * 0.82 / r.width, window.innerHeight * 0.6 / r.height);
         root.style.setProperty('--wm-zoom', Math.max(1, Math.min(z, 6)).toFixed(3));
-        root.style.setProperty('--wm-shift', (window.innerHeight / 2 - (r.top + r.height / 2)).toFixed(1) + 'px');
+        var zoom = parseFloat(getComputedStyle(root).zoom) || 1;   // posun jde do stylu → px stránky
+        root.style.setProperty('--wm-shift', ((window.innerHeight / 2 - (r.top + r.height / 2)) / zoom).toFixed(1) + 'px');
       }
       fit();
       /* Písmo se načítá se swapem — po dotažení se šířka nápisu změní, přeměřit. */
@@ -613,7 +614,7 @@
   <div class="modal-overlay" id="modal-overlay">
 
     <!-- LOGIN MODAL -->
-    <div class="modal" id="login-modal" style="overflow:visible;">
+    <div class="modal" id="login-modal">
       <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej</div>
       <!-- Krok 1: výběr role -->
@@ -662,6 +663,7 @@
             <input class="form-input" type="text" id="login-key" placeholder="Zadej klíč" inputmode="numeric" autocomplete="off" />
             <p class="form-hint">Pouze pro oficiální testovací a vývojářské účty.</p>
           </div>
+          <label class="login-pamatovat" for="login-pamatovat"><input type="checkbox" id="login-pamatovat" checked /><span>Zůstat přihlášen</span></label>
           <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
         </form>
         <div class="modal-divider"><span>nebo</span></div>
@@ -755,7 +757,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=68"></script>
+  <script src="/pamet-prihlaseni.js?v=2"></script>
+  <script src="/script.js?v=77"></script>
   <!-- Odhalování sekcí při scrollu — stejný efekt jako na ostatních stránkách (generická třída .reveal) -->
   <script>
   (function () {

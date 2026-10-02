@@ -35,7 +35,7 @@ function WProfile({ tick, onSignOut }) {
     // 2) Heslo sedí → smaž účet (RPC delete_my_account) a odhlas.
     const { error } = await sb.rpc('delete_my_account');
     if (error) { setDeleting(false); setDelErr('Účet se nepodařilo smazat. Zkus to prosím znovu.'); return; }
-    await sb.auth.signOut();
+    await sb.auth.signOut({ scope: 'local' });
     window.location.href = '/';
   }
   function closeDelModal() { if (deleting) return; setConfirmDel(false); setDelPassword(''); setDelErr(''); }

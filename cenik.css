@@ -92,7 +92,7 @@
 /* ── Srovnání funkcí — okno (dashboard: EPricing → showCompare) ── */
 .e-srov-plocha{position:fixed;inset:0;z-index:1000;background:rgba(11,16,51,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;}
 .e-srov-plocha[hidden]{display:none;}
-.e-srov-okno{background:#fff;border-radius:20px;width:100%;max-width:1200px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;overflow:hidden;color:#0B1033;box-shadow:0 30px 80px -20px rgba(11,16,51,.5);}
+.e-srov-okno{background:#fff;border-radius:20px;width:100%;max-width:1200px;max-height:calc(calc(100vh / var(--z, 1)) - 48px);display:flex;flex-direction:column;overflow:hidden;color:#0B1033;box-shadow:0 30px 80px -20px rgba(11,16,51,.5);}
 .e-srov-hlava{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 30px;border-bottom:1px solid #EEF0F5;}
 .e-srov-h1{font-size:22px;font-weight:800;letter-spacing:-.01em;}
 .e-srov-h2{font-size:14px;color:#5B6178;margin-top:4px;}
@@ -262,7 +262,9 @@
      co vlastně porovnává. Hlavička zůstává přilepená nahoře (.e-srov-zahlavi
      má sticky už mimo tenhle blok), takže se drží obě osy. */
   .e-srov-plocha { padding: 12px; }
-  .e-srov-okno { max-height: calc(100vh - 24px); }
+  /* `vh` dělené --z kvůli zvětšení na velkých monitorech (viz blok
+     VELKÉ OBRAZOVKY ve style.css) — holé 100vh by tam bylo o zoom větší. */
+  .e-srov-okno { max-height: calc(calc(100vh / var(--z, 1)) - 24px); }
   .e-srov-hlava { padding: 16px 18px; }
   .e-srov-h1 { font-size: 18px; }
   /* Odsazení drží sama přilepená buňka, ne tělo — jinak by pod ní při

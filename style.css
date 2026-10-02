@@ -32,6 +32,29 @@
   line-gap-override: 0.00%;
 }
 
+/* ═══════════ VELKÉ OBRAZOVKY — web se zvětší jako celek (1. 10. 2026) ═══════════
+   Web je navržený na notebook (zhruba 1440–1600 × 900). Na velkém monitoru
+   (iMac, Studio Display, 27" na Windows) zůstal malý uprostřed moře bílé.
+   Celá stránka se proto zvětší (CSS zoom) tak, aby vypadala jako na notebooku:
+   stupeň se volí podle šířky i výšky okna, takže po zvětšení je „virtuální"
+   okno vždy aspoň 1600 × 900. Notebooky, Windows 1920 × 1080 i mobily mají
+   --z: 1 a nemění se nic.
+   POZOR: zoom zvětšuje i vh/vw — proto jsou všude psané jako
+   calc(… / var(--z, 1)), a skripty, které zapisují px změřené z innerHeight /
+   getBoundingClientRect, je dělí aktuálním zoomem (mkZoom() ve script.js).
+   Chrome, Safari i Firefox 126+ se chovají stejně (ověřeno); bez podpory zoomu
+   zůstane --z: 1 (@supports). */
+:root { --z: 1; }
+@supports (zoom: 1) {
+  @media (min-width: 1840px) and (min-height: 1035px) { :root { --z: 1.15; } }
+  @media (min-width: 2000px) and (min-height: 1125px) { :root { --z: 1.25; } }
+  @media (min-width: 2160px) and (min-height: 1215px) { :root { --z: 1.35; } }
+  @media (min-width: 2320px) and (min-height: 1305px) { :root { --z: 1.45; } }
+  @media (min-width: 2560px) and (min-height: 1440px) { :root { --z: 1.6; } }
+  @media (min-width: 2800px) and (min-height: 1575px) { :root { --z: 1.75; } }
+  html { zoom: var(--z); }
+}
+
 :root {
   --bg: #05071a;
   --fg: #ffffff;
@@ -51,6 +74,10 @@
 }
 
 html { scroll-behavior: smooth; overflow-x: clip; }
+/* Bez spojených písmen (ligatur) — písmo Plus Jakarta Sans jinak slévá „fi"
+   a „fl" do jednoho znaku (profil, filtr) a Yasinovi to připadalo jako chyba
+   (2026-10-01). Všechno ostatní dědí z html. */
+html { font-variant-ligatures: no-common-ligatures; }
 body {
   background: #060912;
   color: var(--fg);
@@ -86,7 +113,7 @@ img { max-width: 100%; display: block; }
   color: #d0d0ff;
 }
 .section-header { text-align: center; margin-bottom: 64px; }
-.section-header h2 { font-family: var(--font-heading); font-size: clamp(2rem,5vw,3.2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 16px; text-wrap: balance; }
+.section-header h2 { font-family: var(--font-heading); font-size: clamp(2rem,calc(5vw / var(--z, 1)),3.2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 16px; text-wrap: balance; }
 .section-header p { color: var(--muted-fg); font-size: 1.1rem; max-width: 560px; margin: 0 auto; text-wrap: pretty; }
 .section-tag {
   display: inline-block; padding: 6px 16px; border-radius: 100px;
@@ -173,35 +200,46 @@ img { max-width: 100%; display: block; }
    script.js). Tahle třída to vypíná — lišta je kompletní od začátku. */
 .nav-actions.nav-actions-always { opacity: 1; pointer-events: all; }
 .nav-actions .btn-ghost, .nav-actions .btn-primary { padding: 10px 21px; font-size: .95rem; font-family: var(--font-heading); }
-/* ── Hamburger: prosklená pilulka, dvě čárky se překlopí do křížku ── */
+/* ── Hamburger: tři čárky bez kolečka, otevřený se překlopí do křížku ──
+   Prosklená pilulka s dvěma čárkami (dřív) Yasinovi v rohu trčela
+   (2026-10-01). Box zůstává 44×44 kvůli trefení palcem, jen je neviditelný.
+   Barva je značková modrá; bílá jen nad modrou a v otevřeném tmavém menu. */
 .mobile-menu-btn {
   display: none; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-  width: 44px; height: 44px; border-radius: 999px; padding: 0; cursor: pointer;
-  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.34);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  transition: background .2s, border-color .2s, transform .18s;
+  width: 44px; height: 44px; margin-right: -10px; padding: 0; cursor: pointer;
+  background: none; border: 0; border-radius: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .18s;
 }
-.mobile-menu-btn:active { transform: scale(.94); }
+.mobile-menu-btn:active { transform: scale(.92); }
 .mobile-menu-btn span {
-  display: block; width: 17px; height: 2px; border-radius: 2px; background: #fff;
-  transition: transform .3s cubic-bezier(.2,.8,.2,1), background .2s;
+  display: block; width: 24px; height: 3px; border-radius: 3px; background: #0020f6;
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .2s, background .2s;
 }
-.mobile-menu-btn.open { background: rgba(255,255,255,.2); }
-.mobile-menu-btn.open span:nth-child(1) { transform: translateY(3.5px) rotate(45deg); }
-.mobile-menu-btn.open span:nth-child(2) { transform: translateY(-3.5px) rotate(-45deg); }
-/* nad světlou sekcí se čárky i rámeček musí ztmavit, jinak zmizí */
-#navbar.nav-over-light .mobile-menu-btn { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.22); }
-#navbar.nav-over-light .mobile-menu-btn span { background: #0a0d2e; }
+.mobile-menu-btn.open span { background: #fff; }
+.mobile-menu-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+.mobile-menu-btn.open span:nth-child(2) { opacity: 0; }
+.mobile-menu-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
 /* ── Rozbalené menu: prosklený panel sjíždějící zpod navbaru ── */
 .mobile-menu {
   position: fixed; top: 0; left: 0; right: 0; z-index: -1;
   display: flex; flex-direction: column; gap: 0;
-  padding: 68px 20px 18px; margin: 0; border-radius: 0;
+  padding: 68px 20px 68px; margin: 0; border-radius: 0;
   background: rgba(10,13,46,.42);
   backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%);
-  border-bottom: 1px solid rgba(255,255,255,.16);
-  box-shadow: 0 24px 60px -24px rgba(0,0,40,.6);
+  /* Spodek se rozplyne do stránky místo rovné hrany (Yasin 2026-10-01).
+     Maska bere s sebou i rozostření pod panelem; spodní padding je místo
+     pro přechod, aby tlačítka zůstala celá v plné barvě. */
+  /* Křivka, ne rovná čára: rovnoměrný přechod nechával dole dlouhý tmavý
+     „ocas". Takhle panel hned na začátku přechodu většinu síly ztratí
+     a do bílé dojede jen slabý závoj. */
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 64px),
+    rgba(0,0,0,.5) calc(100% - 50px), rgba(0,0,0,.18) calc(100% - 34px),
+    rgba(0,0,0,.05) calc(100% - 16px), transparent);
+          mask-image: linear-gradient(180deg, #000 calc(100% - 64px),
+    rgba(0,0,0,.5) calc(100% - 50px), rgba(0,0,0,.18) calc(100% - 34px),
+    rgba(0,0,0,.05) calc(100% - 16px), transparent);
   transform: translateY(-101%); opacity: 0; visibility: hidden;
   transition: transform .42s cubic-bezier(.2,.8,.2,1), opacity .28s ease, visibility .42s;
 }
@@ -210,21 +248,46 @@ img { max-width: 100%; display: block; }
   color: #fff; font-family: var(--font-heading); font-weight: 800;
   letter-spacing: .01em; font-size: 1rem;
   padding: 12px 2px; text-decoration: none;
-  border-bottom: 1px solid rgba(255,255,255,.13);
 }
-.mobile-menu-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+/* Tlačítka vedle sebe, menší a s větším písmem; obě plná — průhledné
+   „Přihlásit se" s obrysem na rozmazaném panelu působilo nedodělaně
+   (Yasin 2026-10-01). */
+.mobile-menu-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+/* Přihlášený: „Ahoj, jméno!" nad tlačítky přes celou šířku, pod ním
+   Dashboard / Moje brigády a Odhlásit se vedle sebe. */
+.mobile-menu-actions .nav-user-greeting { order: -1; flex-basis: 100%; color: rgba(255,255,255,.8); font-size: .95rem; }
 .mobile-menu-actions a { border-bottom: none; }
-.mobile-menu-actions .btn-ghost, .mobile-menu-actions .btn-primary { width: 100%; justify-content: center; padding: 11px 18px; font-size: .8rem; }
-.mobile-menu-actions .btn-ghost { color: #fff; border: 1.5px solid rgba(255,255,255,.5); background: none; }
+.mobile-menu-actions .btn-ghost, .mobile-menu-actions .btn-primary {
+  flex: 1; justify-content: center; padding: 13px 14px; border: 0; border-radius: 999px;
+  font-size: 1rem; box-shadow: none; white-space: nowrap;
+}
+.mobile-menu-actions .btn-ghost { color: #0020f6; background: #fff; }
+.mobile-menu-actions .btn-primary { color: #fff; background: #0020f6; }
+@media (max-width: 359px) {
+  .mobile-menu-actions .btn-ghost, .mobile-menu-actions .btn-primary { padding: 12px 8px; font-size: .9rem; }
+}
+/* Přihlášený: v liště jen modrý text s ikonkou, bez podkladu. Nad modrou
+   zbělá. Ikonka je TA SAMÁ jako Statistiky v levém menu dashboardu
+   (Iconly Light-Outline / Chart) — maska, aby převzala barvu textu. */
+.ik-statistiky {
+  display: inline-block; width: 20px; height: 20px; flex-shrink: 0; background: currentColor;
+  -webkit-mask: url(/employer/ikony/analytika.svg?v=1) center / contain no-repeat;
+          mask: url(/employer/ikony/analytika.svg?v=1) center / contain no-repeat;
+}
+.nav-do-dash {
+  display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 4px;
+  font-family: var(--font-heading); font-weight: 800; font-size: 1rem;
+  color: var(--primary); text-decoration: none; transition: color .2s;
+}
+.nav-do-dash:hover { color: #0014A3; }
+#navbar.nav-over-blue .nav-do-dash { color: #fff; }
+.mobile-menu-actions .btn-primary iconify-icon, .mobile-menu-actions .btn-primary .ik-statistiky { margin-right: 8px; }
 
 /* Hamburger na stránkách s .vx-nav (Lidé / Hledám práci / Pro zaměstnavatele).
    Ty mají vlastní navbar, ale sdílí panel #mobile-menu ze skrytého #navbar. */
 .vx-burger { position: relative; z-index: 1; }
 @media (max-width: 900px) {
   .vx-burger { display: flex; }
-  .vx-nav.scrolled .vx-burger { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.22); }
-  .vx-nav.scrolled .vx-burger span { background: #0a0d2e; }
-  .vx-nav.scrolled .vx-burger.open { background: rgba(10,13,46,.1); }
 }
 
 /* Odkazy jsou centrované absolutně přes celou šířku navbaru, takže se při
@@ -243,7 +306,7 @@ img { max-width: 100%; display: block; }
    dvě tlačítka a spodní řádek. Původní modrý hero se skleněným pozadím
    (.hero-bg-particles, .hero-line, intro se zoomem) je v historii gitu. */
 #hero {
-  min-height: 100vh; min-height: 100svh;
+  min-height: calc(100vh / var(--z, 1)); min-height: calc(100svh / var(--z, 1));
   display: flex; flex-direction: column;
   background: #fff; color: #14161C;
   position: relative; z-index: 1;      /* překryje tmavý body::before */
@@ -262,14 +325,14 @@ img { max-width: 100%; display: block; }
 .hero-main {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: clamp(96px, 12vh, 128px) 40px 0; text-align: center;
+  padding: clamp(96px, calc(12vh / var(--z, 1)), 128px) 40px 0; text-align: center;
   position: relative; z-index: 1;   /* nad aurorou (positioned, z-index 0) */
 }
 /* overflow:hidden dělá masku, pod kterou nadpis vyjíždí; padding-bottom
    nechává dole místo pro dotažnice, jinak by je maska uřízla */
 .hero-h1 {
   margin: 0; font-family: var(--font-nav); font-weight: 400;
-  font-size: clamp(52px, 8.4vw, 138px); line-height: .94;
+  font-size: clamp(52px, calc(8.4vw / var(--z, 1)), 138px); line-height: .94;
   letter-spacing: -.035em; color: var(--primary); text-wrap: balance;
   padding-bottom: .18em; overflow: hidden;
 }
@@ -303,6 +366,12 @@ img { max-width: 100%; display: block; }
 .hero-h1 .hero-typer span { animation: none; }
 .hero-h1.mk-hotovo { overflow: visible; }
 .hero-h1.mk-hotovo > span { animation: none; clip-path: none; }
+/* Maska (clip-path z mkMask) zůstávala i na vnořených spanech — hlavně na
+   .hero-konec kolem měnícího se slova. Písmena, která při výměně odlétají
+   nahoru a rozmazávají se, pak narážela do neviditelného obdélníku a byla
+   useknutá rovnou hranou. Po dojetí masky ji sundáme všem (i s animací —
+   hodnota z animace s fill-mode both by obyčejné clip-path: none přebila). */
+.hero-h1.mk-hotovo span { animation: none; clip-path: none; }
 
 /* Pozor na specificitu: `.hero-h1 span` (0,1,1) přebíjí holé třídy (0,1,0) a
    vnutilo by všem display:inline-block. Proto je tu všude předřazené .hero-h1. */
@@ -335,7 +404,7 @@ img { max-width: 100%; display: block; }
 }
 
 .hero-cta {
-  margin-top: clamp(40px, 6vh, 72px); display: flex; gap: 18px; flex-wrap: wrap;
+  margin-top: clamp(40px, calc(6vh / var(--z, 1)), 72px); display: flex; gap: 18px; flex-wrap: wrap;
   justify-content: center;
   animation: mkRise .8s cubic-bezier(.22,1,.36,1) .5s both;
 }
@@ -347,13 +416,13 @@ img { max-width: 100%; display: block; }
   transition: background-color .2s ease, transform .18s ease;
 }
 .hero-btn:active { transform: scale(.98); }
-.hero-btn-soft { background: #EEF0FA; color: #14161C; }
-.hero-btn-soft:hover { background: #DFE3F7; }
-/* Hlavní CTA je černé, hover jde do značkové modré — obráceně než odkazy
-   v navbaru (černé → modrá). Ty dvě barvy si na stránce vyměňují role.
-   Třída se nejmenuje podle barvy schválně, ta se tu prohodila už dvakrát. */
-.hero-btn-primary { background: #191919; color: #fff; }
-.hero-btn-primary:hover { background: var(--primary); color: #fff; }
+/* „Stáhnout si apku" bylo světle šedé (#EEF0FA) a na bílém heru se ztrácelo
+   (Yasin 2026-10-01). Teď tmavé s bílým textem a hlavní CTA značkově modré.
+   Třída se nejmenuje podle barvy schválně, ta se tu prohodila už třikrát. */
+.hero-btn-soft { background: #191919; color: #fff; }
+.hero-btn-soft:hover { background: #33353D; color: #fff; }
+.hero-btn-primary { background: var(--primary); color: #fff; }
+.hero-btn-primary:hover { background: #0014A3; color: #fff; }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-h1 span, .hero-cta {
@@ -362,21 +431,30 @@ img { max-width: 100%; display: block; }
 }
 @media (max-width: 680px) {
   .hero-main { padding-left: 22px; padding-right: 22px; }
-  /* Na telefonu je 8.4vw drobné (440 px → 37 px, tedy spodní mez klampu),
+  /* Na telefonu je calc(8.4vw / var(--z, 1)) drobné (440 px → 37 px, tedy spodní mez klampu),
      nadpis proto měříme vlastním poměrem — ať drží stejný dojem jako na desktopu. */
-  .hero-h1 { font-size: clamp(52px, 16vw, 96px); letter-spacing: -.04em; }
+  /* Druhý řádek „jeden swajp." zabírá asi 4,7 em a nadpis má o 92 px užší
+     místo než okno. Na úzkých telefonech (pod ~420 px) by se při 16vw
+     nejdelší slovo nevešlo: nadpis při každé výměně slova skočil na tři
+     řádky a tlačítka pod ním poskočila o 30 px. Druhá mez písmo zmenší
+     právě tolik, aby se řádek vešel vždycky. */
+  .hero-h1 { font-size: clamp(40px, min(calc(16vw / var(--z, 1)), calc((100vw / var(--z, 1) - 96px) / 4.85)), 96px); letter-spacing: -.04em; }
   /* Tlačítka pod sebou přes šířku palce, ale těsněji a o něco nižší —
      dvě široké pilulky s velkou mezerou působily jako formulářová pole. */
   .hero-cta {
     flex-direction: column; align-items: stretch;
-    width: min(100%, 300px); gap: 12px; margin-top: clamp(32px, 5vh, 48px);
+    width: min(100%, 300px); gap: 12px; margin-top: clamp(32px, calc(5vh / var(--z, 1)), 48px);
   }
   .hero-btn { padding: 16px 26px; font-size: 16px; }
 }
 
 /* heroLineUp a heroGradSweep si berou i hera na /lide, /hledam-si-praci
    a /pro-zamestnavatele — zůstávají, i když je hlavní stránka už nepoužívá. */
-@keyframes heroLineUp { from { transform: translateY(120%); } to { transform: translateY(0); } }
+/* Start 160 %, ne 120 %: řádek má kvůli ocáskům (j, p, y) okno o .3em
+   vyšší než text a tučné písmo vystrkuje špičky (N, d, l, tečky nad i/j)
+   nad vlastní box. Při 120 % to nestačilo a během prodlevy před animací
+   koukaly zpod masky useknuté vršky písmen jako řada čárek. */
+@keyframes heroLineUp { from { transform: translateY(160%); } to { transform: translateY(0); } }
 /* 200 % = přesně jedna šířka dlaždice → smyčka navazuje beze švu (dřív 220 % → skok) */
 @keyframes heroGradSweep { to { background-position: 200% center; } }
 
@@ -393,6 +471,12 @@ img { max-width: 100%; display: block; }
 @media (max-height: 760px) {
   .hero-main { padding-top: 84px; }
   .hero-cta { margin-top: 36px; }
+}
+/* Jen telefon: větší mezera mezi nadpisem a tlačítky — nadpis se tím zvedne,
+   tlačítka klesnou (hero-main centruje obsah na výšku). Stojí až za
+   pravidlem pro nízké displeje, aby ho na telefonu přebilo. PC beze změny. */
+@media (max-width: 680px) {
+  .hero-cta { margin-top: clamp(56px, calc(9vh / var(--z, 1)), 84px); }
 }
 
 
@@ -562,7 +646,7 @@ img { max-width: 100%; display: block; }
 
 /* Dashboard + CTA split */
 .employer-split { display: grid; grid-template-columns: 1.15fr 1fr; gap: 64px; align-items: center; }
-.employer-text h2 { font-family: var(--font-heading); font-size: clamp(2rem,4vw,2.8rem); font-weight: 800; margin-bottom: 20px; }
+.employer-text h2 { font-family: var(--font-heading); font-size: clamp(2rem,calc(4vw / var(--z, 1)),2.8rem); font-weight: 800; margin-bottom: 20px; }
 .employer-text > p { color: var(--muted-fg); font-size: 1.05rem; margin-bottom: 32px; }
 .employer-benefits { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
 .employer-benefits li { display: flex; align-items: center; gap: 12px; font-size: .95rem; }
@@ -624,7 +708,7 @@ img { max-width: 100%; display: block; }
 .uvod { position: relative; }
 #hero {
   position: sticky; top: 0;
-  height: 100vh; height: 100svh; min-height: 0;
+  height: calc(100vh / var(--z, 1)); height: calc(100svh / var(--z, 1)); min-height: 0;
 }
 .hero-main {
   filter: blur(calc(var(--p, 0) * 16px));
@@ -639,26 +723,33 @@ img { max-width: 100%; display: block; }
 #brzy {
   position: relative; z-index: 2; background: transparent;
   /* Dráha: první obrazovka karta vyjíždí, zbytek zůstane stát v popředí. */
-  padding: 0; min-height: 185vh;
+  padding: 0; min-height: calc(185vh / var(--z, 1));
+}
+/* Telefon: bez zastavení. Na desktopu karta po vyjetí chvíli stojí, na
+   telefonu to při švihnutí působilo jako zaseknutí — obraz se skoro celou
+   obrazovku nehýbal a pak modrý pruh s telefonem najednou vyletěl. Dráha
+   je tu jen tak dlouhá, aby karta vyjela, a pak stránka jede plynule dál. */
+@media (max-width: 700px) {
+  #brzy { min-height: calc(100vh / var(--z, 1)); min-height: calc(100svh / var(--z, 1)); }
 }
 .wl-slot {
   position: sticky; top: 0;
-  min-height: 100vh; min-height: 100svh;
+  min-height: calc(100vh / var(--z, 1)); min-height: calc(100svh / var(--z, 1));
   display: flex; align-items: center; justify-content: center;
-  padding: clamp(80px, 11vh, 118px) clamp(16px, 4vw, 24px) 28px;
+  padding: clamp(80px, calc(11vh / var(--z, 1)), 118px) clamp(16px, calc(4vw / var(--z, 1)), 24px) 28px;
 }
 /* Žádná karta: čekací list stojí přímo v popředí přes rozmazané hero, takže
    může být velký jako celá obrazovka. Bílý obdélník by ho naopak zmenšil na
    výřez a celý efekt „přenese se dopředu" by z toho zmizel. */
 .wl-panel {
   width: min(760px, 100%);
-  transform: translateY(calc((1 - var(--p, 0)) * 7vh));
+  transform: translateY(calc((1 - var(--p, 0)) * calc(7vh / var(--z, 1))));
   will-change: transform;
 }
 
 .wl-krok {
   width: 100%;
-  display: flex; flex-direction: column; align-items: center; gap: clamp(22px, 3vh, 30px);
+  display: flex; flex-direction: column; align-items: center; gap: clamp(22px, calc(3vh / var(--z, 1)), 30px);
   animation: wlUp .36s cubic-bezier(.4,0,.2,1) both;
 }
 @keyframes wlUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
@@ -666,18 +757,18 @@ img { max-width: 100%; display: block; }
 
 .wl-mark {
   margin: 0; font-family: var(--font-nav); font-weight: 800;
-  font-size: clamp(44px, 8.4vw, 84px); line-height: 1.0;
+  font-size: clamp(44px, calc(8.4vw / var(--z, 1)), 84px); line-height: 1.0;
   letter-spacing: -.042em; color: #14162b; text-align: center;
 }
 .wl-mark b { color: var(--primary); font-weight: 800; }
 .wl-h2 {
   margin: 0; font-family: var(--font-nav); font-weight: 800;
-  font-size: clamp(34px, 6vw, 58px); line-height: 1.04;
+  font-size: clamp(34px, calc(6vw / var(--z, 1)), 58px); line-height: 1.04;
   letter-spacing: -.042em; color: #14162b; text-align: center;
 }
 .wl-lead {
   margin: 0; max-width: 560px; text-align: center;
-  font-size: clamp(17px, 2.4vw, 22px); line-height: 1.55; color: #4E5680;
+  font-size: clamp(17px, calc(2.4vw / var(--z, 1)), 22px); line-height: 1.55; color: #4E5680;
 }
 .wl-lead b { color: var(--primary); font-weight: 700; }
 .wl-blok { display: flex; flex-direction: column; align-items: center; gap: 16px; }
@@ -912,7 +1003,7 @@ img { max-width: 100%; display: block; }
 /* Nízké displeje: přilepená karta se musí vejít i s klávesnicí. */
 @media (max-height: 720px) {
   .wl-krok { gap: 16px; }
-  .wl-mark { font-size: clamp(36px, 7vw, 54px); }
+  .wl-mark { font-size: clamp(36px, calc(7vw / var(--z, 1)), 54px); }
 }
 
 /* ═══════════ DOWNLOAD ═══════════ */
@@ -941,9 +1032,9 @@ img { max-width: 100%; display: block; }
 }
 .dl-card::before { left: 76px; transform: rotate(-3.5deg); }
 .dl-card::after  { right: 76px; transform: rotate(3.5deg); }
-.dl-title { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2rem, 4.6vw, 3rem); line-height: 1.05; letter-spacing: -.5px; color: #0f1222; margin: 0; }
+.dl-title { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2rem, calc(4.6vw / var(--z, 1)), 3rem); line-height: 1.05; letter-spacing: -.5px; color: #0f1222; margin: 0; }
 .dl-title span { color: #7c86ff; }
-.dl-sub { font-size: clamp(1rem, 1.7vw, 1.14rem); color: #5b6478; margin: -2px auto 6px; line-height: 1.55; max-width: 440px; }
+.dl-sub { font-size: clamp(1rem, calc(1.7vw / var(--z, 1)), 1.14rem); color: #5b6478; margin: -2px auto 6px; line-height: 1.55; max-width: 440px; }
 .dl-btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
 .dl-btn { display: inline-flex; align-items: center; gap: 11px; padding: 12px 22px 12px 16px; border-radius: 15px; background: #f4f6fb; border: 1px solid rgba(15,18,40,.06); text-decoration: none; transition: background .2s; }
 .dl-btn:hover { background: #e9ecf5; }
@@ -974,7 +1065,7 @@ img { max-width: 100%; display: block; }
 }
 .download-glow { display: none; }
 .download-content { position: relative; z-index: 2; }
-.download-content h2 { font-family: var(--font-heading); font-size: clamp(2rem,5vw,3rem); font-weight: 800; margin-bottom: 16px; color: #0f1222; }
+.download-content h2 { font-family: var(--font-heading); font-size: clamp(2rem,calc(5vw / var(--z, 1)),3rem); font-weight: 800; margin-bottom: 16px; color: #0f1222; }
 .download-content > p { color: #5b6478; font-size: 1.1rem; margin-bottom: 32px; }
 .download-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
 .store-btn {
@@ -1005,20 +1096,20 @@ img { max-width: 100%; display: block; }
    vypadá jako sklo položené na světle — na plochém plátně by `backdrop-filter`
    neměl co rozmazat a zbyl by jen bílý obdélník.
    overflow: hidden ořezává skvrny, ať nepřetečou do sousedních sekcí. */
-#download.cl-sekce { padding: clamp(78px, 9vw, 118px) 0; position: relative; overflow: hidden; }
+#download.cl-sekce { padding: clamp(78px, calc(9vw / var(--z, 1)), 118px) 0; position: relative; overflow: hidden; }
 /* Kde nad sekcí stojí bílá (FAQ na /hledam-si-praci a /pro-zamestnavatele,
    bílé tělo na /o-nas), by na hraně vznikla ostrá čára. Plátno proto naběhne
    přechodem. Na /lide je nad sekcí plátno taky, tam se třída nedává — jinak
    by se do plynulé plochy naopak vložil bílý pruh. */
 #download.cl-sekce--zbila { background: linear-gradient(180deg, #fff 0, var(--pl-canvas) 190px); }
 /* Aurora má z-index 0, obsah musí být nad ní — jinak by ho překryla. */
-.cl-slot { position: relative; z-index: 1; display: flex; justify-content: center; padding: 0 clamp(16px, 4vw, 24px); }
+.cl-slot { position: relative; z-index: 1; display: flex; justify-content: center; padding: 0 clamp(16px, calc(4vw / var(--z, 1)), 24px); }
 /* .wl-panel se na úvodce posouvá podle scrollu přes --p. Tady --p nikdo
-   nenastavuje, takže by zůstal zaseknutý 7vh dole — proto posun rušíme.
+   nenastavuje, takže by zůstal zaseknutý calc(7vh / var(--z, 1)) dole — proto posun rušíme.
    (transform jiný než none by navíc `backdrop-filter` uvnitř rozbil.) */
 .cl-sekce .wl-panel {
   width: min(760px, 100%); transform: none;
-  padding: clamp(40px, 5vw, 62px) clamp(22px, 4vw, 52px);
+  padding: clamp(40px, calc(5vw / var(--z, 1)), 62px) clamp(22px, calc(4vw / var(--z, 1)), 52px);
   background: rgba(255, 255, 255, .55);
   backdrop-filter: blur(26px) saturate(150%);
   -webkit-backdrop-filter: blur(26px) saturate(150%);
@@ -1041,16 +1132,16 @@ img { max-width: 100%; display: block; }
   -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 24%);
           mask-image: linear-gradient(180deg, transparent 0, #000 24%);
 }
-.cl-sekce .aurora i:nth-child(1) { width: max(480px, 44vw); height: max(380px, 32vw); left: -4vw; top: -16%; }
-.cl-sekce .aurora i:nth-child(2) { width: max(440px, 40vw); height: max(440px, 38vw); right: -6vw; top: 4%; }
-.cl-sekce .aurora i:nth-child(3) { width: max(420px, 38vw); height: max(320px, 26vw); left: 26vw; bottom: -20%; }
+.cl-sekce .aurora i:nth-child(1) { width: max(480px, calc(44vw / var(--z, 1))); height: max(380px, calc(32vw / var(--z, 1))); left: calc(-4vw / var(--z, 1)); top: -16%; }
+.cl-sekce .aurora i:nth-child(2) { width: max(440px, calc(40vw / var(--z, 1))); height: max(440px, calc(38vw / var(--z, 1))); right: calc(-6vw / var(--z, 1)); top: 4%; }
+.cl-sekce .aurora i:nth-child(3) { width: max(420px, calc(38vw / var(--z, 1))); height: max(320px, calc(26vw / var(--z, 1))); left: calc(26vw / var(--z, 1)); bottom: -20%; }
 @media (max-width: 700px) {
   .cl-sekce .wl-panel { border-radius: 26px; padding: 34px 18px; }
 }
 /* Menší než na úvodce: tam nadpis drží celou obrazovku, tady je to sekce
    mezi ostatními a v plné velikosti by přebil vlastní obsah stránky. */
-.cl-sekce .wl-mark { font-size: clamp(36px, 5.6vw, 62px); }
-.cl-sekce .wl-h2 { font-size: clamp(30px, 4.6vw, 48px); }
+.cl-sekce .wl-mark { font-size: clamp(36px, calc(5.6vw / var(--z, 1)), 62px); }
+.cl-sekce .wl-h2 { font-size: clamp(30px, calc(4.6vw / var(--z, 1)), 48px); }
 
 /* ═══════════ FOOTER ═══════════ */
 #footer { padding: 80px 0 32px; border-top: 1px solid rgba(208,208,255,.06); }
@@ -1118,8 +1209,8 @@ img { max-width: 100%; display: block; }
   display: none;
   background: var(--card); border: 1px solid rgba(208,208,255,.12);
   border-radius: 1.5rem; padding: 2.5rem;
-  width: min(480px, calc(100vw - 40px));
-  max-height: calc(100vh - 48px); overflow-y: auto;
+  width: min(480px, calc(calc(100vw / var(--z, 1)) - 40px));
+  max-height: calc(calc(100vh / var(--z, 1)) - 48px); overflow-y: auto;
   position: relative;
   transform: translateY(24px); transition: transform .3s;
 }
@@ -1261,7 +1352,7 @@ img { max-width: 100%; display: block; }
 }
 .about-lead {
   font-family: 'Bricolage Grotesque', sans-serif;
-  font-size: clamp(30px, 4.6vw, 68px);
+  font-size: clamp(30px, calc(4.6vw / var(--z, 1)), 68px);
   line-height: 1.05; letter-spacing: -0.025em; font-weight: 500;
   margin: 0 0 56px; position: relative;
 }
@@ -1290,7 +1381,7 @@ img { max-width: 100%; display: block; }
 }
 .about-h2 {
   font-family: 'Bricolage Grotesque', sans-serif;
-  font-size: clamp(34px, 4.5vw, 76px);
+  font-size: clamp(34px, calc(4.5vw / var(--z, 1)), 76px);
   line-height: 0.95; letter-spacing: -0.03em; font-weight: 600;
   margin: 12px 0 0;
 }
@@ -1362,7 +1453,7 @@ img { max-width: 100%; display: block; }
 .about-num-cell:last-child { border-right: none; }
 .about-big {
   font-family: 'Bricolage Grotesque', sans-serif;
-  font-size: clamp(40px, 4.5vw, 76px);
+  font-size: clamp(40px, calc(4.5vw / var(--z, 1)), 76px);
   line-height: 1; letter-spacing: -0.04em; font-weight: 600;
   background: linear-gradient(135deg, var(--primary), var(--accent));
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
@@ -1421,7 +1512,7 @@ img { max-width: 100%; display: block; }
 }
 .about-quote blockquote {
   margin: 0; font-family: 'Bricolage Grotesque', sans-serif;
-  font-size: clamp(22px, 3vw, 42px); line-height: 1.2;
+  font-size: clamp(22px, calc(3vw / var(--z, 1)), 42px); line-height: 1.2;
   letter-spacing: -0.02em; font-weight: 400;
 }
 .about-quote cite {
@@ -1446,7 +1537,7 @@ img { max-width: 100%; display: block; }
 }
 .about-career h2 {
   font-family: 'Bricolage Grotesque', sans-serif;
-  font-size: clamp(32px, 4vw, 72px); line-height: 0.95;
+  font-size: clamp(32px, calc(4vw / var(--z, 1)), 72px); line-height: 0.95;
   letter-spacing: -0.03em; font-weight: 600; margin: 0; position: relative;
 }
 .about-career-right { position: relative; display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
@@ -1493,7 +1584,7 @@ img { max-width: 100%; display: block; }
 
   /* Section header spacing */
   .section-header { margin-bottom: 40px; }
-  .section-header h2 { font-size: clamp(1.6rem, 7vw, 2.4rem); }
+  .section-header h2 { font-size: clamp(1.6rem, calc(7vw / var(--z, 1)), 2.4rem); }
 
   /* Employer section internal spacers */
   .emp-stats    { margin-bottom: 48px; }
@@ -1539,7 +1630,7 @@ img { max-width: 100%; display: block; }
   .testimonial-card { padding: 24px; }
 
   /* Download card inner */
-  .download-content h2 { font-size: clamp(1.6rem, 7vw, 2.4rem); }
+  .download-content h2 { font-size: clamp(1.6rem, calc(7vw / var(--z, 1)), 2.4rem); }
   .download-buttons { flex-direction: column; align-items: center; }
 }
 
@@ -1876,7 +1967,6 @@ html { scroll-padding-top: 92px; }
 #navbar.nav-over-light .nav-links a { color: #0a0d2e; }
 #navbar.nav-over-light .nav-links a:hover { color: #000; }
 #navbar.nav-over-light .nav-links a.nav-active { color: #000; border-bottom-color: #0a0d2e; }
-#navbar.nav-over-light .mobile-menu-btn { color: #0a0d2e; }
 #navbar.nav-over-light #nav-login-btn {
   background: transparent; color: #0a0d2e; border-color: rgba(10,13,46,.22);
 }
@@ -1921,17 +2011,9 @@ html { scroll-padding-top: 92px; }
 }
 /* „Vytvořit účet" si nechává značkový gradient z .btn-primary (primary → accent).
    Dřív tu byl vlastní #0020f6 → #3a3a99, který byl proti ostatním navbarům kalný. */
-#navbar.nav-light-page .mobile-menu-btn {
-  color: #0020f6; background: rgba(0,32,246,.06); border-color: rgba(0,32,246,.22);
-}
-#navbar.nav-light-page .mobile-menu-btn span { background: #0020f6; }
 
 /* otevřené mobilní menu je tmavý panel — modrý navbar by se v něm ztratil */
 #navbar.nav-light-page:has(.mobile-menu-btn.open) .nav-logo { color: #fff; -webkit-text-fill-color: #fff; }
-#navbar.nav-light-page .mobile-menu-btn.open {
-  background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.34); color: #fff;
-}
-#navbar.nav-light-page .mobile-menu-btn.open span { background: #fff; }
 
 /* dojel jsem k modré patičce → navbar zpátky do bílé, jinak by zmizel */
 #navbar.nav-light-page.nav-over-blue {
@@ -1945,9 +2027,6 @@ html { scroll-padding-top: 92px; }
   background: transparent; color: #fff; border-color: rgba(255,255,255,.4);
 }
 #navbar.nav-light-page.nav-over-blue #nav-login-btn:hover { background: rgba(255,255,255,.12); border-color: #fff; }
-#navbar.nav-light-page.nav-over-blue .mobile-menu-btn {
-  color: #fff; background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.34);
-}
 #navbar.nav-light-page.nav-over-blue .mobile-menu-btn span { background: #fff; }
 
 
@@ -2085,7 +2164,7 @@ html { scroll-padding-top: 92px; }
   .art-meta { display: flex; align-items: center; gap: 11px; margin-bottom: 15px; }
   .art-cat { font-family: var(--font-heading); font-size: .64rem; font-weight: 700;
     letter-spacing: .12em; text-transform: uppercase; color: rgba(10,13,46,.4); }
-  .art-h1 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.9rem, 4.4vw, 2.9rem);
+  .art-h1 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.9rem, calc(4.4vw / var(--z, 1)), 2.9rem);
     line-height: 1.1; letter-spacing: -.03em; color: #0a0d2e; margin: 0 0 20px; text-wrap: balance; }
   .art-lead { font-size: 1.12rem; line-height: 1.65; color: rgba(10,13,46,.66); margin: 0 0 34px; }
 
@@ -2098,7 +2177,7 @@ html { scroll-padding-top: 92px; }
 .art-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 40%; display: block; }
 
 /* tělo článku */
-  .art-body h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+  .art-body h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.25rem, calc(2.4vw / var(--z, 1)), 1.55rem);
     line-height: 1.25; letter-spacing: -.02em; color: #0a0d2e; margin: 46px 0 14px; }
   .art-body h2:first-child { margin-top: 0; }
   .art-body p { font-size: 1.03rem; line-height: 1.78; color: rgba(10,13,46,.74); margin: 0 0 18px; }
@@ -2175,24 +2254,26 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
    jinak by skončil pod ní — aurora je positioned s z-index 0. */
 .aurora { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
 .aurora i { position: absolute; display: block; will-change: transform; }
+/* Mimo obraz se skvrny zastaví — viz auroraJenVObraze() ve script.js. */
+.aurora--stoji i { animation-play-state: paused; }
 .aurora i:nth-child(1) {
-  width: max(620px, 64vw); height: max(500px, 50vw); left: -16vw; top: -20vw;
+  width: max(620px, calc(64vw / var(--z, 1))); height: max(500px, calc(50vw / var(--z, 1))); left: calc(-16vw / var(--z, 1)); top: calc(-20vw / var(--z, 1));
   background: radial-gradient(closest-side, rgba(0,32,246,.26) 0%, rgba(0,32,246,.15) 34%, rgba(0,32,246,.05) 68%, rgba(0,32,246,0) 100%);
   animation: plPluj1 26s ease-in-out infinite alternate;
 }
 .aurora i:nth-child(2) {
-  width: max(560px, 58vw); height: max(620px, 62vw); right: -18vw; top: -4vh;
+  width: max(560px, calc(58vw / var(--z, 1))); height: max(620px, calc(62vw / var(--z, 1))); right: calc(-18vw / var(--z, 1)); top: calc(-4vh / var(--z, 1));
   background: radial-gradient(closest-side, rgba(124,141,255,.30) 0%, rgba(124,141,255,.17) 34%, rgba(124,141,255,.06) 68%, rgba(124,141,255,0) 100%);
   animation: plPluj2 34s ease-in-out infinite alternate;
 }
 .aurora i:nth-child(3) {
-  width: max(520px, 54vw); height: max(360px, 36vw); left: 28vw; bottom: -18vw;
+  width: max(520px, calc(54vw / var(--z, 1))); height: max(360px, calc(36vw / var(--z, 1))); left: calc(28vw / var(--z, 1)); bottom: calc(-18vw / var(--z, 1));
   background: radial-gradient(closest-side, rgba(0,32,246,.16) 0%, rgba(0,32,246,.09) 34%, rgba(0,32,246,.03) 68%, rgba(0,32,246,0) 100%);
   animation: plPluj3 40s ease-in-out infinite alternate;
 }
-@keyframes plPluj1 { to { transform: translate3d(16vw, 12vh, 0) scale(1.15); } }
-@keyframes plPluj2 { to { transform: translate3d(-14vw, 18vh, 0) scale(.9); } }
-@keyframes plPluj3 { to { transform: translate3d(-18vw, -10vh, 0) scale(1.2); } }
+@keyframes plPluj1 { to { transform: translate3d(calc(16vw / var(--z, 1)), calc(12vh / var(--z, 1)), 0) scale(1.15); } }
+@keyframes plPluj2 { to { transform: translate3d(calc(-14vw / var(--z, 1)), calc(18vh / var(--z, 1)), 0) scale(.9); } }
+@keyframes plPluj3 { to { transform: translate3d(calc(-18vw / var(--z, 1)), calc(-10vh / var(--z, 1)), 0) scale(1.2); } }
 @media (max-width: 700px) {
   .aurora i:nth-child(3) { display: none; }
 }
@@ -2206,13 +2287,13 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
 .uvod > :not(:first-child) { position: relative; z-index: 5; }   /* nad notebookem (.mkj-visual má 3) */
 .uvod > .vx-shell, .uvod > .emp-hero-blue {
   position: sticky; top: calc(-1 * var(--uvod-presah, 0px));
-  height: 100vh; height: var(--hero-h, 100vh); min-height: 0;
+  height: calc(100vh / var(--z, 1)); height: var(--hero-h, calc(100vh / var(--z, 1))); min-height: 0;
 }
 /* Hero vyšší než okno (/pro-zamestnavatele — notebook musí být celý vidět):
    roste s obsahem. popredi() ve script.js změří, o kolik přesahuje okno
    (--uvod-presah); o tolik se stránka nejdřív odroluje a teprve pak se hero
    přilepí (záporný top nahoře) a začne rozmazávat. */
-#employers > .emp-hero-blue { height: auto; min-height: var(--hero-h, 100vh); }
+#employers > .emp-hero-blue { height: auto; min-height: var(--hero-h, calc(100vh / var(--z, 1))); }
 #employers .mkj-visual { padding-bottom: 56px; }   /* místo pro stín pod notebookem */
 .uvod > .vx-shell > .vx-frame { height: 100%; min-height: 0; }
 .uvod .vx-hero, .uvod .eh-head, .uvod .mkj-visual {
@@ -2241,10 +2322,6 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
 /* ── Navigace produktových stránek na bílém heru ────────────────────────
    Barvy jako po odscrollování (.scrolled): modré logo, inkoustové odkazy,
    hamburger tmavý. Když je menu otevřené, je pod ním tmavý panel → bílá. */
-.vx-nav .vx-burger { background: rgba(10,13,46,.06); border-color: rgba(10,13,46,.22); }
-.vx-nav .vx-burger span { background: #0a0d2e; }
-.vx-nav .vx-burger.open { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.34); }
-.vx-nav .vx-burger.open span { background: #fff; }
 .vx-nav:has(.vx-burger.open) .vx-logo { color: #fff; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2253,6 +2330,13 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
   .uvod .vx-hero, .uvod .eh-head, .uvod .mkj-visual { filter: none; opacity: 1; transform: none; }
 }
 
+/* ═══════════ BEZ POSUVNÍKU STRÁNKY ═══════════
+   Yasin nechce vpravo vidět posuvník (2026-09-06). Stránka se dál posouvá
+   kolečkem, trackpadem i klávesami, jen se lišta nekreslí. Vnitřních
+   posuvných prvků (dialog cookies, FAQ na /podpora) se to netýká. */
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
 /* ═══════════ POSUVNÝ PRUH DŮVODŮ ═══════════
    Ilustrace nahoře, pod ní vycentrovaný nadpis a popis. Žádné kartičky —
    obrázky mají průhledné pozadí a stojí přímo na ploše sekce. Vodorovný
@@ -2260,12 +2344,12 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
    aby bylo poznat, že se dá jet dál.
    Používá /hledam-si-praci i /pro-zamestnavatele. */
 .proc-pruh {
-  display: flex; gap: clamp(20px, 3vw, 48px);
+  display: flex; gap: clamp(20px, calc(3vw / var(--z, 1)), 48px);
   overflow-x: auto; overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory; scroll-padding-left: var(--proc-okraj);
   /* odsazení od kraje obrazovky řeší padding, ne container — jinak by pruh
      nemohl vyjet až k hraně a useknutá položka by nebyla vidět */
-  --proc-okraj: max(24px, calc((100vw - 1080px) / 2));
+  --proc-okraj: max(24px, calc((calc(100vw / var(--z, 1)) - 1080px) / 2));
   padding: 0 var(--proc-okraj) 10px;
   scrollbar-width: none;
 }
@@ -2289,7 +2373,7 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
 }
 
 .proc-bod {
-  flex: 0 0 clamp(240px, 27vw, 330px); scroll-snap-align: start;
+  flex: 0 0 clamp(240px, calc(27vw / var(--z, 1)), 330px); scroll-snap-align: start;
   display: flex; flex-direction: column; align-items: center; text-align: center;
 }
 /* Ilustrace jsou předem vsazené do stejného plátna 760×620 a zvětšené tak,
@@ -2299,11 +2383,11 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
    menší nebo větší než ostatní. */
 .proc-bod img { width: 100%; height: auto; display: block; }
 .proc-bod h3 {
-  font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.1rem, calc(1.5vw / var(--z, 1)), 1.4rem);
   letter-spacing: -.02em; line-height: 1.1; color: #0e1116; margin: 18px 0 0;
 }
 .proc-bod p {
-  font-size: clamp(.9rem, 1vw, .98rem); line-height: 1.55;
+  font-size: clamp(.9rem, calc(1vw / var(--z, 1)), .98rem); line-height: 1.55;
   color: rgba(14,17,22,.6); margin: 10px 0 0; text-wrap: pretty;
 }
 @media (max-width: 700px) {
@@ -2355,8 +2439,8 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
   background: radial-gradient(90% 55% at 50% -14%, rgba(150,168,255,.42), rgba(150,168,255,0) 70%), #0020F6;
   color: #fff; border: 0; border-radius: 28px;
   padding: 44px 40px 34px;
-  width: min(440px, calc(100vw - 32px));
-  max-height: calc(100vh - 32px); overflow-y: auto;
+  width: min(440px, calc(calc(100vw / var(--z, 1)) - 32px));
+  max-height: calc(calc(100vh / var(--z, 1)) - 32px); overflow-y: auto;
   box-shadow: 0 40px 100px -24px rgba(0,6,70,.7);
   font-family: 'Inter', -apple-system, system-ui, sans-serif;
   scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.3) transparent;
@@ -2461,6 +2545,13 @@ iconify-icon[width="56"] { width: 56px; height: 56px; }
 .modal .reg-consent { color: #C7D0FF !important; }
 .modal .reg-consent a, .modal #register-form > p:last-child a { color: #fff !important; text-decoration: underline; text-underline-offset: 3px; }
 .modal .reg-consent input { accent-color: #fff !important; }
+/* „Zůstat přihlášen" pod polem s klíčem. Odškrtnuté = přihlášení jen do
+   zavření prohlížeče, viz pamet-prihlaseni.js. */
+.modal .login-pamatovat {
+  display: flex; align-items: center; gap: 10px; margin: 4px 4px 16px;
+  color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; user-select: none;
+}
+.modal .login-pamatovat input { width: 18px; height: 18px; margin: 0; flex-shrink: 0; accent-color: #fff; cursor: pointer; }
 .modal #register-form > p:last-child { color: #C7D0FF !important; }
 
 @media (max-width: 500px) {

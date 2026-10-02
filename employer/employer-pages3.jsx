@@ -682,7 +682,7 @@ function ESettingsOld() {
         {/* Odhlásit se */}
         <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid ' + T.border }}>
           <button onClick={async () => {
-            await sb.auth.signOut();
+            await sb.auth.signOut({ scope: 'local' });
             window.location.href = '/';
           }} style={{
             display: 'flex', alignItems: 'center', gap: 9,
@@ -3501,7 +3501,7 @@ function ESettings({ onTab, onNew, onSignOut } = {}) {
     window.location.href = '/';
   }
   const toggleNotif = key => { setNotifs(ns => ns.map(n => n.key === key ? { ...n, on: !n.on } : n)); setDirty(true); };
-  const logout = () => { if (onSignOut) onSignOut(); else if (typeof sb !== 'undefined') { sb.auth.signOut().then(() => { window.location.href = '/'; }); } };
+  const logout = () => { if (onSignOut) onSignOut(); else if (typeof sb !== 'undefined') { sb.auth.signOut({ scope: 'local' }).then(() => { window.location.href = '/'; }); } };
   const rmPhoto = i => { setForm(f => ({ ...f, photos: f.photos.filter((_, j) => j !== i) })); setDirty(true); };
 
   const fBorder = key => flash === key ? '#F5920B' : '#E6E9F5';

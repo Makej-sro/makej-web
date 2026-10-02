@@ -10,7 +10,7 @@
     gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
     gtag('set', 'ads_data_redaction', true);
   </script>
-  <link rel="stylesheet" href="/consent.css?v=2" />
+  <link rel="stylesheet" href="/consent.css?v=3" />
   <script src="/consent.js?v=4" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -36,15 +36,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="/iconify-icons.js"></script>
+  <script src="/iconify-icons.js?v=3"></script>
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="/style.css?v=158" />
+  <link rel="stylesheet" href="/style.css?v=178" />
   <style>
     /* ── Podpora sekce ── */
     .sup-page { padding: 0; }
-    .sup-white-zone { min-height: 100vh; padding: 100px 0 80px; box-sizing: border-box; position: relative; }
+    .sup-white-zone { min-height: calc(100vh / var(--z, 1)); padding: 100px 0 80px; box-sizing: border-box; position: relative; }
     .sup-hero {
       position: relative; z-index: 1;
       text-align: center;
@@ -54,7 +54,7 @@
     }
     .sup-hero h1 {
       font-family: var(--font-heading);
-      font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+      font-size: clamp(2.4rem, calc(5.5vw / var(--z, 1)), 3.8rem);
       font-weight: 800;
       line-height: 1.1;
       margin: 16px 0 20px;
@@ -87,7 +87,7 @@
     .sup-card a:hover { border-color: rgba(91,107,255,.5); background: rgba(91,107,255,.12); color: #fff; }
     .faq-section { max-width: 720px; margin: 0 auto; padding: 0 24px; }
     .faq-heading { text-align: center; margin-bottom: 48px; }
-    .faq-heading h2 { font-family: var(--font-heading); font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800; margin-bottom: 12px; }
+    .faq-heading h2 { font-family: var(--font-heading); font-size: clamp(1.8rem, calc(3.5vw / var(--z, 1)), 2.5rem); font-weight: 800; margin-bottom: 12px; }
     .faq-heading p { color: var(--muted-fg); font-size: .95rem; }
     .faq-heading a { color: #a78bfa; text-decoration: none; }
     .faq-heading a:hover { text-decoration: underline; }
@@ -527,7 +527,7 @@
         <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       </div>
       <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" aria-expanded="false">
-        <span></span><span></span>
+        <span></span><span></span><span></span>
       </button>
     </div>
     <!-- Mobile Menu -->
@@ -744,7 +744,7 @@
       <!-- Contact cards -->
       <div class="sup-cards-wrap" data-nav-blue>
       <div style="text-align:center;margin-bottom:44px;">
-        <h2 style="font-family:var(--font-heading);font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;line-height:1.25;color:#fff;margin:0;">Nenašel jsi svou odpověď?<br><span style="opacity:.75;">Zkus to tady</span></h2>
+        <h2 style="font-family:var(--font-heading);font-size:clamp(2rem,calc(4.5vw / var(--z, 1)),3.2rem);font-weight:800;line-height:1.25;color:#fff;margin:0;">Nenašel jsi svou odpověď?<br><span style="opacity:.75;">Zkus to tady</span></h2>
         <p style="color:rgba(255,255,255,.8);font-size:1.05rem;line-height:1.65;margin:20px auto 0;max-width:480px;">Pokud je tvůj dotaz složitější, neváhej nás kontaktovat emailem. Uděláme vše proto, abys dostal svou odpověď ještě ten stejný den.</p>
         <a href="mailto:podpora@makej.eu" style="display:inline-block;margin-top:20px;padding:12px 28px;border-radius:100px;border:2px solid rgba(255,255,255,.45);color:#fff;font-size:1rem;font-weight:700;font-family:var(--font-body);text-decoration:none;letter-spacing:.01em;transition:background .18s,border-color .18s,transform .18s;" onmouseover="this.style.background='rgba(255,255,255,.15)';this.style.borderColor='#fff';this.style.transform='translateY(-2px)';" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,255,255,.45)';this.style.transform='translateY(0)';">podpora@makej.eu</a>
       </div>
@@ -798,7 +798,7 @@
   <div class="modal-overlay" id="modal-overlay">
 
     <!-- LOGIN MODAL -->
-    <div class="modal" id="login-modal" style="overflow:visible;">
+    <div class="modal" id="login-modal">
       <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej</div>
       <h2 class="modal-title">Přihlásit se</h2>
@@ -818,6 +818,7 @@
             <input class="form-input" type="text" id="login-key" placeholder="Zadej klíč" inputmode="numeric" autocomplete="off" />
             <p class="form-hint">Pouze pro oficiální testovací a vývojářské účty.</p>
           </div>
+          <label class="login-pamatovat" for="login-pamatovat"><input type="checkbox" id="login-pamatovat" checked /><span>Zůstat přihlášen</span></label>
           <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
       </form>
       <div class="modal-divider"><span>nebo</span></div>
@@ -916,7 +917,8 @@
   <!-- ═══════════ COOKIE BANNER ═══════════ -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/script.js?v=68"></script>
+  <script src="/pamet-prihlaseni.js?v=2"></script>
+  <script src="/script.js?v=77"></script>
 
   <!-- ── Podpora: FAQ + typewriter ── -->
   <script>

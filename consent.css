@@ -69,7 +69,7 @@ body { padding-bottom: var(--mk-ck-h, 0); }
 .mk-pf { position: fixed; inset: 0; z-index: 2147483001; display: flex; align-items: flex-end; justify-content: center; padding: 18px; }
 .mk-pf__scrim { position: absolute; inset: 0; background: rgba(20,22,43,.4); animation: mk-fade .2s ease both; }
 .mk-pf__box {
-  position: relative; width: 100%; max-width: 620px; max-height: min(84vh, 760px);
+  position: relative; width: 100%; max-width: 620px; max-height: min(calc(84vh / var(--z, 1)), 760px);
   background: #fff; border: 1px solid var(--mk-line); border-radius: 24px;
   box-shadow: 0 4px 20px rgba(0,32,246,.06);
   display: flex; flex-direction: column; overflow: hidden;
@@ -140,7 +140,7 @@ body { padding-bottom: var(--mk-ck-h, 0); }
   .mk-ck__row { flex-direction: column; }
   .mk-ck__btn { width: 100%; padding: 15px 20px; }
   .mk-pf { padding: 0; }
-  .mk-pf__box { max-width: none; max-height: 92vh; border-radius: 24px 24px 0 0; border-bottom: 0; }
+  .mk-pf__box { max-width: none; max-height: calc(92vh / var(--z, 1)); border-radius: 24px 24px 0 0; border-bottom: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

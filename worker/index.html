@@ -10,7 +10,7 @@
     gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
     gtag('set', 'ads_data_redaction', true);
   </script>
-  <link rel="stylesheet" href="/consent.css?v=2" />
+  <link rel="stylesheet" href="/consent.css?v=3" />
   <script src="/consent.js?v=4" defer></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -23,6 +23,7 @@
 
   <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/pamet-prihlaseni.js?v=2"></script>
   <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
@@ -125,7 +126,7 @@
   const SUPABASE_URL = 'https://cxegfwfbgcgpwerfbvra.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_N_BIwMCTD6ZOTrtBl3juyw_CGIQ_lvh';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: true, storageKey: 'makej-auth' }
+    auth: { persistSession: true, storageKey: 'makej-auth', storage: window.mkAuthUloziste }
   });
 
   const gate = document.getElementById('auth-gate');
@@ -205,7 +206,7 @@
     if (error) { showErr(translateErr(error.message)); btn.disabled = false; btn.textContent = 'Vytvořit účet brigádníka'; return; }
     // Když je potvrzování e-mailu vypnuté, signUp rovnou přihlásí → pre-launch to NECHCEME.
     // Účet se založí, ale do rozhraní až s přístupovým klíčem → odhlásíme.
-    if (data && data.session) { try { await sb.auth.signOut(); } catch (e) {} }
+    if (data && data.session) { try { await sb.auth.signOut({ scope: 'local' }); } catch (e) {} }
     showErr('');
     gateError.style.display = 'block';
     gateError.style.background = 'rgba(91,214,138,0.12)';
@@ -221,7 +222,7 @@
   sb.auth.getSession().then(async ({ data: { session } }) => {
     const role = session?.user?.user_metadata?.role;
     if (session && role !== 'employer' && accessKeyOk()) { hideGate(); return; }
-    if (session) await sb.auth.signOut();
+    if (session) await sb.auth.signOut({ scope: 'local' });
     showGate();
   });
 </script>
@@ -231,8 +232,8 @@
 <script type="text/babel" src="worker-supabase.jsx?v=17"></script>
 <script type="text/babel" src="worker-swipe.jsx?v=18"></script>
 <script type="text/babel" src="worker-messages.jsx?v=12"></script>
-<script type="text/babel" src="worker-profile.jsx?v=12"></script>
+<script type="text/babel" src="worker-profile.jsx?v=13"></script>
 <script type="text/babel" src="worker-history.jsx?v=8"></script>
-<script type="text/babel" src="worker-main.jsx?v=10"></script>
+<script type="text/babel" src="worker-main.jsx?v=11"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@
     gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'denied', personalization_storage: 'denied', security_storage: 'granted', wait_for_update: 500 });
     gtag('set', 'ads_data_redaction', true);
   </script>
-  <link rel="stylesheet" href="/consent.css?v=2" />
+  <link rel="stylesheet" href="/consent.css?v=3" />
   <script src="/consent.js?v=4" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -36,18 +36,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Instrument+Sans:wght@400;500;600&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
-  <script src="/iconify-icons.js"></script>
+  <script src="/iconify-icons.js?v=3"></script>
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" as="image" href="/lide-krok-1.png" />
   <link rel="preload" as="image" href="/lide-krok-2.png" />
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=158" />
+  <link rel="stylesheet" href="style.css?v=178" />
   <style>
     /* Bolt-style střídavé kroky (foto + text) */
     .bolt-head { text-align: center; max-width: 1080px; margin: 0 auto 56px; padding: 0 24px; }
     .bolt-kicker { display: block; font-family: var(--font-heading); font-weight: 800; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: #0020f6; margin-bottom: 16px; }
-    .bolt-head h2 { font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
+    .bolt-head h2 { font-family: var(--font-heading); font-size: clamp(2rem, calc(5vw / var(--z, 1)), 3.2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
     .bolt-journey { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
     .bolt-steps { display: flex; flex-direction: column; gap: 88px; }
     .bolt-path { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
@@ -78,7 +78,7 @@
       padding: 5px 14px; border-radius: 100px;
       background: rgba(0,32,246,.16); border: 1px solid rgba(208,208,255,.14);
     }
-    .bolt-text h3 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3vw, 2.4rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    .bolt-text h3 { font-family: var(--font-heading); font-size: clamp(1.7rem, calc(3vw / var(--z, 1)), 2.4rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
     .bolt-text p { color: var(--muted-fg); font-size: 1.05rem; line-height: 1.7; max-width: 460px; }
 
     @media (max-width: 768px) {
@@ -103,13 +103,13 @@
     /* Sekce „Proč si zvolíš Makej" — brandová modrá, na celou výšku obrazovky.
        Obsah zarovnaný nahoru (žádné vertikální centrování), aby po doskočení
        fontu nadpis nepřecentrovával celý blok = žádný skok při scrollu. */
-    #features { background: linear-gradient(150deg, #2a45ff 0%, #0020f6 58%, #0018c8 100%); min-height: 100vh; box-sizing: border-box;
-      padding-top: max(96px, calc((100vh - 560px) / 2)); padding-bottom: max(96px, calc((100vh - 560px) / 2)); }
+    #features { background: linear-gradient(150deg, #2a45ff 0%, #0020f6 58%, #0018c8 100%); min-height: calc(100vh / var(--z, 1)); box-sizing: border-box;
+      padding-top: max(96px, calc((calc(100vh / var(--z, 1)) - 560px) / 2)); padding-bottom: max(96px, calc((calc(100vh / var(--z, 1)) - 560px) / 2)); }
 
     /* ── Video ukázka aplikace (full-bleed přes celou šířku stránky) ── */
     #features .feat-video {
       position: relative;
-      width: 100vw;
+      width: calc(100vw / var(--z, 1));
       left: 50%;
       transform: translateX(-50%);
       margin: 14px 0 64px;
@@ -117,7 +117,7 @@
       background: #0a0d2e;
       overflow: hidden;
       aspect-ratio: 16 / 9;       /* rezervuje výšku → žádný CLS, než se video načte */
-      max-height: 90vh;
+      max-height: calc(90vh / var(--z, 1));
     }
     #features .feat-video video {
       display: block;
@@ -144,7 +144,7 @@
     /* ── Funkce — text vlevo + mřížka s target ikonami vpravo (brandová modrá) ── */
     #features .bf2 { display: grid; grid-template-columns: 0.82fr 1.18fr; gap: 64px; align-items: start; }
     #features .bf2-kicker { display: inline-block; font-family: var(--font-heading); font-weight: 800; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--secondary); margin-bottom: 20px; }
-    #features .bf2-left h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2.6rem, 6vw, 4.4rem); line-height: 1.04; letter-spacing: -.02em; color: #fff; margin: 0 0 24px; text-wrap: balance; }
+    #features .bf2-left h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2.6rem, calc(6vw / var(--z, 1)), 4.4rem); line-height: 1.04; letter-spacing: -.02em; color: #fff; margin: 0 0 24px; text-wrap: balance; }
     #features .bf2-left h2 .grad { color: var(--secondary); }
     #features .bf2-left p { color: rgba(255,255,255,.74); font-size: 1.22rem; line-height: 1.6; max-width: 40ch; margin: 0 0 40px; }
     #features .bf2-cta { display: inline-flex; align-items: center; gap: 10px; padding: 18px 40px; border-radius: 100px; background: #fff; color: #0a0d2e; font-weight: 700; font-size: 1.08rem; transition: transform .2s ease, box-shadow .2s ease; }
@@ -180,11 +180,11 @@
     /* ═══════════ Modré hero s telefonem (jako employer) ═══════════ */
     .emp-hero-blue { background: #0b21f6; position: relative; overflow: hidden; padding: 134px 24px 0; text-align: center; }
     .eh-head { max-width: 950px; margin: 0 auto; position: relative; z-index: 2; }
-    .eh-head h1 { font-family: var(--font-heading); font-size: clamp(2.7rem, 7vw, 5.4rem); font-weight: 800; color: #fff; line-height: 1.02; letter-spacing: -.025em; margin: 0 0 26px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .eh-head h1 { font-family: var(--font-heading); font-size: clamp(2.7rem, calc(7vw / var(--z, 1)), 5.4rem); font-weight: 800; color: #fff; line-height: 1.02; letter-spacing: -.025em; margin: 0 0 26px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .eh-head h1 .eh-accent { color: #c3c8ff; }
     /* ── Vstupní animace hero (v duchu landing page) ── */
     .eh-line { display: block; overflow: hidden; padding-bottom: .3em; margin-bottom: -.3em; }
-    .eh-line-in { display: inline-block; transform: translateY(120%); animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) both; will-change: transform; }
+    .eh-line-in { display: inline-block; transform: translateY(160%); animation: heroLineUp 1s cubic-bezier(.19,1,.22,1) both; will-change: transform; }
     .eh-line:nth-child(1) .eh-line-in { animation-delay: .1s; }
     .eh-line:nth-child(2) .eh-line-in { animation-delay: .26s; }
     .emp-hero-blue .eh-grad {
@@ -197,7 +197,7 @@
     @media (prefers-reduced-motion: reduce) {
       .eh-line-in, .emp-hero-blue .eh-grad, .eh-sub, .eh-btn, .mkj-visual { animation: none !important; transform: none !important; }
     }
-    .eh-sub { color: rgba(255,255,255,.85); font-size: clamp(1.02rem, 1.6vw, 1.3rem); line-height: 1.5; max-width: 640px; margin: 0 auto 34px; }
+    .eh-sub { color: rgba(255,255,255,.85); font-size: clamp(1.02rem, calc(1.6vw / var(--z, 1)), 1.3rem); line-height: 1.5; max-width: 640px; margin: 0 auto 34px; }
     .eh-btn { display: inline-block; background: #191919; color: #fff; font-family: var(--font-sans); font-weight: 700; font-size: 1.02rem; padding: 16px 32px; border-radius: 16px; text-decoration: none; cursor: pointer; transition: background .2s, transform .2s; }
     .eh-btn:hover { background: #fff; transform: translateY(-2px); }
 
@@ -292,7 +292,7 @@
     .vx-frame {
       position: relative; border-radius: 0; overflow: hidden;
       background: #fff;
-      min-height: 100vh; min-height: var(--hero-h, 100vh); display: flex; flex-direction: column;
+      min-height: calc(100vh / var(--z, 1)); min-height: var(--hero-h, calc(100vh / var(--z, 1))); display: flex; flex-direction: column;
     }
 
     /* ── NAV se zářezem ── */
@@ -318,13 +318,13 @@
     .vx-logo { font-family: var(--font-nav); font-weight: 900; font-size: 2.2rem; color: #0020f6; text-decoration: none; line-height: 1; }
 
     /* ── HERO ── */
-    .vx-hero { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; align-items: center; padding: clamp(96px, 13vh, 130px) 24px 0; text-align: center; }
+    .vx-hero { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; align-items: center; padding: clamp(96px, calc(13vh / var(--z, 1)), 130px) 24px 0; text-align: center; }
     /* Typografie stejná jako hero na /pro-zamestnavatele a /hledam-si-praci (.eh-head h1) */
     /* .vx-heroimg-wrap má z-index 1, nadpis a tlačítka měly auto (0) → obrázek je překrýval */
     .vx-h1, .vx-sub-btns { position: relative; z-index: 2; }
-    .vx-h1 { font-family: var(--font-heading); font-weight: 800; letter-spacing: -.025em; line-height: 1.02; font-size: clamp(2.7rem, 7vw, 5.4rem); color: #0a0d2e; margin: 0; display: flex; flex-direction: column; align-items: center; }
+    .vx-h1 { font-family: var(--font-heading); font-weight: 800; letter-spacing: -.025em; line-height: 1.02; font-size: clamp(2.7rem, calc(7vw / var(--z, 1)), 5.4rem); color: #0a0d2e; margin: 0; display: flex; flex-direction: column; align-items: center; }
     .vx-line { display: block; overflow: hidden; padding-bottom: .3em; margin-bottom: -.3em; }
-    .vx-line-in { display: inline-block; transform: translateY(120%); will-change: transform; }
+    .vx-line-in { display: inline-block; transform: translateY(160%); will-change: transform; }
     .vx-h1 .vx-glitch {
       font-family: inherit; font-weight: inherit; letter-spacing: inherit;
       color: var(--blue);   /* plná firemní modrá, žádný přejíždějící přechod */
@@ -345,7 +345,7 @@
 
     /* 3D portrét lidí — hlavní centerpiece */
     /* Zdrojová fotka měla po stranách ~55 % průhledné plochy — po ořezu odpovídá
-       šířka 422px původním 940px. Bez toho se na mobilu (92vw) postavičky smrskly
+       šířka 422px původním 940px. Bez toho se na mobilu (calc(92vw / var(--z, 1))) postavičky smrskly
        na ~160px a zbytek výšky hera zůstal prázdný. */
     .vx-heroimg-wrap { position: absolute; left: 0; right: 0; bottom: -74px; display: flex; justify-content: center; align-items: flex-end; z-index: 1; pointer-events: none; }
     /* Strop 44 % výšky hera — na nízkém okně by fixních 422px vyjelo až do tlačítek.
@@ -355,7 +355,7 @@
        třemi. Stejný strop šířky by lidi zmenšil skoro na polovinu, proto se
        počítá tak, aby postavy vyšly stejně vysoké jako dřív: tehdy 440 px
        šířky ≈ 554 px výšky, teď 554 px výšky ≈ 842 px šířky. */
-    .vx-heroimg { width: min(842px, 92vw, 88vh); width: min(842px, 92vw, calc(var(--hero-h, 100vh) * .88)); height: auto; display: block; filter: drop-shadow(0 40px 50px rgba(0,10,80,.28)); }
+    .vx-heroimg { width: min(842px, calc(92vw / var(--z, 1)), calc(88vh / var(--z, 1))); width: min(842px, calc(92vw / var(--z, 1)), calc(var(--hero-h, calc(100vh / var(--z, 1))) * .88)); height: auto; display: block; filter: drop-shadow(0 40px 50px rgba(0,10,80,.28)); }
 
     /* spodní pás hero: avataři vlevo, preview karta vpravo — překrývá spodek obrázku */
     .vx-avstack { display:flex; }
@@ -364,9 +364,9 @@
 
     /* ── SEKCE POD RÁMEM ── */
     .vx-sec { padding: 96px 0; }
-    .vx-wrap { width: min(1120px, 90vw); margin: 0 auto; }
+    .vx-wrap { width: min(1120px, calc(90vw / var(--z, 1))); margin: 0 auto; }
     .vx-kick { display:inline-block; font-family:var(--font-heading); font-size:.72rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--blue); }
-    .vx-h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, 4.4vw, 3rem); letter-spacing: -.02em; line-height: 1.02; margin-top: 12px; }
+    .vx-h2 { font-family: var(--font-heading); font-weight: 900; text-transform: uppercase; font-size: clamp(1.9rem, calc(4.4vw / var(--z, 1)), 3rem); letter-spacing: -.02em; line-height: 1.02; margin-top: 12px; }
     .vx-sec-head { text-align:center; max-width: 640px; margin: 0 auto 48px; }
     .vx-sec-head p { color: var(--muted); font-size: 1.04rem; line-height: 1.6; margin-top: 14px; }
 
@@ -404,7 +404,7 @@
     .vx-faq-a { padding:0 4px 22px; color:var(--muted); font-size:.98rem; line-height:1.65; }
 
     #download.vx-cta { background: var(--ink); text-align:center; padding: 96px 0; }
-    .vx-cta h2 { font-family:var(--font-heading); font-weight:900; text-transform:uppercase; font-size:clamp(2rem,5vw,3.4rem); letter-spacing:-.02em; color:#fff; }
+    .vx-cta h2 { font-family:var(--font-heading); font-weight:900; text-transform:uppercase; font-size:clamp(2rem,calc(5vw / var(--z, 1)),3.4rem); letter-spacing:-.02em; color:#fff; }
     .vx-cta p { color:rgba(255,255,255,.7); font-size:1.06rem; max-width:520px; margin:16px auto 0; line-height:1.6; }
     .vx-cta-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:32px 0 14px; }
     .vx-store { display:inline-flex; align-items:center; gap:11px; background:#fff; border-radius:14px; padding:12px 22px; text-decoration:none; color:var(--ink); transition:transform .18s; }
@@ -432,7 +432,7 @@
     .vx-nav       { animation: vxFade .7s cubic-bezier(.2,.8,.2,1) both; }
     /* Postavičky nejdřív nahoře, po ~0,5 s sjedou dolů a odkryjí nadpis */
     .vx-heroimg-wrap { animation: vxDrop 1.5s cubic-bezier(.5,0,.15,1) both; }
-    @keyframes vxDrop { 0%,33% { transform: translateY(-42vh); } 100% { transform: translateY(0); } }
+    @keyframes vxDrop { 0%,33% { transform: translateY(calc(-42vh / var(--z, 1))); } 100% { transform: translateY(0); } }
     /* Text má z-index 2, takže by během letu překrýval hlavy postaviček. Každý řádek
        se proto odkryje přesně ve chvíli, kdy ho padající obrázek mine — 1. řádek v 0,85 s
        (obrázek na 38 % cesty), 2. řádek v 0,97 s (62 %), tlačítka v 1,10 s (86 %). */
@@ -449,9 +449,9 @@
     .vx-intro .vx-sec-head p { font-size: 1.16rem; }
     /* Dvě strany jako velké karty s telefonem (převzato od Yasina) */
     .vx-two { background: #fff; padding-top: 40px; }
-    .vx-two .vx-wrap { width: min(1280px, 94vw); }
+    .vx-two .vx-wrap { width: min(1280px, calc(94vw / var(--z, 1))); }
     .vx-two-head { max-width: 780px; margin: 0 auto 64px; text-align: center; }
-    .vx-two-head h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2rem, 4.4vw, 3.25rem); letter-spacing: -.03em; line-height: 1.05; text-wrap: balance; }
+    .vx-two-head h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(2rem, calc(4.4vw / var(--z, 1)), 3.25rem); letter-spacing: -.03em; line-height: 1.05; text-wrap: balance; }
     .vx-two-head h2 em { font-style: normal; color: var(--blue); }
     .vx-two-head p { color: var(--muted); font-size: 1.12rem; line-height: 1.6; margin: 18px auto 0; max-width: 620px; text-wrap: pretty; }
     /* ── Dvě cesty jako velké karty (stejný princip jako hero na hlavní) ── */
@@ -475,7 +475,7 @@
       background:rgba(255,255,255,.18); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
       font-size:.82rem; font-weight:700; letter-spacing:.01em;
     }
-    .lc-text h3 { font-family:var(--font-heading); font-weight:800; font-size:clamp(2rem,3.4vw,2.9rem); line-height:1.02; letter-spacing:-.03em; margin-bottom:14px; }
+    .lc-text h3 { font-family:var(--font-heading); font-weight:800; font-size:clamp(2rem,calc(3.4vw / var(--z, 1)),2.9rem); line-height:1.02; letter-spacing:-.03em; margin-bottom:14px; }
     .lc-text p { font-size:1.02rem; line-height:1.55; color:rgba(255,255,255,.82); text-wrap:pretty; margin-bottom:26px; }
     .lc-btn {
       display:inline-flex; align-items:center; gap:10px; padding:15px 26px; border-radius:999px;
@@ -489,7 +489,7 @@
     /* Telefon vpravo — iPhone s Dynamic Islandem, zespoda přetéká z karty ven.
        Rozměry uvnitř jsou v procentech obrazovky, ať to sedí v jakékoli velikosti. */
     .lc-phone {
-      flex:0 0 clamp(212px, 21vw, 288px); width:clamp(212px, 21vw, 288px); align-self:center;
+      flex:0 0 clamp(212px, calc(21vw / var(--z, 1)), 288px); width:clamp(212px, calc(21vw / var(--z, 1)), 288px); align-self:center;
       border-radius:38px; padding:7px; background:linear-gradient(160deg,#4a4f63,#14162b 42%,#2c3040 70%,#4a4f63);
       box-shadow:0 26px 60px rgba(0,0,0,.42), 0 0 0 1px rgba(255,255,255,.14) inset;
     }
@@ -508,13 +508,13 @@
     @media (max-width: 980px) {
       .lc-grid { grid-template-columns:1fr; }
       .lc-card { min-height:0; padding:30px 24px 0; }
-      .lc-phone { flex-basis:clamp(180px, 34vw, 230px); width:clamp(180px, 34vw, 230px); border-radius:32px; }
+      .lc-phone { flex-basis:clamp(180px, calc(34vw / var(--z, 1)), 230px); width:clamp(180px, calc(34vw / var(--z, 1)), 230px); border-radius:32px; }
       .lc-screen { border-radius:26px; }
     }
     @media (max-width: 620px) {
       .lc-card { flex-direction:column; align-items:stretch; }
       .lc-text { max-width:none; padding-bottom:22px; }
-      .lc-phone { align-self:center; flex-basis:min(230px, 62vw); width:min(230px, 62vw); }
+      .lc-phone { align-self:center; flex-basis:min(230px, calc(62vw / var(--z, 1))); width:min(230px, calc(62vw / var(--z, 1))); }
     }
     .vx-close { background: var(--blue); text-align:center; }
     .vx-close .vx-sec-head { margin-bottom:0; }
@@ -526,17 +526,17 @@
     /* ── GALERIE 3 KROKŮ (styl VEXO) ── */
     .vx-gallery { background: var(--pl-canvas); }
     .vx-gallery .vx-wrap { width: 100%; max-width: none; }
-    .vx-gal-panel { position:relative; background: transparent; border-radius:0; padding: 20px clamp(28px,6vw,90px) 10px; overflow:hidden; }
-    .vx-gal-word { position:absolute; left:0; right:0; top:48%; transform:translateY(-50%); text-align:center; font-family:var(--font-heading); font-weight:900; text-transform:uppercase; font-size: clamp(4rem, 15vw, 14rem); letter-spacing:-.04em; color: rgba(14,17,22,.055); line-height:1; z-index:0; pointer-events:none; white-space:nowrap; }
-    .vx-gal-cards { position:relative; z-index:2; display:flex; justify-content:center; align-items:flex-start; gap: clamp(24px, 5vw, 72px); }
+    .vx-gal-panel { position:relative; background: transparent; border-radius:0; padding: 20px clamp(28px,calc(6vw / var(--z, 1)),90px) 10px; overflow:hidden; }
+    .vx-gal-word { position:absolute; left:0; right:0; top:48%; transform:translateY(-50%); text-align:center; font-family:var(--font-heading); font-weight:900; text-transform:uppercase; font-size: clamp(4rem, calc(15vw / var(--z, 1)), 14rem); letter-spacing:-.04em; color: rgba(14,17,22,.055); line-height:1; z-index:0; pointer-events:none; white-space:nowrap; }
+    .vx-gal-cards { position:relative; z-index:2; display:flex; justify-content:center; align-items:flex-start; gap: clamp(24px, calc(5vw / var(--z, 1)), 72px); }
     .vx-gal-card { flex:0 0 auto; }
     .vx-gal-card.c1 { margin-top: 0; }
     .vx-gal-card.c2 { margin-top: 0; }
     .vx-gal-card.c3 { margin-top: 150px; }
     .vx-gal-ph { position:relative; border-radius:20px; border:1px solid rgba(14,17,22,.07); box-shadow:0 34px 64px -32px rgba(14,17,22,.45); overflow:hidden; }
-    .vx-gal-card.c3 .vx-gal-ph { width: clamp(210px,18vw,285px); }
-    .vx-gal-card.c1 .vx-gal-ph { width: clamp(315px,27vw,427px); }
-    .vx-gal-card.c2 .vx-gal-ph { width: clamp(290px,25vw,380px); }
+    .vx-gal-card.c3 .vx-gal-ph { width: clamp(210px,calc(18vw / var(--z, 1)),285px); }
+    .vx-gal-card.c1 .vx-gal-ph { width: clamp(315px,calc(27vw / var(--z, 1)),427px); }
+    .vx-gal-card.c2 .vx-gal-ph { width: clamp(290px,calc(25vw / var(--z, 1)),380px); }
     .vx-gal-ph iconify-icon { color: rgba(14,17,22,.22); }
     .vx-gal-ph img { width:100%; height:auto; display:block; }
     .vx-gal-ph .ph-label { position:absolute; bottom:12px; font-family:var(--font-heading); font-size:.66rem; letter-spacing:.08em; color:rgba(14,17,22,.32); text-transform:uppercase; }
@@ -575,16 +575,21 @@
          sotva 240 px a nad nimi by zela díra. Fotka je proto širší než okno,
          krajní dva přesahují přes okraj a .vx-frame (overflow: hidden) je ořízne —
          bez vodorovného posuvníku. Tři uprostřed zůstanou celí. */
-      .vx-heroimg { width: min(842px, 96vw); width: min(842px, 96vw, calc(var(--hero-h, 100vh) * .88)); }
+      .vx-heroimg { width: min(842px, calc(96vw / var(--z, 1))); width: min(842px, calc(96vw / var(--z, 1)), calc(var(--hero-h, calc(100vh / var(--z, 1))) * .88)); }
       .vx-gal-cards { flex-direction:column; align-items:center; gap:34px; }
       .vx-gal-card.c1, .vx-gal-card.c2, .vx-gal-card.c3 { margin-top:0; }
-      .vx-gal-card.c2 .vx-gal-ph, .vx-gal-card.c1 .vx-gal-ph, .vx-gal-card.c3 .vx-gal-ph { width: min(300px,80vw); }
+      .vx-gal-card.c2 .vx-gal-ph, .vx-gal-card.c1 .vx-gal-ph, .vx-gal-card.c3 .vx-gal-ph { width: min(300px,calc(80vw / var(--z, 1))); }
       .vx-gal-cap { text-align:center; }
       .vx-gal-cap p { margin-left:auto; margin-right:auto; }
       .vx-gal-word { font-size: 4.5rem; top: 30px; transform:none; }
     }
+    /* Nízké okno na počítači (Windows notebook 1280 × 600–700): lidé při .88 výšky
+       okna vylezli hlavami do tlačítek — tady jsou o kus menší (1. 10. 2026). */
+    @media (min-width: 601px) and (max-height: 700px) {
+      .vx-heroimg { width: min(842px, calc(92vw / var(--z, 1)), calc(var(--hero-h, calc(100vh / var(--z, 1))) * .74)); }
+    }
     @media (max-width: 600px) {
-      .vx-heroimg { max-width: none; width: 150vw; width: min(150vw, calc(var(--hero-h, 100vh) * .74)); }
+      .vx-heroimg { max-width: none; width: calc(150vw / var(--z, 1)); width: min(calc(150vw / var(--z, 1)), calc(var(--hero-h, calc(100vh / var(--z, 1))) * .74)); }
     }
     @media (max-width: 560px) {
       .vx-fan { width: 100%; height: 380px; }
@@ -600,7 +605,9 @@
     (function () {
       var r = document.documentElement, lastW = null;
       function set() {
-        r.style.setProperty('--hero-h', window.innerHeight + 'px');
+        // ÷ zoom: na velkém monitoru je stránka zvětšená (style.css, VELKÉ OBRAZOVKY)
+        var z = parseFloat(getComputedStyle(r).zoom) || 1;
+        r.style.setProperty('--hero-h', window.innerHeight / z + 'px');
         lastW = window.innerWidth;
       }
       set();
@@ -629,7 +636,7 @@
         <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       </div>
       <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" aria-expanded="false">
-        <span></span><span></span>
+        <span></span><span></span><span></span>
       </button>
     </div>
     <!-- Mobile Menu -->
@@ -664,7 +671,7 @@
               <a href="/podpora">Podpora</a>
             </div>
             <button class="mobile-menu-btn vx-burger" aria-label="Menu" aria-expanded="false">
-              <span></span><span></span>
+              <span></span><span></span><span></span>
             </button>
             <div class="vx-nav-actions">
               <a href="#" class="vx-signin worker-cta-register">Vytvořit účet</a>
@@ -975,7 +982,7 @@
   <div class="modal-overlay" id="modal-overlay">
 
     <!-- LOGIN MODAL -->
-    <div class="modal" id="login-modal" style="overflow:visible;">
+    <div class="modal" id="login-modal">
       <button class="modal-close" id="login-close" aria-label="Zavřít">✕</button>
       <div class="modal-logo">Makej</div>
       <h2 class="modal-title">Přihlásit se</h2>
@@ -995,6 +1002,7 @@
             <input class="form-input" type="text" id="login-key" placeholder="Zadej klíč" inputmode="numeric" autocomplete="off" />
             <p class="form-hint">Pouze pro oficiální testovací a vývojářské účty.</p>
           </div>
+          <label class="login-pamatovat" for="login-pamatovat"><input type="checkbox" id="login-pamatovat" checked /><span>Zůstat přihlášen</span></label>
           <button type="submit" class="btn-primary btn-full btn-lg" id="login-submit">Přihlásit se</button>
       </form>
       <div class="modal-divider"><span>nebo</span></div>
@@ -1093,7 +1101,8 @@
   <!-- ═══════════ COOKIE BANNER ═══════════ -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js?v=68"></script>
+  <script src="/pamet-prihlaseni.js?v=2"></script>
+  <script src="script.js?v=77"></script>
   <!-- Lazy-play ukázkového videa: stáhne a přehraje až ve viewportu (šetří data + LCP) -->
   <script>
   (function () {
