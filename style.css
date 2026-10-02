@@ -416,13 +416,18 @@ img { max-width: 100%; display: block; }
   transition: background-color .2s ease, transform .18s ease;
 }
 .hero-btn:active { transform: scale(.98); }
-/* „Stáhnout si apku" bylo světle šedé (#EEF0FA) a na bílém heru se ztrácelo
-   (Yasin 2026-10-01). Teď tmavé s bílým textem a hlavní CTA značkově modré.
-   Třída se nejmenuje podle barvy schválně, ta se tu prohodila už třikrát. */
-.hero-btn-soft { background: #191919; color: #fff; }
-.hero-btn-soft:hover { background: #33353D; color: #fff; }
-.hero-btn-primary { background: var(--primary); color: #fff; }
-.hero-btn-primary:hover { background: #0014A3; color: #fff; }
+/* Hlavní CTA je černé, hover jde do značkové modré — obráceně než odkazy
+   v navbaru (černé → modrá). Ty dvě barvy si na stránce vyměňují role.
+   Třída se nejmenuje podle barvy schválně, ta se tu prohodila už třikrát.
+
+   Yasin 1. 10. obě ztmavil, protože se světle šedé „Stáhnout si apku" na
+   bílém heru ztrácelo. Problém byl skutečný, řešení moc — hero pak byl celý
+   tmavý a modrý nadpis nad modrým CTA splýval. Zůstává tedy světlé, jen
+   o stupeň sytější a s rámečkem, aby mělo proti bílé vlastní tvar. */
+.hero-btn-soft { background: #E9EDF9; color: #14161C; box-shadow: inset 0 0 0 1.5px #C9D2EA; }
+.hero-btn-soft:hover { background: #DFE4F3; box-shadow: inset 0 0 0 1.5px #B4C0DE; }
+.hero-btn-primary { background: #191919; color: #fff; }
+.hero-btn-primary:hover { background: var(--primary); color: #fff; }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-h1 span, .hero-cta {
