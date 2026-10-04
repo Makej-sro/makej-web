@@ -31,8 +31,40 @@
    vnitřní linkou (žádné poskočení obsahu) a jemná záře ve stejné barvě.
    Nejoblíbenější už nemá trvalý modrý rámeček — stačí štítek nad kartou. */
 .e-c2-karta:hover{border-color:var(--tier);box-shadow:inset 0 0 0 1px var(--tier),0 14px 34px -14px var(--tier-a);transform:translateY(-2px);}
+/* Tarif, který firma zrovna má: rámeček v barvě tarifu natrvalo — stejná řeč
+   jako najetí myší, jen bez nadzvednutí a se slabší září, aby karta nevypadala
+   pořád „rozsvícená". Barvu nese --tier, kterou kartě nastavuje JSX podle
+   tarifu, takže se to drží s kovovým názvem i tlačítkem. */
+.e-c2-karta--vas{border-color:var(--tier);box-shadow:inset 0 0 0 2px var(--tier),0 10px 26px -18px var(--tier-a);}
+.e-c2-karta--vas:hover{box-shadow:inset 0 0 0 2px var(--tier),0 14px 34px -14px var(--tier-a);}
+/* Podklad zvolené karty: tytéž přelévavé vrstvy jako kovový nápis (--tier-vrstvy),
+   jen hodně ztlumené, aby se pod nimi dal číst text. `border-radius: inherit`
+   drží vrstvu v rozích; karta NESMÍ dostat `overflow: hidden`, jinak by se
+   uřízl štítek „Nejoblíbenější", který trčí nad její horní hranu. */
+.e-c2-karta--vas::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;z-index:0;pointer-events:none;
+  background-image:var(--tier-vrstvy);
+  background-size:180% 180%,180% 180%,180% 180%,100% 100%;background-repeat:no-repeat;
+  opacity:.11;
+  animation:mk-tier-drift 14s linear infinite;
+}
+/* Lesk: pruh světla pomalu přejede přes kartu a shora ji nasvítí — dohromady
+   ten skleněný dojem. Je nad podkladem, ale pod obsahem. */
+.e-c2-karta--vas::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(104deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%),
+    linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,0) 45%);
+  background-size:230% 100%,100% 100%;background-repeat:no-repeat;
+  animation:mk-karta-lesk 9s ease-in-out infinite;
+}
+@keyframes mk-karta-lesk{
+  0%,14%   { background-position:140% 0,0 0; }
+  58%,100% { background-position:-50% 0,0 0; }
+}
+/* Obsah musí nad obě vrstvy, jinak by ho lesk přesvětlil. */
+.e-c2-karta--vas > *{position:relative;z-index:1;}
 .e-c2-stitek-dop{position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:#0020F6;color:#fff;}
-.e-c2-stitek-vas{position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:#EEF1FF;border:1px solid #D6DCFF;color:#0020F6;}
 .e-c2-kdo{font-size:13px;font-weight:500;color:#8A90A6;}
 .e-c2-nazev{font-size:19px;font-weight:700;}
 .e-c2-popis{font-size:13px;line-height:1.4;color:#5B6178;text-wrap:pretty;min-height:36px;}
@@ -66,7 +98,15 @@
 .e-c2-pata button{background:none;border:0;cursor:pointer;font:inherit;font-size:14.5px;font-weight:700;color:#0020F6;padding:2px;}
 .e-c2-pata button:hover{color:#0019C4;text-decoration:underline;}
 .e-c2-pata p{margin:0;font-size:12.5px;color:#8A90A6;}
-.e-c2-akt{display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 18px;border-radius:999px;background:#EEF1FF;border:1px solid #D6DCFF;color:#0020F6;font-size:14px;font-weight:700;white-space:nowrap;box-sizing:border-box;cursor:default;}
+/* „Aktuální tarif" — bílá pilulka, nápis v přelévavé barvě tarifu (.mk-grad),
+   aby mluvil stejnou řečí jako kovová tlačítka u ostatních tarifů. Rámeček
+   bere --tier-a (barva tarifu v 35 % krytí), kterou kartě nastavuje JSX;
+   fallback je pro srovnávací okno, kde --tier nemusí být. Velikost písma
+   musí říct CSS, jinak .mk-grad spadne na výchozích 40 px. */
+.e-c2-akt{display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 18px;border-radius:999px;background:#fff;border:1px solid var(--tier-a,#D6DCFF);font-size:14px;font-weight:700;white-space:nowrap;box-sizing:border-box;cursor:default;}
+.e-c2-akt .mk-grad{font:700 14px/1.2 Inter,sans-serif;letter-spacing:-.01em;}
+.e-c2-akt--mini{padding:0 12px;}
+.e-c2-akt--mini .mk-grad{font-size:13px;}
 .e-c2-prep-mini button{font-size:13px;padding:7px 13px;}
 .e-c2-prep-mini .e-c2-sleva{font-size:11px;padding:2px 7px;}
 .e-obj-karta{background:#fff;border-radius:20px;box-shadow:0 24px 64px -16px rgba(11,16,51,.35);padding:24px 26px 20px;display:flex;flex-direction:column;gap:18px;color:#0B1033;}
@@ -125,18 +165,22 @@
   50%      { background-position: 100% 100%, 0% 0%, 50% 100%, 0 0; }
   75%      { background-position: 0% 100%, 100% 0%, 0% 50%, 0 0; }
 }
+/* Vrstvy přechodu drží `--tier-vrstvy` na prvku s data-tier (viz níž), ať je
+   stejné barvy použije nápis i podklad zvolené karty a nepíší se dvakrát. */
+
 /* Přelévavý barevný text */
 .mk-grad {
+  background-image: var(--tier-vrstvy);
   font: 700 40px/1.2 Inter, sans-serif; letter-spacing: -0.02em;
   background-size: 180% 180%, 180% 180%, 180% 180%, 100% 100%; background-repeat: no-repeat;
   -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
   animation: mk-tier-drift 8s linear infinite;
 }
-[data-tier="zakladni"]  .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #FFFFFF 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #8E9BB8 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #DDE3EE 0%, transparent 70%), linear-gradient(180deg, #9AA3B8 0%, #E6EAF2 100%); }
-[data-tier="vyhodny"]   .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #6B70FF 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #9FD0FF 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #8A5CFF 0%, transparent 70%), linear-gradient(180deg, #2E33F0 0%, #B9BBFF 100%); }
-[data-tier="dynamicky"] .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #5FD18D 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #C8F59A 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #2BC4B0 0%, transparent 70%), linear-gradient(180deg, #229B54 0%, #B8EFCB 100%); }
-[data-tier="maximalni"] .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #F08A4B 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #FFC27A 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #E0452B 0%, transparent 70%), linear-gradient(180deg, #BE5518 0%, #FFD2B0 100%); }
-[data-tier="vlastni"]   .mk-grad { background-image: radial-gradient(40% 60% at 20% 30%, #A77BE8 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #F29BD8 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #6A6CF0 0%, transparent 70%), linear-gradient(180deg, #7A41C8 0%, #E0CCFA 100%); }
+[data-tier="zakladni"]  { --tier-vrstvy: radial-gradient(40% 60% at 20% 30%, #FFFFFF 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #8E9BB8 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #DDE3EE 0%, transparent 70%), linear-gradient(180deg, #9AA3B8 0%, #E6EAF2 100%); }
+[data-tier="vyhodny"]  { --tier-vrstvy: radial-gradient(40% 60% at 20% 30%, #6B70FF 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #9FD0FF 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #8A5CFF 0%, transparent 70%), linear-gradient(180deg, #2E33F0 0%, #B9BBFF 100%); }
+[data-tier="dynamicky"]  { --tier-vrstvy: radial-gradient(40% 60% at 20% 30%, #5FD18D 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #C8F59A 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #2BC4B0 0%, transparent 70%), linear-gradient(180deg, #229B54 0%, #B8EFCB 100%); }
+[data-tier="maximalni"]  { --tier-vrstvy: radial-gradient(40% 60% at 20% 30%, #F08A4B 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #FFC27A 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #E0452B 0%, transparent 70%), linear-gradient(180deg, #BE5518 0%, #FFD2B0 100%); }
+[data-tier="vlastni"]  { --tier-vrstvy: radial-gradient(40% 60% at 20% 30%, #A77BE8 0%, transparent 70%), radial-gradient(40% 60% at 80% 70%, #F29BD8 0%, transparent 70%), radial-gradient(35% 50% at 50% 50%, #6A6CF0 0%, transparent 70%), linear-gradient(180deg, #7A41C8 0%, #E0CCFA 100%); }
 
 /* Barva kovu na plátnech metal-fx (text / odznáček / tlačítko) */
 [data-tier="zakladni"]  [data-cell="text"] canvas, [data-tier="zakladni"]  .metal-fx-glow-svg { filter: grayscale(1) sepia(.6) hue-rotate(185deg) saturate(1.8) brightness(.95); }
@@ -206,6 +250,10 @@
 @media (prefers-reduced-motion: reduce) {
   .mk-grad, .mk-sheen, .mk-rim { animation: none; }
   .mk-rim-fill::after { animation: none; opacity: 0; }
+  /* Podklad zvolené karty zůstane, jen přestane téct; lesk se schová úplně,
+     protože zamrzlý pruh světla uprostřed karty vypadá jako chyba. */
+  .e-c2-karta--vas::before { animation: none; }
+  .e-c2-karta--vas::after { animation: none; opacity: 0; }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

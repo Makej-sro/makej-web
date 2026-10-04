@@ -6,12 +6,17 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<!-- vzhled ceníku — stejný soubor jako dashboard a web -->
+<link rel="stylesheet" href="/cenik.css?v=11">
 <style>
   *,*::before,*::after{box-sizing:border-box}
   html,body{margin:0;min-height:100%;background:#0020F6}
   @keyframes empPop{0%{transform:scale(.92) translateY(12px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
   @keyframes empSpin{to{transform:rotate(360deg)}}
-  /* stejný font override jako v dashboardu */
+  /* stejný font override jako v dashboardu — a Inter i na body, protože
+     srovnávací okno je portál mimo #root a jinak tu padne na patkové písmo
+     (v dashboardu ho Inter nese body, takže tam se to neprojeví) */
+  body { font-family: "Inter", -apple-system, system-ui, sans-serif; }
   #root, #root * { font-family: "Inter", -apple-system, system-ui, sans-serif !important; }
   #root{display:flex;flex-direction:column;min-height:calc(100vh - 38px)}
   .banner{background:rgba(0,0,0,.25);color:#fff;padding:9px 18px;font:600 13px Inter,sans-serif}

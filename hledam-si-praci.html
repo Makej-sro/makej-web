@@ -42,7 +42,7 @@
   <link rel="preload" as="image" href="/krok-1.jpg?v=6" />
   <link rel="preload" as="image" href="/krok-2.jpg?v=5" />
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=179" />
+  <link rel="stylesheet" href="style.css?v=180" />
   <style>
     /* Bolt-style střídavé kroky (foto + text) */
     .bolt-journey { position: relative; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
@@ -746,6 +746,13 @@
                 <button class="wl-go" type="submit" id="wl-go">Chci být u toho</button>
               </div>
               <span class="wl-err" id="wl-e1" role="alert" hidden></span>
+              <!-- Past na roboty: člověk tohle pole nevidí, takže ho nevyplní.
+                   Není `type=hidden` ani `display:none` — to roboti poznají.
+                   `tabindex=-1` a `autocomplete=off` ho drží mimo cestu lidem
+                   i našeptávači prohlížeče. -->
+              <div class="wl-past" aria-hidden="true">
+                <label>Nevyplňujte<input type="text" id="wl-past" name="firma_web" tabindex="-1" autocomplete="off"></label>
+              </div>
             </form>
 
             <!-- Zůstává schované, dokud server nevrátí skutečné číslo. -->
@@ -1003,7 +1010,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="/pamet-prihlaseni.js?v=2"></script>
-  <script src="script.js?v=77"></script>
+  <script src="script.js?v=78"></script>
   <!-- Lazy-play ukázkového videa: stáhne a přehraje až ve viewportu (šetří data + LCP) -->
   <script>
   (function () {

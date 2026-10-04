@@ -1462,69 +1462,10 @@ function CenikCislo({ value, style, className = 'yp-num' }) {
 // pruh Vlastní s posuvníkem. Vzhled a texty z návrhu, písmo a modrá naše;
 // zůstává dopočítávání cen při přepnutí Měsíčně/Ročně (CenikCislo) a
 // kalkulačka ceny Vlastního (stejný sazebník jako Samův web).
-const _CENIK2_CSS = `
-.e-c2{display:flex;flex-direction:column;gap:14px;padding:14px 24px 14px;color:#0B1033;}
-.e-c2-hlava{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;}
-.e-c2-h1{margin:0 0 4px;font-size:28px;line-height:1.15;font-weight:800;letter-spacing:-.02em;}
-.e-c2-sub{margin:0;font-size:15px;color:#5B6178;}
-.e-c2-prep{display:flex;align-items:center;gap:4px;padding:4px;background:#fff;border:1px solid #E3E6EE;border-radius:999px;}
-.e-c2-prep button{border:0;cursor:pointer;font:inherit;font-size:14px;font-weight:600;padding:8px 18px;border-radius:999px;background:transparent;color:#5B6178;display:flex;align-items:center;gap:8px;transition:background .18s,color .18s;}
-.e-c2-prep button.on{background:#0B1033;color:#fff;}
-.e-c2-prep .e-c2-sleva{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:#DCFCE7;color:#15803D;}
-.e-c2-karty{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding-top:10px;align-items:stretch;}
-.e-c2-karta{position:relative;background:#fff;border:1px solid #E3E6EE;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;transition:border-color .28s ease,box-shadow .28s ease,transform .28s cubic-bezier(.2,.8,.2,1);}
-/* Najetí: rámeček v barvě tarifu (jako kovový název) — plynule, zesílený
-   vnitřní linkou (žádné poskočení obsahu) a jemná záře ve stejné barvě.
-   Nejoblíbenější už nemá trvalý modrý rámeček — stačí štítek nad kartou. */
-.e-c2-karta:hover{border-color:var(--tier);box-shadow:inset 0 0 0 1px var(--tier),0 14px 34px -14px var(--tier-a);transform:translateY(-2px);}
-.e-c2-stitek-dop{position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:#0020F6;color:#fff;}
-.e-c2-stitek-vas{position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:#EEF1FF;border:1px solid #D6DCFF;color:#0020F6;}
-.e-c2-kdo{font-size:13px;font-weight:500;color:#8A90A6;}
-.e-c2-nazev{font-size:19px;font-weight:700;}
-.e-c2-popis{font-size:13px;line-height:1.4;color:#5B6178;text-wrap:pretty;min-height:36px;}
-.e-c2-cena{display:flex;align-items:baseline;gap:6px;height:36px;}
-.e-c2-num{font-size:34px;line-height:1;font-weight:800;letter-spacing:-.02em;white-space:nowrap;font-variant-numeric:tabular-nums;}
-.e-c2-kc{font-size:17px;font-weight:700;color:#5B6178;}
-.e-c2-obd{font-size:13.5px;color:#5B6178;}
-.e-c2-uspora{font-size:12.5px;font-weight:600;height:17px;transition:color .2s;}
-.e-c2-btn{cursor:pointer;font:inherit;font-size:14.5px;font-weight:700;height:40px;border-radius:11px;border:1px solid #CDD2DF;background:#fff;color:#0B1033;width:100%;transition:border-color .15s,background .15s;}
-.e-c2-btn:hover{border-color:#0B1033;}
-.e-c2-btn.prim{border:0;background:#0020F6;color:#fff;}
-.e-c2-btn.prim:hover{background:#0019C4;}
-.e-c2-btn:disabled{background:#F3F4F8;border:1px solid #EEF0F5;color:#8A90A6;cursor:default;}
-.e-c2-funkce{border-top:1px solid #EEF0F5;padding-top:12px;display:flex;flex-direction:column;gap:7px;}
-.e-c2-uvod{font-size:12.5px;font-weight:600;color:#5B6178;}
-.e-c2-f{display:flex;gap:8px;font-size:13.5px;line-height:1.35;}
-.e-c2-f.ne{color:#A0A5B8;}
-.e-c2-f svg{flex:none;margin-top:1px;}
-.e-c2-vl{background:#0B1033;border-radius:18px;padding:16px 26px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:36px;align-items:center;color:#fff;}
-.e-c2-vl .e-c2-kdo,.e-c2-vl .e-c2-popis{color:#B7BCD0;}
-.e-c2-vl .e-c2-popis{min-height:0;font-size:14px;}
-.e-c2-vl input[type=range]{width:100%;margin:0;accent-color:#0020F6;cursor:pointer;}
-.e-c2-vl-btn{cursor:pointer;font:inherit;font-size:14.5px;font-weight:700;height:40px;padding:0 20px;border-radius:11px;border:0;background:#fff;color:#0B1033;white-space:nowrap;display:inline-flex;align-items:center;text-decoration:none;}
-.e-c2-vl-btn:hover{background:#E6E9F5;text-decoration:none;}
-.e-c2-pata{display:flex;align-items:baseline;justify-content:center;gap:12px;text-align:center;}
-.e-c2-pata button{background:none;border:0;cursor:pointer;font:inherit;font-size:14.5px;font-weight:700;color:#0020F6;padding:2px;}
-.e-c2-pata button:hover{color:#0019C4;text-decoration:underline;}
-.e-c2-pata p{margin:0;font-size:12.5px;color:#8A90A6;}
-.e-c2-akt{display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 18px;border-radius:999px;background:#EEF1FF;border:1px solid #D6DCFF;color:#0020F6;font-size:14px;font-weight:700;white-space:nowrap;box-sizing:border-box;cursor:default;}
-.e-c2-prep-mini button{font-size:13px;padding:7px 13px;}
-.e-c2-prep-mini .e-c2-sleva{font-size:11px;padding:2px 7px;}
-.e-obj-karta{background:#fff;border-radius:20px;box-shadow:0 24px 64px -16px rgba(11,16,51,.35);padding:24px 26px 20px;display:flex;flex-direction:column;gap:18px;color:#0B1033;}
-.e-obj-box{background:#F6F7FA;border:1px solid #EEF0F5;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
-.e-obj-kdy{font-size:13px;color:#5B6178;background:#F6F7FA;border-radius:10px;padding:10px 12px;}
-.e-obj-pravni{font-size:12px;line-height:1.5;color:#8A90A6;text-align:center;margin-top:-6px;text-wrap:pretty;}
-.e-obj-pravni a{color:#5B6178;text-decoration:underline;text-underline-offset:2px;}
-.e-obj-pravni a:hover{color:#0020F6;}
-.e-obj-ok{width:52px;height:52px;border-radius:50%;background:#16A34A;display:grid;place-items:center;box-shadow:0 10px 24px -8px rgba(22,163,74,.55);}
-.e-c2-x{cursor:pointer;width:40px;height:40px;flex:none;border-radius:10px;border:1px solid #E3E6EE;background:#fff;display:flex;align-items:center;justify-content:center;transition:border-color .15s;}
-.e-c2-x:hover{border-color:#0B1033;}
-.e-c2-tl-prim{cursor:pointer;border:0;background:#0020F6;color:#fff;transition:background .15s;}
-.e-c2-tl-prim:hover{background:#0019C4;}
-.e-c2-tl-out{cursor:pointer;border:1px solid #CDD2DF;background:#fff;color:#0B1033;transition:border-color .15s;}
-.e-c2-tl-out:hover{border-color:#0B1033;text-decoration:none;}
-.e-c2-srow:hover{background:#FAFBFD;}
-`;
+// Vzhled ceníku (.e-c2*) žije v /cenik.css, který načítá employer/index.html
+// i web. Dřív tu byla jeho kopie jako řetězec; vkládala se do <body>, tedy až
+// za <link> v <head>, a tím přebíjela sdílený soubor — mimo jiné jeho mobilní
+// pravidla, takže ceník v dashboardu držel na telefonu čtyři sloupce.
 // Barvy tarifů = hlavní barva kovového názvu (_MK_TIER.hex v employer-shell.jsx)
 const _C2_BARVA = { zakladni: '#B7C1D6', vyhodny: '#2E33F0', dynamicky: '#229B54', maximalni: '#BE5518', vlastni: '#7A41C8' };
 const _C2_ANO = <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3 3 7-7" fill="none" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
@@ -1741,7 +1682,6 @@ function EPricing({ onTab, onPlanChange }) {
     <div style={{ background: '#fff', border: '1px solid #DDE1F0', borderRadius: 22, overflow: 'hidden' }}>
     {/* Bez hlavičky „Tarify" (Yasin 27. 9.) — nadpis stránky je „Vyber si svůj plán" */}
     <style>{_CENIK_CSS}</style>
-    <style>{_CENIK2_CSS}</style>
     <div className="e-c2">
 
       <div className="e-c2-hlava">
@@ -1759,10 +1699,13 @@ function EPricing({ onTab, onPlanChange }) {
           const jeVas = plan.id === currentPlanId;
           const dop = !!plan.popular;
           return (
-            <div key={plan.id} className="e-c2-karta" style={{ '--tier': _C2_BARVA[plan.id], '--tier-a': _C2_BARVA[plan.id] + '59' }}>
-              {/* Štítky nad kartou na střed; když je nejoblíbenější zároveň tarif firmy, jen „Váš tarif" */}
-              {dop && !jeVas && <div className="e-c2-stitek-dop">Nejoblíbenější</div>}
-              {jeVas && <div className="e-c2-stitek-vas">Váš tarif</div>}
+            // data-tier nese --tier-vrstvy z cenik.css (stejné barvy jako kovový
+            // nápis), ze kterých kreslí podklad zvolené karty.
+            <div key={plan.id} data-tier={plan.id} className={'e-c2-karta' + (jeVas ? ' e-c2-karta--vas' : '')} style={{ '--tier': _C2_BARVA[plan.id], '--tier-a': _C2_BARVA[plan.id] + '59' }}>
+              {/* Štítek nad kartou na střed. Pilulka „Váš tarif" je pryč — který tarif
+                  firma má, říká silnější rámeček v barvě tarifu a nápis „Aktuální tarif".
+                  Proto „Nejoblíbenější" už nemusí ustupovat, když jde o tarif firmy. */}
+              {dop && <div className="e-c2-stitek-dop">Nejoblíbenější</div>}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <div className="e-c2-kdo">{plan.kdo}</div>
                 {/* Název tarifu jako tekutý kov v barvě tarifu (návrh 27. 9.) */}
@@ -1782,8 +1725,9 @@ function EPricing({ onTab, onPlanChange }) {
                 </div>
               </div>
               {jeVas
-                // „Aktuální tarif" ve stylu štítku „Váš tarif" (světle modrá pilulka), ne šedé tlačítko
-                ? <div style={{ display: 'flex', justifyContent: 'center' }}><span className="e-c2-akt">Aktuální tarif</span></div>
+                // Bílá pilulka, nápis v přelévavé barvě tarifu — stejná řeč jako
+                // kovová tlačítka u ostatních tarifů.
+                ? <div style={{ display: 'flex', justifyContent: 'center' }}><span className="e-c2-akt"><TierGradientText tier={plan.id}>Aktuální tarif</TierGradientText></span></div>
                 // Kovové tlačítko přesně jako v návrhu (pilulka podle textu, na střed) —
                 // roztažené přes celou šířku se kov natahoval a vypadal jako pozadí za tlačítkem.
                 : <div style={{ display: 'flex', justifyContent: 'center' }}><TierMetalButton tier={plan.id} onClick={() => handleSelect(plan.id)}>{plan.cta}</TierMetalButton></div>}
@@ -1920,7 +1864,7 @@ function EPricing({ onTab, onPlanChange }) {
                 const cena = p => p.free ? 'Zdarma' : p.calc ? 'od ' + _kalkCena(20).toLocaleString('cs-CZ') + ' Kč / měs' : (annual ? p.annualPrice : p.price).toLocaleString('cs-CZ') + ' Kč / měs';
                 const tlacitko = p => {
                   const zakl = { font: 'inherit', fontSize: 13, fontWeight: 700, height: 36, borderRadius: 10, padding: '0 14px', width: '100%', boxSizing: 'border-box' };
-                  if (p.id === currentPlanId) return <span className="e-c2-akt" style={{ height: 36, fontSize: 13 }}>Aktuální tarif</span>;
+                  if (p.id === currentPlanId) return <span className="e-c2-akt e-c2-akt--mini" style={{ height: 36 }}><TierGradientText tier={p.id}>Aktuální tarif</TierGradientText></span>;
                   if (p.contact) return <a className="e-c2-tl-out" href={'mailto:podpora@makej.eu?subject=' + encodeURIComponent('Poptávka tarifu Vlastní — ' + kalkPocet.toLocaleString('cs-CZ') + ' inzerátů')} style={{ ...zakl, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>Poptávka</a>;
                   const vyber = () => { setShowCompare(false); handleSelect(p.id); };
                   if (p.popular) return <button type="button" className="e-c2-tl-prim" onClick={vyber} style={zakl}>Vybrat</button>;
@@ -1937,7 +1881,9 @@ function EPricing({ onTab, onPlanChange }) {
                         </div>
                       </div>
                       {PLANS.map(p => {
-                        const stitek = p.id === currentPlanId ? ['Váš tarif', '#EEF1FF', '#0020F6'] : p.popular ? ['Nejoblíbenější', '#0020F6', '#fff'] : null;
+                        // „Váš tarif" tu nebyl potřeba dvakrát — sloupec to říká nápisem
+                        // „Aktuální tarif" pod cenou, stejně jako karta.
+                        const stitek = p.popular ? ['Nejoblíbenější', '#0020F6', '#fff'] : null;
                         return (
                           <div key={p.id} style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '18px 12px 14px', textAlign: 'center', background: bgOf(p.id), borderRadius: '12px 12px 0 0' }}>
                             <div style={{ height: 20, display: 'flex', justifyContent: 'center' }}>

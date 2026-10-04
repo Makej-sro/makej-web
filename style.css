@@ -780,6 +780,10 @@ img { max-width: 100%; display: block; }
 
 /* ── Krok 1: e-mail ── */
 .wl-form { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+/* Past na roboty u čekacího listu. Schválně NE `display:none` ani
+   `visibility:hidden` — na to se roboti dívají a pole přeskočí. Takhle
+   v toku zůstane, jen je odsunuté mimo obraz a nulové velikosti. */
+.wl-past { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
 .wl-row { width: 100%; max-width: 520px; margin: 0 auto; display: flex; gap: 11px; }
 .wl-in {
   flex: 1; min-width: 0; font-family: var(--font-sans); font-size: 16.5px; font-weight: 500;

@@ -1454,11 +1454,29 @@ function showToast(msg) {
     $('wl-email').focus();
   });
 
+  // Druhá vrstva proti robotům (první je kontrola hlavičky Origin v RPC
+  // join_launch_list). Měří se, jak dlouho byl formulář na obrazovce —
+  // člověk e-mail nenapíše dřív než za pár vteřin, skript ano.
+  const otevreno = Date.now();
+
   // ── 1 · zápis na seznam ──────────────────────────────────────────────
   form1.addEventListener('submit', async ev => {
     ev.preventDefault();
     const pole = $('wl-email'), box = $('wl-e1'), btn = $('wl-go');
     const email = (pole.value || '').trim();
+
+    // Past vyplněná nebo odeslání do 2 s = robot. Tváříme se, že to prošlo,
+    // ať nemá podle čeho poznat, že ho odhalujeme, a zápis zahodíme.
+    const past = $('wl-past');
+    if ((past && past.value) || Date.now() - otevreno < 2000) {
+      zapamatuj({ email: email, kdy: Date.now() });
+      $('wl-mail2').textContent = email;
+      $('wl-lead2').textContent = 'Dáme ti vědět, až appku spustíme.';
+      ukaz('wl-2');
+      napis('Děkujeme za zaslání.', 'wl-typed', 'wl-cur2', true);
+      return;
+    }
+
     if (!email) return chyba(pole, box, 'Zadej e-mail.');
     if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) return chyba(pole, box, 'Tohle není platný e-mail.');
 
