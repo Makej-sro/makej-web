@@ -26,7 +26,26 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const ENV = (k: string) => (typeof Deno !== 'undefined' ? Deno.env.get(k) : undefined) || '';
 const SUPABASE_URL = ENV('SUPABASE_URL');
-const SUPABASE_ANON = ENV('SUPABASE_ANON_KEY');
+
+// Veřejný klíč k ověření přihlášeného uživatele. `SUPABASE_ANON_KEY` je u
+// Supabase vedený jako LEGACY a po vypnutí starých JWT klíčů (Settings → API
+// Keys → Disable JWT-based API keys) přestane platit — proto se bere až jako
+// poslední. Nový `SUPABASE_PUBLISHABLE_KEYS` je slovník v JSON, ne jeden klíč.
+function publishableZProstredi(): string {
+  const raw = ENV('SUPABASE_PUBLISHABLE_KEYS');
+  if (!raw) return '';
+  try {
+    const d = JSON.parse(raw);
+    const fronta: unknown[] = Array.isArray(d) ? [...d] : Object.values(d);
+    while (fronta.length) {
+      const v = fronta.shift();
+      if (typeof v === 'string' && v.startsWith('sb_publishable_')) return v;
+      if (v && typeof v === 'object') fronta.push(...Object.values(v as Record<string, unknown>));
+    }
+  } catch { /* nevadí, zkusí se další zdroj */ }
+  return '';
+}
+const SUPABASE_ANON = ENV('SUPABASE_PUBLISHABLE_KEY') || publishableZProstredi() || ENV('SUPABASE_ANON_KEY');
 const ANTHROPIC_KEY = ENV('ANTHROPIC_API_KEY');
 const MODEL = 'claude-sonnet-5';
 const MAX_BAJTU = 3_000_000;
