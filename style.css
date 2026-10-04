@@ -2688,6 +2688,11 @@ html::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .rc-karta--lide .rc-media img {
   position: absolute; right: 0; bottom: 0;
   width: auto; max-width: none; height: clamp(230px, calc(25vw / var(--z, 1)), 318px);
+  /* Mobil je nakloněný, takže kolem něj zbývá průhledný roh, který leží přes
+     pravou polovinu tlačítka. Průhledné pixely obrázku kliknutí přesto berou,
+     takže tam tlačítko nešlo zmáčknout — obrázek je jen ozdoba, nepotřebuje
+     na sebe myš ani dotyk. */
+  pointer-events: none;
 }
 
 /* Notebook je na šířku, tak dostane i prostor pod odsazením karty — vyjde
