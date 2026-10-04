@@ -2567,3 +2567,136 @@ html::-webkit-scrollbar { display: none; width: 0; height: 0; }
   .modal, #login-modal { padding: 34px 22px 26px; border-radius: 24px; }
   .modal .modal-logo { font-size: 38px; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CESTA — střídavé řádky (vzor Bolt)
+   ══════════════════════════════════════════════════════════════════════════
+   Kroky na /hledam-si-praci a /pro-zamestnavatele. Dřív to byly galerie
+   karet vedle sebe (3 a 2×2); každý krok měl malou fotku a dva řádky textu,
+   takže se pořadí kroků četlo špatně a fotky nebyly k ničemu.
+
+   Teď má každý krok vlastní široký řádek: velká fotka na jedné straně, text
+   na druhé, a strany se po řádcích střídají. Oko tak jde shora dolů po
+   jednotlivých krocích místo zleva doprava po kartách.
+
+   Sdílené oběma stránkami — mění se na jednom místě. */
+
+.cesta { position: relative; max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+
+.cesta-kroky { position: relative; z-index: 1; display: flex; flex-direction: column;
+  gap: clamp(56px, calc(7vw / var(--z, 1)), 104px); }
+
+.cesta-radek { display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, calc(5vw / var(--z, 1)), 72px); align-items: center; }
+/* Liché řádky mají fotku vpravo. `order` místo prohození v HTML, aby pořadí
+   kroků zůstalo čitelné i ve zdroji a pro odečítač obrazovky. */
+.cesta-radek:nth-child(even) .cesta-foto { order: 2; }
+
+.cesta-foto {
+  border-radius: 22px; overflow: hidden; background: #f4f5fb;
+  border: 1px solid rgba(10,13,46,.07);
+  box-shadow: 0 34px 64px -32px rgba(10,13,46,.45);
+}
+.cesta-foto img { width: 100%; height: 100%; display: block; object-fit: cover; aspect-ratio: 4 / 3; }
+
+.cesta-popis { max-width: 480px; }
+.cesta-popis h3 {
+  font-family: var(--font-heading); font-weight: 800; letter-spacing: -.02em;
+  font-size: clamp(1.7rem, calc(3.2vw / var(--z, 1)), 2.5rem); line-height: 1.12;
+  margin: 0 0 14px; color: #0a0d2e;
+}
+.cesta-popis p { color: rgba(10,13,46,.62); font-size: 1.05rem; line-height: 1.65; margin: 0; }
+
+@media (max-width: 860px) {
+  .cesta-radek { grid-template-columns: 1fr; gap: 22px; }
+  /* Na mobilu jde fotka vždy nad text, střídání ztrácí smysl. */
+  .cesta-radek:nth-child(even) .cesta-foto { order: 0; }
+  .cesta-kroky { gap: 52px; }
+  .cesta-popis { max-width: none; }
+  .cesta-foto img { aspect-ratio: 16 / 10; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ROZCESTNÍK — „S čím ti Makej pomůže?"
+   ══════════════════════════════════════════════════════════════════════════
+   Tři karty na úvodce: brigádník, firma, Lidé. Každá má vlastní barvu,
+   popis, tlačítko a dole snímek z reálné appky, který se o spodní hranu
+   karty ořízne (proto `overflow: hidden` a záporný spodní okraj obrázku).
+
+   Obrázek sedí ve `.rc-media`, aby ho šlo později vyměnit za <video>
+   beze změny rozvržení — stačí zachovat poměr stran. */
+
+.rc { padding: clamp(72px, calc(8vw / var(--z, 1)), 112px) 0; background: #fff; }
+.rc-wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+.rc-h2 {
+  text-align: center; margin: 0 0 clamp(34px, calc(4vw / var(--z, 1)), 54px);
+  font-family: var(--font-nav); font-weight: 400; letter-spacing: -.03em;
+  font-size: clamp(2rem, calc(4.6vw / var(--z, 1)), 3.2rem); line-height: 1.05; color: #0a0d2e;
+}
+
+.rc-karty { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, calc(2vw / var(--z, 1)), 26px); }
+
+.rc-karta {
+  position: relative; overflow: hidden; border-radius: 22px;
+  --rc-pad: 28px;
+  padding: 30px var(--rc-pad) 0; display: flex; flex-direction: column; isolation: isolate;
+}
+/* Barvy podle role. --rc-tl je barva textu tlačítka na jeho podkladu. */
+.rc-karta--prace { background: #0022F0; color: #fff; }
+.rc-karta--firmy { background: #F2F4FF; color: #0a0d2e; }
+.rc-karta--lide  { background: #0B1033; color: #fff; }
+
+.rc-karta h3 {
+  margin: 0 0 10px; font-family: var(--font-heading); font-weight: 800;
+  font-size: clamp(1.25rem, calc(1.9vw / var(--z, 1)), 1.6rem); letter-spacing: -.02em;
+}
+.rc-karta p { margin: 0 0 20px; font-size: .97rem; line-height: 1.55; opacity: .85; text-wrap: pretty; }
+
+/* `margin-top: auto` sráží tlačítko nad snímek. Odstavce mají různý počet
+   řádků, takže bez toho by každé tlačítko leželo jinde; takhle jsou všechna
+   v jedné rovině, protože karty jsou v mřížce stejně vysoké. */
+.rc-btn {
+  margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-heading); font-weight: 700; font-size: .9rem;
+  padding: 11px 18px; border-radius: 999px; text-decoration: none;
+  transition: transform .18s ease, box-shadow .2s ease;
+}
+.rc-karta--prace .rc-btn,
+.rc-karta--lide  .rc-btn { background: #fff; color: #0a0d2e; }
+.rc-karta--firmy .rc-btn { background: #0022F0; color: #fff; }
+.rc-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -10px rgba(0,0,0,.45); text-decoration: none; }
+.rc-btn svg { flex: none; }
+
+/* Snímek dole. Okno má pevnou výšku a zařízení v něm stojí na spodní hraně —
+   výška je nastavená tak, aby se notebook i telefon vešly celé. `overflow`
+   je pojistka, kdyby někdo přidal vyšší snímek, aby nenatáhl celou mřížku.
+   Obrázky mají průhledné pozadí, takže kolem nich není potřeba rámeček. */
+.rc-media {
+  padding-top: 20px;
+  height: clamp(210px, calc(21vw / var(--z, 1)), 268px);
+  display: flex; justify-content: center; align-items: flex-end; overflow: hidden;
+}
+.rc-media img, .rc-media video {
+  display: block; width: 100%; max-width: 300px; height: auto;
+}
+/* Nakloněný mobil u Lidí stojí vpravo vedle tlačítka a vejde se celý.
+   `.rc-media` zůstává jako rozpěrka, aby tlačítko drželo rovinu se zbylými
+   kartami; obrázek sám je vytažený z toku a ukotvený do pravého dolního rohu,
+   takže může být vyšší než ta rozpěrka a sahat až k tlačítku. */
+.rc-karta--lide .rc-media { position: static; }
+.rc-karta--lide .rc-media img {
+  position: absolute; right: 0; bottom: 0;
+  width: auto; max-width: none; height: clamp(230px, calc(25vw / var(--z, 1)), 318px);
+}
+
+/* Notebook je na šířku, tak dostane i prostor pod odsazením karty — vyjde
+   tím o poznání větší, ale pořád se vejde celý. */
+.rc-karta--firmy .rc-media { margin-left: calc(var(--rc-pad) * -1); margin-right: calc(var(--rc-pad) * -1); }
+.rc-karta--firmy .rc-media img, .rc-karta--firmy .rc-media video { max-width: 100%; }
+
+@media (max-width: 920px) {
+  .rc-karty { grid-template-columns: 1fr; gap: 18px; }
+  .rc-karta { --rc-pad: 24px; min-height: 0; padding: 26px var(--rc-pad) 0; }
+  .rc-media img, .rc-media video { max-width: 260px; }
+}

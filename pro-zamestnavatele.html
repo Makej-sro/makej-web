@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=180" />
+  <link rel="stylesheet" href="style.css?v=192" />
   <!-- Vzhled ceníku sdílený s dashboardem (employer/index.html). -->
   <link rel="stylesheet" href="/cenik.css?v=11" />
   <style>
@@ -197,30 +197,9 @@
        Čtyři screenshoty 2×2 místo čtyř řad pod sebou — pravý sloupec je výškově
        posunutý, aby mřížka nebyla strohá. Za kartami prosvítá velké slovo. */
     .emp-gal { position: relative; max-width: 1080px; margin: 0 auto; padding: 10px 24px 0; overflow: hidden; }
-    .emp-gal-word { position: absolute; left: 0; right: 0; top: 46%; transform: translateY(-50%); text-align: center;
-      font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
-      font-size: clamp(4rem, calc(15vw / var(--z, 1)), 13rem); letter-spacing: -.04em; color: rgba(10,13,46,.05);
-      line-height: 1; z-index: 0; pointer-events: none; white-space: nowrap; }
-    .emp-gal-cards { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr;
-      gap: clamp(28px, calc(5vw / var(--z, 1)), 60px) clamp(24px, calc(4vw / var(--z, 1)), 54px); align-items: start; }
-    .emp-gal-card:nth-child(2), .emp-gal-card:nth-child(4) { margin-top: clamp(28px, calc(6vw / var(--z, 1)), 74px); }
     /* kaskáda, když do obrazu přijde víc karet najednou */
     .emp-gal-card:nth-child(2) { transition-delay: .1s; }
-    .emp-gal-card:nth-child(3) { transition-delay: .2s; }
-    .emp-gal-card:nth-child(4) { transition-delay: .3s; }
-    .emp-gal-ph { border-radius: 18px; border: 1px solid rgba(10,13,46,.07); overflow: hidden;
-      box-shadow: 0 34px 64px -32px rgba(10,13,46,.45); background: #f4f5fb; }
-    .emp-gal-ph img { width: 100%; height: auto; display: block; }
-    .emp-gal-cap { margin-top: 16px; }
-    .emp-gal-cap .n { font-family: var(--font-heading); font-weight: 800;
-      font-size: .76rem; letter-spacing: .08em; color: var(--primary); font-variant-numeric: tabular-nums; }
-    .emp-gal-cap h3 { font-family: var(--font-heading); font-weight: 800; text-transform: uppercase;
-      font-size: 1.05rem; letter-spacing: -.01em; margin: 5px 0 0; color: #0a0d2e; }
-    .emp-gal-cap p { color: rgba(10,13,46,.6); font-size: .92rem; line-height: 1.5; margin: 6px 0 0; max-width: 380px; }
     @media (max-width: 760px) {
-      .emp-gal-cards { grid-template-columns: 1fr; gap: 34px; }
-      .emp-gal-card:nth-child(2), .emp-gal-card:nth-child(4) { margin-top: 0; }
-      .emp-gal-word { font-size: clamp(3rem, calc(22vw / var(--z, 1)), 7rem); }
     }
     /* ── „Proč Makej": kompaktní varianta téže galerie — jedna řada čtyř karet,
        za nimi velké slovo. Držena co nejnižší, sekce je jen mezikrok k ceníku. ── */
@@ -239,7 +218,6 @@
     @media (max-width: 560px) {
       .emp-why { padding-bottom: 46px; }
     }
-    .bolt-journey { position: relative; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
     .bolt-cta { display: flex; justify-content: center; margin-top: 60px; position: relative; z-index: 1; }
     /* CTA morph: tlačítko je bílé a zmodrá teprve až doscrolluje na obrazovku (chytne pozornost) */
     .bolt-cta a.cta-morph {
@@ -516,26 +494,35 @@
       <div class="emp-white-zone nav-light">
 
       <!-- KROKY — galerie 2×2 (vzor ze sekce Lidé) -->
-      <div class="bolt-journey">
-        <div class="emp-gal">
-          <div class="emp-gal-word" aria-hidden="true">NÁBOR</div>
-          <div class="emp-gal-cards">
-          <div class="emp-gal-card js-reveal-up">
-            <div class="emp-gal-ph"><img src="/emp-krok-1.jpg?v=3" alt="Firemní dashboard Makej na notebooku — přehled inzerátů" loading="lazy" decoding="async" /></div>
-            <div class="emp-gal-cap"><span class="n"></span><h3>Vytvořte inzerát</h3><p>Vyplňte pozici, datum, hodinovou mzdu a popis. Hotovo za 60 sekund přímo v aplikaci.</p></div>
+      <div class="cesta">
+        <div class="cesta-kroky">
+          <div class="cesta-radek js-reveal-up">
+            <div class="cesta-foto"><img src="/emp-krok-1.jpg?v=3" alt="Firemní dashboard Makej na notebooku — přehled inzerátů" loading="lazy" decoding="async" /></div>
+            <div class="cesta-popis">
+              <h3>Vytvořte inzerát</h3>
+              <p>Vyplňte pozici, datum, hodinovou mzdu a popis. Hotovo za 60 sekund přímo v aplikaci.</p>
+            </div>
           </div>
-          <div class="emp-gal-card js-reveal-up">
-            <div class="emp-gal-ph"><img src="/emp-krok-2.jpg?v=3" alt="Skupina brigádníků prohlíží nabídky v appce" loading="lazy" decoding="async" /></div>
-            <div class="emp-gal-cap"><span class="n"></span><h3>Kandidáti swajpují</h3><p>Tisíce lidí uvidí vaši nabídku ve feedu. Ti co chtějí, swajpnou doprava — a vy je vidíte okamžitě.</p></div>
+          <div class="cesta-radek js-reveal-up">
+            <div class="cesta-foto"><img src="/emp-krok-2.jpg?v=3" alt="Skupina brigádníků prohlíží nabídky v appce" loading="lazy" decoding="async" /></div>
+            <div class="cesta-popis">
+              <h3>Kandidáti swajpují</h3>
+              <p>Tisíce lidí uvidí vaši nabídku ve feedu. Ti co chtějí, swajpnou doprava — a vy je vidíte v dashboardu.</p>
+            </div>
           </div>
-          <div class="emp-gal-card js-reveal-up">
-            <div class="emp-gal-ph"><img src="/emp-krok-3.jpg?v=3" alt="Zástupce firmy mluví s brigádníky na kampusu" loading="lazy" decoding="async" /></div>
-            <div class="emp-gal-cap"><span class="n"></span><h3>Přijmete nebo odmítnete</h3><p>Podívejte se na profil, hodnocení a zkušenosti. Jedním tapem přijmete — nebo posunete dál.</p></div>
+          <div class="cesta-radek js-reveal-up">
+            <div class="cesta-foto"><img src="/emp-krok-3.jpg?v=3" alt="Zástupce firmy mluví s brigádníky na kampusu" loading="lazy" decoding="async" /></div>
+            <div class="cesta-popis">
+              <h3>Přijmete nebo odmítnete</h3>
+              <p>Podívejte se na profil, hodnocení a zkušenosti. Jedním tapem přijmete — nebo posunete dál.</p>
+            </div>
           </div>
-          <div class="emp-gal-card js-reveal-up">
-            <div class="emp-gal-ph"><img src="/emp-krok-4.jpg?v=3" alt="Brigádník a zástupce firmy si domlouvají detaily" loading="lazy" decoding="async" /></div>
-            <div class="emp-gal-cap"><span class="n"></span><h3>Domluvíte detaily</h3><p>Po přijetí se otevře chat. Upřesněte čas, místo a co si vzít. Kandidát je připravený.</p></div>
-          </div>
+          <div class="cesta-radek js-reveal-up">
+            <div class="cesta-foto"><img src="/emp-krok-4.jpg?v=3" alt="Brigádník a zástupce firmy si domlouvají detaily" loading="lazy" decoding="async" /></div>
+            <div class="cesta-popis">
+              <h3>Domluvíte detaily</h3>
+              <p>Po přijetí se otevře chat. Upřesněte čas, místo a co si vzít. Kandidát je připravený.</p>
+            </div>
           </div>
         </div>
         <div class="bolt-cta">
@@ -903,7 +890,7 @@
       </div>
       <!-- aria-hidden: co je na displeji, je stejně napsané v textu sekce. -->
       <div class="vxc-foto" aria-hidden="true">
-        <img src="/emp-mockup.webp?v=1" alt="" width="1440" height="868" loading="lazy" decoding="async" />
+        <img src="/dashboard-notebook.webp" alt="" width="1440" height="868" loading="lazy" decoding="async" />
       </div>
     </div>
   </section>
@@ -1264,7 +1251,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="/pamet-prihlaseni.js?v=2"></script>
-  <script src="script.js?v=78"></script>
+  <script src="script.js?v=80"></script>
   <!-- Kovové názvy a tlačítka v ceníku — stejné komponenty jako dashboard
        (metal-fx + React, bez Babelu). Načte se až u ceníku; když se
        nenačte nebo prohlížeč neumí WebGL2, zůstane CSS náhrada. -->

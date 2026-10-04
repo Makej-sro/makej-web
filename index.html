@@ -40,7 +40,7 @@
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=180" />
+  <link rel="stylesheet" href="style.css?v=192" />
 
     <!-- ═══════════ ÚVODNÍ NAPSÁNÍ NADPISU ═══════════
        Místo modré plochy s logem se na čisté stránce po písmenech napíše
@@ -112,24 +112,8 @@
       box-shadow: 0 20px 40px -12px rgba(0,10,80,.6); }
     @media (max-width: 700px) { .vx-close { padding: 68px 0; } }
 
-    /* ── Varianta se snímkem appky ──
-       Text vlevo, telefon vpravo. Snímek má průhledné pozadí, takže splývá
-       s modrou — proto kolem něj není rámeček ani stín navíc. */
-    .vx-close--foto { text-align: left; padding: 84px 0; }
-    .vx-close--foto .vx-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.18fr);
-      align-items: center; gap: clamp(28px, calc(5vw / var(--z, 1)), 64px); }
-    .vx-close--foto .vx-sec-head { max-width: 520px; margin: 0; }
-    .vx-close--foto .vx-sec-head p { margin-left: 0; margin-right: 0; }
-    .vx-close--foto .vxc-foto img { display: block; width: 100%; height: auto; }
-    /* Žádný přesah dolů: .vx-close má overflow:hidden kvůli světlu v pozadí,
-       takže by se telefon neprotáhl ven, ale uřízl v půlce těla. */
-    @media (max-width: 900px) {
-      .vx-close--foto { text-align: center; padding: 68px 0; }
-      .vx-close--foto .vx-wrap { grid-template-columns: 1fr; gap: 34px; }
-      .vx-close--foto .vx-sec-head { margin: 0 auto; }
-      .vx-close--foto .vx-sec-head p { margin-left: auto; margin-right: auto; }
-      .vx-close--foto .vxc-foto { margin-bottom: 0; }
-    }
+    /* ── Závěr úvodky: na střed, bez snímku ──
+       Tlačítko se vystředí samo, protože celá .vx-close je text-align:center. */
   </style>
   <script>
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -467,20 +451,65 @@
   </section>
   </div><!-- /.uvod -->
 
+  <!-- ═══════════ ROZCESTNÍK ═══════════
+       Tři vstupy podle toho, kdo přišel: brigádník, firma, Lidé. Snímky jsou
+       Snímek zatím jen u zaměstnavatelů; u zbylých dvou karet čekáme na
+       materiál. `.rc-media` je připravená i na <video> — stačí vyměnit <img>
+       a nechat poměr stran. -->
+  <section class="rc nav-light" aria-labelledby="rc-nadpis">
+    <div class="rc-wrap">
+      <h2 class="rc-h2 js-reveal-up" id="rc-nadpis">S čím ti Makej pomůže?</h2>
+      <div class="rc-karty">
+
+        <div class="rc-karta rc-karta--prace js-reveal-up">
+          <h3>Hledám si práci</h3>
+          <p>Procházej inzeráty, swajpni nabídku a s firmou se domluv rovnou v chatu.</p>
+          <a class="rc-btn" href="/hledam-si-praci">Přejít na Hledám si práci
+            <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M5 12h13M12 5l7 7-7 7"/></svg>
+          </a>
+          <div class="rc-media">
+            <img src="/rc-prace.webp" width="670" height="540" loading="lazy" decoding="async"
+                 alt="Inzerát na pomoc při natáčení v appce Makej" />
+          </div>
+        </div>
+
+        <div class="rc-karta rc-karta--firmy js-reveal-up">
+          <h3>Pro zaměstnavatele</h3>
+          <p>Přidej inzerát, plánuj směny a spravuj kandidáty v jednom přehledném dashboardu.</p>
+          <a class="rc-btn" href="/pro-zamestnavatele">Přejít na Pro zaměstnavatele
+            <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M5 12h13M12 5l7 7-7 7"/></svg>
+          </a>
+          <div class="rc-media">
+            <img src="/dashboard-notebook.webp" width="1440" height="868" loading="lazy" decoding="async"
+                 alt="Plán směn ve firemním dashboardu Makej na notebooku" />
+          </div>
+        </div>
+
+        <div class="rc-karta rc-karta--lide js-reveal-up">
+          <h3>Lidé</h3>
+          <p>Vytvoř si kartu a nabídni svůj skill. Nebo najdi lidi, kteří umí přesně to, co potřebuješ.</p>
+          <a class="rc-btn" href="/lide">Přejít na Lidé
+            <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M5 12h13M12 5l7 7-7 7"/></svg>
+          </a>
+          <div class="rc-media">
+            <img src="/rc-lide.webp" width="700" height="803" loading="lazy" decoding="async"
+                 alt="Tržiště lidí v appce Makej — nabídky podle oboru a okolí" />
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ═══════════ MODRÝ PRUH S TELEFONEM ═══════════
        Převzato od Yasina. Stejný kus je závěrem /hledam-si-praci; tady stojí
        mezi čekacím listem a patičkou. -->
-  <section class="vx-close vx-close--foto" data-nav-blue>
+  <section class="vx-close vx-close--konec" data-nav-blue>
     <div class="vx-wrap">
       <div class="vx-sec-head">
         <h2 class="vx-h2">Vstup do světa práce</h2>
         <p>Hledáš práci, nebo nabízíš svůj skill? Založ si osobní profil. Sháníš lidi do firmy? Vytvoř si firemní účet. Registrace zabere pár minut a je zdarma.</p>
-        <a href="#" class="vx-btn worker-cta-register">Vytvořit účet zdarma</a>
-      </div>
-      <!-- Snímek má vyříznuté pozadí, takže sedí přímo na modré bez hrany.
-           aria-hidden: obsah displeje je stejně napsaný v textu sekce. -->
-      <div class="vxc-foto" aria-hidden="true">
-        <img src="/hsp-mockup.webp" alt="" width="1240" height="732" fetchpriority="low" decoding="async" />
+        <a href="#" class="vx-btn worker-cta-register">Vytvořit profil zdarma</a>
       </div>
     </div>
   </section>
@@ -686,6 +715,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="/pamet-prihlaseni.js?v=2"></script>
-  <script src="script.js?v=78"></script>
+  <script src="script.js?v=80"></script>
 </body>
 </html>

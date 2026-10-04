@@ -42,78 +42,21 @@
   <link rel="preload" as="image" href="/krok-1.jpg?v=6" />
   <link rel="preload" as="image" href="/krok-2.jpg?v=5" />
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="style.css?v=180" />
+  <link rel="stylesheet" href="style.css?v=192" />
   <style>
     /* Bolt-style střídavé kroky (foto + text) */
     .bolt-journey { position: relative; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
-    .bolt-steps { display: flex; flex-direction: column; gap: 88px; }
     .bolt-cta { display: flex; justify-content: center; margin-top: 60px; position: relative; z-index: 1; }
-    .bolt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
-    .bolt-row:nth-child(even) .bolt-media { order: 2; }
 
-    .bolt-media {
-      aspect-ratio: 4 / 3;
-      border-radius: 24px;
-      overflow: hidden;
-      background: linear-gradient(150deg, #0a1640, #0a0e26);
-      border: 1px solid rgba(208,208,255,.1);
-      display: grid; place-items: center;
-    }
-    .bolt-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .bolt-media-empty {
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
-      color: rgba(208,208,255,.32); font-size: .85rem; font-weight: 500;
-    }
 
-    .bolt-text-label {
-      display: inline-block;
-      font-family: var(--font-heading);
-      font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-      color: var(--secondary);
-      margin-bottom: 16px;
-      padding: 5px 14px; border-radius: 100px;
-      background: rgba(0,32,246,.16); border: 1px solid rgba(208,208,255,.14);
-    }
-    .bolt-text h3 { font-family: var(--font-heading); font-size: clamp(1.7rem, calc(3vw / var(--z, 1)), 2.4rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
-    .bolt-text p { color: var(--muted-fg); font-size: 1.05rem; line-height: 1.7; max-width: 460px; }
 
     @media (max-width: 768px) {
-      .bolt-steps { gap: 48px; }
-      .bolt-row { grid-template-columns: 1fr; gap: 24px; }
-      .bolt-row:nth-child(even) .bolt-media { order: 0; }
     }
 
 
-    /* ── Kroky jako galerie (stejný vzor jako u zaměstnavatelů) ── */
-    #how-it-works .bolt-steps {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: clamp(20px, calc(3vw / var(--z, 1)), 40px); align-items: start;
-      position: relative; z-index: 2;
-    }
-    #how-it-works .bolt-row { display: block; grid-template-columns: none; gap: 0; }
-    #how-it-works .bolt-row:nth-child(2) { margin-top: clamp(26px, calc(5vw / var(--z, 1)), 64px); }
     /* kaskáda, když do obrazu přijde víc karet najednou */
     #how-it-works .bolt-row:nth-child(2) { transition-delay: .1s; }
-    #how-it-works .bolt-row:nth-child(3) { transition-delay: .2s; }
-    #how-it-works .bolt-media {
-      aspect-ratio: auto; border-radius: 18px; background: #f4f5fb;
-      border: 1px solid rgba(10,13,46,.07); box-shadow: 0 34px 64px -32px rgba(10,13,46,.45);
-      display: block;
-    }
-    #how-it-works .bolt-media img { width: 100%; height: auto; }
-    #how-it-works .bolt-text { margin-top: 16px; }
-    #how-it-works .bolt-text h3 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: -.01em; margin: 0; }
-    #how-it-works .bolt-text p { font-size: .92rem; line-height: 1.5; margin: 6px 0 0; max-width: 380px; }
-    .hsp-gal-word {
-      position: absolute; left: 0; right: 0; top: 46%; transform: translateY(-50%); text-align: center;
-      font-family: var(--font-heading); font-weight: 900; text-transform: uppercase;
-      font-size: clamp(4rem, calc(15vw / var(--z, 1)), 13rem); letter-spacing: -.04em; color: rgba(10,13,46,.05);
-      line-height: 1; z-index: 0; pointer-events: none; white-space: nowrap;
-    }
     @media (max-width: 760px) {
-      #how-it-works .bolt-steps { grid-template-columns: 1fr; gap: 34px; }
-      #how-it-works .bolt-row:nth-child(2) { margin-top: 0; }
-      .hsp-gal-word { font-size: clamp(3rem, calc(22vw / var(--z, 1)), 7rem); }
     }
 
 
@@ -140,13 +83,14 @@
     #how-it-works { background: #fff; }
     /* „Makej" v nadpisu celé v brandové modré (jako tečka nad „j"), ne levandulové */
     #how-it-works .bolt-text h3 { color: #0a0d2e; }
-    #how-it-works .bolt-text p { color: rgba(10,13,46,.6); }
-    #how-it-works .bolt-text-label { color: var(--primary); background: rgba(0,32,246,.07); border-color: rgba(0,32,246,.18); }
 
     /* Sekce „Proč si zvolíš Makej" — brandová modrá, na celou výšku obrazovky.
        Obsah zarovnaný nahoru (žádné vertikální centrování), aby po doskočení
        fontu nadpis nepřecentrovával celý blok = žádný skok při scrollu. */
-    #features { background: var(--pl-canvas); box-sizing: border-box;
+    /* Přechod z bílé sekce kroků: místo ostré hrany se podklad rozpíjí přes
+       prvních ~220 px (stejně jako #download.cl-sekce--zbila ve style.css).
+       Poslední zarážka barvu drží dál, takže zbytek sekce je plná plocha. */
+    #features { background: linear-gradient(180deg, #fff 0, var(--pl-canvas) 220px); box-sizing: border-box;
       padding-top: clamp(72px, calc(9vw / var(--z, 1)), 118px); padding-bottom: clamp(40px, calc(5vw / var(--z, 1)), 56px); }
     /* panel jde přes celou šířku, ať se velké slovo v pozadí rozjede k okrajům */
     #features .container { width: 100%; max-width: none; padding: 0; }
@@ -542,38 +486,29 @@
     <!-- ═══════════ HOW IT WORKS ═══════════ -->
     <section id="how-it-works" class="nav-light" style="padding-top:90px;">
       <div class="container">
-        <div class="bolt-journey" id="boltWrap">
-          <div class="hsp-gal-word" aria-hidden="true">BRIGÁDA</div>
-          <div class="bolt-steps">
-          <div class="bolt-row js-reveal-up">
-            <div class="bolt-media">
-              <img src="/krok-1.jpg?v=6" alt="Makač ukazuje nabídku v appce Makej na telefonu" />
+        <div class="cesta" id="boltWrap">
+          <div class="cesta-kroky">
+            <div class="cesta-radek js-reveal-up">
+              <div class="cesta-foto"><img src="/krok-1.jpg?v=6" alt="Makač ukazuje nabídku v appce Makej na telefonu" loading="lazy" decoding="async" /></div>
+              <div class="cesta-popis">
+                <h3>Swajpni nabídky</h3>
+                <p>Prohlížej nabídky jedním palcem. Doprava = chci, doleva = nechci. Rychlé, intuitivní a zábavné.</p>
+              </div>
             </div>
-            <div class="bolt-text">
-              <h3>Swajpni nabídky</h3>
-              <p>Prohlížej nabídky jedním palcem. Doprava = chci, doleva = nechci. Rychlé, intuitivní a zábavné.</p>
+            <div class="cesta-radek js-reveal-up">
+              <div class="cesta-foto"><img src="/krok-2.jpg?v=5" alt="Podání rukou se zástupcem firmy po matchi" loading="lazy" decoding="async" /></div>
+              <div class="cesta-popis">
+                <h3>Matchni se s firmou</h3>
+                <p>Když tě firma přijme, vznikne match. Začněte si chatovat a domluvte se na detailech přímo v appce.</p>
+              </div>
             </div>
-          </div>
-
-          <div class="bolt-row js-reveal-up">
-            <div class="bolt-media">
-              <img src="/krok-2.jpg?v=5" alt="Podání rukou se zástupcem firmy po matchi" />
+            <div class="cesta-radek js-reveal-up">
+              <div class="cesta-foto"><img src="/krok-3.jpg?v=5" alt="Makač s vydělanými penězi po odvedené práci" loading="lazy" decoding="async" /></div>
+              <div class="cesta-popis">
+                <h3>Pracuj a vydělávej</h3>
+                <p>Přijď na směnu, odveď práci a vydělanej jdi domů.</p>
+              </div>
             </div>
-            <div class="bolt-text">
-              <h3>Matchni se s firmou</h3>
-              <p>Když tě firma přijme, vznikne match. Začněte si chatovat a domluvte se na detailech přímo v appce.</p>
-            </div>
-          </div>
-
-          <div class="bolt-row js-reveal-up">
-            <div class="bolt-media">
-              <img src="/krok-3.jpg?v=5" alt="Makač s vydělanými penězi po odvedené práci" />
-            </div>
-            <div class="bolt-text">
-              <h3>Pracuj a vydělávej</h3>
-              <p>Přijď na směnu, odveď práci a vydělanej jdi domů.</p>
-            </div>
-          </div>
           </div>
           <div class="bolt-cta">
             <a href="#" class="btn-primary btn-lg worker-cta-register cta-morph">
@@ -1010,7 +945,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="/pamet-prihlaseni.js?v=2"></script>
-  <script src="script.js?v=78"></script>
+  <script src="script.js?v=80"></script>
   <!-- Lazy-play ukázkového videa: stáhne a přehraje až ve viewportu (šetří data + LCP) -->
   <script>
   (function () {
