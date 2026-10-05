@@ -11,7 +11,7 @@
     gtag('set', 'ads_data_redaction', true);
   </script>
   <link rel="stylesheet" href="/consent.css?v=3" />
-  <script src="/consent.js?v=4" defer></script>
+  <script src="/consent.js?v=5" defer></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>makej. — najdi brigádu</title>
@@ -23,7 +23,7 @@
 
   <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/pamet-prihlaseni.js?v=2"></script>
+  <script src="/pamet-prihlaseni.js?v=4"></script>
   <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
@@ -137,17 +137,20 @@
 
   // ─── Přístupový klíč (pre-launch) ───────────────────────────────────────────
   // Dashboard ještě není hotový → do rozhraní se nikdo nedostane bez klíče.
-  // Klíč se sdílí s marketingovým webem přes sessionStorage 'makej-gate-ok', takže
-  // kdo se přihlásí s klíčem na makej.eu a je přesměrován sem, nemusí ho psát znovu.
+  // Klíč se sdílí s marketingovým webem přes cookie pro celou doménu makej.eu
+  // (mkBrana v /pamet-prihlaseni.js), takže kdo se přihlásí s klíčem na
+  // makej.eu a je přesměrován sem, nemusí ho psát znovu. Dřív to byl
+  // sessionStorage — ten ale patří jednomu původu, a od přesunu appky na
+  // app.makej.eu jsou to dva různé původy, takže by se klíč chtěl dvakrát.
   //   ⇒ ZMĚNIT KLÍČ = uprav ACCESS_KEY.   ⇒ NAOSTRO = dej ACCESS_KEY na '' (pustí všechny).
   const ACCESS_KEY = '8939';
   function accessKeyOk() {
     if (!ACCESS_KEY) return true;
-    try { if (sessionStorage.getItem('makej-gate-ok') === ACCESS_KEY) return true; } catch (e) {}
+    if (window.mkBrana && window.mkBrana.precti() === ACCESS_KEY) return true;
     const el = document.getElementById('login-key');
     return !!el && el.value.trim() === ACCESS_KEY;
   }
-  function markGateOk() { try { sessionStorage.setItem('makej-gate-ok', ACCESS_KEY); } catch (e) {} }
+  function markGateOk() { if (window.mkBrana) window.mkBrana.uloz(ACCESS_KEY); }
   function showErr(msg) { gateError.textContent = msg; gateError.style.display = 'block'; }
   function clearErr() { gateError.style.display = 'none'; }
 

@@ -3,6 +3,15 @@
 // kdežto px zapsané do stylu se zoomem ještě zvětší — proto se dělí tímhle.
 function mkZoom() { return parseFloat(getComputedStyle(document.documentElement).zoom) || 1; }
 
+// Appka a firemní dashboard běží na vlastní doméně (repo makej-app), proto
+// absolutní adresy. Při změně domény se mění jen tahle konstanta.
+//
+// JE TO ZÁROVEŇ VYPÍNAČ: dokud na makej.eu leží záložní kopie `employer/`
+// a `worker/`, stačí dát APPKA = '' a všechny odkazy se vrátí na makej.eu
+// (adresy se skládají jako APPKA + '/employer/', takže z prázdné konstanty
+// vyjde '/employer/'). Hodí se, kdyby se na app.makej.eu něco ukázalo.
+const APPKA = 'https://app.makej.eu';
+
 // ═══════════ NAVBAR SCROLL + SCROLLSPY ═══════════
 const navbar    = document.getElementById('navbar');
 const navActions = document.getElementById('nav-actions') || document.querySelector('.nav-actions');
@@ -480,26 +489,32 @@ function initAuth() {
       const name = user.user_metadata?.name || user.email.split('@')[0];
       const role = user.user_metadata?.role;
       // V liště jen barevný text s ikonkou, bez podkladu; ikonka je ta samá
-      // jako Statistiky v levém menu dashboardu (employer/ikony/analytika.svg). „Odhlásit se" na webu není — odhlašuje se
-      // v dashboardu (Yasin 1. 10.: na webu to bylo divné).
+      // jako Statistiky v levém menu dashboardu — web má svou kopii
+      // v /ikony/analytika.svg, protože dashboard je od rozdělení domén jiný
+      // repozitář. „Odhlásit se" na webu není — odhlašuje se v dashboardu
+      // (Yasin 1. 10.: na webu to bylo divné).
       const dashBtn = role === 'employer'
-        ? `<a href="/employer/" class="nav-do-dash" id="dashboard-btn">
+        ? `<a href="${APPKA}/employer/" class="nav-do-dash" id="dashboard-btn">
              <span class="ik-statistiky" aria-hidden="true"></span>Dashboard
            </a>`
-        : `<a href="/worker/" class="nav-do-dash" id="worker-btn">
+        : `<a href="${APPKA}/worker/" class="nav-do-dash" id="worker-btn">
              <iconify-icon icon="solar:case-round-linear" width="20"></iconify-icon>Moje brigády
            </a>`;
       navActions.innerHTML = dashBtn;
       mobileActions.innerHTML = `
         <span class="nav-user-greeting">Ahoj, ${name}!</span>
         ${role === 'employer'
-          ? `<a href="/employer/" class="btn-primary"><span class="ik-statistiky" aria-hidden="true"></span>Dashboard</a>`
-          : `<a href="/worker/" class="btn-primary"><iconify-icon icon="solar:case-round-linear" width="20"></iconify-icon>Moje brigády</a>`}
+          ? `<a href="${APPKA}/employer/" class="btn-primary"><span class="ik-statistiky" aria-hidden="true"></span>Dashboard</a>`
+          : `<a href="${APPKA}/worker/" class="btn-primary"><iconify-icon icon="solar:case-round-linear" width="20"></iconify-icon>Moje brigády</a>`}
       `;
 
       // Hero CTA: hide auth buttons, show the right dashboard/worker button
       if (heroCTAAuth)     heroCTAAuth.style.display     = 'none';
       if (heroCTALoggedin) heroCTALoggedin.style.display = 'flex';
+      // Adresa se dává z APPKA, ne z HTML — jinak by byla doména napsaná
+      // na dvou místech a vypínač výš by na tyhle dvě tlačítka nedosáhl.
+      if (heroDashBtn)   heroDashBtn.href   = APPKA + '/employer/';
+      if (heroWorkerBtn) heroWorkerBtn.href = APPKA + '/worker/';
       if (heroDashBtn)   heroDashBtn.style.display   = role === 'employer' ? 'inline-flex' : 'none';
       if (heroWorkerBtn) heroWorkerBtn.style.display = role !== 'employer' ? 'inline-flex' : 'none';
     } else {
@@ -612,8 +627,10 @@ function initAuth() {
       showError('login-error', ACCESS_LOCKED_MSG);
       return;
     }
-    // Klíč prošel → poznač do session, ať /worker/ po přesměrování ví, že brána byla ověřena.
-    try { sessionStorage.setItem('makej-gate-ok', ACCESS_KEY); } catch (e) {}
+    // Klíč prošel → poznač si to, ať appka na app.makej.eu po přesměrování ví,
+    // že brána byla ověřena, a nechtěla klíč znovu. Cookie pro celou doménu
+    // (mkBrana v pamet-prihlaseni.js) — sessionStorage patří jednomu původu.
+    if (window.mkBrana) window.mkBrana.uloz(ACCESS_KEY);
 
     const btn = document.getElementById('login-submit');
     const email    = document.getElementById('login-email').value.trim();
@@ -766,8 +783,9 @@ function initAuth() {
       showError('login-error', ACCESS_LOCKED_MSG);
       return;
     }
-    // Klíč prošel → poznač do session i pro Google (redirect na /worker/ ho pak nechce znovu).
-    try { sessionStorage.setItem('makej-gate-ok', ACCESS_KEY); } catch (e) {}
+    // Totéž pro Google: po návratu z přesměrování se jde do appky a ta klíč
+    // nemá odkud vzít, pokud není v cookie pro celou doménu.
+    if (window.mkBrana) window.mkBrana.uloz(ACCESS_KEY);
     const pamatovat = document.getElementById('login-pamatovat');
     if (window.mkNastavPamatovani) window.mkNastavPamatovani(!pamatovat || pamatovat.checked);
     try { sessionStorage.setItem('makej-po-prihlaseni', '1'); } catch (e) {}
@@ -827,8 +845,8 @@ function initAuth() {
           ov.querySelectorAll('.role-card').forEach(b => { b.disabled = false; b.style.opacity = 1; });
           return chyba('Nepovedlo se uložit. Zkus to prosím znovu.');
         }
-        if (role === 'employer') prechodDoDashboardu('/employer/');
-        else window.location.href = '/worker/';
+        if (role === 'employer') prechodDoDashboardu(APPKA + '/employer/');
+        else window.location.href = APPKA + '/worker/';
       });
     });
   }
@@ -849,8 +867,8 @@ function initAuth() {
       // Univerzální předregistrace roli neposílá — chybějící role je tedy signál
       // „ještě si nevybral". Nemusíme se kvůli tomu ptát databáze.
       if (!role) { ukazRozcestnik(session.user); return; }
-      if (role === 'employer') prechodDoDashboardu('/employer/');
-      else window.location.href = '/worker/';
+      if (role === 'employer') prechodDoDashboardu(APPKA + '/employer/');
+      else window.location.href = APPKA + '/worker/';
     }
   });
 
@@ -1700,16 +1718,17 @@ function showToast(msg) {
 
 /* ═══════════ PŘECHOD DO DASHBOARDU (modrá obrazovka) ═══════════
    Po přihlášení firmy se modrá rozlije kruhem od tlačítka, v ní naskočí orb
-   a „Nahráváme vaše údaje" — a teprve pak se přejde na /employer/. Dashboard
-   začíná na úplně stejné modré (employer/index.html, #auth-gate), takže
-   přechod mezi stránkami není vidět. Vzhled obou je v nahravani.css.
+   a „Nahráváme vaše údaje" — a teprve pak se přejde na app.makej.eu/employer/.
+   Dashboard začíná na úplně stejné modré (#auth-gate v jeho index.html, repo
+   makej-app), takže přechod mezi stránkami není vidět. Vzhled obou je
+   v nahravani.css — ten je proto v obou repozitářích stejný, viz jeho hlavička.
 
    Styl se přidá hned při načtení stránky, ne až při přihlášení — jinak by
    se modrá první vteřinu vykreslila bez stylů. */
 (function () {
   if (!document.querySelector('link[href^="/nahravani.css"]')) {
     const l = document.createElement('link');
-    l.rel = 'stylesheet'; l.href = '/nahravani.css?v=7';
+    l.rel = 'stylesheet'; l.href = '/nahravani.css?v=8';
     document.head.appendChild(l);
   }
 })();
@@ -1717,7 +1736,10 @@ function showToast(msg) {
 function prechodDoDashboardu(cil) {
   if (document.querySelector('.nahr-plocha')) return;         // už běží
   // Okamžik kliknutí — dashboard podle něj drží modrou nejméně 5 s od něj.
-  try { sessionStorage.setItem('makej-nahr-od', String(Date.now())); } catch (e) {}
+  // Jde v adrese, ne v sessionStorage: ta patří jednomu původu, takže od
+  // přesunu dashboardu na app.makej.eu by si ji tam nepřečetl a modrá by
+  // se počítala až od otevření dashboardu — tedy o celý tenhle přechod dýl.
+  cil += (cil.indexOf('?') < 0 ? '?' : '&') + 'od=' + Date.now();
   // Kruh se rozlije od tlačítka, kterým se člověk přihlásil. Po přihlášení
   // přes Google (návrat přesměrováním) žádné tlačítko není — pak od středu.
   const tlacitko = window.__prechodOd;
@@ -1746,10 +1768,10 @@ function prechodDoDashboardu(cil) {
 
 // Přihlášená firma klikne v menu na „Dashboard" → stejný přechod.
 document.addEventListener('click', e => {
-  const a = e.target.closest && e.target.closest('a[href="/employer/"]');
+  const a = e.target.closest && e.target.closest('a[href="' + APPKA + '/employer/"]');
   if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
   e.preventDefault();
-  prechodDoDashboardu('/employer/');
+  prechodDoDashboardu(APPKA + '/employer/');
 });
 
 /* ═══════════ AURORA SE HÝBE, JEN KDYŽ JE VIDĚT ═══════════

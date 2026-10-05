@@ -268,11 +268,13 @@ img { max-width: 100%; display: block; }
 }
 /* Přihlášený: v liště jen modrý text s ikonkou, bez podkladu. Nad modrou
    zbělá. Ikonka je TA SAMÁ jako Statistiky v levém menu dashboardu
-   (Iconly Light-Outline / Chart) — maska, aby převzala barvu textu. */
+   (Iconly Light-Outline / Chart) — maska, aby převzala barvu textu.
+   Vlastní kopie v /ikony/: dashboard je od rozdělení domén jiný repozitář,
+   tahat si obrázek přes app.makej.eu by znamenalo přesměrování na každý. */
 .ik-statistiky {
   display: inline-block; width: 20px; height: 20px; flex-shrink: 0; background: currentColor;
-  -webkit-mask: url(/employer/ikony/analytika.svg?v=1) center / contain no-repeat;
-          mask: url(/employer/ikony/analytika.svg?v=1) center / contain no-repeat;
+  -webkit-mask: url(/ikony/analytika.svg?v=1) center / contain no-repeat;
+          mask: url(/ikony/analytika.svg?v=1) center / contain no-repeat;
 }
 .nav-do-dash {
   display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 4px;
@@ -2105,8 +2107,8 @@ html { scroll-padding-top: 92px; }
   width: 34px; height: 34px; display: block;
   background-repeat: no-repeat; background-position: center; background-size: contain;
 }
-.role-ic--user { background-image: url('employer/user-blue.png'); }
-.role-ic--company { background-image: url('employer/company-blue.png'); }
+.role-ic--user { background-image: url('/ikony/user-blue.png'); }
+.role-ic--company { background-image: url('/ikony/company-blue.png'); }
 
 /* Odkaz „Zapomněl jsem heslo?" v přihlašovacím modálu */
 .modal .login-forgot-row { display: flex; justify-content: flex-end; margin: -6px 0 14px; }
@@ -2130,11 +2132,11 @@ html { scroll-padding-top: 92px; }
 /* Chevron „Zpět" v přihlašovacím modálu — šedý, na hover zmodrá spolu s textem */
 .modal .modal-back .back-ic {
   width: 13px; height: 13px; flex-shrink: 0;
-  background: url('employer/chevron-gray.png') center/contain no-repeat;
+  background: url('/ikony/chevron-gray.png') center/contain no-repeat;
   transition: transform .2s ease;
 }
 .modal .modal-back:hover .back-ic {
-  background-image: url('employer/chevron-blue.png');
+  background-image: url('/ikony/chevron-blue.png');
   transform: translateX(-2px);
 }
 

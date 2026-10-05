@@ -1,6 +1,10 @@
 /* ══════════════════════════════════════════════════════════════════════════
    CENÍK — sdílený vzhled dashboardu i webu
    ══════════════════════════════════════════════════════════════════════════
+   POZOR: tenhle soubor je ve dvou repozitářích — `makej-web` (web) a
+   `makej-app` (dashboard). Je to vědomá kopie, ne nedopatření: od rozdělení
+   domén nemá jak být sdílený. Když měníš jeden, projdi i druhý.
+
    Načítá ho `employer/index.html` (záložka Tarify) i `pro-zamestnavatele.html`
    (sekce #pricing). Dřív žil dvakrát: jednou jako řetězec `_CENIK2_CSS`
    v employer-pages3.jsx, podruhé opsaný do stylů webu — a při každé Yasinově

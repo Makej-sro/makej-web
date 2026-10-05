@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Makej — dashboard pro zaměstnavatele</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
-  <link rel="stylesheet" href="/nahravani.css?v=7" />
+  <link rel="stylesheet" href="/nahravani.css?v=8" />
   <!-- Vzhled ceníku (.e-c2*) — stejný soubor načítá i web, ať se obě
        místa nerozcházejí. Dřív byl opsaný v employer-pages3.jsx. -->
   <link rel="stylesheet" href="/cenik.css?v=11" />
@@ -769,15 +769,29 @@
   <!-- Orb (thinking-orbs, MIT) bez Reactu — viz /vendor/thinking-orbs/orb.js.
        Když se nenačte, zůstanou aspoň tečky za textem. -->
   <script>
-    // Okamžik kliknutí na „Přihlásit se" (web ho uložil) — modrá od něj drží
-    // nejméně 5 s. Kdo sem přijde přímo, tomu se počítá od otevření stránky.
+    // Okamžik kliknutí na „Přihlásit se" — modrá od něj drží nejméně 5 s.
+    // Web ho posílá v adrese jako ?od=… (sessionStorage nejde: patří jednomu
+    // původu a web běží na makej.eu, tohle na app.makej.eu). Kdo sem přijde
+    // přímo — záložka, obnovení — tomu se počítá od otevření stránky.
     window.__nahrOd = (function () {
       try {
-        const u = Number(sessionStorage.getItem('makej-nahr-od'));
+        const u = Number(new URLSearchParams(location.search).get('od'));
+        // Starší než 20 s = záložka s odkazem z minula, ne čerstvé kliknutí.
         if (u && Date.now() - u < 20000) return u;
       } catch (e) {}
       return Date.now();
     })();
+    // Adresu uklidit, ať se ?od=… nedostane do záložek ani do historie.
+    // Maže se JEN „od" — ne celý dotaz: Supabase si při vytvoření klienta
+    // (níž) čte z adresy přihlašovací návratové parametry, a ty by tím zmizely.
+    try {
+      const q = new URLSearchParams(location.search);
+      if (q.has('od')) {
+        q.delete('od');
+        const zbytek = q.toString();
+        history.replaceState(null, '', location.pathname + (zbytek ? '?' + zbytek : '') + location.hash);
+      }
+    } catch (e) {}
   </script>
   <!-- blocking="render": stránka se ukáže až s nakresleným orbem (první
        snímek se kreslí hned při spuštění), takže orb naskočí spolu s textem
@@ -795,7 +809,7 @@
        Modrá obrazovka výš se teď vykreslí dřív, než se na ně začne čekat. -->
   <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/pamet-prihlaseni.js?v=2"></script>
+  <script src="/pamet-prihlaseni.js?v=4"></script>
 
   <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>

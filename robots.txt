@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
+# Záložní kopie dashboardu a appky na makej.eu (dokud se app.makej.eu
+# neověří). Nemá se indexovat — ostrá verze je na app.makej.eu a ta si
+# indexování zakazuje svým robots.txt. Až se složky smažou, tyhle dva
+# řádky pryč, ať roboti vidí 301 a přenesou si na novou doménu odkazy.
 Disallow: /employer/
 Disallow: /worker/
 

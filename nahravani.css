@@ -10,7 +10,13 @@
      nejdřív 5 s od kliknutí.
 
    Proto je vzhled v jednom souboru: kdyby se obě obrazovky lišily byť
-   o pixel, při přechodu by to cuklo. */
+   o pixel, při přechodu by to cuklo.
+
+   POZOR: tenhle soubor je ve dvou repozitářích — `makej-web` (web) a
+   `makej-app` (dashboard). Je to vědomá kopie, ne nedopatření: od rozdělení
+   domén nemá jak být sdílený, a právě tady na shodnosti záleží nejvíc —
+   každá z těch dvou obrazovek se kreslí z jiné domény. Když měníš jeden,
+   projdi i druhý. */
 
 /* League Spartan z vlastního serveru (stejný soubor jako web ve style.css).
    Dashboard načítá Google Fonts až bokem, aby neblokovaly vykreslení — text
