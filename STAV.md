@@ -33,6 +33,21 @@ Po změně JSX **vždy bumpni `?v=N`** u daného souboru v `employer/index.html`
 
 ## Hotovo naposledy
 
+- **Dashboard a webová appka přesunuty na `app.makej.eu`** (2026-10-05):
+
+  Vlastní repo **`makej-app`** (`~/Makej-projekt/makej-app`, github.com/Makej-sro/makej-app), vlastní Netlify projekt. Odkazy jdou přes konstantu **`APPKA`** ve `script.js` — jediné místo, kde je doména napsaná.
+
+  **PŘESTĚHOVÁNO NADVAKRÁT, teď jsme po první fázi.** Ve `makej-web` zůstává **záložní kopie `employer/` a `worker/`** (bajt na bajt stejná jako v makej-app), takže `makej.eu/employer/` pořád funguje, dokud se app.makej.eu neověří. Drží to pravidlo v `_redirects` **záměrně bez `!`** — Netlify bez vykřičníku přesměrovává jen tam, kde soubor není, takže záloha vyhraje a 301 se zapne samo, až se složky smažou. Kdyby se na app.makej.eu něco ukázalo, stačí dát `APPKA = ''` a odkazy se vrátí na makej.eu.
+
+  **DRUHÁ FÁZE** (až se to ověří): smazat ve `makej-web` `employer/`, `worker/`, `vendor/thinking-orbs/` a vyhodit dva `Disallow` z `robots.txt` (ať roboti uvidí 301 a přenesou odkazy). V `_redirects` se nemění nic. **Pozor:** dokud záloha žije, je zmrazená — opravy patří do `makej-app`, jinak se obě kopie rozejdou.
+
+  **Rozdělení domén utrhlo tři věci, které se tiše opíraly o společný původ** — `sessionStorage` i `localStorage` patří jednomu původu: (1) přihlášení → cookie pro `.makej.eu`, dělená po kusech kvůli limitu 4 kB; (2) přístupový klíč před spuštěním → nově cookie `mkBrana`, jinak by ho appka chtěla podruhé; (3) čas kliknutí na „Přihlásit se", podle kterého modrá drží 5 s → nově v adrese jako `?od=…`. **Když budeš přidávat další předávání mezi webem a appkou, tohle si ověř — tiše to nespadne, jen to přestane fungovat.**
+
+  Web si navíc bral pět obrázků z `employer/` (→ vlastní `ikony/`, ať nevisí na složce, která se bude mazat) a `nahravani.css` chybělo úplně (404 → modrá bez stylů). `cenik.css`, `nahravani.css`, `consent.*`, `pamet-prihlaseni.js` a `vendor/metal-fx/` jsou teď **vědomé kopie v obou repech** — měníš jeden, projdi druhý.
+
+  **Čeká na push.** `consent.js` dosedl na skutečnost: `makej-auth` je cookie, přidaný `makej-pamatovat`, `makej-gate-ok` → `makej-brana`.
+
+
 - **Jezdící pruhy důvodů, tým na /o-nas, písmo právních stránek** (2026-09-21):
 
   **Pruhy „Proč" jedou samy a jdou chytit.** Posouvá se `scrollLeft` z `script.js`, ne CSS transformem — **transform by ruční posun přebíjel a prohlížeč by v pruhu neměl co scrollovat**. Položky zdvojuje JS (ne HTML, aby se kopie nerozešla s originálem), smyčka se uzavírá odečtením poloviny šířky stopy. 60 px/s, po dotyku vteřina klidu, na mobilu se nic nehýbe (stojí pod sebou).
