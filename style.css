@@ -451,7 +451,12 @@ img { max-width: 100%; display: block; }
      pohromadě `.hero-konec` (nowrap), takže se nemá kde zalomit jinde.
 
      5,2 dává rezervu kolem 8 %, tedy přes 30 px. Písmo je o ~7 % menší. */
-  .hero-h1 { font-size: clamp(40px, min(calc(16vw / var(--z, 1)), calc((100vw / var(--z, 1) - 96px) / 5.2)), 96px); letter-spacing: -.04em; }
+  .hero-h1 { font-size: clamp(40px, min(calc(16vw / var(--z, 1)), calc((100vw / var(--z, 1) - 96px) / 5.2)), 96px); letter-spacing: -.04em;
+    /* Bez balance. Vyvažování umí vzít „Práce na jeden swajp." a rozdělit ho
+       na tři krátké řádky, i když se vejde na dva — a protože „jeden swajp."
+       je teď jeden nedělitelný celek, vycházelo mu to tak tím spíš. Prosté
+       zalamování dá vždycky „Práce na" + „jeden swajp.". */
+    text-wrap: initial; }
   /* Tlačítka pod sebou přes šířku palce, ale těsněji a o něco nižší —
      dvě široké pilulky s velkou mezerou působily jako formulářová pole. */
   .hero-cta {
