@@ -4,12 +4,14 @@
 function mkZoom() { return parseFloat(getComputedStyle(document.documentElement).zoom) || 1; }
 
 // Appka a firemní dashboard běží na vlastní doméně (repo makej-app), proto
-// absolutní adresy. Při změně domény se mění jen tahle konstanta.
+// absolutní adresy. Při změně domény se mění jen tahle konstanta — všude se
+// skládá jako APPKA + '/employer/'.
 //
-// JE TO ZÁROVEŇ VYPÍNAČ: dokud na makej.eu leží záložní kopie `employer/`
-// a `worker/`, stačí dát APPKA = '' a všechny odkazy se vrátí na makej.eu
-// (adresy se skládají jako APPKA + '/employer/', takže z prázdné konstanty
-// vyjde '/employer/'). Hodí se, kdyby se na app.makej.eu něco ukázalo.
+// POZOR: prázdná APPKA už appku nevzkřísí. Býval to vypínač zpátky na
+// makej.eu, ale fungoval jen proto, že tu po dobu stěhování ležela záložní
+// kopie `employer/` a `worker/`. Ta je od ověření app.makej.eu smazaná,
+// takže z prázdné konstanty by vyšlo '/employer/', což je dnes jen 301 zpátky
+// na appku. Kdyby bylo potřeba se vrátit, musí se vrátit i ty složky.
 const APPKA = 'https://app.makej.eu';
 
 // ═══════════ NAVBAR SCROLL + SCROLLSPY ═══════════

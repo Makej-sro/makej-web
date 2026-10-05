@@ -3,15 +3,12 @@
 /cenik    /pro-zamestnavatele#pricing    301
 
 # Appka a dashboard se přestěhovaly na vlastní doménu (repo makej-app).
+# Stěhovalo se nadvakrát: nejdřív tu zůstala záložní kopie `employer/`
+# a `worker/`, a protože jsou tahle pravidla bez „!", Netlify je obsluhoval
+# ze souborů a nepřesměrovával. Po ověření app.makej.eu se složky smazaly
+# a tím se přesměrování zaplo samo — tady se nemuselo sáhnout na nic.
 #
-# ZÁMĚRNĚ BEZ „!" — a na tom tady všechno závisí. Netlify bez vykřičníku
-# přesměrovává jen tehdy, když na adrese žádný soubor není. Dokud tu leží
-# záložní kopie `employer/` a `worker/`, obslouží je ona a tohle pravidlo
-# se vůbec nepoužije. Jakmile se složky smažou, přesměrování se zapne samo.
-# S „!" by se vynutilo hned a záloha by byla nedosažitelná.
-#
-# DRUHÁ FÁZE (až se app.makej.eu ověří): smazat `employer/`, `worker/`
-# a `vendor/thinking-orbs/`, vrátit `Disallow` do robots.txt → hotovo,
-# tady se nemění nic.
+# Vykřičník tu pořád není schválně: 301 má platit jen tam, kde soubor není,
+# ať se nedá omylem přebít něco, co na makej.eu opravdu leží.
 /employer/*   https://app.makej.eu/employer/:splat   301
 /worker/*     https://app.makej.eu/worker/:splat     301

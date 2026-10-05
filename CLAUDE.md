@@ -16,7 +16,7 @@
 | Firemní dashboard + webová appka (React přes Babel Standalone) | `~/Makej-projekt/makej-app` | **app.makej.eu** | github.com/Makej-sro/makej-app |
 | Brigádnická appka (Capacitor obal, iOS/Android) | `~/Makej-projekt/makej-aplikace` | — | — (untracked) |
 
-> **Pozor na strukturu:** od 2026-10 jsou **dashboard a webová appka ve vlastním repu `makej-app`** na doméně `app.makej.eu`. Ve `makej-web` zatím leží jejich **zmrazená záložní kopie** (`employer/`, `worker/`), dokud se app.makej.eu neověří — **opravy patří do `makej-app`**, jinak se obě rozejdou; postup druhé fáze je v `STAV.md`. Marketingový web na ně odkazuje přes konstantu `APPKA` ve `script.js` (jediné místo, kde je doména napsaná). Staré adresy `/employer/*` a `/worker/*` míří 301 na novou doménu. `makej-web`, `makej-app` a `makej-aplikace` jsou sourozenci ve složce `Makej-projekt/`; mobilní `makej` je samostatně v `cursor/makej`.
+> **Pozor na strukturu:** od 2026-10 jsou **dashboard a webová appka ve vlastním repu `makej-app`** na doméně `app.makej.eu` — ve `makej-web` už složky `employer/` ani `worker/` nejsou. Marketingový web na ně odkazuje přes konstantu `APPKA` ve `script.js` (jediné místo, kde je doména napsaná), přihlašuje se na `app.makej.eu`. Staré adresy `/employer/*` a `/worker/*` míří 301 na novou doménu. Marketingový web na ně odkazuje přes konstantu `APPKA` ve `script.js` (jediné místo, kde je doména napsaná). Staré adresy `/employer/*` a `/worker/*` míří 301 na novou doménu. `makej-web`, `makej-app` a `makej-aplikace` jsou sourozenci ve složce `Makej-projekt/`; mobilní `makej` je samostatně v `cursor/makej`.
 
 Všechny appky sdílí jednu Supabase a session → změny se přes realtime propisují mezi mobilem a web dashboardem.
 

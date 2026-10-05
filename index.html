@@ -321,6 +321,10 @@
         <a href="#brzy" class="hero-btn hero-btn-soft">Stáhnout si apku</a>
         <a href="javascript:void(0)" class="hero-btn hero-btn-primary" id="hero-register-btn">Vytvořit profil</a>
       </div>
+      <!-- Místní cesty jsou schválně: adresu sem stejně doplní `script.js`
+           z konstanty APPKA (ať doména není napsaná na dvou místech) a kdyby
+           se k tomu nedostal, `/employer/` projde přes 301 na app.makej.eu.
+           Tlačítka se navíc ukazují jen přihlášeným, tedy až z JS. -->
       <div class="hero-cta" id="hero-cta-loggedin" style="display:none;">
         <a href="/employer/" class="hero-btn hero-btn-primary" id="hero-dashboard-btn" style="display:none;">
           <span class="ik-statistiky" aria-hidden="true"></span>
@@ -716,6 +720,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="/pamet-prihlaseni.js?v=4"></script>
-  <script src="script.js?v=84"></script>
+  <script src="script.js?v=85"></script>
 </body>
 </html>
