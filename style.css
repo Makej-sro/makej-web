@@ -438,12 +438,20 @@ img { max-width: 100%; display: block; }
   .hero-main { padding-left: 22px; padding-right: 22px; }
   /* Na telefonu je calc(8.4vw / var(--z, 1)) drobné (440 px → 37 px, tedy spodní mez klampu),
      nadpis proto měříme vlastním poměrem — ať drží stejný dojem jako na desktopu. */
-  /* Druhý řádek „jeden swajp." zabírá asi 4,7 em a nadpis má o 92 px užší
-     místo než okno. Na úzkých telefonech (pod ~420 px) by se při 16vw
-     nejdelší slovo nevešlo: nadpis při každé výměně slova skočil na tři
-     řádky a tlačítka pod ním poskočila o 30 px. Druhá mez písmo zmenší
-     právě tolik, aby se řádek vešel vždycky. */
-  .hero-h1 { font-size: clamp(40px, min(calc(16vw / var(--z, 1)), calc((100vw / var(--z, 1) - 96px) / 4.85)), 96px); letter-spacing: -.04em; }
+  /* Druhý řádek „jeden swajp." zabírá 4,7 em a nadpis má o 92 px užší místo
+     než okno. Bez druhé meze by se na úzkých telefonech nejdelší slovo
+     nevešlo a nadpis by při výměně skákal na tři řádky.
+
+     Dělitel byl 4,85, což řádek posadilo přesně na doraz — naměřená rezerva
+     byla jen 12–16 px (4–5 % řádku) na všech šířkách od 320 do 430 px. To
+     stačí na papíře, ale ne na skutečném telefonu: jiné vykreslení písma,
+     `text-size-adjust` v Safari nebo o pár pixelů užší okno ten zbytek
+     spolknou a řádek se zlomí mezi „jeden" a slovem — to je ten skok na tři
+     řádky a zpátky. Zlom padne právě sem, protože slovo s tečkou drží
+     pohromadě `.hero-konec` (nowrap), takže se nemá kde zalomit jinde.
+
+     5,2 dává rezervu kolem 8 %, tedy přes 30 px. Písmo je o ~7 % menší. */
+  .hero-h1 { font-size: clamp(40px, min(calc(16vw / var(--z, 1)), calc((100vw / var(--z, 1) - 96px) / 5.2)), 96px); letter-spacing: -.04em; }
   /* Tlačítka pod sebou přes šířku palce, ale těsněji a o něco nižší —
      dvě široké pilulky s velkou mezerou působily jako formulářová pole. */
   .hero-cta {
