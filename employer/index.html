@@ -912,7 +912,10 @@
       } else {
         gateMsg.textContent = 'Přesměrování na přihlášení…';
       }
-      window.location.replace('/?login=employer');
+      // Kořen app.makej.eu je přihlašovací stránka. Dřív tu bylo
+      // `?login=employer`, protože se mířilo na makej.eu, kde ten parametr
+      // otevíral modál — tady nemá co dělat.
+      window.location.replace('/');
     });
   </script>
 

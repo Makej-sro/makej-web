@@ -542,7 +542,7 @@ function initAuth() {
         const el = document.getElementById(id);
         if (el) el.addEventListener('click', e => {
           e.preventDefault();
-          type === 'register' ? goToEmailSignup() : openModal(type);
+          type === 'register' ? goToEmailSignup() : naPrihlaseni();
         });
       });
 
@@ -550,6 +550,21 @@ function initAuth() {
       if (heroCTAAuth)     heroCTAAuth.style.display     = 'flex';
       if (heroCTALoggedin) heroCTALoggedin.style.display = 'none';
     }
+  }
+
+  // Přihlašování se přestěhovalo na app.makej.eu — je tam vlastní stránka ve
+  // stejném vzhledu jako tenhle modál. Na webu se tedy nepřihlašuje, jen se
+  // tam odkazuje; modál v HTML zůstává kvůli vypínači níž.
+  //
+  // Když je APPKA prázdná (vypínač v hlavičce souboru, viz tam), appka na
+  // vlastní doméně se neuplatní a přihlášení se otevře postaru v modálu —
+  // jinak by vypínač nechal „Přihlásit se" ukazovat na nedostupnou adresu.
+  //
+  // „Vytvořit účet" tím NENÍ dotčené: účty se zatím nezakládají, takže míří
+  // dál na sběr e-mailů (goToEmailSignup níž).
+  function naPrihlaseni() {
+    if (!APPKA) { openModal('login'); return; }
+    window.location.href = APPKA + '/';
   }
 
   // Appka ještě neběží, takže „Vytvořit účet" ani „Vybrat tarif" nevedou na
@@ -579,7 +594,7 @@ function initAuth() {
   const heroRegisterBtn = document.getElementById('hero-register-btn');
   const heroLoginBtn    = document.getElementById('hero-login-btn');
   if (heroRegisterBtn) heroRegisterBtn.addEventListener('click', e => { e.preventDefault(); goToEmailSignup(); });
-  if (heroLoginBtn)    heroLoginBtn.addEventListener('click',    e => { e.preventDefault(); openModal('login'); });
+  if (heroLoginBtn)    heroLoginBtn.addEventListener('click',    e => { e.preventDefault(); naPrihlaseni(); });
 
   // Okno se dá otevřít rovnou z adresy:
   //   ?login=…       — dashboard firem tak posílá nepřihlášeného zpátky sem,
@@ -601,7 +616,7 @@ function initAuth() {
         const role = parametry.get('registrace');
         openModal('register', role === 'employer' || role === 'worker' ? role : undefined);
       } else {
-        openModal('login');
+        naPrihlaseni();
       }
       parametry.delete('login');
       parametry.delete('registrace');
@@ -620,7 +635,7 @@ function initAuth() {
   document.getElementById('login-close').addEventListener('click', closeModals);
   document.getElementById('register-close').addEventListener('click', closeModals);
   document.getElementById('switch-to-register').addEventListener('click', e => { e.preventDefault(); goToEmailSignup(); });
-  document.getElementById('switch-to-login').addEventListener('click', e => { e.preventDefault(); openModal('login'); });
+  document.getElementById('switch-to-login').addEventListener('click', e => { e.preventDefault(); naPrihlaseni(); });
   const regBackBtn = document.getElementById('reg-back');
   if (regBackBtn) regBackBtn.addEventListener('click', () => {
     showRegStep(1);
