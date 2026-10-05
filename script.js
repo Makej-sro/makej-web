@@ -581,15 +581,30 @@ function initAuth() {
   if (heroRegisterBtn) heroRegisterBtn.addEventListener('click', e => { e.preventDefault(); goToEmailSignup(); });
   if (heroLoginBtn)    heroLoginBtn.addEventListener('click',    e => { e.preventDefault(); openModal('login'); });
 
-  // Dashboard firem posílá nepřihlášeného sem s ?login=employer. Dřív tu
-  // parametr nikdo nečetl — člověk skončil na úvodce a musel si přihlášení
-  // hledat sám. Teď se okno otevře rovnou a parametr zmizí z adresy, ať se
-  // okno neotevírá znovu při každém obnovení stránky.
+  // Okno se dá otevřít rovnou z adresy:
+  //   ?login=…       — dashboard firem tak posílá nepřihlášeného zpátky sem,
+  //   ?registrace=…  — pro „Zaregistruj se" z app.makej.eu PO SPUŠTĚNÍ.
+  // Bez toho člověk skončí na úvodce a okno si musí najít sám. U registrace
+  // se dá přidat role (`?registrace=employer`), pak se přeskočí rozcestník.
+  // Parametr se z adresy maže, ať se okno neotevírá při každém obnovení.
+  //
+  // POZOR: `?registrace` zatím nikdo nevolá — dokud se účty nezakládají volně,
+  // míří „Zaregistruj se" na `#predregistrace`, tedy na sběr e-mailů. Je to
+  // schválně připravené dopředu, ne zapomenutý kód; po spuštění se jen přehodí
+  // odkaz v `index.html` repa makej-app.
   try {
     const parametry = new URLSearchParams(location.search);
-    if (parametry.has('login')) {
-      openModal('login');
+    const chceLogin = parametry.has('login');
+    const chceReg   = parametry.has('registrace');
+    if (chceLogin || chceReg) {
+      if (chceReg) {
+        const role = parametry.get('registrace');
+        openModal('register', role === 'employer' || role === 'worker' ? role : undefined);
+      } else {
+        openModal('login');
+      }
       parametry.delete('login');
+      parametry.delete('registrace');
       const zbytek = parametry.toString();
       history.replaceState(null, '', location.pathname + (zbytek ? '?' + zbytek : '') + location.hash);
     }
