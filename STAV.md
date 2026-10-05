@@ -1,6 +1,7 @@
 # STAV — aktuální kontext projektu
 
 > Tenhle soubor je „kde právě jsme". `CLAUDE.md` = neměnný popis projektu (architektura, DB, konvence).
+> `PRED-SPUSTENIM.md` = co se musí přepnout při ostrém startu (ne co je rozdělané — to patří sem).
 > `STAV.md` = co se řešilo naposledy, na co si dát pozor, co je rozdělané.
 > **Po dokončení každé větší práce sem AI zapíše 2–3 řádky.** Drž to stručné.
 

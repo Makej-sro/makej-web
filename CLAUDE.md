@@ -1,6 +1,8 @@
 # Makej! — CLAUDE.md
 
 > **Nejdřív si přečti [`STAV.md`](STAV.md)** (aktuální stav — co se řešilo naposledy, co je rozdělané).
+> Co se musí přepnout při ostrém startu (přístupový klíč, demo data, klíče Supabase) je
+> v [`PRED-SPUSTENIM.md`](PRED-SPUSTENIM.md) — **když něco nastavuješ „jen na teď", zapiš to tam.**
 > Detaily (struktura souborů, DB triggery/RLS, flows, realtime, „kde co hledat") jsou v
 > [`REFERENCE.md`](REFERENCE.md) — **čti ho jen když potřebuješ konkrétní podrobnost.** Tenhle soubor drž stručný.
 
