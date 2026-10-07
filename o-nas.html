@@ -182,9 +182,6 @@
     /* poslední řádek mřížky (dvě položky) je bez linky — sekci ukončuje až odkaz pod ní */
     /* textový odkaz s podtržítkem místo pilulky — drží editorial ráz sekce */
     .oc-cta { margin-top: clamp(44px, calc(5vw / var(--z, 1)), 72px); }
-    /* Když pod sebou nemá žádný výčet, odstup shora by byl zbytečný —
-       sekce si ho drží sama. */
-    .oc-cta--samo { margin-top: 0; }
     .oc-cta a { display: inline-flex; align-items: center; gap: 14px; font-family: var(--font-heading);
       font-weight: 800; font-size: clamp(17px, calc(1.8vw / var(--z, 1)), 22px); letter-spacing: -.02em; color: var(--blue);
       padding-bottom: 10px; border-bottom: 2px solid var(--blue);
@@ -361,6 +358,16 @@
             <p>A stejně skončí u hromady nerelevantních životopisů, které musí někdo pročíst.</p>
           </li>
         </ol>
+        <!-- Dřív tu za „Čemu věříme“ býval výčet „Co chystáme“. Zrušen — plány
+             se měnily rychleji, než se stránka stíhala přepisovat, a totéž je
+             živě na blogu. Zůstal jen odkaz a sedí rovnou sem, pod důvody
+             vzniku: kdo dočte, proč Makej vzniklo, se nejspíš ptá, jak to jde
+             teď. Míří na sekci Novinky, ne na začátek blogu. -->
+        <div class="oc-cta">
+          <a href="/blog#novinky">Podívej se na naše novinky
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
       </div>
     </section>
 
@@ -373,20 +380,6 @@
         </div>
         <div class="oc-shot">
           <img src="/ikona-makej.svg" alt="Ikona aplikace Makej" loading="lazy" />
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══════════ ODKAZ NA NOVINKY ═══════════ -->
-    <!-- Dřív tu býval výčet „Co chystáme". Zrušen — plány se měnily rychleji,
-         než se stránka stíhala přepisovat, a totéž je živě na blogu. Zůstal
-         jen odkaz, a míří rovnou na sekci Novinky, ne na začátek blogu. -->
-    <section class="oc-sec">
-      <div class="oc-in">
-        <div class="oc-cta oc-cta--samo">
-          <a href="/blog#novinky">Podívej se na naše novinky
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
-          </a>
         </div>
       </div>
     </section>
