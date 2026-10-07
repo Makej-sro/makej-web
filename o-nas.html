@@ -81,6 +81,15 @@
       display: flex; align-items: center; position: relative;
       /* dole visí přes okraj nápis „Makej“ — spodní odsazení mu drží místo */
       padding-bottom: clamp(64px, calc(12vw / var(--z, 1)), 190px); }
+    /* Aurora má `inset: 0` a sama o sobě žádné prolnutí, takže na bílém podkladu
+       končila tvrdou vodorovnou hranou přes celou šířku — přesně vidět, kde hero
+       končí, a obří „Makej“ pod ním vypadal rozpůlený. Úvodka to řeší maskou
+       (`#hero .aurora` ve style.css), jenže ta míří na jiné id, takže sem
+       nedosáhne. Stejné prolnutí, ať hero do bílé přejde měkce. */
+    .oc-hero .aurora {
+      -webkit-mask-image: linear-gradient(180deg, #000 76%, transparent 100%);
+              mask-image: linear-gradient(180deg, #000 76%, transparent 100%);
+    }
     .oc-hero-txt { width: min(1280px, calc(92vw / var(--z, 1))); margin: 0 auto; position: relative; z-index: 1;
       padding: clamp(104px, calc(12vh / var(--z, 1)), 150px) 0 clamp(48px, calc(6vw / var(--z, 1)), 84px); }
 
