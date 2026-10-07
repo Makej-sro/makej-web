@@ -170,16 +170,12 @@
     .oc-shot img { width: min(100%, 500px); height: auto; display: block; }
 
     /* ── na čem pracujeme — dva sloupce položek oddělených linkami ── */
-    .oc-list2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(32px, calc(5vw / var(--z, 1)), 72px); }
-    .oc-list2 > div { padding: clamp(28px, calc(3vw / var(--z, 1)), 40px) 0; border-bottom: 1px solid var(--line); }
     /* poslední řádek mřížky (dvě položky) je bez linky — sekci ukončuje až odkaz pod ní */
-    .oc-list2 > div:nth-last-child(-n+2) { border-bottom: 0; }
-    .oc-list2 h3 { margin: 0 0 10px; font-weight: 800; font-size: clamp(21px, calc(2.4vw / var(--z, 1)), 30px);
-      line-height: 1.1; letter-spacing: -.03em; text-wrap: balance; }
-    .oc-list2 p { margin: 0; max-width: 420px; font-size: clamp(15px, calc(1.3vw / var(--z, 1)), 17px);
-      line-height: 1.6; color: var(--mut); text-wrap: pretty; }
     /* textový odkaz s podtržítkem místo pilulky — drží editorial ráz sekce */
     .oc-cta { margin-top: clamp(44px, calc(5vw / var(--z, 1)), 72px); }
+    /* Když pod sebou nemá žádný výčet, odstup shora by byl zbytečný —
+       sekce si ho drží sama. */
+    .oc-cta--samo { margin-top: 0; }
     .oc-cta a { display: inline-flex; align-items: center; gap: 14px; font-family: var(--font-heading);
       font-weight: 800; font-size: clamp(17px, calc(1.8vw / var(--z, 1)), 22px); letter-spacing: -.02em; color: var(--blue);
       padding-bottom: 10px; border-bottom: 2px solid var(--blue);
@@ -243,9 +239,6 @@
       .oc-hero-txt { padding: 108px 0 48px; }
       .oc-cols { grid-template-columns: 1fr; gap: 24px; }
       .oc-team { grid-template-columns: 1fr; gap: 24px; }
-      .oc-list2 { grid-template-columns: 1fr; }
-      .oc-list2 > div:nth-last-child(-n+2) { border-bottom: 1px solid var(--line); }
-      .oc-list2 > div:last-child { border-bottom: 0; }
       .oc-rows li { grid-template-columns: 1fr; gap: 10px; }
       .oc-rows p { grid-column: auto; }
       .oc-shot { justify-self: center; }
@@ -375,41 +368,14 @@
       </div>
     </section>
 
-    <!-- ═══════════ NA ČEM PRACUJEME DÁL ═══════════ -->
+    <!-- ═══════════ ODKAZ NA NOVINKY ═══════════ -->
+    <!-- Dřív tu býval výčet „Co chystáme". Zrušen — plány se měnily rychleji,
+         než se stránka stíhala přepisovat, a totéž je živě na blogu. Zůstal
+         jen odkaz, a míří rovnou na sekci Novinky, ne na začátek blogu. -->
     <section class="oc-sec">
       <div class="oc-in">
-        <div class="oc-head">
-          <h2 class="oc-eh">Co<br>chystáme</h2>
-          <p>Jak nám to jde, hlásíme průběžně — novinky z appky, články i to, co zrovna stavíme.</p>
-        </div>
-        <div class="oc-list2">
-          <div>
-            <h3>Inzerát předvyplněný AI</h3>
-            <p>Firma napíše, koho shání, a zbytek nabídky se doplní sám.</p>
-          </div>
-          <div>
-            <h3>Smlouvy přímo v appce</h3>
-            <p>Dohoda podepsaná v telefonu, než dorazíš na první směnu.</p>
-          </div>
-          <div>
-            <h3>Vlastní HR software</h3>
-            <p>Správa náboru pro firmy na jednom místě, bez tabulek a e-mailů.</p>
-          </div>
-          <div>
-            <h3>Expanze do celé ČR</h3>
-            <p>Začínáme v Brně a Jihomoravském kraji, dál chceme všude.</p>
-          </div>
-          <div>
-            <h3>Bezpečné peníze</h3>
-            <p>Odměna přes prostředníka, ať se obě strany nemusí bát.</p>
-          </div>
-          <div>
-            <h3>Aplikace brzy vychází</h3>
-            <p>Makej finišuje a už brzy ho stáhneš do telefonu.</p>
-          </div>
-        </div>
-        <div class="oc-cta">
-          <a href="/blog">Podívej se na naše novinky
+        <div class="oc-cta oc-cta--samo">
+          <a href="/blog#novinky">Podívej se na naše novinky
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
           </a>
         </div>

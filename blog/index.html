@@ -616,6 +616,11 @@
       window.addEventListener('scroll', podleScrollu, { passive: true });
       window.addEventListener('resize', podleScrollu, { passive: true });
       podleScrollu();
+      // Ještě jednou po `load`: když se sem přijde s kotvou (/blog#novinky
+      // z „O nás"), doskroluje script.js až tady a na samotnou scroll událost
+      // se spolehnout nedá — zvýrazněná by pak zůstala sekce, od které se
+      // odskrolovalo, a menu by tvrdilo něco jiného, než je na obrazovce.
+      window.addEventListener('load', function () { setTimeout(podleScrollu, 60); });
     })();
   </script>
 
