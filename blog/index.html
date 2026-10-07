@@ -36,7 +36,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="/iconify-icons.js?v=3"></script>
+  <script src="/iconify-icons.js?v=4"></script>
   <!-- lokálně a synchronně: přes CDN s async se komponenta upgradovala pozdě a ikony posouvaly layout -->
   <script src="/iconify-icon.min.js?v=3.0.0"></script>
   <link rel="preload" href="/fonts/LeagueSpartan-Variable.woff2" as="font" type="font/woff2" crossorigin />
@@ -140,6 +140,25 @@
     .bs-body h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1rem; line-height: 1.3;
       color: #0a0d2e; margin: 0 0 6px; }
     .bs-body p { font-size: .85rem; line-height: 1.5; color: rgba(10,13,46,.58); margin: 0; }
+
+    /* Sítí přibývá, tak se ukazují jen tři nejnovější a zbytek je pod tlačítkem.
+       Skrývá je rodič, ne karta sama — jedno přepnutí atributu tak odkryje
+       všechny najednou a nemusí se sahat na každou zvlášť. */
+    .bs-grid:not([data-vse]) .bs-skryta { display: none; }
+    .bs-vic { display: flex; align-items: center; justify-content: center; gap: 9px;
+      margin: 18px auto 0; padding: 12px 22px; cursor: pointer;
+      background: #fff; border: 1px solid rgba(10,13,46,.12); border-radius: 999px;
+      font-family: var(--font-heading); font-weight: 700; font-size: .9rem; color: #0a0d2e;
+      transition: border-color .18s, box-shadow .18s, transform .18s; }
+    .bs-vic:hover { border-color: rgba(0,32,246,.32); box-shadow: 0 14px 30px -20px rgba(10,13,46,.5);
+      transform: translateY(-1px); }
+    .bs-vic:active { transform: scale(.98); }
+    .bs-vic iconify-icon { transition: transform .22s ease; color: rgba(10,13,46,.5); }
+    .bs-vic[aria-expanded="true"] iconify-icon { transform: rotate(180deg); }
+    /* Počet schovaných — po rozbalení nemá co říkat, tak zmizí. */
+    .bs-vic-pocet { min-width: 22px; padding: 0 7px; height: 22px; border-radius: 999px;
+      background: rgba(0,32,246,.1); color: #0020f6; font-size: .78rem; line-height: 22px; }
+    .bs-vic[aria-expanded="true"] .bs-vic-pocet { display: none; }
 
     /* 2) novinky — řádky, štítek vlevo, datum vpravo */
     .bn-list { display: flex; flex-direction: column; gap: 10px; }
@@ -255,8 +274,8 @@
 
           <section class="blog-sec" id="socialni-site">
             <div class="blog-sec-h"><h2>Sociální sítě</h2><span>Nejnovější příspěvky</span></div>
-            <div class="bs-grid">
-            <article class="bs-card">
+            <div class="bs-grid" id="bs-grid">
+            
               <a href="https://www.instagram.com/p/DdoozpjDNXC/" target="_blank" rel="noopener">
                 <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-11.jpg" alt="Novinky ze světa práce" loading="lazy" /></div>
                 <div class="bs-body">
@@ -286,7 +305,7 @@
                 </div>
               </a>
             </article>
-            <article class="bs-card">
+            <article class="bs-card bs-skryta">
               <a href="https://www.instagram.com/p/DdCzqy5jNZa/" target="_blank" rel="noopener">
                 <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-8.jpg" alt="Novinky ze světa práce" loading="lazy" /></div>
                 <div class="bs-body">
@@ -296,7 +315,7 @@
                 </div>
               </a>
             </article>
-            <article class="bs-card">
+            <article class="bs-card bs-skryta">
               <a href="https://www.instagram.com/p/DcwCo0hDK-8/" target="_blank" rel="noopener">
                 <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-7.jpg" alt="Novinky ze světa práce" loading="lazy" /></div>
                 <div class="bs-body">
@@ -306,7 +325,7 @@
                 </div>
               </a>
             </article>
-            <article class="bs-card">
+            <article class="bs-card bs-skryta">
               <a href="https://www.instagram.com/p/DcltG34DH6V/" target="_blank" rel="noopener">
                 <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-6.jpg" alt="WTF je hledání práce přes nudné portály v roce 2026" loading="lazy" /></div>
                 <div class="bs-body">
@@ -316,7 +335,7 @@
                 </div>
               </a>
             </article>
-            <article class="bs-card">
+            <article class="bs-card bs-skryta">
               <a href="https://www.instagram.com/p/DcdD6HcjA4A/" target="_blank" rel="noopener">
                 <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-5.jpg" alt="Novinky ze světa práce — postavička s megafonem" loading="lazy" /></div>
                 <div class="bs-body">
@@ -326,7 +345,7 @@
                 </div>
               </a>
             </article>
-            <article class="bs-card">
+            <article class="bs-card bs-skryta">
               <a href="https://www.instagram.com/p/Da-f75SjKc2/" target="_blank" rel="noopener">
                 <div class="bs-media"><span class="bs-ig"><iconify-icon icon="mdi:instagram"></iconify-icon></span><img src="/blog-img/post-1.jpg" alt="Co je Makej?" loading="lazy" /></div>
                 <div class="bs-body">
@@ -337,6 +356,13 @@
               </a>
             </article>
             </div>
+
+            <button type="button" class="bs-vic" id="bs-vic" aria-expanded="false" aria-controls="bs-grid">
+              <span class="bs-vic-text">Zobrazit starší příspěvky</span>
+              <span class="bs-vic-pocet">5</span>
+              <iconify-icon icon="solar:alt-arrow-down-linear" width="18" aria-hidden="true"></iconify-icon>
+            </button>
+
           </section>
 
           <section class="blog-sec" id="novinky">
@@ -606,6 +632,54 @@
         });
       }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
       els.forEach(function (el) { obs.observe(el); });
+    })();
+  </script>
+
+  <script>
+    /* Starší příspěvky ze sítí — rozbalení.
+       Skrývá je CSS přes `.bs-grid:not([data-vse])`, takže stačí přepnout
+       jeden atribut na mřížce. Bez JS zůstanou tři viditelné a tlačítko se
+       schová, aby nenabízelo něco, co nikam nevede. */
+    (function () {
+      var mrizka  = document.getElementById('bs-grid');
+      var tlacitko = document.getElementById('bs-vic');
+      if (!mrizka || !tlacitko) return;
+      var skryte = [].slice.call(mrizka.querySelectorAll('.bs-skryta'));
+      if (!skryte.length) { tlacitko.hidden = true; return; }
+      var popisek = tlacitko.querySelector('.bs-vic-text');
+
+      tlacitko.addEventListener('click', function () {
+        var rozbaleno = mrizka.hasAttribute('data-vse');
+        if (rozbaleno) {
+          mrizka.removeAttribute('data-vse');
+          tlacitko.setAttribute('aria-expanded', 'false');
+          popisek.textContent = 'Zobrazit starší příspěvky';
+          // Po sbalení může být tlačítko nad viewportem — vrátit se k sekci,
+          // ať člověk nekouká doprostřed stránky a nehledá, kam zmizel.
+          var sekce = document.getElementById('socialni-site');
+          if (sekce && sekce.getBoundingClientRect().top < 0) {
+            sekce.scrollIntoView({ block: 'start', behavior: 'smooth' });
+          }
+        } else {
+          mrizka.setAttribute('data-vse', '');
+          tlacitko.setAttribute('aria-expanded', 'true');
+          popisek.textContent = 'Zobrazit méně';
+          // Karty naskakují až když je zahlédne IntersectionObserver výš.
+          // Odkryté jsou do té doby průhledné, tak je ukážeme rovnou —
+          // jinak by po kliknutí na okamžik zůstalo prázdné místo.
+          skryte.forEach(function (k) {
+            k.classList.add('visible');
+            k.style.transitionDelay = '0s';
+            // Ikonka Instagramu se u karty schované přes display:none nevykreslí
+            // ani potom, co se odkryje — komponenta si ji nakreslí při připojení
+            // do stránky a pro neviditelný prvek to přeskočí. Přepsání atributu
+            // ji donutí začít znovu, tentokrát už nad viditelnou kartou.
+            k.querySelectorAll('iconify-icon').forEach(function (ik) {
+              ik.replaceWith(ik.cloneNode(true));
+            });
+          });
+        }
+      });
     })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
