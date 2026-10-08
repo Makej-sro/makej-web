@@ -120,6 +120,33 @@ výš. Udělat to **jednou dávkou**, ne po částech, ať nic nezůstane rozpů
 
 > Anon klíč `sb_publishable_…` se netýká — je veřejný záměrně a chrání ho RLS.
 
+**Zvážit i klíč Resendu** (`resend_api_key` v Supabase Vaultu). Nikde neunikl,
+ale od 8. 10. 2026 je citlivější než dřív: v Google Workspace je výjimka ze
+spamového filtru pro celou doménu `makej.eu` s podmínkou ověření, takže
+kdokoli s tím klíčem dokáže poslat poštu, která projde DKIM jako `@makej.eu`
+a **dorazí všem do doručené pošty bez kontroly**.
+
+---
+
+## 4b · Doručitelnost pošty
+
+Vyřešeno 8. 10. 2026, ale ať se to nerozbije:
+
+- **SPF neprochází zarovnaně.** Obálková doména Resendu je Amazon SES
+  (`54.240.3.11`), ne `send.makej.eu`, takže SPF sice projde, ale nezarovná se
+  na `makej.eu`. **DMARC drží výhradně na DKIM.** Kdyby záznam
+  `resend._domainkey.makej.eu` zmizel nebo se rozbil, DMARC spadne, pošta jde
+  do spamu a zároveň přestane platit výjimka v Gmailu, která ověření vyžaduje.
+- Klíč `resend._domainkey` je **1024bitový** (Google doporučuje 2048). Když
+  Resend nabídne přetočení na 2048, udělat to.
+- DMARC je `v=DMARC1; p=none;` **bez `rua=`** — nechodí žádná hlášení, takže
+  o příští potíži se dozvíme až od příjemce. Doplnit `rua=mailto:…`.
+- E-maily se posílají **jen jako HTML, bez textové verze** (`makej_posli_email`
+  skládá tělo jen s `html`). Chybějící `text/plain` je mírný spamový signál.
+- Doménu poškodila vlna botů (29. 9.–4. 10. 2026, ~90 nevyžádaných uvítacích
+  e-mailů na vykradené adresy). Před hromadnou poštou proto vždy filtrovat
+  `where not podezrele`.
+
 ---
 
 ## 5 · Úklid
