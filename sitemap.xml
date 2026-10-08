@@ -55,6 +55,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://makej.eu/partneri</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://makej.eu/privacy</loc>
     <lastmod>2026-08-25</lastmod>
     <changefreq>yearly</changefreq>
