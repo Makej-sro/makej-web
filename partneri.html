@@ -364,9 +364,11 @@
               <input id="pt-organizace" class="pt-vstup" type="text" placeholder="Organizace" autocomplete="organization" aria-label="Organizace">
             </div>
             <div class="pt-dva">
-              <input id="pt-email" class="pt-vstup" type="email" required placeholder="E-mail" autocomplete="email" aria-label="E-mail">
+              <input id="pt-ico" class="pt-vstup" type="text" placeholder="IČO (nepovinné)" inputmode="numeric" autocomplete="off" aria-label="IČO">
               <input id="pt-telefon" class="pt-vstup" type="tel" placeholder="Telefon (nepovinné)" autocomplete="tel" inputmode="tel" aria-label="Telefon">
             </div>
+            <!-- E-mail přes celou šířku — jediné povinné pole, ať je vidět. -->
+            <input id="pt-email" class="pt-vstup" type="email" required placeholder="E-mail" autocomplete="email" aria-label="E-mail">
 
             <div class="pt-typy" role="group" aria-label="Typ organizace">
               <button type="button" class="pt-typ je" data-typ="firma">Firma</button>
@@ -1269,6 +1271,7 @@
           p_typ:        typ,
           p_zprava:     (document.getElementById('pt-zprava').value || '').trim(),
           p_telefon:    (document.getElementById('pt-telefon').value || '').trim(),
+          p_ico:        (document.getElementById('pt-ico').value || '').trim(),
         }),
       }).then(function (r) {
         if (!r.ok) throw new Error(r.status + ' ' + r.statusText);

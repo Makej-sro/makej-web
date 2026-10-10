@@ -37,6 +37,7 @@ create table if not exists public.partner_zajem (
   organizace text,
   email      text not null,
   telefon    text,                      -- nepovinné, formulář ho nevyžaduje
+  ico        text,                      -- text, ne číslo: může mít vedoucí nulu
   typ        text,                      -- firma | skola | neziskovka | medium
   zprava     text,
   origin     text,
@@ -63,6 +64,7 @@ create table if not exists public.partner_zajem_zahozene (
   email      text,
   organizace text,
   telefon    text,
+  ico        text,
   origin     text,
   ip         text,
   ua         text,
@@ -79,7 +81,8 @@ create or replace function public.partner_zajem_pridat(
   p_email      text default null,
   p_typ        text default null,
   p_zprava     text default null,
-  p_telefon    text default null
+  p_telefon    text default null,
+  p_ico        text default null
 ) returns boolean
 language plpgsql
 security definer
@@ -87,6 +90,8 @@ set search_path to 'public'
 as $function$
 declare
   v_email    text := lower(btrim(coalesce(p_email, '')));
+  -- Z IČO jdou pryč mezery a tečky, které lidi píšou („123 45 678").
+  v_ico      text := nullif(regexp_replace(coalesce(p_ico, ''), '[^0-9]', '', 'g'), '');
   v_hlavicky json;
   v_origin   text;
   v_ip       text;
@@ -114,9 +119,9 @@ begin
   end if;
 
   if not v_ok then
-    insert into public.partner_zajem_zahozene (email, organizace, telefon, origin, ip, ua, duvod)
+    insert into public.partner_zajem_zahozene (email, organizace, telefon, ico, origin, ip, ua, duvod)
     values (v_email, left(btrim(coalesce(p_organizace, '')), 200),
-            left(btrim(coalesce(p_telefon, '')), 40),
+            left(btrim(coalesce(p_telefon, '')), 40), left(v_ico, 20),
             nullif(v_origin, ''), v_ip, v_ua,
             case when coalesce(v_origin, '') = '' then 'bez hlavicky Origin' else 'cizi Origin' end);
     -- Tváříme se jako úspěch, ať bot nepozná, že neprošel, a nepřizpůsobí se.
@@ -125,12 +130,13 @@ begin
 
   -- Délky ořezané schválně: pole na webu limit nemají a do oznámení se to
   -- vypisuje, takže by se tudy dal poslat libovolně dlouhý text.
-  insert into public.partner_zajem (jmeno, organizace, email, telefon, typ, zprava, origin, ip)
+  insert into public.partner_zajem (jmeno, organizace, email, telefon, ico, typ, zprava, origin, ip)
   values (
     nullif(left(btrim(coalesce(p_jmeno, '')), 200), ''),
     nullif(left(btrim(coalesce(p_organizace, '')), 200), ''),
     v_email,
     nullif(left(btrim(coalesce(p_telefon, '')), 40), ''),
+    left(v_ico, 20),
     case when p_typ in ('firma', 'skola', 'neziskovka', 'medium') then p_typ end,
     nullif(left(btrim(coalesce(p_zprava, '')), 4000), ''),
     nullif(v_origin, ''),
@@ -144,8 +150,8 @@ $function$;
 comment on function public.partner_zajem_pridat is
   'Zápis poptávky z /partneri. Filtruje boty podle hlavičky Origin, zahozené loguje.';
 
-revoke all on function public.partner_zajem_pridat(text, text, text, text, text, text) from public;
-grant execute on function public.partner_zajem_pridat(text, text, text, text, text, text) to anon, authenticated;
+revoke all on function public.partner_zajem_pridat(text, text, text, text, text, text, text) from public;
+grant execute on function public.partner_zajem_pridat(text, text, text, text, text, text, text) to anon, authenticated;
 
 -- ── 4 · Oznámení o poptávce ────────────────────────────────────────────────
 -- Obálku dodává `makej_email_html` (migration_email_sablona.sql), odeslání
@@ -181,6 +187,15 @@ as $fn$
           '<tr><td style="padding:0 0 13px;font-size:13px;color:#8a93b2;width:104px;vertical-align:top;">Organizace</td>' ||
             '<td style="padding:0 0 13px;font-size:16px;font-weight:800;color:#0a0d2e;">' ||
             coalesce(p.organizace, '<span style="font-weight:400;color:#8a93b2;">neuvedeno</span>') || '</td></tr>' ||
+          -- IČO je zároveň odkaz do veřejného rejstříku, ať jde firma ověřit na klik.
+          '<tr><td style="padding:0 0 13px;font-size:13px;color:#8a93b2;vertical-align:top;">IČO</td>' ||
+            '<td style="padding:0 0 13px;font-size:15px;">' ||
+            case when p.ico is null
+                 then '<span style="color:#8a93b2;">neuvedeno</span>'
+                 else '<a href="https://or.justice.cz/ias/ui/rejstrik-$firma?ico=' || p.ico ||
+                      '" style="color:#0020f6;font-weight:700;text-decoration:none;">' || p.ico ||
+                      '</a> <span style="color:#8a93b2;font-size:13px;">· rejstřík</span>'
+            end || '</td></tr>' ||
           '<tr><td style="padding:0 0 13px;font-size:13px;color:#8a93b2;vertical-align:top;">Typ</td>' ||
             '<td style="padding:0 0 13px;font-size:15px;color:#0a0d2e;">' ||
             coalesce(p.typ, '<span style="color:#8a93b2;">neuvedeno</span>') || '</td></tr>' ||
