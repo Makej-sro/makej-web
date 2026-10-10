@@ -154,29 +154,7 @@
     .oc-head p { margin: 0 0 12px; max-width: 480px; font-size: clamp(16px, calc(1.5vw / var(--z, 1)), 20px);
       line-height: 1.55; color: var(--txt); text-wrap: pretty; }
 
-    /* ── problémy — číslované řádky oddělené linkami ── */
-    .oc-rows { list-style: none; margin: 0; padding: 0; }
-    .oc-rows li { display: grid; grid-template-columns: 92px 1fr 1fr; gap: clamp(24px, calc(4vw / var(--z, 1)), 56px);
-      align-items: start; padding: clamp(30px, calc(3.6vw / var(--z, 1)), 46px) 0; border-bottom: 1px solid var(--line); }
-    .oc-rows li:last-child { border-bottom: 0; padding-bottom: 0; }
-    .oc-num { font-weight: 900; font-size: clamp(30px, calc(3.4vw / var(--z, 1)), 44px); line-height: 1;
-      letter-spacing: -.04em; color: var(--wm); font-family: var(--font-heading); }
-    .oc-rows h3 { margin: 0; font-weight: 800; font-size: clamp(23px, calc(2.7vw / var(--z, 1)), 34px); line-height: 1.1;
-      letter-spacing: -.03em; text-wrap: balance; }
-    .oc-rows p { margin: 6px 0 0; max-width: 440px; font-size: clamp(15.5px, calc(1.35vw / var(--z, 1)), 18px);
-      line-height: 1.6; color: var(--mut); text-wrap: pretty; }
 
-    /* ── modrý pás s citátem ── */
-    .oc-quote { background: var(--blue); color: #fff; padding: clamp(60px, calc(7vw / var(--z, 1)), 88px) 56px; }
-    .oc-quote-in { display: grid; grid-template-columns: 1.25fr .75fr; gap: clamp(36px, calc(5vw / var(--z, 1)), 72px);
-      align-items: center; max-width: 1280px; margin: 0 auto; }
-    .oc-quote h2 { margin: 0 0 22px; font-weight: 900; font-size: clamp(34px, calc(5vw / var(--z, 1)), 62px); line-height: 1;
-      letter-spacing: -.04em; text-transform: uppercase; text-wrap: balance; }
-    .oc-quote p { margin: 0; max-width: 520px; font-size: 18px; line-height: 1.6; color: rgba(255,255,255,.82); }
-    /* Ikona appky bez rámu — její modrá je shodná s pásem (#0020f6),
-       takže čtverec splyne s pozadím a zůstane vidět jen bílé „M“. */
-    .oc-shot { justify-self: end; display: grid; place-items: center; }
-    .oc-shot img { width: min(100%, 500px); height: auto; display: block; }
 
     /* ── na čem pracujeme — dva sloupce položek oddělených linkami ── */
     /* poslední řádek mřížky (dvě položky) je bez linky — sekci ukončuje až odkaz pod ní */
@@ -231,23 +209,17 @@
     /* ── responsive ── */
     @media (max-width: 1000px) {
       .oc-cols { gap: 26px; }
-      .oc-head, .oc-quote-in { grid-template-columns: 1fr; align-items: start; }
+      /* Nadpis a text vedle sebe se na úzké obrazovce nevejdou — pod sebe.
+         Pravidlo původně platilo i pro `.oc-quote-in` ze zrušené sekce. */
+      .oc-head { grid-template-columns: 1fr; align-items: start; }
       .oc-head p { margin-bottom: 0; }
-      .oc-shot { justify-self: start; }
       .oc-team { grid-template-columns: 1fr 1fr; }
-      /* v jednom sloupci má linku každá položka kromě poslední */
-      .oc-rows li { grid-template-columns: 68px 1fr; }
-      .oc-rows p { grid-column: 2; max-width: none; }
     }
     @media (max-width: 680px) {
-      .oc-sec, .oc-quote { padding-left: 22px; padding-right: 22px; }
       .oc-hero { min-height: calc(92vh / var(--z, 1)); min-height: calc(92svh / var(--z, 1)); }
       .oc-hero-txt { padding: 108px 0 48px; }
       .oc-cols { grid-template-columns: 1fr; gap: 24px; }
       .oc-team { grid-template-columns: 1fr; gap: 24px; }
-      .oc-rows li { grid-template-columns: 1fr; gap: 10px; }
-      .oc-rows p { grid-column: auto; }
-      .oc-shot { justify-self: center; }
     }
   </style>
 </head>
@@ -329,63 +301,11 @@
     })();
     </script>
 
-    <!-- ═══════════ PROČ MAKEJ VZNIKLO ═══════════ -->
-    <section class="oc-sec oc-under-wm">
-      <div class="oc-in">
-        <div class="oc-head">
-          <h2 class="oc-eh">Proč<br>vzniklo</h2>
-          <p>Opakovaně jsme naráželi na stejný problém. Firmy nemohly najít spolehlivé lidi, zatímco spousta lidí — včetně nás — hledala práci nebo brigádu. Existující portály byly zdlouhavé a rychlé spojení obou stran většinou vůbec neumožňovaly.</p>
-        </div>
-        <ol class="oc-rows">
-          <li>
-            <span class="oc-num">01</span>
-            <h3>Desítky roztříštěných portálů</h3>
-            <p>Nabídky rozházené na deseti místech, každé s vlastním účtem a vlastními pravidly.</p>
-          </li>
-          <li>
-            <span class="oc-num">02</span>
-            <h3>Dlouhé životopisy a formuláře</h3>
-            <p>Půl hodiny vyplňování kvůli víkendové brigádě, na kterou stačí umět přijít včas.</p>
-          </li>
-          <li>
-            <span class="oc-num">03</span>
-            <h3>Týdny čekání v nejistotě</h3>
-            <p>Odešleš přihlášku a nevíš, jestli ji vůbec někdo otevřel. Odpověď často nepřijde nikdy.</p>
-          </li>
-          <li>
-            <span class="oc-num">04</span>
-            <h3>Firmy platí desetitisíce za inzerci</h3>
-            <p>A stejně skončí u hromady nerelevantních životopisů, které musí někdo pročíst.</p>
-          </li>
-        </ol>
-        <!-- Dřív tu za „Čemu věříme“ býval výčet „Co chystáme“. Zrušen — plány
-             se měnily rychleji, než se stránka stíhala přepisovat, a totéž je
-             živě na blogu. Zůstal jen odkaz a sedí rovnou sem, pod důvody
-             vzniku: kdo dočte, proč Makej vzniklo, se nejspíš ptá, jak to jde
-             teď. Míří na sekci Novinky, ne na začátek blogu. -->
-        <div class="oc-cta">
-          <a href="/blog#novinky">Podívej se na naše novinky
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══════════ ČEMU VĚŘÍME ═══════════ -->
-    <section class="oc-quote">
-      <div class="oc-quote-in">
-        <div>
-          <h2>Tak snadné jako objednat si jídlo</h2>
-          <p>Tohle je jediná věta, podle které se rozhodujeme, co do Makej přidat a co ne.</p>
-        </div>
-        <div class="oc-shot">
-          <img src="/ikona-makej.svg" alt="Ikona aplikace Makej" loading="lazy" />
-        </div>
-      </div>
-    </section>
-
     <!-- ═══════════ KDO STOJÍ ZA MAKEJ ═══════════ -->
-    <section class="oc-sec">
+    <!-- `oc-under-wm` drží odsazení shora, aby spodní půlka obřího nápisu
+         „Makej“ z hera nekolidovala s nadpisem. Třídu nosila sekce „Proč
+         vzniklo“, která tu byla před touhle; po jejím zrušení patří sem. -->
+    <section class="oc-sec oc-under-wm">
       <div class="oc-in">
         <div class="oc-head">
           <h2 class="oc-eh">Kdo<br>za tím<br>stojí</h2>
@@ -415,6 +335,16 @@
         <div class="oc-kontakt">
           <h3>Kontakt</h3>
           <a href="mailto:podpora@makej.eu">podpora@makej.eu</a>
+        </div>
+
+        <!-- Odkaz na novinky. Visel pod „Proč vzniklo“; ta sekce je zrušená,
+             tak sedí sem na konec stránky — kdo dočte, kdo za Makej stojí,
+             se nejspíš ptá, jak to jde teď. Míří na sekci Novinky, ne na
+             začátek blogu. -->
+        <div class="oc-cta">
+          <a href="/blog#novinky">Podívej se na naše novinky
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+          </a>
         </div>
       </div>
     </section>
